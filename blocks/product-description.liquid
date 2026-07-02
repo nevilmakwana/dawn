@@ -7,115 +7,231 @@
   endif
 %}
 
-<div class="koraa-premium-accordions">
-  <accordion-element>
-    <details open>
-      <summary>Description & Fit</summary>
-      <div class="accordion__content">
+<hm-accordion class="hm-accordions-container">
+  <div class="hm-accordion-item is-open">
+    <button class="hm-accordion-header" aria-expanded="true">
+      <span class="hm-accordion-title">Description & Fit</span>
+      <span class="hm-accordion-icon"></span>
+    </button>
+    <div class="hm-accordion-content-wrapper">
+      <div class="hm-accordion-content">
         {{ product.description | strip_html | newline_to_br }}
       </div>
-    </details>
-  </accordion-element>
+    </div>
+  </div>
 
-  <accordion-element>
-    <details>
-      <summary>Materials</summary>
-      <div class="accordion__content">
+  <div class="hm-accordion-item">
+    <button class="hm-accordion-header" aria-expanded="false">
+      <span class="hm-accordion-title">Materials</span>
+      <span class="hm-accordion-icon"></span>
+    </button>
+    <div class="hm-accordion-content-wrapper">
+      <div class="hm-accordion-content">
         {{ product.metafields.custom.materials | default: "Premium materials selected for exceptional quality, comfort, and durability." }}
       </div>
-    </details>
-  </accordion-element>
+    </div>
+  </div>
 
-  <accordion-element>
-    <details>
-      <summary>Care Guide</summary>
-      <div class="accordion__content">
+  <div class="hm-accordion-item">
+    <button class="hm-accordion-header" aria-expanded="false">
+      <span class="hm-accordion-title">Care Guide</span>
+      <span class="hm-accordion-icon"></span>
+    </button>
+    <div class="hm-accordion-content-wrapper">
+      <div class="hm-accordion-content">
         {{ product.metafields.custom.care_guide | default: "<p>Machine wash cold on a gentle cycle. Do not bleach. Tumble dry low or line dry to preserve fabric integrity. Iron on low heat if necessary.</p>" }}
       </div>
-    </details>
-  </accordion-element>
+    </div>
+  </div>
 
-  <accordion-element>
-    <details>
-      <summary>Delivery & Payment</summary>
-      <div class="accordion__content">
+  <div class="hm-accordion-item">
+    <button class="hm-accordion-header" aria-expanded="false">
+      <span class="hm-accordion-title">Delivery, Payment & Returns</span>
+      <span class="hm-accordion-icon"></span>
+    </button>
+    <div class="hm-accordion-content-wrapper">
+      <div class="hm-accordion-content">
         <p>Free standard delivery on orders over ₹2000. Express shipping options available at checkout.</p>
         <p>30-day hassle-free return policy. Secure payment gateways including UPI, Credit Cards, and Net Banking.</p>
       </div>
-    </details>
-  </accordion-element>
-</div>
+    </div>
+  </div>
+</hm-accordion>
 
 <style>
 /* Base Accordion Container */
-.koraa-premium-accordions {
+.hm-accordions-container {
+  display: block;
   width: 100%;
-  margin-top: 24px;
+  margin-top: 32px;
+  border-top: 1px solid #e5e5e5;
 }
 
 /* Individual Accordion Element */
-.koraa-premium-accordions accordion-element {
-  display: block;
-  border-top: 1px solid #e0e0e0;
+.hm-accordion-item {
+  border-bottom: 1px solid #e5e5e5;
 }
 
-.koraa-premium-accordions accordion-element:last-child {
-  border-bottom: 1px solid #e0e0e0;
-}
-
-/* Summary / Header */
-.koraa-premium-accordions accordion-element details summary {
-  padding: 16px 0;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #111;
-  cursor: pointer;
-  list-style: none; /* Hide default arrow */
+/* Header Button */
+.hm-accordion-header {
+  width: 100%;
+  padding: 18px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Hide default marker in webkit */
-.koraa-premium-accordions accordion-element details summary::-webkit-details-marker {
-  display: none;
+.hm-accordion-title {
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #111;
+  font-family: var(--font-body--family);
 }
 
 /* Custom Plus/Minus Icon */
-.koraa-premium-accordions accordion-element details summary::after {
-  content: '+';
-  font-size: 1.2rem;
-  font-weight: 300;
-  transition: transform 0.3s ease;
+.hm-accordion-icon {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  flex-shrink: 0;
 }
 
-.koraa-premium-accordions accordion-element details[open] summary::after {
-  content: '−';
+.hm-accordion-icon::before,
+.hm-accordion-icon::after {
+  content: '';
+  position: absolute;
+  background-color: #111;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-/* Content Area */
-.koraa-premium-accordions accordion-element .accordion__content {
+/* Horizontal line (-) */
+.hm-accordion-icon::before {
+  width: 12px;
+  height: 1px;
+}
+
+/* Vertical line (|) */
+.hm-accordion-icon::after {
+  width: 1px;
+  height: 12px;
+}
+
+/* Minus state when open */
+.hm-accordion-item.is-open .hm-accordion-icon::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+  opacity: 0;
+}
+
+/* Content Wrapper (for smooth height transition) */
+.hm-accordion-content-wrapper {
+  overflow: hidden;
+  height: 0;
+  transition: height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Inner content padding */
+.hm-accordion-content {
   padding-bottom: 24px;
-  font-size: 0.85rem;
-  line-height: 1.6;
-  color: #555;
-  animation: slideDown 0.3s ease-out;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #444;
+  font-family: var(--font-body--family);
 }
 
-.koraa-premium-accordions accordion-element .accordion__content p {
+.hm-accordion-content p {
+  margin-top: 0;
   margin-bottom: 8px;
 }
-.koraa-premium-accordions accordion-element .accordion__content p:last-child {
+.hm-accordion-content p:last-child {
   margin-bottom: 0;
 }
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 </style>
+
+<script>
+if (!customElements.get('hm-accordion')) {
+  class HmAccordion extends HTMLElement {
+    constructor() {
+      super();
+      this.items = this.querySelectorAll('.hm-accordion-item');
+      this.bindEvents();
+      this.initOpenState();
+    }
+
+    bindEvents() {
+      this.items.forEach(item => {
+        const header = item.querySelector('.hm-accordion-header');
+        header.addEventListener('click', (e) => this.toggleItem(item, e));
+      });
+    }
+
+    initOpenState() {
+      this.items.forEach(item => {
+        if (item.classList.contains('is-open')) {
+          const wrapper = item.querySelector('.hm-accordion-content-wrapper');
+          wrapper.style.height = wrapper.scrollHeight + 'px';
+        }
+      });
+    }
+
+    toggleItem(clickedItem, event) {
+      const wrapper = clickedItem.querySelector('.hm-accordion-content-wrapper');
+      const header = clickedItem.querySelector('.hm-accordion-header');
+      const isOpen = clickedItem.classList.contains('is-open');
+
+      // Record scroll position relative to the clicked header to prevent layout jump
+      const headerRect = header.getBoundingClientRect();
+      const offsetTop = headerRect.top;
+
+      if (isOpen) {
+        // Close it
+        wrapper.style.height = wrapper.scrollHeight + 'px';
+        // trigger reflow
+        wrapper.offsetHeight;
+        wrapper.style.height = '0px';
+        clickedItem.classList.remove('is-open');
+        header.setAttribute('aria-expanded', 'false');
+      } else {
+        // Open it
+        clickedItem.classList.add('is-open');
+        header.setAttribute('aria-expanded', 'true');
+        wrapper.style.height = wrapper.scrollHeight + 'px';
+        
+        // When transition ends, set height to auto in case content resizes
+        wrapper.addEventListener('transitionend', function handler(e) {
+          if (e.propertyName === 'height' && clickedItem.classList.contains('is-open')) {
+            wrapper.style.height = 'auto';
+            wrapper.removeEventListener('transitionend', handler);
+          }
+        });
+      }
+
+      // Maintain scroll position smoothly so it doesn't jump
+      requestAnimationFrame(() => {
+        const newHeaderRect = header.getBoundingClientRect();
+        if (newHeaderRect.top !== offsetTop) {
+          window.scrollBy({
+            top: newHeaderRect.top - offsetTop,
+            behavior: 'instant'
+          });
+        }
+      });
+    }
+  }
+  customElements.define('hm-accordion', HmAccordion);
+}
+</script>
 
 {% schema %}
 {

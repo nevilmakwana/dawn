@@ -14,10 +14,13 @@
     </svg>
   </a>
 
-  <a href="/collections/all" class="mobile-bottom-nav__item" aria-label="Favourites">
-    <svg class="mobile-bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-    </svg>
+  <a href="#" id="openHmFavouritesTrigger" class="mobile-bottom-nav__item" aria-label="Favourites">
+    <div class="mobile-bottom-nav__cart-wrapper">
+      <svg class="mobile-bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
+      <span class="mobile-bottom-nav__badge" id="wishlistBadge" style="display:none;">0</span>
+    </div>
   </a>
 
   <a href="/account" class="mobile-bottom-nav__item {% if template.name == 'customers/account' or template.name == 'customers/login' %}mobile-bottom-nav__item--active{% endif %}" aria-label="Account">
@@ -34,7 +37,7 @@
         <line x1="3" y1="6" x2="21" y2="6"></line>
         <path d="M16 10a4 4 0 0 1-8 0"></path>
       </svg>
-      <span class="mobile-bottom-nav__badge" id="cartBadge" style="display:none;">0</span>
+      <span class="mobile-bottom-nav__badge" id="cartBadge" style="{% if cart.item_count == 0 %}display:none;{% else %}display:flex;{% endif %}">{{ cart.item_count }}</span>
     </div>
   </a>
 </nav>
@@ -42,8 +45,8 @@
 <script>
   // Update cart badge count
   (function() {
-    function updateCartBadge() {
-      fetch('/cart.js')
+    window.updateCartBadge = function() {
+      fetch('/cart.js?t=' + Date.now(), { cache: 'no-store' })
         .then(r => r.json())
         .then(cart => {
           const badge = document.getElementById('cartBadge');
@@ -55,11 +58,34 @@
           }
         }).catch(() => {});
     }
-    if (document.readyState === 'complete') updateCartBadge();
-    else window.addEventListener('load', updateCartBadge);
-  })();
+    
+    // Shopify dynamic cart sync hooks
+    document.addEventListener('cart:update', window.updateCartBadge);
+    document.addEventListener('cart:updated', window.updateCartBadge);
+    document.addEventListener('cart:change', window.updateCartBadge);
+    document.addEventListener('cart:refresh', window.updateCartBadge);
 
-  // Scroll-based reveal for bottom nav (ONLY on homepage)
+    // Global Wishlist Badge Update
+    window.updateWishlistBadge = function() {
+      try {
+        const list = JSON.parse(localStorage.getItem('greyexim_wishlist')) || [];
+        const count = list.length;
+        const bottomBadge = document.getElementById('wishlistBadge');
+        if (bottomBadge) {
+          bottomBadge.textContent = count;
+          bottomBadge.style.display = count > 0 ? 'flex' : 'none';
+        }
+        const headerBadge = document.getElementById('wishlist-header-badge');
+        if (headerBadge) {
+          headerBadge.textContent = count;
+          headerBadge.style.display = count > 0 ? 'flex' : 'none';
+        }
+      } catch(e) {}
+    };
+    
+    if (document.readyState === 'complete') window.updateWishlistBadge();
+    else window.addEventListener('load', window.updateWishlistBadge);
+  })();  // Scroll-based reveal for bottom nav (ONLY on homepage)
   {% if template.name == 'index' %}
   (function() {
     var nav = document.getElementById('mobileBottomNav');

@@ -1,0 +1,389 @@
+<style>
+  /* Full Screen Overlay */
+  .hm-favourites-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: #fff;
+    z-index: 9997; /* Under bottom nav (9998) */
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .hm-favourites-overlay.is-active {
+    transform: translateY(0);
+  }
+
+  /* Header */
+  .hm-favourites-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+    background: #fff;
+    flex-shrink: 0;
+  }
+  
+  .hm-favourites-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    flex: 1;
+  }
+
+  .hm-favourites-close {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    margin-right: -8px;
+    cursor: pointer;
+    display: flex;
+  }
+
+  /* Scrollable Content */
+  .hm-favourites-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 16px 90px;
+    -webkit-overflow-scrolling: touch;
+    background: #fff;
+  }
+
+  /* Grid Layout (2-column on mobile) */
+  .hm-favourites-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 8px;
+  }
+
+  @media screen and (min-width: 768px) {
+    .hm-favourites-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px 16px;
+    }
+  }
+
+  .hm-favourite-card {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: #fff;
+  }
+
+  .hm-favourite-card__image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3/4;
+    background-color: #f4f4f4;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .hm-favourite-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .hm-favourite-card__remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(44, 36, 28, 0.55);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    backdrop-filter: blur(40px) saturate(200%);
+    box-shadow: 
+      0 4px 12px rgba(44, 36, 28, 0.2),
+      0 0 0 0.5px rgba(255,255,255,0.12) inset;
+    border: 0.5px solid rgba(255,255,255,0.15);
+    cursor: pointer;
+    color: #ffffff;
+    transition: all 0.2s ease;
+  }
+  
+  .hm-favourite-card__remove:active {
+    transform: scale(0.92);
+    background: rgba(44, 36, 28, 0.7);
+  }
+
+  .hm-favourite-card__remove svg {
+    width: 20px;
+    height: 20px;
+    stroke: #ffffff;
+    stroke-width: 1.8;
+    fill: #ffffff;
+    transition: all 0.2s ease;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .hm-favourite-card__details {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .hm-favourite-card__title {
+    font-size: 13px;
+    color: #111;
+    margin: 0 0 4px 0;
+    line-height: 1.3;
+    font-weight: 400;
+  }
+
+  .hm-favourite-card__price {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+    margin: 0 0 12px 0;
+  }
+
+  .hm-favourite-card__add-btn {
+    width: 100%;
+    background: #111;
+    color: #fff;
+    border: 1px solid #111;
+    padding: 10px 0;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: auto;
+  }
+
+  .hm-favourite-card__add-btn:active {
+    background: #333;
+    transform: scale(0.98);
+  }
+
+  .hm-favourite-card__add-btn.is-loading {
+    background: #fff;
+    color: #111;
+    pointer-events: none;
+  }
+  
+  .hm-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(17,17,17,0.2);
+    border-top-color: #111;
+    border-radius: 50%;
+    animation: hm-spin 0.8s linear infinite;
+    display: none;
+  }
+  .hm-favourite-card__add-btn.is-loading .hm-spinner {
+    display: block;
+  }
+
+  @keyframes hm-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .hm-favourites-empty {
+    text-align: center;
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    height: 100%;
+    justify-content: center;
+  }
+  .hm-favourites-empty svg {
+    width: 48px;
+    height: 48px;
+    stroke: #999;
+    fill: none;
+  }
+  .hm-favourites-empty p {
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+  }
+  .hm-favourites-empty .hm-btn-shop {
+    margin-top: 16px;
+    background: transparent;
+    color: #111;
+    border: 1px solid #111;
+    padding: 12px 32px;
+    font-size: 13px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 500;
+  }
+</style>
+
+<div class="hm-favourites-overlay" id="hmFavouritesOverlay">
+  <div class="hm-favourites-header">
+    <div style="width:36px;"></div> <!-- spacer -->
+    <h1 class="hm-favourites-title">Favourites</h1>
+    <button class="hm-favourites-close" id="closeHmFavourites" aria-label="Close">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+  
+  <div class="hm-favourites-content">
+    <div id="hmFavouritesContainer" class="hm-favourites-grid">
+      <!-- Products will be rendered here by JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('hmFavouritesOverlay');
+    const container = document.getElementById('hmFavouritesContainer');
+    const closeBtn = document.getElementById('closeHmFavourites');
+
+    // Open overlay handler
+    document.body.addEventListener('click', (e) => {
+      const openBtn = e.target.closest('#openHmFavouritesTrigger');
+      if (openBtn) {
+        e.preventDefault();
+        renderFavourites();
+        overlay.classList.add('is-active');
+        document.body.style.overflow = 'hidden'; // prevent background scrolling
+      }
+    });
+
+    // Close overlay handler
+    closeBtn.addEventListener('click', () => {
+      overlay.classList.remove('is-active');
+      document.body.style.overflow = '';
+    });
+
+    function getWishlistData() {
+      try { return JSON.parse(localStorage.getItem('greyexim_wishlist')) || []; }
+      catch(e) { return []; }
+    }
+
+    function removeWishlistItemOverlay(id) {
+      let list = getWishlistData();
+      list = list.filter(item => String(item.id) !== String(id));
+      localStorage.setItem('greyexim_wishlist', JSON.stringify(list));
+      
+      if (typeof window.updateWishlistBadge === 'function') window.updateWishlistBadge();
+
+      // Uncheck heart on page if present
+      document.querySelectorAll(`.product-title-wishlist-btn[data-product-id="${id}"]`).forEach(b => {
+        b.classList.remove('is-wishlisted');
+      });
+      
+      renderFavourites();
+    }
+
+    window.hmRemoveFavourite = function(id) {
+      removeWishlistItemOverlay(id);
+    };
+
+    window.hmAddFavouriteToCart = function(btn, variantId) {
+      if (!variantId) return;
+      btn.classList.add('is-loading');
+      
+      const textSpan = btn.querySelector('.btn-text');
+      if(textSpan) textSpan.textContent = 'Adding';
+
+      let formData = {
+        'items': [{
+          'id': variantId,
+          'quantity': 1
+        }]
+      };
+
+      fetch(window.Shopify.routes.root + 'cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Error adding to cart');
+        return response.json();
+      })
+      .then(data => {
+        // Try to update global cart badge
+        if (typeof window.updateCartBadge === 'function') window.updateCartBadge();
+        else if (typeof updateCartBadge === 'function') updateCartBadge();
+
+        // Redirect directly to the cart page so the user can immediately order
+        window.location.href = window.Shopify.routes.root + 'cart';
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        btn.classList.remove('is-loading');
+        if(textSpan) textSpan.textContent = 'Error';
+      });
+    };
+
+    function renderFavourites() {
+      const items = getWishlistData();
+      
+      if (items.length === 0) {
+        container.classList.remove('hm-favourites-grid');
+        container.innerHTML = `
+          <div class="hm-favourites-empty">
+            <svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <p>SAVE YOUR FAVOURITE ITEMS</p>
+            <p style="font-size: 13px; color: #666; margin-top:-8px;">Want to save the items that you love? Just click on the heart symbol beside the item and it will show up here.</p>
+            <a href="#" onclick="document.getElementById('closeHmFavourites').click(); return false;" class="hm-btn-shop">Shop Now</a>
+          </div>
+        `;
+        return;
+      }
+
+      container.classList.add('hm-favourites-grid');
+      let html = '';
+      items.reverse().forEach(item => {
+        html += `
+          <div class="hm-favourite-card">
+            <div class="hm-favourite-card__image-wrapper">
+              <a href="${item.url}">
+                <img src="${item.image || '//cdn.shopify.com/s/images/themes/product-1.png'}" alt="" class="hm-favourite-card__image" loading="lazy">
+              </a>
+              <button class="hm-favourite-card__remove" onclick="hmRemoveFavourite('${item.id}')" aria-label="Remove">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+              </button>
+            </div>
+            <div class="hm-favourite-card__details">
+              <a href="${item.url}" style="text-decoration:none;">
+                <h3 class="hm-favourite-card__title">${item.title}</h3>
+              </a>
+              <p class="hm-favourite-card__price">${item.price}</p>
+              <button class="hm-favourite-card__add-btn" onclick="hmAddFavouriteToCart(this, '${item.variantId}')">
+                <span class="hm-spinner"></span>
+                <span class="btn-text">Add</span>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+  });
+</script>

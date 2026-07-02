@@ -1,0 +1,179 @@
+<style>
+  /* Mobile Product Header - Individual Glass Buttons */
+  .hm-mobile-product-header {
+    display: none;
+  }
+
+  @media screen and (max-width: 989px) {
+    .hm-mobile-product-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: max(12px, env(safe-area-inset-top)) 16px 12px 16px;
+      /* Transparent header background so image shows under */
+      background-color: transparent; 
+      pointer-events: none; /* Let touches pass through the empty space */
+    }
+
+    .hm-mobile-product-header .header-left,
+    .hm-mobile-product-header .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      pointer-events: auto; /* Re-enable touches for buttons */
+    }
+
+    .hm-mobile-header-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px !important;
+      height: 42px !important;
+      border-radius: 50%;
+      /* Individual round button dark glass effect */
+      background: rgba(44, 36, 28, 0.55) !important;
+      -webkit-backdrop-filter: blur(40px) saturate(200%);
+      backdrop-filter: blur(40px) saturate(200%);
+      box-shadow: 
+        0 4px 12px rgba(44, 36, 28, 0.2),
+        0 0 0 0.5px rgba(255,255,255,0.12) inset;
+      border: 0.5px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      color: #ffffff;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-sizing: border-box !important;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.2s ease;
+      position: relative;
+      /* Stop conflicting JS animations from custom-koraa.css on the button itself */
+      animation: none !important;
+      transform: none !important;
+    }
+
+    .hm-mobile-header-btn:active {
+      transform: scale(0.92) !important;
+      background: rgba(44, 36, 28, 0.7) !important;
+    }
+
+    .hm-mobile-header-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: rgba(255, 255, 255, 0.85);
+      stroke-width: 1.8;
+      fill: none !important;
+      transition: all 0.2s ease;
+      transform-origin: center;
+    }
+
+    /* Wishlisted state */
+    .hm-mobile-header-btn.is-wishlisted svg.product-wishlist-icon {
+      fill: #ffffff !important;
+      stroke: #ffffff !important;
+      /* Smooth popup spring animation */
+      animation: smooth-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    @keyframes smooth-pop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.35); }
+      100% { transform: scale(1); }
+    }
+  }
+</style>
+
+{%- assign current_product = product -%}
+
+<div class="hm-mobile-product-header">
+  <div class="header-left">
+    <button type="button" class="hm-mobile-header-btn" id="hm-back-btn" aria-label="Go Back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+    </button>
+  </div>
+  <div class="header-right">
+    <button type="button" class="hm-mobile-header-btn" id="hm-share-btn" aria-label="Share">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+        <polyline points="16 6 12 2 8 6"></polyline>
+        <line x1="12" y1="2" x2="12" y2="15"></line>
+      </svg>
+    </button>
+    <button
+      type="button"
+      class="hm-mobile-header-btn product-title-wishlist-btn"
+      id="hm-wishlist-btn"
+      data-product-id="{{ current_product.id }}"
+      data-variant-id="{{ current_product.selected_or_first_available_variant.id }}"
+      data-product-url="{{ current_product.url }}"
+      data-product-title="{{ current_product.title | escape }}"
+      data-product-image="{{ current_product.featured_image | image_url: width: 200 }}"
+      data-product-price="{{ current_product.price | money }}"
+      aria-label="Add to Wishlist"
+    >
+      <svg class="product-wishlist-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // Back Button
+    var backBtn = document.getElementById('hm-back-btn');
+    if (backBtn) {
+      backBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          window.location.href = '/';
+        }
+      });
+    }
+
+    // Share Button
+    var shareBtn = document.getElementById('hm-share-btn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var shareData = {
+          title: document.title,
+          url: window.location.href
+        };
+
+        if (navigator.share) {
+          navigator.share(shareData).catch(function(err) {
+            console.log('Error sharing:', err);
+          });
+        } else {
+          // Fallback for HTTP / Local IPs where navigator.share and navigator.clipboard are undefined
+          var textArea = document.createElement('textarea');
+          textArea.value = window.location.href;
+          textArea.style.position = 'fixed';
+          textArea.style.opacity = '0';
+          document.body.appendChild(textArea);
+          textArea.select();
+          try {
+            document.execCommand('copy');
+            alert('Link copied to clipboard!');
+          } catch(err) {
+            alert('Could not copy link automatically.');
+          }
+          document.body.removeChild(textArea);
+        }
+      });
+    }
+  })();
+</script>

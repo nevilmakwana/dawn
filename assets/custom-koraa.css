@@ -82,6 +82,33 @@ body::-webkit-scrollbar {
 @media screen and (max-width: 749px) {
   .header {
     padding-block: var(--custom-header-padding-mobile) !important;
+    min-height: 0 !important;
+  }
+  
+  /* Reset minimum heights and paddings of icons so header can shrink completely */
+  .header__icon,
+  .header-actions__action,
+  .dropdown-localization__button,
+  .menu-drawer-button,
+  .header__drawer {
+    --header-drawer-min-height: 0px !important;
+    padding-block: 0 !important;
+    padding-inline: 8px !important; /* Keep a little gap between icons */
+    margin-block: 0 !important;
+    min-height: unset !important;
+    height: auto !important;
+  }
+  
+  .header-actions__action .svg-wrapper,
+  .header__icon .svg-wrapper,
+  .header__icon svg {
+    height: 24px !important;
+    width: 24px !important;
+  }
+  
+  /* Ensure the grid column gaps don't artificially inflate height */
+  .header__columns {
+    align-items: center !important;
   }
 }
 
@@ -1211,7 +1238,7 @@ footer .section-background {
   font-weight: 500 !important;
   letter-spacing: -0.02em !important;
   line-height: 1.1 !important;
-  margin-bottom: 8px !important;
+  margin-bottom: 4px !important;
   text-transform: none !important;
   color: var(--koraa-black) !important;
 }
@@ -1265,7 +1292,7 @@ footer .section-background {
   display: flex !important;
   gap: 8px !important;
   flex-wrap: wrap !important;
-  margin-bottom: 24px !important;
+  margin-bottom: 16px !important;
   border: none !important;
   padding: 0 !important;
 }
@@ -1279,7 +1306,7 @@ footer .section-background {
   border: 1px solid var(--koraa-border) !important;
   background: transparent !important;
   color: var(--koraa-text-dark) !important;
-  padding: 12px 16px !important;
+  padding: 10px 14px !important;
   min-width: 48px;
   text-align: center;
   font-size: 0.85rem !important;
@@ -1311,7 +1338,7 @@ footer .section-background {
   background-color: var(--koraa-black) !important;
   color: var(--koraa-white) !important;
   border: none !important;
-  padding: 16px 24px !important;
+  padding: 14px 24px !important;
   font-size: 0.85rem !important;
   font-weight: 500 !important;
   letter-spacing: 0.1em !important;
@@ -1319,7 +1346,7 @@ footer .section-background {
   border-radius: 2px !important;
   cursor: pointer !important;
   transition: background-color 0.3s ease, transform 0.1s ease !important;
-  margin-bottom: 12px !important;
+  margin-bottom: 8px !important;
   height: auto !important;
   min-height: 52px !important;
   display: flex !important;
@@ -1341,7 +1368,7 @@ footer .section-background {
 
 /* Hide extra padding on quantity box if any */
 .product-details quantity-selector {
-  margin-bottom: 24px !important;
+  margin-bottom: 16px !important;
 }
 
 /* =============================================
@@ -1355,20 +1382,20 @@ footer .section-background {
 
 /* Accordion wrapper */
 .product-details .accordion {
-  border-top: 1px solid #000 !important;
+  border-top: none !important;
   padding: 0 !important;
   margin: 0 !important;
 }
 
 /* Each accordion row */
 .product-details accordion-custom {
-  border-bottom: 1px solid #000 !important;
+  border-bottom: none !important;
   display: block !important;
 }
 
 /* Summary / Header row */
 .product-details .details__header {
-  padding: 20px 0 !important;
+  padding: 12px 0 !important;
   font-size: 12px !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
@@ -2049,17 +2076,20 @@ div[data-rating] {
     min-width: 49vw !important;
   }
 
-  /* Product details column - H&M style with adjusted values */
+  /* Product details column - Simplified Sticky Scroll */
   .product-information__grid.product-information__grid--half .product-details {
     grid-column: 3 / 4 !important;
-    width: 460px !important;
-    max-width: 460px !important;
+    width: 550px !important;
+    max-width: 550px !important;
     margin: 0 auto !important;
-    padding-top: 24px !important;
-    padding-bottom: 32px !important;
-    padding-left: 16px !important;
-    padding-right: 0 !important;
+    padding-top: 0px !important;
+    padding-bottom: 24px !important;
     box-sizing: border-box !important;
+    /* Advanced Smooth Sliding Sticky Scroll */
+    position: sticky !important;
+    align-self: start !important;
+    /* Slides up smoothly to reveal content when accordion opens */
+    top: min(calc(var(--header-group-height, 120px) + 0px), calc(100vh - var(--elem-height, 2000px) - 24px)) !important;
   }
 
   /* Ensure media gallery extends full width within its column */
@@ -2171,4 +2201,771 @@ div[data-rating] {
   font-size: 11px !important;
   text-transform: uppercase !important;
   border: none !important;
+}
+
+/* =============================================
+   H&M-Style Wishlist Heart Icon on Product Title
+   ============================================= */
+.product-title-wishlist-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.product-title-wishlist-row__title {
+  flex: 1;
+  min-width: 0;
+}
+
+.product-title-wishlist-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  margin-top: 4px;
+  border-radius: 50%;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+.product-title-wishlist-btn:hover {
+  transform: scale(1.15);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.product-title-wishlist-btn:active {
+  transform: scale(0.92);
+}
+
+.product-wishlist-icon {
+  width: 22px;
+  height: 22px;
+  color: #222;
+  fill: none;
+  transition: color 0.3s ease, fill 0.3s ease, transform 0.3s ease;
+}
+
+/* ---- Wishlisted (filled) state ---- */
+.product-title-wishlist-btn.is-wishlisted .product-wishlist-icon {
+  fill: #e74c3c;
+  color: #e74c3c;
+}
+
+/* ---- Pop/bounce animation when adding ---- */
+.product-title-wishlist-btn.is-animating {
+  animation: wishlist-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes wishlist-pop {
+  0%   { transform: scale(1); }
+  15%  { transform: scale(0.7); }
+  40%  { transform: scale(1.3); }
+  60%  { transform: scale(0.95); }
+  80%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* ---- Shrink animation when removing ---- */
+.product-title-wishlist-btn.is-removing {
+  animation: wishlist-remove 0.35s ease;
+}
+
+@keyframes wishlist-remove {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(0.75); }
+  100% { transform: scale(1); }
+}
+
+/* ---- Particle burst (tiny hearts/circles) ---- */
+.wishlist-particle {
+  position: fixed;
+  width: 5px;
+  height: 5px;
+  background: #e74c3c;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  animation: wishlist-particle-burst 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+.wishlist-particle:nth-child(odd) {
+  background: #ff6b81;
+  width: 4px;
+  height: 4px;
+}
+
+.wishlist-particle:nth-child(3n) {
+  background: #222;
+  width: 3px;
+  height: 3px;
+}
+
+@keyframes wishlist-particle-burst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty)) scale(0);
+  }
+}
+
+/* ---- Toast notification ---- */
+.wishlist-toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #222;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+              opacity 0.4s ease;
+}
+
+.wishlist-toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.wishlist-toast__icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.wishlist-toast__text {
+  white-space: nowrap;
+}
+
+/* Mobile adjustments */
+@media screen and (max-width: 749px) {
+  .product-wishlist-icon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .product-title-wishlist-btn {
+    margin-top: 2px;
+  }
+  
+  .wishlist-toast {
+    bottom: 80px; /* Above mobile bottom nav */
+    font-size: 12px;
+    padding: 10px 20px;
+  }
+
+  /* =========================================
+     H&M Mobile Product Slide & Title Overrides
+     ========================================= */
+
+  /* 1. Edge-to-Edge Image Gallery */
+  body.template-product .section.product-information,
+  body.template-product .page-width {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  body.template-product .product-information__grid {
+    gap: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  body.template-product .product-information__media {
+    width: 100vw !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100vw !important;
+    border-radius: 0 !important;
+  }
+  
+  body.template-product .product-information__media img {
+    border-radius: 0 !important;
+  }
+
+  /* Hide the desktop grid gallery on mobile so it doesn't show extra photos below the slider */
+  body.template-product .media-gallery__grid {
+    display: none !important;
+  }
+
+  /* Title and Price section padding */
+  body.template-product .product-details {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    margin-top: 0px !important; /* Reset margin to prevent title clipping */
+    padding-top: 8px !important; /* Add some breathing space below image gallery */
+  }
+
+  /* ===== H&M COMPACT SPACING — Override Shopify's spacing-style variables ===== */
+
+  /* Reset the group-block (title+price container) — no excess gap */
+  body.template-product .product-details .group-block,
+  body.template-product .group-block {
+    --padding-block-start: 0px !important;
+    --padding-block-end: 0px !important;
+    padding-block-start: 0px !important; /* Force override inline padding */
+    padding-block-end: 0px !important;
+  }
+  body.template-product .group-block-content {
+    gap: 2px !important;
+  }
+
+  /* price block inside the group */
+  body.template-product .group-block product-price.spacing-style {
+    --padding-block-start: 0px !important;
+    --padding-block-end: 0px !important;
+    padding-block-start: 0px !important;
+    padding-block-end: 0px !important;
+  }
+
+  /* Tax note "MRP inclusive of all taxes" — reduce its size and margin */
+  body.template-product .tax-note {
+    margin-top: 1px !important;
+    font-size: 11px !important;
+    color: #888 !important;
+    display: block !important;
+  }
+
+  /* 
+   * The gap from price→color section comes from product-price's inner div margin.
+   */
+  body.template-product product-price > div {
+    margin-bottom: 0 !important;
+    gap: 3px !important;
+  }
+
+  /* All blocks AFTER the group (variant-picker, buy-buttons) — uniform 14px top padding */
+  body.template-product .product-details > .spacing-style:not(.group-block) {
+    --padding-block-start: 14px !important;
+    --padding-block-end: 0px !important;
+    padding-block-start: 14px !important;
+    padding-block-end: 0px !important;
+    margin-block: 0 !important;
+  }
+
+  /* Variant options fieldset — consistent with rest */
+  body.template-product fieldset.variant-option {
+    padding-block-end: 0 !important;
+    margin-block: 0 !important;
+  }
+
+  /* Make variant titles bold and black */
+  body.template-product fieldset.variant-option legend {
+    font-weight: 700 !important;
+    font-size: 11px !important;
+    color: #000 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 8px !important;
+  }
+
+  body.template-product fieldset.variant-option legend span,
+  body.template-product fieldset.variant-option .variant-option__value {
+    font-weight: 700 !important;
+    color: #000 !important;
+  }
+
+  /* Clean Size/Variant Buttons */
+  body.template-product fieldset.variant-option input + label {
+    padding: 16px 20px !important;
+    font-size: 13px !important;
+    border: 1px solid #d0d0d0 !important;
+    border-radius: 0 !important; /* Sharp corners */
+    background: #fff !important;
+    color: #000 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+  }
+  
+  body.template-product fieldset.variant-option input:checked + label {
+    background: #000 !important;
+    color: #fff !important;
+    border-color: #000 !important;
+  }
+
+  /* Fix for Accordions overflowing and hiding below recommended section */
+  @media screen and (max-width: 989px) {
+    body.template-product .group-block-content {
+      height: auto !important;
+    }
+    
+    /* H&M Style: Hide the default global header on mobile product pages */
+    body.template-product #header-group {
+      display: none !important;
+    }
+  }
+
+  /* Buy buttons block gap (between quantity + add to cart) */
+  body.template-product .buy-buttons-block {
+    --padding-block-start: 2px !important;
+    padding-block-start: 2px !important;
+    gap: 2px !important;
+    margin-block: 0 !important;
+  }
+
+  /* Full-width Add to Cart button */
+  body.template-product .product-form__submit {
+    width: 100% !important;
+    background-color: #000 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 18px 0 !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+  }
+
+  /* Hide the quantity selector completely on mobile */
+  body.template-product .quantity-selector-wrapper,
+  body.template-product .quantity-wrapper,
+  body.template-product quantity-input,
+  body.template-product [class*="quantity"] {
+    display: none !important;
+  }
+
+  /* Remove bottom padding from variant section */
+  body.template-product variant-picker.spacing-style {
+    --padding-block-end: 0px !important;
+    padding-block-end: 0px !important;
+  }
+
+  /* ================================================================ */
+
+  /* Hide Desktop Wishlist Button */
+  .product-title-wishlist-row .product-title-wishlist-btn {
+    display: none !important;
+  }
+
+  /* 2. Wishlist Icon Placement (Top Right of Image) */
+  media-gallery {
+    position: relative !important;
+    display: block !important;
+  }
+
+  .wishlist-btn-mobile-slider {
+    display: none !important;
+  }
+
+  /* 3. H&M Square Pagination Dots (Bottom Left) */
+  .product-media-gallery__slideshow .slideshow__control {
+    display: none !important;
+  }
+
+  .slideshow-controls[controls-on-media] {
+    position: absolute !important;
+    bottom: 24px !important;
+    left: 16px !important;
+    width: auto !important;
+    z-index: 10 !important;
+  }
+
+  .slideshow-controls__dots {
+    padding: 0 !important;
+    gap: 4px !important;
+  }
+
+  .slideshow-controls__dots button {
+    width: 6px !important;
+    height: 6px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  .slideshow-controls__dots button::after {
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    box-shadow: inset 0 0 0 1px #222 !important;
+    width: 6px !important;
+    height: 6px !important;
+    margin: 0 !important;
+  }
+
+  .slideshow-controls__dots button[aria-selected='true']::after {
+    background-color: #222 !important;
+    box-shadow: none !important;
+  }
+
+  /* 4. Product Title & Price Typography */
+  .product-title-wishlist-row__title {
+    width: 100% !important;
+  }
+
+  .product-title-wishlist-row__title a,
+  .product-title-wishlist-row__title p {
+    text-transform: uppercase !important;
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    letter-spacing: 0.5px !important;
+    color: #000 !important;
+    margin: 0 !important;
+  }
+  
+  .price {
+    margin-top: 2px !important;
+  }
+
+  .price-item--regular,
+  .price-item--sale {
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    color: #000 !important;
+  }
+}
+
+/* Hide Mobile Wishlist Button on Desktop */
+@media screen and (min-width: 750px) {
+  .wishlist-btn-mobile-slider {
+    display: none !important;
+  }
+}
+
+/* =============================================
+   Wishlist Drawer (Cart-Style Sidebar)
+   ============================================= */
+
+/* Header Badge - Matching Cart Bubble Style */
+.wishlist-header-badge {
+  position: absolute;
+  top: 4.5px;
+  right: 2.5px;
+  width: 20px;
+  height: 20px;
+  background: #000;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  pointer-events: none;
+}
+
+/* Wishlist button alignment fix */
+#header-wishlist-btn.action__wishlist {
+  padding: 0 !important;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Overlay */
+.wishlist-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 9998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+  backdrop-filter: blur(2px);
+}
+
+.wishlist-drawer-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Drawer */
+.wishlist-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 420px;
+  max-width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: #fff;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.08);
+}
+
+.wishlist-drawer.is-open {
+  transform: translateX(0);
+}
+
+/* Drawer Header */
+.wishlist-drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.wishlist-drawer__title {
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 0;
+  color: #222;
+}
+
+.wishlist-drawer__count {
+  font-weight: 400;
+  color: #999;
+  font-size: 13px;
+}
+
+.wishlist-drawer__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  color: #222;
+}
+
+.wishlist-drawer__close:hover {
+  background-color: #f0f0f0;
+}
+
+/* Items Container */
+.wishlist-drawer__items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Individual Item */
+.wishlist-drawer__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f5f5f5;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.wishlist-drawer__item:hover {
+  background: #fafafa;
+}
+
+.wishlist-drawer__item-image-link {
+  flex-shrink: 0;
+  display: block;
+  width: 80px;
+  height: 80px;
+  overflow: hidden;
+  background: #f8f8f8;
+}
+
+.wishlist-drawer__item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.wishlist-drawer__item-image-link:hover .wishlist-drawer__item-image {
+  transform: scale(1.05);
+}
+
+.wishlist-drawer__item-info {
+  flex: 1;
+  min-width: 0;
+  padding-top: 4px;
+}
+
+.wishlist-drawer__item-title {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #222;
+  text-decoration: none;
+  line-height: 1.4;
+  margin-bottom: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.wishlist-drawer__item-title:hover {
+  text-decoration: underline;
+}
+
+.wishlist-drawer__item-price {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  font-weight: 400;
+}
+
+.wishlist-drawer__item-remove {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  color: #222;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  margin-top: 0;
+  align-self: center;
+}
+
+.wishlist-drawer__item-remove:hover {
+  background-color: #f0f0f0;
+}
+
+/* Bin icon lid-lift animation on hover - matching cart */
+.wishlist-drawer__item-remove .remove-icon-top {
+  transition: transform 0.2s ease;
+  transform-origin: center 6px;
+}
+
+.wishlist-drawer__item-remove:hover .remove-icon-top {
+  transform: translateY(-1.5px) rotate(-8deg);
+}
+
+.wishlist-drawer__item-remove .remove-icon-bottom {
+  transition: transform 0.15s ease;
+}
+
+.wishlist-drawer__item-remove:hover .remove-icon-bottom {
+  transform: translateY(0.5px);
+}
+
+/* Empty State */
+.wishlist-drawer__empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px 24px;
+  color: #999;
+}
+
+.wishlist-drawer__empty-text {
+  font-size: 14px;
+  color: #999;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.wishlist-drawer__shop-btn {
+  display: inline-block;
+  padding: 12px 32px;
+  background: #222;
+  color: #fff;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 8px;
+}
+
+.wishlist-drawer__shop-btn:hover {
+  background: #444;
+}
+
+/* Footer */
+.wishlist-drawer__footer {
+  display: flex;
+  padding: 16px 24px;
+  border-top: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.wishlist-drawer__clear-btn {
+  width: 100%;
+  padding: 12px;
+  background: none;
+  border: 1px solid #ddd;
+  color: #666;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wishlist-drawer__clear-btn:hover {
+  background: #222;
+  color: #fff;
+  border-color: #222;
+}
+
+/* Mobile */
+@media screen and (max-width: 749px) {
+  .wishlist-drawer {
+    width: 100vw;
+  }
+  
+  .wishlist-drawer__item {
+    padding: 14px 16px;
+  }
+  
+  .wishlist-drawer__header {
+    padding: 16px;
+  }
+  
+  .wishlist-drawer__footer {
+    padding: 12px 16px;
+  }
 }

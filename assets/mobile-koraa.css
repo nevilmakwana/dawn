@@ -175,7 +175,7 @@
     }
 
     body[data-koraa-scroll-state="visible"] .header__row--top {
-      min-height: 44px !important;
+      min-height: unset !important;
       padding-block: 0 !important;
     }
   }
@@ -319,8 +319,8 @@
   position: absolute;
   top: -5px;
   right: -8px;
-  background: #FF3B30;
-  color: white;
+  background: #ffffff;
+  color: #000000;
   font-size: 0.55rem;
   font-weight: 700;
   min-width: 16px;
@@ -330,7 +330,6 @@
   align-items: center;
   justify-content: center;
   padding: 0 4px;
-  border: 1.5px solid rgba(30, 30, 30, 0.65);
 }
 
 /* --- Mobile-First Optimizations --- */

@@ -1,18 +1,165 @@
 
-
 {% if closest.product == blank %}
   {% assign text = 'placeholders.product_title' | t %}
   {% assign product_title = '<p role="heading" aria-level="3">' | append: text | append: '</p>' %}
   {% render 'text', fallback_text: product_title, block: block %}
 {% else %}
   {% assign product_title = '<p role="heading" aria-level="3">' | append: closest.product.title | append: '</p>' %}
-  <a
-    class="contents user-select-text"
-    ref="productTitleLink"
-    href="{{ closest.product.selected_or_first_available_variant.url }}"
-  >
-    {% render 'text', fallback_text: product_title, block: block %}
-  </a>
+  <div class="product-title-wishlist-row">
+    <div class="product-title-wishlist-row__title">
+      <a
+        class="contents user-select-text"
+        ref="productTitleLink"
+        href="{{ closest.product.selected_or_first_available_variant.url }}"
+      >
+        {% render 'text', fallback_text: product_title, block: block %}
+      </a>
+    </div>
+    <button
+      type="button"
+      class="product-title-wishlist-btn"
+      data-product-id="{{ closest.product.id }}"
+      data-variant-id="{{ closest.product.selected_or_first_available_variant.id }}"
+      data-product-url="{{ closest.product.url }}"
+      data-product-title="{{ closest.product.title | escape }}"
+      data-product-image="{{ closest.product.featured_image | image_url: width: 200 }}"
+      data-product-price="{{ closest.product.price | money }}"
+      aria-label="Add to wishlist"
+      id="product-wishlist-btn"
+    >
+      <svg class="product-wishlist-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Wishlist Toast Notification -->
+  <div class="wishlist-toast" id="wishlist-toast">
+    <svg class="wishlist-toast__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#e74c3c" stroke="none">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+    </svg>
+    <span class="wishlist-toast__text" id="wishlist-toast-text">Added to Wishlist</span>
+  </div>
+
+  <script>
+    (function() {
+      const STORAGE_KEY = 'greyexim_wishlist';
+
+      function getWishlist() {
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+        catch(e) { return []; }
+      }
+
+      function saveWishlist(list) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      }
+
+      function isInWishlist(productId) {
+        return getWishlist().some(item => String(item.id) === String(productId));
+      }
+
+      function addToWishlist(data) {
+        const list = getWishlist();
+        if (!list.some(item => String(item.id) === String(data.id))) {
+          list.push(data);
+          saveWishlist(list);
+        }
+      }
+
+      function removeFromWishlist(productId) {
+        const list = getWishlist().filter(item => String(item.id) !== String(productId));
+        saveWishlist(list);
+      }
+
+      function showToast(message) {
+        // Toast notifications are disabled
+        return;
+        const toast = document.getElementById('wishlist-toast');
+        const toastText = document.getElementById('wishlist-toast-text');
+        if (!toast || !toastText) return;
+        toastText.textContent = message;
+        toast.classList.remove('is-visible');
+        // Force reflow
+        void toast.offsetWidth;
+        toast.classList.add('is-visible');
+        setTimeout(() => toast.classList.remove('is-visible'), 2500);
+      }
+
+      function createParticles(btn) {
+        const rect = btn.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        for (let i = 0; i < 6; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'wishlist-particle';
+          const angle = (Math.PI * 2 * i) / 6;
+          const distance = 18 + Math.random() * 12;
+          const tx = Math.cos(angle) * distance;
+          const ty = Math.sin(angle) * distance;
+          particle.style.cssText = `
+            left: ${centerX}px;
+            top: ${centerY}px;
+            --tx: ${tx}px;
+            --ty: ${ty}px;
+          `;
+          document.body.appendChild(particle);
+          setTimeout(() => particle.remove(), 600);
+        }
+      }
+
+      const btns = document.querySelectorAll('.product-title-wishlist-btn');
+      if (!btns.length) return;
+
+      btns.forEach(btn => {
+        const productId = btn.dataset.productId;
+
+        // Set initial state
+        if (isInWishlist(productId)) {
+          btn.classList.add('is-wishlisted');
+        }
+
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          if (isInWishlist(productId)) {
+            // Remove from wishlist
+            removeFromWishlist(productId);
+            // Update all buttons for this product
+            document.querySelectorAll(`.product-title-wishlist-btn[data-product-id="${productId}"]`).forEach(b => {
+              b.classList.remove('is-wishlisted');
+              b.classList.add('is-removing');
+              setTimeout(() => b.classList.remove('is-removing'), 400);
+            });
+            showToast('Removed from Wishlist');
+          } else {
+            // Add to wishlist
+            addToWishlist({
+              id: productId,
+              variantId: btn.dataset.variantId,
+              url: btn.dataset.productUrl,
+              title: btn.dataset.productTitle,
+              image: btn.dataset.productImage,
+              price: btn.dataset.productPrice,
+              addedAt: Date.now()
+            });
+            // Update all buttons for this product
+            document.querySelectorAll(`.product-title-wishlist-btn[data-product-id="${productId}"]`).forEach(b => {
+              b.classList.add('is-wishlisted');
+              b.classList.add('is-animating');
+              createParticles(b);
+              setTimeout(() => b.classList.remove('is-animating'), 600);
+            });
+            showToast('Added to Wishlist ♥');
+          }
+          if (typeof window.updateWishlistBadge === 'function') window.updateWishlistBadge();
+        });
+      });
+
+      if (typeof window.updateWishlistBadge === 'function') window.updateWishlistBadge();
+    })();
+  </script>
 {% endif %}
 
 {% schema %}

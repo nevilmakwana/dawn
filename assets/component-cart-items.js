@@ -86,7 +86,7 @@ class CartItemsComponent extends Component {
       line,
       quantity: 0,
       action: 'clear',
-    });
+    }, { hideSpinner: true });
 
     const cartItemRowToRemove = this.refs.cartItemRows[line - 1];
 
@@ -112,16 +112,17 @@ class CartItemsComponent extends Component {
       return;
     }
 
-    // Add class to the row to trigger the animation
+    // Smoothly animate the row removal for a better UX
     rowsToRemove.forEach((row) => {
       const remove = () => row.remove();
 
       if (prefersReducedMotion()) return remove();
 
+      // Set the height so the CSS animation can transition it to 0 smoothly
       row.style.setProperty('--row-height', `${row.clientHeight}px`);
       row.classList.add('removing');
 
-      // Remove the row after the animation ends
+      // Remove the row from DOM only after the smooth collapse animation ends
       onAnimationEnd(row, remove);
     });
   }
@@ -132,11 +133,15 @@ class CartItemsComponent extends Component {
    * @param {number} config.line - The line.
    * @param {number} config.quantity - The quantity.
    * @param {string} config.action - The action.
+   * @param {Object} options - Additional options.
+   * @param {boolean} [options.hideSpinner=false] - Whether to skip the loading state.
    */
-  updateQuantity(config) {
+  updateQuantity(config, options = {}) {
     const cartPerformaceUpdateMarker = cartPerformance.createStartingMarker(`${config.action}:user-action`);
 
-    this.#disableCartItems();
+    if (!options.hideSpinner) {
+      this.#disableCartItems();
+    }
 
     const { line, quantity } = config;
     const { cartTotal } = this.refs;
@@ -156,7 +161,9 @@ class CartItemsComponent extends Component {
       sections_url: window.location.pathname,
     });
 
-    cartTotal?.shimmer();
+    if (!options.hideSpinner) {
+      cartTotal?.shimmer();
+    }
 
     fetch(`${Theme.routes.cart_change_url}`, fetchConfig('json', { body }))
       .then((response) => {

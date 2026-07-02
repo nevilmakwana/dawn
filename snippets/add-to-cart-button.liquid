@@ -21,7 +21,7 @@
 <add-to-cart-component
   ref="addToCartButtonContainer"
   data-product-variant-media="{{ product_variant_media }}"
-  data-add-to-cart-animation="{{ settings.add_to_cart_animation }}"
+  data-add-to-cart-animation="false"
 >
   <button
     {% if id != blank %}
@@ -31,7 +31,8 @@
     name="add"
     ref="addToCartButton"
     on:click="/handleClick"
-    class="button {{ class }}"
+    class="button {{ class }} add-to-cart-button"
+    style="transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);"
     {% if data_testid %}
       data-testid="{{ data_testid }}"
     {% endif %}
@@ -58,11 +59,12 @@
         </span>
       </span>
     </span>
-    {% comment %} checkmark burst markup {% endcomment %}
-    <span class="add-to-cart__added">
-      <span class="svg-wrapper add-to-cart__added-icon">
-        {{- 'icon-checkmark-burst.svg' | inline_asset_content -}}
-      </span>
+    {% comment %} Simple Apple-style added state {% endcomment %}
+    <span class="add-to-cart__added" style="font-weight: 600; letter-spacing: 0.5px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      ADDED
     </span>
   </button>
 </add-to-cart-component>

@@ -113,10 +113,11 @@
     </div>
   {% endif %}
 
-  <a
-    href="#swym-wishlist"
+  <button
+    type="button"
     class="header-actions__action action__wishlist{% if display_style == 'text' %} header-actions__text-style{% endif %}"
     aria-label="Wishlist"
+    id="header-wishlist-btn"
   >
     <span class="{% if display_style == 'icon' %}hidden{% else %}mobile:hidden{% endif %}">
       Wishlist
@@ -141,7 +142,8 @@
         />
       </svg>
     </span>
-  </a>
+    <span class="wishlist-header-badge" id="wishlist-header-badge" style="display:none;">0</span>
+  </button>
 
   {% if settings.cart_type == 'drawer' and template.name != 'cart' %}
     <script
