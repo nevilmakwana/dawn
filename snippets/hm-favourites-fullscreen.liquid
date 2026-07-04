@@ -376,9 +376,9 @@
             const closeBtn = document.getElementById('closeHmFavourites');
             if (closeBtn) closeBtn.click();
 
-            // If the theme has a Cart Drawer, update sections and open it smoothly
-            const cartDrawer = document.querySelector('cart-drawer-component');
-            if (cartDrawer) {
+            // If the theme has a Cart Drawer configured to auto-open, dispatch the event
+            const autoOpenDrawer = document.querySelector('cart-drawer-component[auto-open]');
+            if (autoOpenDrawer) {
               document.dispatchEvent(new CustomEvent('cart:update', {
                 bubbles: true,
                 detail: {
@@ -388,16 +388,8 @@
                   }
                 }
               }));
-              
-              // Wait for DOM to morph and replace the old cart drawer component
-              setTimeout(() => {
-                const freshCartDrawer = document.querySelector('cart-drawer-component');
-                if (freshCartDrawer && typeof freshCartDrawer.open === 'function') {
-                  freshCartDrawer.open();
-                }
-              }, 100);
             } else {
-              // Otherwise, redirect to the cart page if no drawer is found
+              // Otherwise, redirect to the cart page
               window.location.href = window.Shopify.routes.root + 'cart';
             }
           });
