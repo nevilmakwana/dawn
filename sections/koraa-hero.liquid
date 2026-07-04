@@ -375,19 +375,22 @@
 </style>
 
 <script>
-  /* Koraa Carousel — Editor-aware, re-initializable */
-  (function() {
-    function initCarousel(container) {
-      var el = container ? container.querySelector('#koraa-carousel') : document.getElementById('koraa-carousel');
-      if (!el) return;
+  /* Koraa Carousel — Editor-aware, robust initialization */
+  window.initKoraaHeroCarousel = function(container) {
+    var carousels = container ? container.querySelectorAll('.koraa-carousel') : document.querySelectorAll('.koraa-carousel');
+    
+    carousels.forEach(function(el) {
+      if (el.dataset.initialized) {
+        if (el._carouselCleanup) el._carouselCleanup();
+      }
+      el.dataset.initialized = 'true';
+      
       var slides = el.querySelectorAll('.koraa-carousel__slide');
       var dots = el.querySelectorAll('.koraa-carousel__dot');
 
       var speed = parseInt(el.dataset.speed, 10) * 1000 || 5000;
-      var effect = el.dataset.effect || 'crossfade';
       var autoplay = el.dataset.autoplay === 'true';
       var current = 0, busy = false, timer = null;
-      var isEditorMode = window.Shopify && window.Shopify.designMode;
 
       // Find which slide is currently active (from Liquid)
       slides.forEach(function(s, i) {
@@ -400,7 +403,13 @@
           var videos = s.querySelectorAll('video');
           videos.forEach(function(v) {
             if (idx === activeIndex) {
-              v.play().catch(function() {});
+              var playPromise = v.play();
+              if (playPromise !== undefined) {
+                playPromise.catch(function(error) {
+                  // Autoplay might be blocked by browser, it's fine
+                  console.log('Video play prevented:', error);
+                });
+              }
             } else {
               v.pause();
               v.currentTime = 0;
@@ -470,41 +479,48 @@
       
       // Ensure the initial active slide's video starts playing
       handleSlideVideos(current);
-    }
+    });
+  };
 
-    // Initialize on page load
-    initCarousel();
+  // Initialize on page load
+  window.initKoraaHeroCarousel();
 
-    // ===== SHOPIFY THEME EDITOR EVENTS =====
+  // ===== SHOPIFY THEME EDITOR EVENTS =====
+  if (!window.koraaHeroEditorListenersAdded) {
+    window.koraaHeroEditorListenersAdded = true;
 
-    // Re-initialize when section is loaded/re-rendered (image upload, setting change)
+    // Re-initialize when section is loaded/re-rendered
     document.addEventListener('shopify:section:load', function(e) {
-      initCarousel(e.target);
+      if (e.target.querySelector('.koraa-carousel')) {
+        window.initKoraaHeroCarousel(e.target);
+      }
     });
 
     // Show selected slide in editor
     document.addEventListener('shopify:block:select', function(e) {
-      var carousel = document.getElementById('koraa-carousel');
-      if (!carousel || !carousel.contains(e.target)) return;
-
-      var slides = carousel.querySelectorAll('.koraa-carousel__slide');
-      for (var i = 0; i < slides.length; i++) {
-        if (slides[i] === e.target || slides[i].contains(e.target)) {
-          if (carousel._carouselCleanup) carousel._carouselCleanup();
-          if (carousel._carouselShowSlide) carousel._carouselShowSlide(i);
-          break;
+      var carousels = document.querySelectorAll('.koraa-carousel');
+      carousels.forEach(function(carousel) {
+        if (!carousel.contains(e.target)) return;
+        var slides = carousel.querySelectorAll('.koraa-carousel__slide');
+        for (var i = 0; i < slides.length; i++) {
+          if (slides[i] === e.target || slides[i].contains(e.target)) {
+            if (carousel._carouselCleanup) carousel._carouselCleanup();
+            if (carousel._carouselShowSlide) carousel._carouselShowSlide(i);
+            break;
+          }
         }
-      }
+      });
     });
 
     // Resume autoplay when block deselected
     document.addEventListener('shopify:block:deselect', function(e) {
-      var carousel = document.getElementById('koraa-carousel');
-      if (!carousel || !carousel.contains(e.target)) return;
-      // Re-initialize to resume autoplay
-      initCarousel();
+      var carousels = document.querySelectorAll('.koraa-carousel');
+      carousels.forEach(function(carousel) {
+        if (!carousel.contains(e.target)) return;
+        window.initKoraaHeroCarousel(carousel.parentElement);
+      });
     });
-  })();
+  }
 </script>
 
 {% schema %}

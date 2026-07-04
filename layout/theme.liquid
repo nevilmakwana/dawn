@@ -86,6 +86,23 @@
       body.koraa-scroll-ready .header__row--top {
         transition: border-bottom-color 0.35s ease !important;
       }
+      /* Temporarily hide common cookie consent banners */
+      #shopify-pc__banner, 
+      .cc-window, 
+      .cc-banner, 
+      .cookie-banner, 
+      #cookie-banner, 
+      .gdpr-cookie-message, 
+      #gdpr-cookie-message, 
+      .shopify-privacy-banner, 
+      .pc-bannerContainer,
+      .cookie-consent,
+      #cookie-consent {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
       {% endif %}
     </style>
     {%- render 'fonts' -%}

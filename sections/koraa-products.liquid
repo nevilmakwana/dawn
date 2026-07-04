@@ -75,7 +75,20 @@
         {%- assign product_count = product_count | plus: 1 -%}
         <div class="koraa-product-card">
           <a href="{{ product.url }}" style="text-decoration: none; color: inherit; display: block; width: 100%; height: 100%;">
-            <div class="koraa-product-card__image-wrapper">
+            <div class="koraa-product-card__image-wrapper" style="position: relative;">
+              {% assign is_best_seller = false %}
+              {% for tag in product.tags %}
+                {% assign lower_tag = tag | strip | downcase %}
+                {% if lower_tag == 'best seller' or lower_tag == 'bestseller' or lower_tag == 'best-seller' or lower_tag == 'best_seller' %}
+                  {% assign is_best_seller = true %}
+                  {% break %}
+                {% endif %}
+              {% endfor %}
+              
+              {% if is_best_seller %}
+                <div class="koraa-product-card__badge-bestseller" style="position: absolute; top: 12px; left: 12px; background: #000; color: #fff; font-size: 10px; font-weight: 600; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; z-index: 2; letter-spacing: 0.5px;">Best Seller</div>
+              {% endif %}
+
               {% if product.featured_image %}
                 <img
                   class="koraa-product-card__image"
