@@ -388,9 +388,14 @@
                   }
                 }
               }));
-              if (typeof cartDrawer.open === 'function') {
-                cartDrawer.open();
-              }
+              
+              // Wait for DOM to morph and replace the old cart drawer component
+              setTimeout(() => {
+                const freshCartDrawer = document.querySelector('cart-drawer-component');
+                if (freshCartDrawer && typeof freshCartDrawer.open === 'function') {
+                  freshCartDrawer.open();
+                }
+              }, 100);
             } else {
               // Otherwise, redirect to the cart page if no drawer is found
               window.location.href = window.Shopify.routes.root + 'cart';
