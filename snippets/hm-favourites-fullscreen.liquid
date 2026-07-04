@@ -404,6 +404,24 @@
       closeBtn.click();
     });
 
+    // Intercept clicks on product links during select mode
+    container.addEventListener('click', (e) => {
+      if (window.isSelectMode) {
+        const link = e.target.closest('a');
+        if (link) {
+          e.preventDefault(); // Stop navigation to product page
+          const card = link.closest('.hm-favourite-card');
+          if (card) {
+            const checkbox = card.querySelector('.hm-favourite-checkbox');
+            if (checkbox) {
+              checkbox.checked = !checkbox.checked;
+              window.updateFavouritesSelectedCount();
+            }
+          }
+        }
+      }
+    });
+
     window.isSelectMode = false;
     window.toggleFavouritesSelectMode = function() {
       window.isSelectMode = !window.isSelectMode;
