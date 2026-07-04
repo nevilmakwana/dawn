@@ -291,32 +291,54 @@
   .hm-favourites-select-mode-btn {
     background: transparent;
     border: none;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 12px;
+    font-weight: 400;
     text-transform: uppercase;
-    color: #111;
+    color: #666;
+    letter-spacing: 0.5px;
     cursor: pointer;
     padding: 8px;
     margin-left: -8px;
     flex: 0 0 auto;
+    transition: color 0.2s;
+  }
+  .hm-favourites-select-mode-btn:hover {
+    color: #111;
   }
   .hm-favourite-card-checkbox {
     position: absolute;
     top: 8px;
     left: 8px;
     z-index: 2;
-    background: #fff;
-    border-radius: 4px;
-    padding: 4px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     display: none;
   }
   .hm-favourite-checkbox {
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
     cursor: pointer;
     margin: 0;
     display: block;
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: transparent;
+    border: 1px solid #111;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.2s ease;
+  }
+  .hm-favourite-checkbox:checked {
+    background-color: #111;
+  }
+  .hm-favourite-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 8px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg);
   }
   .hm-favourites-grid.is-select-mode .hm-favourite-card-checkbox {
     display: block;
@@ -422,15 +444,20 @@
     }
 
     function removeWishlistItemOverlay(id) {
+      bulkRemoveWishlistItemOverlay([String(id)]);
+    }
+
+    function bulkRemoveWishlistItemOverlay(ids) {
       let list = getWishlistData();
-      list = list.filter(item => String(item.id) !== String(id));
+      list = list.filter(item => !ids.includes(String(item.id)));
       localStorage.setItem('greyexim_wishlist', JSON.stringify(list));
       
       if (typeof window.updateWishlistBadge === 'function') window.updateWishlistBadge();
 
-      // Uncheck heart on page if present
-      document.querySelectorAll(`.product-title-wishlist-btn[data-product-id="${id}"]`).forEach(b => {
-        b.classList.remove('is-wishlisted');
+      ids.forEach(id => {
+        document.querySelectorAll(`.product-title-wishlist-btn[data-product-id="${id}"]`).forEach(b => {
+          b.classList.remove('is-wishlisted');
+        });
       });
       
       renderFavourites();
@@ -440,7 +467,7 @@
       removeWishlistItemOverlay(id);
     };
 
-    window.hmAddFavouriteToCart = function(btn, variantId) {
+    window.hmAddFavouriteToCart = function(btn, variantId, productId) {
       if (!variantId) return;
       btn.classList.add('is-loading');
       
@@ -482,6 +509,8 @@
             // Update the global cart badge if present
             if (typeof window.updateCartBadge === 'function') window.updateCartBadge();
             else if (typeof updateCartBadge === 'function') updateCartBadge();
+            
+            if (productId) removeWishlistItemOverlay(productId);
 
             // If the theme has a Cart Drawer configured to auto-open, dispatch the event
             const autoOpenDrawer = document.querySelector('cart-drawer-component[auto-open]');
@@ -536,6 +565,7 @@
       });
 
       const itemsToAdd = selectedCheckboxes.map(cb => ({ id: cb.value, quantity: 1 }));
+      const productIdsToRemove = selectedCheckboxes.map(cb => cb.dataset.productId);
 
       let formData = {
         'items': itemsToAdd,
@@ -560,6 +590,8 @@
           .then(cartData => {
             if (typeof window.updateCartBadge === 'function') window.updateCartBadge();
             else if (typeof updateCartBadge === 'function') updateCartBadge();
+
+            bulkRemoveWishlistItemOverlay(productIdsToRemove);
 
             const autoOpenDrawer = document.querySelector('cart-drawer-component[auto-open]');
             if (autoOpenDrawer) {
@@ -631,7 +663,7 @@
         html += `
           <div class="hm-favourite-card">
             <div class="hm-favourite-card-checkbox">
-              <input type="checkbox" value="${item.variantId}" class="hm-favourite-checkbox" onchange="window.updateFavouritesSelectedCount()">
+              <input type="checkbox" value="${item.variantId}" data-product-id="${item.id}" class="hm-favourite-checkbox" onchange="window.updateFavouritesSelectedCount()">
             </div>
             <div class="hm-favourite-card__image-wrapper">
               <a href="${item.url}">
@@ -646,7 +678,7 @@
                 <h3 class="hm-favourite-card__title">${item.title}</h3>
               </a>
               <p class="hm-favourite-card__price">${item.price}</p>
-              <button class="hm-favourite-card__add-btn" onclick="hmAddFavouriteToCart(this, '${item.variantId}')">
+              <button class="hm-favourite-card__add-btn" onclick="hmAddFavouriteToCart(this, '${item.variantId}', '${item.id}')">
                 <span class="hm-spinner"></span>
                 <span class="btn-text">Add</span>
               </button>
