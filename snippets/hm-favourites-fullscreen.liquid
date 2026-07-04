@@ -289,14 +289,31 @@
     border-top-color: #fff;
   }
   .hm-favourites-select-mode-btn {
-    background: transparent;
-    border: none;
-    padding: 8px;
-    margin-left: -8px;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(44, 36, 28, 0.55);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    backdrop-filter: blur(40px) saturate(200%);
+    box-shadow: 0 4px 12px rgba(44, 36, 28, 0.2), 0 0 0 0.5px rgba(255,255,255,0.12) inset;
+    border: 0.5px solid rgba(255,255,255,0.15);
+    cursor: pointer;
+    color: #ffffff;
+    padding: 0;
+    margin: 0;
+    transition: all 0.2s ease;
+  }
+  .hm-favourites-select-mode-btn svg {
+    stroke: #ffffff;
+    width: 20px;
+    height: 20px;
+  }
+  .hm-favourites-select-mode-btn:active {
+    transform: scale(0.92);
+    background: rgba(44, 36, 28, 0.7);
   }
   .hm-favourite-card-checkbox {
     position: absolute;
@@ -314,7 +331,7 @@
     appearance: none;
     -webkit-appearance: none;
     background-color: #fff;
-    border: none;
+    border: 1px solid transparent;
     border-radius: 50%;
     position: relative;
     transition: all 0.2s ease;
@@ -339,7 +356,7 @@
 <div class="hm-favourites-overlay" id="hmFavouritesOverlay">
   <div class="hm-favourites-header">
     <button class="hm-favourites-select-mode-btn" id="hmFavouritesSelectModeBtn" onclick="toggleFavouritesSelectMode()" style="display: none;" aria-label="Select">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="9 11 12 14 22 4"></polyline>
         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
       </svg>
@@ -425,12 +442,12 @@
       const footer = document.getElementById('hmFavouritesFooter');
       
       if (window.isSelectMode) {
-        btn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>`;
+        btn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>`;
         container.classList.add('is-select-mode');
         footer.style.display = 'block';
         window.updateFavouritesSelectedCount();
       } else {
-        btn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>`;
+        btn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>`;
         container.classList.remove('is-select-mode');
         footer.style.display = 'none';
         document.querySelectorAll('.hm-favourite-checkbox').forEach(cb => cb.checked = false);
