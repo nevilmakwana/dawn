@@ -64,12 +64,28 @@
   }
 
   .hm-favourites-close {
-    background: transparent;
-    border: none;
-    padding: 8px;
-    margin-right: -8px;
-    cursor: pointer;
     display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(44, 36, 28, 0.05); /* Lighter grey for header */
+    border: 1px solid rgba(0,0,0,0.05);
+    cursor: pointer;
+    color: #111;
+    padding: 0;
+    margin: 0;
+    transition: all 0.2s ease;
+  }
+  .hm-favourites-close:active {
+    transform: scale(0.92);
+    background: rgba(44, 36, 28, 0.1);
+  }
+  .hm-favourites-close svg {
+    stroke: #111;
+    width: 20px;
+    height: 20px;
   }
 
   /* Scrollable Content */
@@ -295,25 +311,22 @@
     width: 38px;
     height: 38px;
     border-radius: 50%;
-    background: rgba(44, 36, 28, 0.55);
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
-    backdrop-filter: blur(40px) saturate(200%);
-    box-shadow: 0 4px 12px rgba(44, 36, 28, 0.2), 0 0 0 0.5px rgba(255,255,255,0.12) inset;
-    border: 0.5px solid rgba(255,255,255,0.15);
+    background: rgba(44, 36, 28, 0.05); /* Lighter grey for header */
+    border: 1px solid rgba(0,0,0,0.05);
     cursor: pointer;
-    color: #ffffff;
+    color: #111;
     padding: 0;
     margin: 0;
     transition: all 0.2s ease;
   }
   .hm-favourites-select-mode-btn svg {
-    stroke: #ffffff;
+    stroke: #111;
     width: 20px;
     height: 20px;
   }
   .hm-favourites-select-mode-btn:active {
     transform: scale(0.92);
-    background: rgba(44, 36, 28, 0.7);
+    background: rgba(44, 36, 28, 0.1);
   }
   .hm-favourite-card-checkbox {
     position: absolute;
@@ -322,30 +335,37 @@
     z-index: 2;
     display: none;
   }
+  .hm-favourite-card-checkbox label {
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+  }
   .hm-favourite-checkbox {
+    display: none !important;
+  }
+  .hm-custom-checkbox {
     width: 24px;
     height: 24px;
-    cursor: pointer;
-    margin: 0;
-    display: block;
-    appearance: none;
-    -webkit-appearance: none;
     background-color: #fff;
-    border: 1px solid transparent;
     border-radius: 50%;
-    position: relative;
-    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border: 1px solid #eee;
+    transition: all 0.2s ease;
   }
-  .hm-favourite-checkbox:checked {
-    background-color: #fff;
+  .hm-favourite-checkbox:checked + .hm-custom-checkbox {
+    border-color: #111;
+  }
+  .hm-favourite-checkbox:checked + .hm-custom-checkbox::after {
+    content: '';
+    width: 14px;
+    height: 10px;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
-    background-size: 14px;
-    background-position: center;
+    background-size: contain;
     background-repeat: no-repeat;
-  }
-  .hm-favourite-checkbox:checked::after {
-    display: none;
+    background-position: center;
   }
   .hm-favourites-grid.is-select-mode .hm-favourite-card-checkbox {
     display: block;
@@ -356,7 +376,7 @@
 <div class="hm-favourites-overlay" id="hmFavouritesOverlay">
   <div class="hm-favourites-header">
     <button class="hm-favourites-select-mode-btn" id="hmFavouritesSelectModeBtn" onclick="toggleFavouritesSelectMode()" style="display: none;" aria-label="Select">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="9 11 12 14 22 4"></polyline>
         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
       </svg>
@@ -442,12 +462,12 @@
       const footer = document.getElementById('hmFavouritesFooter');
       
       if (window.isSelectMode) {
-        btn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>`;
+        btn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>`;
         container.classList.add('is-select-mode');
         footer.style.display = 'block';
         window.updateFavouritesSelectedCount();
       } else {
-        btn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>`;
+        btn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>`;
         container.classList.remove('is-select-mode');
         footer.style.display = 'none';
         document.querySelectorAll('.hm-favourite-checkbox').forEach(cb => cb.checked = false);
@@ -693,7 +713,10 @@
         html += `
           <div class="hm-favourite-card">
             <div class="hm-favourite-card-checkbox">
-              <input type="checkbox" value="${item.variantId}" data-product-id="${item.id}" class="hm-favourite-checkbox" onchange="window.updateFavouritesSelectedCount()">
+              <label>
+                <input type="checkbox" value="${item.variantId}" data-product-id="${item.id}" class="hm-favourite-checkbox" onchange="window.updateFavouritesSelectedCount()">
+                <span class="hm-custom-checkbox"></span>
+              </label>
             </div>
             <div class="hm-favourite-card__image-wrapper">
               <a href="${item.url}">
