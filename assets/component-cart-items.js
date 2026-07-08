@@ -99,17 +99,23 @@ class CartItemsComponent extends Component {
 
     // If the cart item row is the last row, optimistically trigger the cart empty state
     const isEmptyCart = rowsToRemove.length == this.refs.cartItemRows.length;
-    const template = document.getElementById('empty-cart-template-' + this.sectionId);
 
     // Smoothly animate the row removal for a better UX
     rowsToRemove.forEach((row) => {
       const remove = () => {
         row.remove();
-        if (isEmptyCart && template instanceof HTMLTemplateElement) {
-          const clone = document.importNode(template.content, true);
-          startViewTransition(() => {
-            this.replaceChildren(clone);
-          }, [this.isDrawer ? 'empty-cart-drawer' : 'empty-cart-page']);
+        if (isEmptyCart) {
+          // Toggle title visibility
+          document.querySelectorAll('.cart-title__empty').forEach(el => el.classList.remove('hidden'));
+          document.querySelectorAll('.cart-title__populated').forEach(el => el.classList.add('hidden'));
+
+          // Toggle products visibility
+          document.querySelectorAll('.cart-products__empty').forEach(el => el.classList.remove('hidden'));
+          document.querySelectorAll('.cart-products__populated').forEach(el => el.classList.add('hidden'));
+
+          // Add empty state classes to wrappers
+          document.querySelectorAll('.cart-page').forEach(el => el.classList.add('cart-page--empty'));
+          document.querySelectorAll('.cart-drawer').forEach(el => el.classList.add('cart-drawer--empty'));
         }
       };
 

@@ -37,7 +37,7 @@
     style="--product-title-case: uppercase;"
   {% endif %}
 >
-  {% if cart.empty? or force_empty %}
+  <div class="cart-products__empty{% unless cart.empty? or force_empty %} hidden{% endunless %}">
     {%- if shop.customer_accounts_enabled and customer == null -%}
       <p>
         {{ 'actions.log_in_html' | t: link: routes.account_login_url }}
@@ -52,7 +52,9 @@
         {{ 'actions.continue_shopping' | t }}
       </span>
     </a>
-  {%- else -%}
+  </div>
+
+  <div class="cart-products__populated{% if cart.empty? or force_empty %} hidden{% endif %}">
     <span
       class="visually-hidden"
       ref="cartItemCount"
@@ -60,11 +62,13 @@
     >
       {{- cart.item_count -}}
     </span>
+
     <form
       action="{{ routes.cart_url }}"
       class="cart-form"
       id="cart-form"
       method="post"
+      ref="cartForm"
     >
       <div
         class="cart-items spacing-style{% if block_settings.dividers %} cart-items--dividers{% endif %}"
@@ -380,7 +384,7 @@
         </table>
       </div>
     </form>
-  {%- endif -%}
+  </div>
 </div>
 
 {% stylesheet %}

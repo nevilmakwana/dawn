@@ -21,12 +21,13 @@
   {{ block.shopify_attributes }}
 >
   <h1 class="{{ block_settings.type_preset | default: 'h2' }}">
-    {%- if cart.empty? or force_empty -%}
+    <span class="cart-title__empty{% unless cart.empty? or force_empty %} hidden{% endunless %}">
       {{ 'content.your_cart_is_empty' | t }}
-    {%- else -%}
+    </span>
+    <span class="cart-title__populated{% if cart.empty? or force_empty %} hidden{% endif %}">
       {{ block_settings.title }}
       {%- if block_settings.show_count -%}{% render 'cart-bubble' %}{%- endif -%}
-    {%- endif -%}
+    </span>
   </h1>
 </div>
 

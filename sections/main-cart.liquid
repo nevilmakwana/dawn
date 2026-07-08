@@ -7,46 +7,6 @@
 {% endcapture %}
 
 {% capture cart_items_children %}
-  <template id="empty-cart-template-{{ section.id }}">
-    <div class="section-background color-{{ section.settings.color_scheme }}"></div>
-    <div
-      class="section color-{{ section.settings.color_scheme }} section--{{ section.settings.section_width }}"
-    >
-      {%- assign cart_title_preset = 'h2' -%}
-      {%- assign cart_title_alignment = 'left' -%}
-      {%- for block in section.blocks -%}
-        {%- if block.type == '_cart-title' -%}
-          {%- assign cart_title_preset = block.settings.type_preset | default: 'h2' -%}
-          {%- assign cart_title_alignment = block.settings.alignment | default: 'left' -%}
-        {%- endif -%}
-      {%- endfor -%}
-      <div
-        class="cart-page spacing-style cart-page--empty"
-        style="{% render 'spacing-style', settings: section.settings %}"
-      >
-        <div class="cart-page__title">
-          <div class="cart-title spacing-style text-{{ cart_title_alignment }}"><h1 class="{{ cart_title_preset }}">{{ 'content.your_cart_is_empty' | t }}</h1></div>
-        </div>
-        <div class="cart-page__items">
-          <div class="cart-items__wrapper">
-            {%- if shop.customer_accounts_enabled and customer == null -%}
-              <p>
-                {{ 'actions.log_in_html' | t: link: routes.account_login_url }}
-              </p>
-            {%- endif -%}
-            <a class="button cart-items__empty-button" href="{{ settings.empty_cart_button_link | default: routes.all_products_collection_url }}">
-              <span class="button-text">
-                {{ 'actions.continue_shopping' | t }}
-              </span>
-            </a>
-          </div>
-        </div>
-        {{ cart_page_more_blocks_content }}
-      </div>
-    </div>
-  </template>
-
-  {% # theme-check-disable UniqueStaticBlockId %}
   <div class="section-background color-{{ section.settings.color_scheme }}"></div>
   <div
     class="section color-{{ section.settings.color_scheme }} section--{{ section.settings.section_width }}"
