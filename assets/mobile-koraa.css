@@ -390,7 +390,7 @@
   }
 
   .koraa-product-card__image-wrapper {
-    border-radius: 8px;
+    border-radius: 0 !important;
     aspect-ratio: 3/4;
   }
 
