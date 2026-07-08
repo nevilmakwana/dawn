@@ -94,13 +94,24 @@ class CartItemsComponent extends Component {
 
     const rowsToRemove = [
       cartItemRowToRemove,
-      // Get all nested lines of the row to remove
       ...this.refs.cartItemRows.filter((row) => row.dataset.parentKey === cartItemRowToRemove.dataset.key),
     ];
 
+    // If the cart item row is the last row, optimistically trigger the cart empty state
+    const isEmptyCart = rowsToRemove.length == this.refs.cartItemRows.length;
+    const template = document.getElementById('empty-cart-template');
+
     // Smoothly animate the row removal for a better UX
     rowsToRemove.forEach((row) => {
-      const remove = () => row.remove();
+      const remove = () => {
+        row.remove();
+        if (isEmptyCart && template instanceof HTMLTemplateElement) {
+          const clone = document.importNode(template.content, true);
+          startViewTransition(() => {
+            this.replaceChildren(clone);
+          }, [this.isDrawer ? 'empty-cart-drawer' : 'empty-cart-page']);
+        }
+      };
 
       if (prefersReducedMotion()) return remove();
 
