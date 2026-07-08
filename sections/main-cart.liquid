@@ -23,11 +23,9 @@
         {%- content_for 'block', id: 'cart-page-items', type: '_cart-products' %}
       </div>
 
-      {%- unless cart.empty? -%}
-        <div class="cart-page__summary">
+        <div class="cart-page__summary{% if cart.empty? %} hidden{% endif %}">
           {%- content_for 'block', id: 'cart-page-summary', type: '_cart-summary' -%}
         </div>
-      {%- endunless -%}
 
       {{ cart_page_more_blocks_content }}
     </div>

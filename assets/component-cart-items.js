@@ -113,6 +113,9 @@ class CartItemsComponent extends Component {
           document.querySelectorAll('.cart-products__empty').forEach(el => el.classList.remove('hidden'));
           document.querySelectorAll('.cart-products__populated').forEach(el => el.classList.add('hidden'));
 
+          // Hide cart summary (Discount, Estimated total, Checkout)
+          document.querySelectorAll('.cart-page__summary').forEach(el => el.classList.add('hidden'));
+
           // Add empty state classes to wrappers
           document.querySelectorAll('.cart-page').forEach(el => el.classList.add('cart-page--empty'));
           document.querySelectorAll('.cart-drawer').forEach(el => el.classList.add('cart-drawer--empty'));
