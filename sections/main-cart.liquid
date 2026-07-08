@@ -12,12 +12,20 @@
     <div
       class="section color-{{ section.settings.color_scheme }} section--{{ section.settings.section_width }}"
     >
+      {%- assign cart_title_preset = 'h2' -%}
+      {%- assign cart_title_alignment = 'left' -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == '_cart-title' -%}
+          {%- assign cart_title_preset = block.settings.type_preset | default: 'h2' -%}
+          {%- assign cart_title_alignment = block.settings.alignment | default: 'left' -%}
+        {%- endif -%}
+      {%- endfor -%}
       <div
         class="cart-page spacing-style cart-page--empty"
         style="{% render 'spacing-style', settings: section.settings %}"
       >
         <div class="cart-page__title">
-          <div class="cart-title spacing-style text-center"><h1 class="h2">{{ 'content.your_cart_is_empty' | t }}</h1></div>
+          <div class="cart-title spacing-style text-{{ cart_title_alignment }}"><h1 class="{{ cart_title_preset }}">{{ 'content.your_cart_is_empty' | t }}</h1></div>
         </div>
         <div class="cart-page__items">
           <div class="cart-items__wrapper">
