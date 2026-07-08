@@ -7,7 +7,7 @@
 {% endcapture %}
 
 {% capture cart_items_children %}
-  <template id="empty-cart-template">
+  <template id="empty-cart-template-{{ section.id }}">
     <div class="section-background color-{{ section.settings.color_scheme }}"></div>
     <div
       class="section color-{{ section.settings.color_scheme }} section--{{ section.settings.section_width }}"
