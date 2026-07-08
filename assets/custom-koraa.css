@@ -2982,3 +2982,19 @@ div[data-rating] {
     border-radius: 0 !important;
   }
 }
+
+/* Header Badge Desktop Styling - White round, black text */
+@media screen and (min-width: 990px) {
+  .wishlist-header-badge {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  .header-actions__cart-icon .cart-bubble__background {
+    background-color: #ffffff !important;
+  }
+  
+  .header-actions__cart-icon .cart-bubble {
+    color: #000000 !important;
+  }
+}
