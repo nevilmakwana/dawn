@@ -731,16 +731,13 @@
 /* TABS */
 .koraa-search-menu__tabs {
   display: flex;
-  overflow-x: auto;
-  white-space: nowrap;
+  flex-wrap: wrap;
+  justify-content: center;
   padding: 24px 20px 0;
   background: transparent;
   border-bottom: 1px solid #e5e5e5;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
   gap: 12px;
 }
-.koraa-search-menu__tabs::-webkit-scrollbar { display: none; }
 
 .koraa-search-menu__tab {
   background: none;
