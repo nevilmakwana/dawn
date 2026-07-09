@@ -47,16 +47,29 @@
               <a href="{{ link.url }}" class="koraa-search-menu__link">Shop All {{ link.title }}</a>
             </li>
           </ul>
-          {% if link.type == 'collection_link' and link.object.products.size > 0 %}
-            <div class="koraa-search-menu__bestsellers">
-              <h4 class="koraa-search-menu__bestsellers-title">Bestsellers</h4>
-              <div class="koraa-search-menu__bestsellers-grid">
+          
+          <div class="koraa-search-menu__bestsellers">
+            <h4 class="koraa-search-menu__bestsellers-title">Bestsellers</h4>
+            <div class="koraa-search-menu__bestsellers-grid">
+              {% if link.type == 'collection_link' and link.object.products.size > 0 %}
                 {% for product in link.object.products limit: 4 %}
                   {% render 'product-card', product: product, show_vendor: false %}
                 {% endfor %}
-              </div>
+              {% else %}
+                {% for i in (1..4) %}
+                  <div class="product-card">
+                    <div class="product-card__placeholder-image" style="background: #f4f4f4; padding-bottom: 120%; position: relative;">
+                      {{ 'product-' | append: i | placeholder_svg_tag: 'placeholder-svg' }}
+                    </div>
+                    <div class="product-card__content" style="padding-top: 10px;">
+                      <h3 style="font-size: 0.9rem; margin: 0 0 5px;">Example Product</h3>
+                      <p style="margin: 0; font-size: 0.85rem; color: #666;">Rs. 2,999.00</p>
+                    </div>
+                  </div>
+                {% endfor %}
+              {% endif %}
             </div>
-          {% endif %}
+          </div>
         {% endif %}
       </div>
       {% assign first_content_active = true %}
