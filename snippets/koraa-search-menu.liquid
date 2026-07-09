@@ -14,17 +14,24 @@
 
   <!-- Horizontal Tabs -->
   <div class="koraa-search-menu__tabs">
+    {% assign first_tab_active = false %}
     {% for link in linklists['main-menu'].links %}
-      <button class="koraa-search-menu__tab {% if forloop.first %}is-active{% endif %}" data-target="koraa-menu-tab-{{ forloop.index }}">
+      {% assign downcase_title = link.title | downcase %}
+      {% if downcase_title == 'home' %}{% continue %}{% endif %}
+      <button class="koraa-search-menu__tab {% if first_tab_active == false %}is-active{% endif %}" data-target="koraa-menu-tab-{{ forloop.index }}">
         {{ link.title }}
       </button>
+      {% assign first_tab_active = true %}
     {% endfor %}
   </div>
 
   <!-- Tab Contents -->
   <div class="koraa-search-menu__contents">
+    {% assign first_content_active = false %}
     {% for link in linklists['main-menu'].links %}
-      <div class="koraa-search-menu__content {% if forloop.first %}is-active{% endif %}" id="koraa-menu-tab-{{ forloop.index }}">
+      {% assign downcase_title = link.title | downcase %}
+      {% if downcase_title == 'home' %}{% continue %}{% endif %}
+      <div class="koraa-search-menu__content {% if first_content_active == false %}is-active{% endif %}" id="koraa-menu-tab-{{ forloop.index }}">
         {% if link.links != blank %}
           <ul class="koraa-search-menu__list">
             {% for childlink in link.links %}
@@ -42,6 +49,7 @@
           </ul>
         {% endif %}
       </div>
+      {% assign first_content_active = true %}
     {% endfor %}
   </div>
 </div>
