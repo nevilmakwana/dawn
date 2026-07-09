@@ -856,6 +856,200 @@
 
 .koraa-search-menu__bestsellers-grid {
   display: grid;
+.koraa-search-menu__form {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #f5f5f5;
+  border: 1px solid #e5e5e5;
+  border-radius: 999px; /* Pill shape */
+  padding: 8px 14px;
+}
+
+.koraa-search-menu__submit {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  color: #1a1a1a;
+}
+
+.koraa-icon-search {
+  width: 18px;
+  height: 18px;
+  stroke: #1a1a1a;
+}
+
+.koraa-search-menu__input {
+  flex: 1;
+  border: none !important;
+  background: transparent !important;
+  font-size: 1rem;
+  color: #1a1a1a !important;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-body-family);
+  -webkit-appearance: none; /* Removes iOS default styling */
+  appearance: none;
+  border-radius: 0;
+  box-shadow: none !important;
+}
+
+.koraa-search-menu__input::placeholder {
+  color: #767676;
+}
+
+.koraa-search-menu__input::-webkit-search-decoration,
+.koraa-search-menu__input::-webkit-search-cancel-button,
+.koraa-search-menu__input::-webkit-search-results-button,
+.koraa-search-menu__input::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+
+.koraa-search-menu__close {
+  background: none;
+  border: none;
+  padding: 8px 0;
+  color: #1a1a1a;
+  font-size: 0.9rem;
+  font-weight: 400;
+  font-family: var(--font-body-family);
+  text-transform: none;
+  flex-shrink: 0; /* Prevents being cut off */
+  cursor: pointer;
+}
+
+/* TABS */
+.koraa-search-menu__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 24px 10px 0;
+  background: transparent;
+  border-bottom: 1px solid #e5e5e5;
+  gap: 6px;
+}
+
+.koraa-search-menu__tab {
+  background: none;
+  border: none;
+  padding: 0 4px 12px;
+  font-size: 0.75rem;
+  font-family: var(--font-heading-family);
+  letter-spacing: 0.05em;
+  color: #767676;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.3s;
+  flex-shrink: 0;
+}
+
+.koraa-search-menu__tab::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #1a1a1a;
+  transform: scaleX(0);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: center;
+}
+
+.koraa-search-menu__tab.is-active {
+  color: #1a1a1a;
+}
+
+.koraa-search-menu__tab.is-active::after {
+  transform: scaleX(1);
+}
+
+/* CONTENTS */
+.koraa-search-menu__contents {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 24px 100px;
+  background: transparent;
+}
+
+.koraa-search-menu__content {
+  display: none;
+}
+
+.koraa-search-menu__content.is-active {
+  display: block;
+  animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.koraa-search-menu__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.koraa-search-menu__list-item {
+  margin-bottom: 28px;
+}
+
+.koraa-search-menu__link {
+  text-decoration: none;
+  color: #1a1a1a;
+  font-size: 1.15rem;
+  font-family: var(--font-body-family);
+  letter-spacing: 0.03em;
+  font-weight: 400;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.koraa-search-menu__link::after {
+  content: "→";
+  font-family: system-ui;
+  font-size: 1.2rem;
+  opacity: 0.3;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.koraa-search-menu__link:active::after {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+.koraa-search-menu__link.is-highlight {
+  color: #FF5252;
+}
+.koraa-search-menu__link.is-highlight::after {
+  background: #d44d4d;
+}
+
+.koraa-search-menu__bestsellers {
+  padding: 16px 20px 32px;
+  border-top: 1px solid #e5e5e5;
+  margin-top: 16px;
+}
+
+.koraa-search-menu__bestsellers-title {
+  font-family: var(--font-heading-family);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+}
+
+.koraa-search-menu__bestsellers-grid {
+  display: grid;
   grid-template-columns: 1fr 1fr;
   column-gap: 12px;
   row-gap: 24px;
@@ -863,4 +1057,108 @@
 
 .koraa-search-menu__bestsellers-grid product-card {
   --product-card-gap: 8px;
+}
+
+/* --- PRODUCT CARD ACTION ICONS (WISHLIST & CART) --- */
+.product-card__action-icons {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 10;
+  pointer-events: none; /* Let clicks pass through empty space */
+}
+
+.product-card__action-icons > * {
+  pointer-events: auto; /* Enable clicks on the buttons */
+}
+
+/* The wishlist button */
+.product-card-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  color: #111;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.product-card-action-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 1.5px;
+  transition: all 0.2s ease;
+}
+
+.product-card-action-btn:active {
+  transform: scale(0.92);
+  background: #f4f4f4;
+}
+
+.product-card-action-btn.is-wishlisted svg {
+  fill: #e74c3c;
+  stroke: #e74c3c;
+}
+
+/* Quick Add cart button override inside our wrapper */
+.product-card-action-btn-wrapper {
+  /* Override quick-add logic hiding it by default */
+  --quick-add-mobile-display: flex;
+  --quick-add-display: flex;
+  --quick-add-mobile-opacity: 1;
+  opacity: 1;
+}
+
+.product-card-action-btn-wrapper .quick-add__button {
+  position: static !important;
+  display: flex !important;
+  opacity: 1 !important;
+  align-items: center;
+  justify-content: center;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: unset !important;
+  min-height: unset !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  backdrop-filter: blur(8px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  color: #111 !important;
+  padding: 0 !important;
+  transform: none !important;
+  margin: 0 !important;
+  transition: all 0.2s ease !important;
+}
+
+.product-card-action-btn-wrapper .quick-add__button:active {
+  transform: scale(0.92) !important;
+  background: #f4f4f4 !important;
+}
+
+.product-card-action-btn-wrapper .add-to-cart-icon {
+  margin: 0 !important;
+}
+
+.product-card-action-btn-wrapper .add-to-cart-icon svg {
+  width: 18px !important;
+  height: 18px !important;
+  stroke: currentColor;
+}
+
+.product-card-action-btn-wrapper .add-to-cart-text__content {
+  display: none !important; /* Hide text, only show icon */
 }
