@@ -88,16 +88,28 @@
               <div class="koraa-product-card__badge-bestseller" style="position: absolute; top: 12px; left: 12px; background: #000; color: #fff; font-size: 10px; font-weight: 600; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; z-index: 2; letter-spacing: 0.5px;">Best Seller</div>
             {% endif %}
 
-            <a href="{{ product.url }}" ref="productCardLink" style="text-decoration: none; color: inherit; display: block; width: 100%; height: 100%;">
-              {% if product.featured_image %}
-                <img
-                  class="koraa-product-card__image"
-                  src="{{ product.featured_image | image_url: width: 600 }}"
-                  alt="{{ product.title }}"
-                  loading="lazy"
-                >
-              {% endif %}
-            </a>
+            <div class="koraa-card-carousel" data-product-id="{{ product.id }}">
+              <div class="koraa-card-carousel__track">
+                {%- for image in product.images -%}
+                  <a href="{{ product.url }}" class="koraa-card-carousel__slide" draggable="false">
+                    <img
+                      class="koraa-product-card__image"
+                      src="{{ image | image_url: width: 600 }}"
+                      alt="{{ image.alt | default: product.title }}"
+                      loading="lazy"
+                      draggable="false"
+                    >
+                  </a>
+                {%- endfor -%}
+              </div>
+              {%- if product.images.size > 1 -%}
+                <div class="koraa-card-carousel__dots">
+                  {%- for image in product.images -%}
+                    <span class="koraa-card-carousel__dot{% if forloop.first %} is-active{% endif %}" data-index="{{ forloop.index0 }}"></span>
+                  {%- endfor -%}
+                </div>
+              {%- endif -%}
+            </div>
 
             <!-- Floating Action Icons (Outside the Anchor Tag to prevent navigation) -->
             <div class="product-card__action-icons" style="position: absolute; bottom: 8px; right: 8px; display: flex; flex-direction: row; gap: 6px; z-index: 9999;">
@@ -445,6 +457,88 @@
         btn.querySelector('svg').style.fill = '#e74c3c';
         btn.querySelector('svg').style.stroke = '#e74c3c';
       }
+    });
+  });
+
+  /* ── Product Card Image Carousel (Swipe) ── */
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.koraa-card-carousel').forEach(function(carousel) {
+      const track = carousel.querySelector('.koraa-card-carousel__track');
+      const slides = carousel.querySelectorAll('.koraa-card-carousel__slide');
+      const dots = carousel.querySelectorAll('.koraa-card-carousel__dot');
+      if (!track || slides.length <= 1) return;
+
+      let currentIndex = 0;
+      let startX = 0;
+      let currentX = 0;
+      let isDragging = false;
+      let hasSwiped = false;
+      const totalSlides = slides.length;
+      const SWIPE_THRESHOLD = 40;
+
+      function goToSlide(index) {
+        currentIndex = Math.max(0, Math.min(index, totalSlides - 1));
+        track.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
+        dots.forEach(function(dot, i) {
+          dot.classList.toggle('is-active', i === currentIndex);
+        });
+      }
+
+      // Dot click navigation
+      dots.forEach(function(dot) {
+        dot.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          goToSlide(parseInt(dot.dataset.index));
+        });
+      });
+
+      // Touch events
+      track.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+        hasSwiped = false;
+        track.classList.add('is-dragging');
+      }, {passive: true});
+
+      track.addEventListener('touchmove', function(e) {
+        if (!isDragging) return;
+        currentX = e.touches[0].clientX;
+        var diffX = currentX - startX;
+        if (Math.abs(diffX) > 10) hasSwiped = true;
+        var offset = -(currentIndex * 100) + (diffX / carousel.offsetWidth * 100);
+        track.style.transform = 'translateX(' + offset + '%)';
+      }, {passive: true});
+
+      track.addEventListener('touchend', function(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        track.classList.remove('is-dragging');
+        var diffX = currentX - startX;
+        if (Math.abs(diffX) > SWIPE_THRESHOLD) {
+          if (diffX < 0 && currentIndex < totalSlides - 1) {
+            goToSlide(currentIndex + 1);
+          } else if (diffX > 0 && currentIndex > 0) {
+            goToSlide(currentIndex - 1);
+          } else {
+            goToSlide(currentIndex);
+          }
+        } else {
+          goToSlide(currentIndex);
+        }
+        currentX = 0;
+        startX = 0;
+      });
+
+      // Prevent link navigation if user swiped
+      slides.forEach(function(slide) {
+        slide.addEventListener('click', function(e) {
+          if (hasSwiped) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        });
+      });
     });
   });
 </script>
