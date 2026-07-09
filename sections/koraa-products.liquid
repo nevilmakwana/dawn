@@ -73,7 +73,7 @@
           {%- break -%}
         {%- endif -%}
         {%- assign product_count = product_count | plus: 1 -%}
-        <div class="koraa-product-card">
+        <product-card class="koraa-product-card">
           <div class="koraa-product-card__image-wrapper" style="position: relative;">
             {% assign is_best_seller = false %}
             {% for tag in product.tags %}
@@ -88,7 +88,7 @@
               <div class="koraa-product-card__badge-bestseller" style="position: absolute; top: 12px; left: 12px; background: #000; color: #fff; font-size: 10px; font-weight: 600; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; z-index: 2; letter-spacing: 0.5px;">Best Seller</div>
             {% endif %}
 
-            <a href="{{ product.url }}" style="text-decoration: none; color: inherit; display: block; width: 100%; height: 100%;">
+            <a href="{{ product.url }}" ref="productCardLink" style="text-decoration: none; color: inherit; display: block; width: 100%; height: 100%;">
               {% if product.featured_image %}
                 <img
                   class="koraa-product-card__image"
@@ -139,6 +139,11 @@
 
             </div>
 
+            <!-- Hidden quick add component -->
+            <div style="display: none;" class="koraa-hidden-quick-add">
+              {% render 'quick-add', product: product, section_id: section.id %}
+            </div>
+
             <a href="{{ product.url }}" style="text-decoration: none; color: inherit; display: block; width: 100%; height: 100%;">
               <button class="koraa-product-card__quickview" type="button">Quick view</button>
             </a>
@@ -160,7 +165,7 @@
               {% endif %}
             </div>
           </a>
-        </div>
+        </product-card>
       {%- endfor -%}
     </div>
   {% else %}
@@ -412,9 +417,15 @@
     e.preventDefault();
     e.stopPropagation();
     
-    // Find the quick view button on the same card and trigger it
-    const card = e.target.closest('.koraa-product-card');
+    // Find the quick add button and trigger it
+    const card = e.target.closest('product-card');
     if (card) {
+      const quickAddBtn = card.querySelector('quick-add-component .add-to-cart-button');
+      if (quickAddBtn) {
+        quickAddBtn.click();
+        return;
+      }
+      
       const quickViewBtn = card.querySelector('.koraa-product-card__quickview');
       if (quickViewBtn) {
         quickViewBtn.click();
