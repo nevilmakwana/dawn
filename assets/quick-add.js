@@ -20,9 +20,16 @@ export class QuickAddComponent extends Component {
     );
     const productLink = productCard?.getProductCardLink() || hotspotProduct?.getHotspotProductLink();
 
-    if (!productLink?.href) return '';
+    let href = productLink?.href;
+    if (!href) {
+      if (this.dataset.productUrl) {
+        href = this.dataset.productUrl;
+      } else {
+        return '';
+      }
+    }
 
-    const url = new URL(productLink.href);
+    const url = new URL(href, window.location.origin);
 
     if (url.searchParams.has('variant')) {
       return url.toString();
@@ -172,9 +179,7 @@ export class QuickAddComponent extends Component {
     this.#abortController = new AbortController();
 
     try {
-      const separator = productPageUrl.includes('?') ? '&' : '?';
-      const fetchUrl = `${productPageUrl}${separator}section_id=main`;
-      const response = await fetch(fetchUrl, {
+      const response = await fetch(productPageUrl, {
         signal: this.#abortController.signal,
       });
 
