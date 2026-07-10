@@ -172,7 +172,9 @@ export class QuickAddComponent extends Component {
     this.#abortController = new AbortController();
 
     try {
-      const response = await fetch(productPageUrl, {
+      const separator = productPageUrl.includes('?') ? '&' : '?';
+      const fetchUrl = `${productPageUrl}${separator}section_id=main`;
+      const response = await fetch(fetchUrl, {
         signal: this.#abortController.signal,
       });
 
