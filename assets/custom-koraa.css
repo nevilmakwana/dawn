@@ -2607,30 +2607,41 @@ div[data-rating] {
   }
 
   .slideshow-controls__dots {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    list-style: none !important;
+    margin: 10px 0 0 0 !important;
     padding: 0 !important;
-    gap: 4px !important;
+    gap: 6px !important;
+  }
+  
+  .slideshow-controls__dots li {
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
   }
 
   .slideshow-controls__dots button {
-    width: 6px !important;
-    height: 6px !important;
+    font-size: 0 !important;
+    color: transparent !important;
+    width: 8px !important;
+    height: 8px !important;
     margin: 0 !important;
     padding: 0 !important;
-    border-radius: 0 !important;
+    border-radius: 50% !important;
+    border: none !important;
+    background-color: #ccc !important;
+    box-shadow: none !important;
   }
 
   .slideshow-controls__dots button::after {
-    border-radius: 0 !important;
-    background-color: transparent !important;
-    box-shadow: inset 0 0 0 1px #222 !important;
-    width: 6px !important;
-    height: 6px !important;
-    margin: 0 !important;
+    display: none !important;
   }
 
-  .slideshow-controls__dots button[aria-selected='true']::after {
+  .slideshow-controls__dots button[aria-selected='true'] {
     background-color: #222 !important;
-    box-shadow: none !important;
   }
 
   /* 4. Product Title & Price Typography */
