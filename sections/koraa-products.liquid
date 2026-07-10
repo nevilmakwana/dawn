@@ -103,11 +103,6 @@
                       </div>
                     {% endfor %}
                   </div>
-                  <div class="koraa-swipe-dots">
-                    {% for image in product.images limit: 5 %}
-                      <span class="koraa-swipe-dot{% if forloop.first %} active{% endif %}" data-index="{{ forloop.index0 }}"></span>
-                    {% endfor %}
-                  </div>
                 </div>
               {% elsif product.featured_image %}
                 <img
