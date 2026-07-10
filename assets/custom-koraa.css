@@ -3059,3 +3059,94 @@ div[data-rating] {
 }
 
 /* Localization in header on mobile — VISIBLE, positioned by mobile-koraa.css */
+
+/* ================================================================ */
+/* QUICK ADD MODAL UI - MATCH PRODUCT PAGE (Mobile)                 */
+/* ================================================================ */
+@media screen and (max-width: 749px) {
+  /* 1. Hide the grid gallery, we only want the swipe carousel */
+  .quick-add-modal__content .media-gallery__grid {
+    display: none !important;
+  }
+
+  /* 2. Hide Quantity Selector */
+  .quick-add-modal__content quantity-input,
+  .quick-add-modal__content .quantity-selector-wrapper,
+  .quick-add-modal__content .quantity-wrapper {
+    display: none !important;
+  }
+
+  /* 3. Title Typography */
+  .quick-add-modal__content h2.h3 a,
+  .quick-add-modal__content .product__title h2 a,
+  .quick-add-modal__content .product-title-wishlist-row__title a {
+    text-transform: uppercase !important;
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    letter-spacing: 0.5px !important;
+    color: #000 !important;
+    text-decoration: none !important;
+    margin: 0 !important;
+  }
+
+  /* 4. Price Typography */
+  .quick-add-modal__content .price--large .price-item {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #1a1a1a !important;
+  }
+
+  /* 5. Variant Legends */
+  .quick-add-modal__content fieldset.variant-option legend,
+  .quick-add-modal__content .product-form__input .form__label {
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    color: #000 !important;
+    margin-bottom: 12px !important;
+    text-transform: capitalize !important;
+  }
+
+  /* 6. Variant Pills */
+  .quick-add-modal__content fieldset.variant-option input + label,
+  .quick-add-modal__content .product-form__input input[type="radio"] + label {
+    border-radius: 50px !important;
+    font-weight: 400 !important;
+    padding: 8px 16px !important;
+    border: 1px solid #e2e2e2 !important;
+  }
+  .quick-add-modal__content fieldset.variant-option input:checked + label,
+  .quick-add-modal__content .product-form__input input[type="radio"]:checked + label {
+    background-color: #000 !important;
+    color: #fff !important;
+    border-color: #000 !important;
+  }
+
+  /* 7. Buttons (Add to Cart & Buy it Now) */
+  .quick-add-modal__content .product-form__submit,
+  .quick-add-modal__content div[data-shopify="payment-button"] button,
+  .quick-add-modal__content .shopify-payment-button__button,
+  .quick-add-modal__content .shopify-payment-button__button--unbranded {
+    width: 100% !important;
+    background-color: #000 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 18px 0 !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    min-height: auto !important;
+    box-shadow: none !important;
+    margin-bottom: 10px !important;
+  }
+
+  /* 8. Fix spacing */
+  .quick-add-modal__content .product-details {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-top: 0 !important;
+  }
+}
