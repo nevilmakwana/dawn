@@ -932,7 +932,7 @@
     font-weight: 700 !important;
   }
 
-  /* 4. Quantity Selector and Alignment */
+  /* 4. Quantity Selector and Alignment (Custom Theme Classes) */
   #quick-add-modal-content .product-form__quantity,
   #quick-add-modal-content .product-form__input--quantity {
     display: flex !important;
@@ -944,38 +944,36 @@
     padding: 0 !important;
   }
   
+  #quick-add-modal-content .quantity-selector,
+  #quick-add-modal-content .quantity-selector .quantity-minus,
+  #quick-add-modal-content .quantity-selector .quantity-plus,
   #quick-add-modal-content quantity-input,
-  #quick-add-modal-content .quantity,
-  #quick-add-modal-content .quantity-selector-wrapper,
-  #quick-add-modal-content .quantity-wrapper {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    width: 140px !important;
-    min-width: unset !important;
-    --inputs-radius: 0px !important;
-    --inputs-radius-outset: 0px !important;
+  #quick-add-modal-content .quantity {
     border-radius: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    border-start-start-radius: 0 !important;
+    border-end-start-radius: 0 !important;
+    border-start-end-radius: 0 !important;
+    border-end-end-radius: 0 !important;
   }
   
+  #quick-add-modal-content .quantity-selector,
   #quick-add-modal-content quantity-input,
   #quick-add-modal-content .quantity {
     border: 1px solid #000 !important; /* Solid black border for sharp theme look */
     height: 44px !important;
     background: #fff !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 140px !important;
+    min-width: 140px !important;
+    max-width: 140px !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   
-  #quick-add-modal-content .quantity::after,
-  #quick-add-modal-content .quantity::before {
-    border-radius: 0 !important;
-    display: none !important; /* Hide pseudo-element borders if any */
-  }
-  
+  #quick-add-modal-content .quantity-selector :is(.quantity-minus, .quantity-plus),
   #quick-add-modal-content .quantity__button {
-    --inputs-radius: 0px !important;
-    border-radius: 0 !important;
     width: 44px !important;
     height: 100% !important;
     display: flex !important;
@@ -984,8 +982,10 @@
     background: transparent !important;
     border: none !important;
     color: #000 !important;
+    padding: 0 !important;
   }
 
+  #quick-add-modal-content .quantity-selector input[type='number'],
   #quick-add-modal-content .quantity__input {
     width: 50px !important;
     height: 100% !important;
@@ -1082,6 +1082,25 @@
     max-width: 100% !important;
     scroll-snap-align: start !important;
     display: block !important;
+  }
+  
+  /* Force Title Below Carousel on Mobile */
+  .quick-add-modal__content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .quick-add-modal__content .product-information__media {
+    order: 1 !important;
+  }
+  .quick-add-modal__content .product-header {
+    order: 2 !important;
+    display: block !important;
+    padding: 16px 16px 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  .quick-add-modal__content .product-details {
+    order: 3 !important;
   }
 }
 </style>
