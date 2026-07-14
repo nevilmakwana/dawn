@@ -926,6 +926,7 @@
 
   /* 4. Quantity Selector */
   #quick-add-modal-content quantity-input,
+  #quick-add-modal-content .quantity,
   #quick-add-modal-content .quantity-selector-wrapper,
   #quick-add-modal-content .quantity-wrapper {
     display: inline-flex !important;
@@ -933,11 +934,17 @@
     justify-content: flex-start !important;
     width: auto !important;
     min-width: 120px !important;
+    border-radius: 0 !important;
   }
-  #quick-add-modal-content quantity-input {
+  #quick-add-modal-content quantity-input,
+  #quick-add-modal-content .quantity {
     border: 1px solid #e2e2e2 !important;
     border-radius: 0 !important; /* Sharp corners for quantity */
     height: 44px !important;
+  }
+  #quick-add-modal-content .quantity::after,
+  #quick-add-modal-content .quantity::before {
+    border-radius: 0 !important;
   }
   
   /* 5. Action Buttons (Theme UI Sharp) */
@@ -960,22 +967,30 @@
     align-items: center !important;
     justify-content: center !important;
   }
+  #quick-add-modal-content .product-form__submit::after,
+  #quick-add-modal-content .product-form__submit::before,
+  #quick-add-modal-content .shopify-payment-button__button::after,
+  #quick-add-modal-content .shopify-payment-button__button::before {
+    border-radius: 0 !important;
+  }
   
   /* Add to Cart */
   #quick-add-modal-content button.product-form__submit,
   #quick-add-modal-content .product-form__submit {
-    background-color: #000 !important;
-    color: #fff !important;
+    background-color: #fff !important;
+    color: #000 !important;
     border: 1px solid #000 !important;
+    border-radius: 0 !important;
   }
 
   /* Buy it Now */
   #quick-add-modal-content div[data-shopify="payment-button"] button,
   #quick-add-modal-content .shopify-payment-button__button,
   #quick-add-modal-content .shopify-payment-button__button--unbranded {
-    background-color: #000 !important;
-    color: #fff !important;
+    background-color: #fff !important;
+    color: #000 !important;
     border: 1px solid #000 !important;
+    border-radius: 0 !important;
     font-size: 0 !important; /* Hide original text */
   }
   #quick-add-modal-content div[data-shopify="payment-button"] button::after,
@@ -983,6 +998,7 @@
   #quick-add-modal-content .shopify-payment-button__button--unbranded::after {
     content: "BUY NOW" !important;
     font-size: 14px !important;
+    color: #000 !important;
   }
 
   /* 6. Carousel Fix */
