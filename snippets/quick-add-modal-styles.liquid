@@ -704,6 +704,33 @@
     display: block !important;
   }
 
+  /* Restore Carousel Dots */
+  .quick-add-modal__content .slideshow-controls__dots button.button {
+    width: 8px !important;
+    height: 8px !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 4px !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .quick-add-modal__content .slideshow-controls__dots button.button::after {
+    content: '' !important;
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    background-color: #000 !important;
+    opacity: 0.2 !important;
+    display: block !important;
+  }
+  .quick-add-modal__content .slideshow-controls__dots button.button[aria-selected='true']::after {
+    opacity: 1 !important;
+  }
+
   /* ── 4. PRODUCT TITLE + PRICE (JS-created .product-header) ── */
   .quick-add-modal__content .product-header {
     order: 2 !important;
