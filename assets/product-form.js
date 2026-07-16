@@ -281,6 +281,11 @@ class ProductFormComponent extends Component {
 
   /** @param {Event} event */
   handleSubmit(event) {
+    if (event.submitter?.name === 'return_to' && event.submitter?.value === '/checkout') {
+      // Allow native form submission for instant checkout redirect (Buy Now button)
+      return;
+    }
+
     event.preventDefault();
 
     if (this.#variantChangeInProgress) {

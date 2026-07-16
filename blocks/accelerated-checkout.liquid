@@ -20,7 +20,9 @@
 
 {% capture accelerated_checkout_button %}
   {% if product != blank and form_obj != blank %}
-    {{ form_obj | payment_button }}
+    <button type="submit" name="return_to" value="/checkout" class="shopify-payment-button__button shopify-payment-button__button--unbranded">
+      BUY NOW
+    </button>
   {% endif %}
 {% endcapture %}
 
