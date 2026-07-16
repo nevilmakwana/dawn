@@ -84,30 +84,16 @@
 
       <button
         class="button quick-add__button quick-add__button--choose add-to-cart-button"
-        {% comment %} type="submit" is the default, so we explicitly set it to "button" to prevent the ProductFormComponent.handleSubmit from being triggered {% endcomment %}
         type="button"
         name="add"
         on:click="quick-add-component/handleClick"
+        style="display: flex !important; align-items: center; justify-content: center; width: 26px !important; height: 26px !important; min-width: 0 !important; min-height: 0 !important; border-radius: 50% !important; background: rgba(255, 255, 255, 0.95) !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important; border: none !important; color: #111 !important; padding: 0 !important; cursor: pointer; opacity: 1 !important; visibility: visible !important;"
       >
-        <span
-          class="add-to-cart-text"
-        >
-          {% comment %} split the icon and the text with a grid transition {% endcomment %}
-          <span
-            aria-hidden="true"
-            class="svg-wrapper add-to-cart-icon"
-          >
-            {{- 'icon-add-to-cart.svg' | inline_asset_content -}}
-          </span>
-          <span class="add-to-cart-text__content is-visually-hidden-mobile">
-            <span>
-              {% comment %} use a double-nested span to bake the padding into the text {% endcomment %}
-              <span>
-                {{ choose_options_text }}
-              </span>
-            </span>
-          </span>
-        </span>
+        <svg style="width: 14px; height: 14px; stroke: currentColor; stroke-width: 1.5px; fill: none; margin: 0;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
       </button>
     {%- endform -%}
   </product-form-component>
