@@ -31,14 +31,15 @@ export class QuickAddComponent extends Component {
 
     const url = new URL(href, window.location.origin);
 
-    if (!url.searchParams.has('variant')) {
-      const selectedVariantId = this.#getSelectedVariantId();
-      if (selectedVariantId) {
-        url.searchParams.set('variant', selectedVariantId);
-      }
+    if (url.searchParams.has('variant')) {
+      return url.toString();
     }
 
-    url.searchParams.set('section_id', 'product-information');
+    const selectedVariantId = this.#getSelectedVariantId();
+    if (selectedVariantId) {
+      url.searchParams.set('variant', selectedVariantId);
+    }
+
     return url.toString();
   }
 
@@ -51,9 +52,6 @@ export class QuickAddComponent extends Component {
     return productCard?.getSelectedVariantId() || null;
   }
 
-  /** @type {IntersectionObserver | null} */
-  #observer = null;
-
   connectedCallback() {
     super.connectedCallback();
 
@@ -62,18 +60,6 @@ export class QuickAddComponent extends Component {
       signal: this.#cartUpdateAbortController.signal,
     });
     document.addEventListener(ThemeEvents.variantSelected, this.#updateQuickAddButtonState.bind(this));
-    
-    this.addEventListener('mouseenter', this.#prefetchContent.bind(this), { passive: true });
-    this.addEventListener('touchstart', this.#prefetchContent.bind(this), { passive: true });
-
-    // Preload when scrolled into view (especially for mobile) to ensure zero lag
-    this.#observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        this.#prefetchContent();
-        this.#observer?.disconnect(); // Only fetch once
-      }
-    }, { rootMargin: '200px 0px' });
-    this.#observer.observe(this);
   }
 
   disconnectedCallback() {
@@ -83,26 +69,7 @@ export class QuickAddComponent extends Component {
     this.#abortController?.abort();
     this.#cartUpdateAbortController.abort();
     document.removeEventListener(ThemeEvents.variantSelected, this.#updateQuickAddButtonState.bind(this));
-    
-    this.removeEventListener('mouseenter', this.#prefetchContent.bind(this));
-    this.removeEventListener('touchstart', this.#prefetchContent.bind(this));
-    
-    this.#observer?.disconnect();
   }
-
-  #prefetchContent = () => {
-    const currentUrl = this.productPageUrl;
-    if (!this.#cachedContent.has(currentUrl)) {
-      this.fetchProductPage(currentUrl).then((html) => {
-        if (html && !this.#cachedContent.has(currentUrl)) {
-          const gridElement = html.querySelector('[data-product-grid-content]');
-          if (gridElement) {
-            this.#cachedContent.set(currentUrl, gridElement.cloneNode(true));
-          }
-        }
-      });
-    }
-  };
 
   /**
    * Clears the cached content when cart is updated
@@ -135,23 +102,7 @@ export class QuickAddComponent extends Component {
     // Check if we have cached content for this URL
     let productGrid = this.#cachedContent.get(currentUrl);
 
-    // Open modal immediately for instant perceived performance and smooth animation
-    this.#openQuickAddModal();
-
     if (!productGrid) {
-      const modalContent = document.getElementById('quick-add-modal-content');
-      if (modalContent) {
-        modalContent.innerHTML = `
-          <div style="display: flex; justify-content: center; align-items: center; height: 400px; width: 100%;">
-            <div class="loading-overlay__spinner">
-              <svg aria-hidden="true" focusable="false" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
-                <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
-              </svg>
-            </div>
-          </div>
-        `;
-      }
-
       // Fetch and cache the content
       const html = await this.fetchProductPage(currentUrl);
       if (html) {
@@ -170,6 +121,8 @@ export class QuickAddComponent extends Component {
       await this.updateQuickAddModal(freshContent);
       this.#updateVariantPicker(productGrid);
     }
+
+    this.#openQuickAddModal();
   };
 
   #resetScroll() {
@@ -213,9 +166,6 @@ export class QuickAddComponent extends Component {
     dialogComponent.closeDialog();
   };
 
-  /** @type {Map<string, Promise<Document | null>>} */
-  #fetchPromises = new Map();
-
   /**
    * Fetches the product page content
    * @param {string} productPageUrl - The URL of the product page to fetch
@@ -224,42 +174,32 @@ export class QuickAddComponent extends Component {
   async fetchProductPage(productPageUrl) {
     if (!productPageUrl) return null;
 
-    if (this.#fetchPromises.has(productPageUrl)) {
-      return this.#fetchPromises.get(productPageUrl);
-    }
-
     // We use this to abort the previous fetch request if it's still pending.
     this.#abortController?.abort();
     this.#abortController = new AbortController();
 
-    const fetchPromise = (async () => {
-      try {
-        const response = await fetch(productPageUrl, {
-          signal: this.#abortController.signal,
-        });
+    try {
+      const response = await fetch(productPageUrl, {
+        signal: this.#abortController.signal,
+      });
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch product page: HTTP error ${response.status}`);
-        }
-
-        const responseText = await response.text();
-        const html = new DOMParser().parseFromString(responseText, 'text/html');
-
-        return html;
-      } catch (error) {
-        if (error.name === 'AbortError') {
-          return null;
-        } else {
-          throw error;
-        }
-      } finally {
-        this.#abortController = null;
-        this.#fetchPromises.delete(productPageUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch product page: HTTP error ${response.status}`);
       }
-    })();
-    
-    this.#fetchPromises.set(productPageUrl, fetchPromise);
-    return fetchPromise;
+
+      const responseText = await response.text();
+      const html = new DOMParser().parseFromString(responseText, 'text/html');
+
+      return html;
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        return null;
+      } else {
+        throw error;
+      }
+    } finally {
+      this.#abortController = null;
+    }
   }
 
   /**
