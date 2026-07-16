@@ -705,29 +705,33 @@
   }
 
   /* Restore Carousel Dots */
+  .quick-add-modal__content .slideshow-controls__dots {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 12px 0 !important;
+  }
   .quick-add-modal__content .slideshow-controls__dots button.button {
     width: 8px !important;
     height: 8px !important;
-    min-height: 0 !important;
+    min-width: 8px !important;
+    min-height: 8px !important;
     padding: 0 !important;
-    margin: 0 4px !important;
+    margin: 0 !important;
     border-radius: 50% !important;
-    background: transparent !important;
+    background: #000 !important;
     border: none !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .quick-add-modal__content .slideshow-controls__dots button.button::after {
-    content: '' !important;
-    width: 8px !important;
-    height: 8px !important;
-    border-radius: 50% !important;
-    background-color: #000 !important;
     opacity: 0.2 !important;
     display: block !important;
+    flex: 0 0 8px !important;
   }
-  .quick-add-modal__content .slideshow-controls__dots button.button[aria-selected='true']::after {
+  .quick-add-modal__content .slideshow-controls__dots button.button::after,
+  .quick-add-modal__content .slideshow-controls__dots button.button::before {
+    display: none !important;
+  }
+  .quick-add-modal__content .slideshow-controls__dots button.button[aria-selected='true'] {
     opacity: 1 !important;
   }
 
