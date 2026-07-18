@@ -142,6 +142,7 @@
   const closeBtn = document.getElementById('accountDrawerClose');
 
   function openDrawer() {
+    if (typeof window.closeWishlistDrawer === 'function') window.closeWishlistDrawer();
     drawer.classList.add('is-open');
     overlay.classList.add('is-open');
     document.body.style.overflow = 'hidden';

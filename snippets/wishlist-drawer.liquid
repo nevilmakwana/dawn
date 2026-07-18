@@ -232,6 +232,7 @@
     overlay.addEventListener('click', closeDrawer);
 
     function openDrawer() {
+      if (typeof window.closeAccountDrawer === 'function') window.closeAccountDrawer();
       renderWishlistItems();
       drawer.classList.add('is-active');
       overlay.classList.add('is-active');
@@ -243,6 +244,7 @@
       overlay.classList.remove('is-active');
       document.body.style.overflow = '';
     }
+    window.closeWishlistDrawer = closeDrawer;
 
     function getWishlistData() {
       try { return JSON.parse(localStorage.getItem('greyexim_wishlist')) || []; }
