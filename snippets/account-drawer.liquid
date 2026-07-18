@@ -142,6 +142,8 @@
   const closeBtn = document.getElementById('accountDrawerClose');
 
   function openDrawer() {
+    // Close ALL other drawers/overlays first
+    if (typeof window.closeHmFavourites === 'function') window.closeHmFavourites();
     if (typeof window.closeWishlistDrawer === 'function') window.closeWishlistDrawer();
     drawer.classList.add('is-open');
     overlay.classList.add('is-open');

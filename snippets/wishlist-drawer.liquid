@@ -233,6 +233,7 @@
 
     function openDrawer() {
       if (typeof window.closeAccountDrawer === 'function') window.closeAccountDrawer();
+      if (typeof window.closeHmFavourites === 'function') window.closeHmFavourites();
       renderWishlistItems();
       drawer.classList.add('is-active');
       overlay.classList.add('is-active');

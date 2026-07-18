@@ -425,29 +425,38 @@
     const container = document.getElementById('hmFavouritesContainer');
     const closeBtn = document.getElementById('closeHmFavourites');
 
+    // Reusable close function
+    function closeFavourites() {
+      overlay.classList.remove('is-active');
+      backdrop.classList.remove('is-active');
+      document.body.style.overflow = '';
+      if (window.isSelectMode) window.toggleFavouritesSelectMode();
+    }
+    // Expose globally so other drawers can close this
+    window.closeHmFavourites = closeFavourites;
+
     // Open overlay handler
     document.body.addEventListener('click', (e) => {
       const openBtn = e.target.closest('#openHmFavouritesTrigger, #header-wishlist-btn');
       if (openBtn) {
         e.preventDefault();
+        // Close account drawer if open
+        if (typeof window.closeAccountDrawer === 'function') window.closeAccountDrawer();
+        // Close wishlist side-drawer if open
+        if (typeof window.closeWishlistDrawer === 'function') window.closeWishlistDrawer();
         renderFavourites();
         overlay.classList.add('is-active');
         backdrop.classList.add('is-active');
-        document.body.style.overflow = 'hidden'; // prevent background scrolling
+        document.body.style.overflow = 'hidden';
       }
     });
 
     // Close overlay handler
-    closeBtn.addEventListener('click', () => {
-      overlay.classList.remove('is-active');
-      backdrop.classList.remove('is-active');
-      document.body.style.overflow = '';
-      if (window.isSelectMode) window.toggleFavouritesSelectMode();
-    });
+    closeBtn.addEventListener('click', closeFavourites);
 
     // Close on backdrop click
     backdrop.addEventListener('click', () => {
-      closeBtn.click();
+      closeFavourites();
     });
 
     // Intercept clicks on product links during select mode
