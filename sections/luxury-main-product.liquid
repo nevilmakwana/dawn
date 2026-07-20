@@ -1,0 +1,163 @@
+{{ 'luxury-product.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'luxury-product.js' | asset_url }}" defer="defer"></script>
+
+<div class="luxury-product" data-section-id="{{ section.id }}">
+  <div class="product-layout container">
+    
+    <!-- Media Gallery (Left) -->
+    <div class="product-media">
+      <div class="product-gallery swiper" id="ProductGallerySwiper">
+        <div class="swiper-wrapper">
+          {%- if product.media.size > 0 -%}
+            {%- for media in product.media -%}
+              <div class="media-item swiper-slide">
+                {%- if media.media_type == 'image' -%}
+                  {{ media | image_url: width: 1000 | image_tag: loading: 'lazy' }}
+                {%- else -%}
+                  {{ media | media_tag }}
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          {%- else -%}
+            <!-- Unsplash Fallbacks for Empty Products -->
+            <div class="media-item swiper-slide">
+              <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=1000&auto=format&fit=crop" alt="Product Front" loading="eager">
+            </div>
+            <div class="media-item swiper-slide">
+              <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=1000&auto=format&fit=crop" alt="Product Detail" loading="lazy">
+            </div>
+            <div class="media-item swiper-slide">
+              <img src="https://images.unsplash.com/photo-1591561954557-26941169b49e?q=80&w=1000&auto=format&fit=crop" alt="Product Detail" loading="lazy">
+            </div>
+          {%- endif -%}
+        </div>
+        <div class="swiper-pagination"></div>
+      </div>
+    </div>
+
+    <!-- Product Info (Right) -->
+    <div class="product-info">
+      <div class="product-vendor">{{ product.vendor | default: 'LUXE HOUSE' }}</div>
+      <h1 class="product-title">{{ product.title | default: 'The Signature Leather Bag' }}</h1>
+      <div class="product-price">
+        {%- if product.compare_at_price > product.price -%}
+          <s>{{ product.compare_at_price | money }}</s>
+        {%- endif -%}
+        {{ product.price | default: 240000 | money }}
+      </div>
+
+      <!-- Add to Cart Form -->
+      {%- form 'product', product, class: 'product-form' -%}
+        <!-- Hidden Master Select -->
+        <select name="id" style="display: none;">
+          {%- for variant in product.variants -%}
+            <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected="selected"{% endif %}>
+              {{ variant.title }}
+            </option>
+          {%- endfor -%}
+        </select>
+
+        <!-- Custom Variant Selectors -->
+        {%- unless product.has_only_default_variant -%}
+          {%- for option in product.options_with_values -%}
+            <div class="variant-selector">
+              <span class="variant-selector__label">{{ option.name }}</span>
+              <div class="variant-selector__options">
+                {%- for value in option.values -%}
+                  <div class="variant-option">
+                    <input type="radio" 
+                           id="Option-{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}" 
+                           name="options[{{ option.name | escape }}]" 
+                           value="{{ value | escape }}"
+                           {% if option.selected_value == value %}checked{% endif %}>
+                    <label for="Option-{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}">
+                      {{ value }}
+                    </label>
+                  </div>
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- else -%}
+           <!-- Fallback options for visual testing -->
+           <div class="variant-selector">
+              <span class="variant-selector__label">Size</span>
+              <div class="variant-selector__options">
+                <div class="variant-option"><input type="radio" id="s1" name="size" checked><label for="s1">S</label></div>
+                <div class="variant-option"><input type="radio" id="s2" name="size"><label for="s2">M</label></div>
+                <div class="variant-option"><input type="radio" id="s3" name="size"><label for="s3">L</label></div>
+              </div>
+           </div>
+           <div class="variant-selector">
+              <span class="variant-selector__label">Color</span>
+              <div class="variant-selector__options">
+                <div class="variant-option"><input type="radio" id="c1" name="color" checked><label for="c1">Noir</label></div>
+                <div class="variant-option"><input type="radio" id="c2" name="color"><label for="c2">Blanc</label></div>
+              </div>
+           </div>
+        {%- endunless -%}
+
+        <div class="product-form__buttons">
+          <button type="submit" name="add" class="btn btn--primary product-form__submit"
+            {% unless product.selected_or_first_available_variant.available and product.id != blank %}disabled{% endunless %}>
+            {%- if product.selected_or_first_available_variant.available or product.id == blank -%}
+              Add to Bag
+            {%- else -%}
+              Sold Out
+            {%- endif -%}
+          </button>
+        </div>
+      {%- endform -%}
+
+      <!-- Product Accordions -->
+      <div class="product-accordion">
+        <div class="accordion-item is-open">
+          <button class="accordion-header">
+            Description
+            <span class="accordion-icon"></span>
+          </button>
+          <div class="accordion-content">
+            {%- if product.description != blank -%}
+              {{ product.description }}
+            {%- else -%}
+              <p>An exquisite piece crafted with precision. This item features premium materials and timeless design, embodying the essence of modern luxury.</p>
+            {%- endif -%}
+          </div>
+        </div>
+        
+        <div class="accordion-item">
+          <button class="accordion-header">
+            Details
+            <span class="accordion-icon"></span>
+          </button>
+          <div class="accordion-content">
+            <ul style="padding-left: 1rem; margin: 0;">
+              <li>Made in Italy</li>
+              <li>100% Premium Leather</li>
+              <li>Signature hardware</li>
+              <li>Height: 15cm, Width: 22cm, Depth: 6cm</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header">
+            Shipping & Returns
+            <span class="accordion-icon"></span>
+          </button>
+          <div class="accordion-content">
+            <p>Complimentary express shipping and returns on all orders. Items must be returned within 14 days of receiving your order.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Luxury Main Product",
+  "settings": []
+}
+{% endschema %}

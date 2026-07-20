@@ -1,0 +1,92 @@
+<div class="luxury-section" data-section-id="{{ section.id }}">
+  <div class="luxury-section__header">
+    <h2 class="luxury-section__title">{{ section.settings.heading }}</h2>
+  </div>
+
+  <div class="product-carousel container">
+    <!-- Swiper -->
+    <div class="swiper product-swiper-{{ section.id }}">
+      <div class="swiper-wrapper">
+        {%- assign collection = collections[section.settings.collection] -%}
+        
+        {%- if collection != blank and collection.products_count > 0 -%}
+          {%- for product in collection.products limit: section.settings.max_products -%}
+            <div class="swiper-slide">
+              {% render 'luxury-product-card', product_card_product: product, show_secondary_image: section.settings.show_secondary_image, show_vendor: false %}
+            </div>
+          {%- endfor -%}
+        {%- else -%}
+          <!-- Placeholder Products -->
+          {%- for i in (1..6) -%}
+            <div class="swiper-slide">
+              {% render 'luxury-product-card', product_card_product: blank, show_secondary_image: true, show_vendor: false %}
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Load Swiper CSS/JS if not loaded -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    new Swiper('.product-swiper-{{ section.id }}', {
+      slidesPerView: 1.2,
+      spaceBetween: 16,
+      grabCursor: true,
+      breakpoints: {
+        768: {
+          slidesPerView: 2.5,
+          spaceBetween: 24,
+        },
+        1024: {
+          slidesPerView: 4,
+          spaceBetween: 32,
+        }
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Luxury Product Carousel",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "New Arrivals",
+      "label": "Heading"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "max_products",
+      "min": 4,
+      "max": 12,
+      "step": 1,
+      "default": 8,
+      "label": "Maximum products to show"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "default": true,
+      "label": "Show second image on hover"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Luxury Product Carousel"
+    }
+  ]
+}
+{% endschema %}

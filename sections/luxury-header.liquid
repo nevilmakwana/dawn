@@ -1,0 +1,114 @@
+<!-- Luxury Header -->
+<div class="luxury-header-wrapper">
+  <header id="LuxuryHeader" class="luxury-header">
+    <div class="luxury-header__main">
+      <!-- Left Section -->
+      <div class="luxury-header__left">
+        <button id="MobileMenuOpen" class="header-icon-group desktop-only">
+          <span class="header-text-label">Menu</span>
+          <svg class="header-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <button id="MobileMenuOpen" class="header-icon" style="display: inline-flex;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <button id="SearchOpen" class="header-icon-group desktop-only">
+          <svg class="header-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span class="header-text-label">Search</span>
+        </button>
+      </div>
+
+      <!-- Center Logo -->
+      <div class="luxury-header__center">
+        <a href="{{ routes.root_url }}" class="luxury-header__logo">PRADA</a>
+      </div>
+
+      <!-- Right Section -->
+      <div class="luxury-header__right">
+        <a href="#" class="header-text-link desktop-only">Contact us</a>
+        <button class="header-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </button>
+        <a href="{{ routes.account_url }}" class="header-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </a>
+        <a href="{{ routes.cart_url }}" class="header-icon header-icon--cart">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          <span class="bag-badge">{{ cart.item_count }}</span>
+        </a>
+      </div>
+    </div>
+  </header>
+</div>
+
+<!-- Mobile Menu Drawer -->
+<div id="MobileMenuDrawer" class="mobile-menu-drawer">
+  <div class="mobile-menu-header">
+    <button id="MobileMenuClose" class="mobile-menu-close">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+  <nav class="container">
+    <div class="drawer-nav-item"><a href="#">New Arrivals</a></div>
+    <div class="drawer-nav-item"><a href="#">Women</a></div>
+    <div class="drawer-nav-item"><a href="#">Men</a></div>
+    <div class="drawer-nav-item"><a href="#">Handbags</a></div>
+    <div class="drawer-nav-item"><a href="#">Accessories</a></div>
+    <div class="drawer-footer-links">
+      <a href="{{ routes.account_url }}">Account</a>
+      <a href="#">Contact</a>
+      <a href="#">Help</a>
+    </div>
+  </nav>
+</div>
+
+<!-- Search Overlay -->
+<div id="SearchOverlay">
+  <div style="display: flex; justify-content: flex-end; padding: var(--space-4) var(--space-4);">
+    <button id="SearchClose" class="search-overlay__close">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+  <div class="search-overlay__form">
+    <form action="{{ routes.search_url }}" method="get">
+      <input type="search" name="q" placeholder="Search...">
+    </form>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Luxury Header",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Luxury Header"
+    }
+  ]
+}
+{% endschema %}

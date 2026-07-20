@@ -1,0 +1,35 @@
+<!-- Hero Section -->
+<section class="relative h-[860px] w-full overflow-hidden group mt-20" data-section-id="{{ section.id }}">
+    <div class="absolute inset-0 bg-black">
+        <img class="w-full h-full object-cover opacity-80" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_6841bdb962_dd16d05768c38ae5.png" alt="cinematic editorial fashion photograph, model in sleek black coat walking through minimalist studio," />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30"></div>
+    </div>
+
+    <div class="relative z-10 h-full max-w-[1440px] mx-auto px-8 flex flex-col justify-center items-start">
+        <span class="text-white/90 text-xs tracking-[0.25em] uppercase mb-6 font-medium">New Collection</span>
+        <h1 class="text-white font-display text-6xl md:text-8xl mb-8 max-w-2xl leading-tight">
+            Spring / Summer 2025
+        </h1>
+        <a href="#categories" class="group/btn relative overflow-hidden bg-transparent border border-white px-10 py-4 text-white text-xs uppercase tracking-widest transition-all duration-500 hover:bg-white hover:text-black">
+            <span class="relative z-10">Explore Now</span>
+        </a>
+    </div>
+
+    <!-- Active Status Indicator -->
+    <div class="absolute bottom-12 right-12 flex items-center space-x-2">
+        <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+        <span class="text-white text-[10px] uppercase tracking-widest">Active</span>
+    </div>
+</section>
+
+{% schema %}
+{
+  "name": "UXPilot Hero Banner",
+  "settings": [],
+  "presets": [
+    {
+      "name": "UXPilot Hero Banner"
+    }
+  ]
+}
+{% endschema %}

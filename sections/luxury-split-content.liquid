@@ -1,0 +1,69 @@
+<div class="prada-split {% if section.settings.reverse_layout %}prada-split--reverse{% endif %}" data-section-id="{{ section.id }}">
+  <div class="prada-split__text">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="prada-split__title">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subheading != blank -%}
+      <p class="prada-split__subtitle">{{ section.settings.subheading }}</p>
+    {%- endif -%}
+    {%- if section.settings.button_label != blank -%}
+      <a href="{{ section.settings.button_link }}" class="prada-link">
+        {{ section.settings.button_label }}
+      </a>
+    {%- endif -%}
+  </div>
+  <div class="prada-split__media">
+    {%- if section.settings.image != blank -%}
+      {{ section.settings.image | image_url: width: 1000 | image_tag: loading: 'lazy' }}
+    {%- else -%}
+      <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=1000&h=1000&fit=crop" alt="Men's Sunglasses" loading="lazy">
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Prada Split Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image (Use 1:1 Square)"
+    },
+    {
+      "type": "checkbox",
+      "id": "reverse_layout",
+      "label": "Reverse layout on desktop",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "Men's Sunglasses",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "default": "New Geometric Shapes",
+      "label": "Subheading"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "default": "FOR HIM",
+      "label": "Button Label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Prada Split Banner"
+    }
+  ]
+}
+{% endschema %}
