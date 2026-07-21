@@ -166,7 +166,8 @@
   .prada-header-btn__icon svg {
     width: 22px;
     height: 22px;
-    fill: none;
+    fill: currentColor;
+    stroke: none;
     color: #fff;
   }
 
@@ -327,7 +328,8 @@
   .prada-header .header__search summary .prada-search-icon-wrapper svg {
     width: 18px;
     height: 18px;
-    fill: none;
+    fill: currentColor;
+    stroke: none;
     color: #fff;
   }
 
@@ -350,7 +352,8 @@
   .prada-header .header__icon--account svg {
     width: 18px;
     height: 18px;
-    fill: none;
+    fill: currentColor;
+    stroke: none;
     color: #fff;
   }
 
@@ -377,7 +380,8 @@
   .prada-header .header__icon--cart svg {
     width: 18px;
     height: 18px;
-    fill: none;
+    fill: currentColor;
+    stroke: none;
     color: #fff;
   }
 
@@ -604,7 +608,7 @@
       
       <a href="#" class="prada-header-btn prada-header-btn--wishlist" aria-label="View your wish list">
         <span class="prada-header-btn__icon">
-          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-wishlist prada-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1 7.8 7.8 7.8-7.8 1-1a5.5 5.5 0 000-7.8z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-wishlist prada-icon" viewBox="0 0 1024 1024"><path transform="matrix(1 0 0 -1 0 960)" d="M466 230q-63-94-159.5-126T106 83Q13 133-14 227t-6 195q26 123 103 218l414 433q4 4 15 4t15-4l415-434q75-93 102-216 22-102-5.5-196.5T893 82q-106-20-201.5 12T532 220l-21 34-21-34q-7-11-12-12t-12-2zM512 878L136 485Q69 401 46 295q-17-76 6-155.5T144 42q84-48 181-42t176 83l10 12h2l11-12q80-77 177.5-83.5T882 42q68 39 85 118t6 156Q951 422 884 506L512 878z" fill="currentColor"></path></svg>
         </span>
       </a>
 
@@ -616,14 +620,14 @@
           aria-label="Account"
         >
           <span class="prada-header-btn__icon">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-account prada-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M4 21v-2a4 4 0 014-4h8a4 4 0 014 4v2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-account prada-icon" viewBox="0 0 1024 1024"><path transform="matrix(1 0 0 -1 0 960)" d="M375-74v123q0 29 20 49t49 20h133q28 0 48-20t20-49v-123q0-28-20-48t-48-20H444q-29 0-49 20t-20 48zm314-1q0 46-32.5 78.5T578 36H443q-46 0-78.5-32.5T332-75v-121q0-46 32.5-78.5T443-307h135q46 0 78.5 32.5T689-196v121zM512 901q97 0 196-22t193-61q6 53 38 107.5T1019 1021q2 3 5 4t5-1l42-26q3-2 3-5-1-4-8-12-14-16-29-37.5T1005 896q-19-45-42-99-4-10-15-13T924 786q-172 73-376.5 73T171 786q-13-2-24 1-13 4-18 14-23 54-41 99.5T58 943q-14 21-28 37.5t-8 12q0 3 3 5l42 26q2 2 5 1t5-4q42-41 74-95t38-107.5q94 39 193 61t197 22zm-352-73q164 59 352 59 189 0 352-59-2 29-23 60t-60 67q-106-38-232-47.5T512 899q-121 0-246 9.5T33 955q-38-35-59.5-66.5T-28 828q188 59 352 59z" fill="currentColor"></path></svg>
           </span>
         </a>
       {%- endif -%}
 
       <a href="{{ routes.cart_url }}" class="prada-header-btn prada-header-btn--cart" id="cart-icon-bubble" aria-label="{{ 'templates.cart.cart' | t }}">
         <span class="prada-header-btn__icon">
-          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-cart prada-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h12l1 14H5L6 6z"/><path d="M9 6V4a3 3 0 016 0v2"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-cart prada-icon" viewBox="0 0 1024 1024"><path transform="matrix(1 0 0 -1 0 960)" d="M512-5q-36 0-66.5-13.5T392-56t-38.5-40T340-160v-64q0-10 7.5-17.5T365-249q10 0 17 7.5t7 17.5v64q0 21 10.5 40.5T430-89t39-21 43-7.5q21 0 39.5 7.5T590-89t29.5 30.5T630-18q0 10 7.5 17.5t17.5 7.5q10 0 17.5-7.5T680-18q0 34-13.5 64T628-56t-53.5 37.5T512-5zm412 1018L789 266h214l21 482v4q0 25-18.5 43T963 813q-6 0-14-11l35 155q6 27-12 42.5t-46 15.5H98q-28 0-46-15.5T40 957L75 802q-8 11-14 11-25 0-43.5-18T-1 752v-4L20 266h215L100 1013q-13 41 12.5 71T171 1067h682q46 0 71.5-30.5T924 1013zm-881-22h762L672 319H352L43 991z" fill="currentColor"></path></svg>
         </span>
         {%- if cart.item_count > 0 -%}
           <span class="prada-cart-badge" aria-hidden="true">{{ cart.item_count }}</span>
