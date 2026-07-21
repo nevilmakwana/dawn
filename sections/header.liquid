@@ -435,6 +435,11 @@
       margin: 0 !important;
     }
 
+    .prada-header {
+      position: relative !important;
+      padding: 10px 16px !important;
+    }
+
     .prada-header-left {
       flex: 1 1 0%;
       display: flex;
@@ -444,7 +449,11 @@
     }
 
     .prada-header-center {
-      flex: 0 0 auto;
+      position: absolute !important;
+      left: 50% !important;
+      top: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      z-index: 2;
       display: flex;
       align-items: center;
       justify-content: center;
