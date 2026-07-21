@@ -481,6 +481,18 @@
     padding: {{ section.settings.padding_top | times: 0.5 | round: 0 }}px 3rem {{ section.settings.padding_bottom | times: 0.5 | round: 0 }}px 3rem;
   }
 
+  .prada-header-logo .header__heading-logo {
+    width: {{ settings.mobile_logo_width | default: 90 }}px !important;
+    max-width: 100% !important;
+    max-height: none !important;
+  }
+
+  @media screen and (min-width: 990px) {
+    .prada-header-logo .header__heading-logo {
+      width: {{ settings.logo_width }}px !important;
+    }
+  }
+
   .section-header {
     position: sticky; /* This is for fixing a Safari z-index issue. PR #2147 */
     margin-bottom: {{ section.settings.margin_bottom | times: 0.75 | round: 0 }}px;
