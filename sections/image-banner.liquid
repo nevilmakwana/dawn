@@ -24,6 +24,11 @@
 {%- endif -%}
 
 {%- style -%}
+  #Banner-{{ section.id }} {
+    height: 100vh !important;
+    min-height: 100vh !important;
+  }
+
   #Banner-{{ section.id }}::after {
     opacity: {{ section.settings.image_overlay_opacity | divided_by: 100.0 }};
   }
