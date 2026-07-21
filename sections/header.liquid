@@ -17,24 +17,16 @@
 {%- endif -%}
 
 <style>
+  /* ========================================
+     PRADA-STYLE HEADER - Pixel-Perfect Copy
+     Based on actual prada.com source code
+     ======================================== */
+
+  /* Reset Dawn's default header-drawer styles */
   header-drawer {
     justify-self: start;
-    margin-left: -1.2rem;
+    margin-left: 0;
   }
-
-  {%- if section.settings.sticky_header_type == 'reduce-logo-size' -%}
-    .scrolled-past-header .header__heading-logo-wrapper {
-      width: 75%;
-    }
-  {%- endif -%}
-
-  {%- if section.settings.menu_type_desktop != "drawer" -%}
-    @media screen and (min-width: 990px) {
-      header-drawer {
-        display: none;
-      }
-    }
-  {%- endif -%}
 
   .menu-drawer-container {
     display: flex;
@@ -51,10 +43,6 @@
     flex-wrap: wrap;
   }
 
-  summary.list-menu__item {
-    padding-right: 2.7rem;
-  }
-
   .list-menu__item {
     display: flex;
     align-items: center;
@@ -63,119 +51,422 @@
 
   .list-menu__item--link {
     text-decoration: none;
-    padding-bottom: 1rem;
-    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+    padding-top: 0.5rem;
     line-height: calc(1 + 0.8 / var(--font-body-scale));
   }
 
-  @media screen and (min-width: 750px) {
-    .list-menu__item--link {
-      padding-bottom: 0.5rem;
-      padding-top: 0.5rem;
-    }
+  summary.list-menu__item {
+    padding-right: 2.7rem;
   }
 
-  /* Prada Header Styles */
+  /* ---- Section Header Wrapper ---- */
+  .section-header {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    margin-bottom: 0 !important;
+    border: none !important;
+  }
+
+  .header-wrapper {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .header-wrapper--border-bottom {
+    border-bottom: none !important;
+  }
+
+  /* ---- Prada Header Container ---- */
   .prada-header {
-    display: flex;
+    display: flex !important;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 100;
+    padding: 14px 20px !important;
     background: transparent !important;
+    border: none !important;
+    grid-template-columns: none !important;
+    column-gap: 0 !important;
   }
-  
-  .prada-header-left, .prada-header-center, .prada-header-right {
+
+  @media screen and (min-width: 990px) {
+    .prada-header {
+      padding: 16px 24px !important;
+    }
+  }
+
+  /* ---- Three Column Layout ---- */
+  .prada-header-left,
+  .prada-header-center,
+  .prada-header-right {
     display: flex;
     align-items: center;
-    flex: 1;
   }
-  
+
   .prada-header-left {
+    flex: 1;
     justify-content: flex-start;
-    gap: 20px;
+    gap: 0;
   }
-  
+
   .prada-header-center {
+    flex: 0 0 auto;
     justify-content: center;
   }
-  
+
   .prada-header-right {
+    flex: 1;
     justify-content: flex-end;
-    gap: 15px;
+    gap: 0;
   }
-  
-  .prada-menu-toggle, .header__icon--search, .prada-header-left summary {
+
+  /* ---- Prada Buttons (Menu, Search, Contact, etc.) ---- */
+  .prada-header-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    color: #fff;
+    padding: 8px 10px;
+    transition: opacity 0.2s ease;
+    position: relative;
+  }
+
+  .prada-header-btn:hover {
+    opacity: 0.7;
+  }
+
+  .prada-header-btn__label {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: capitalize;
+    color: #fff;
+    white-space: nowrap;
+    line-height: 1;
+  }
+
+  .prada-header-btn__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+  }
+
+  .prada-header-btn__icon svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Hamburger icon override */
+  .prada-header-btn--menu .prada-header-btn__icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Cart badge */
+  .prada-cart-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    color: #000;
+    font-size: 9px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0 4px;
+  }
+
+  .prada-cart-badge--empty {
+    display: none;
+  }
+
+  /* ---- Logo ---- */
+  .prada-header-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #fff;
+    padding: 0 20px;
+  }
+
+  .prada-header-logo .header__heading-logo-wrapper {
+    margin: 0;
+    width: auto;
+  }
+
+  .prada-header-logo .header__heading-logo {
+    width: auto;
+    max-width: 160px;
+    height: auto;
+    max-height: 28px;
+  }
+
+  .prada-text-logo {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #fff;
+    margin: 0;
+    white-space: nowrap;
+    line-height: 1;
+  }
+
+  @media screen and (min-width: 990px) {
+    .prada-text-logo {
+      font-size: 26px;
+      letter-spacing: 0.3em;
+    }
+  }
+
+  .prada-header .header__heading {
+    margin: 0;
+    line-height: 1;
+  }
+
+  /* ---- Dawn Overrides ---- */
+  .prada-header .header__icons {
+    display: flex !important;
+    align-items: center;
+    gap: 0;
+    width: auto !important;
+    flex: 1;
+    justify-content: flex-end;
+    padding: 0 !important;
+  }
+
+  /* Hide Dawn's default search in header icons */
+  .prada-header .header__icons .header__search {
+    display: none !important;
+  }
+
+  /* Override Dawn header-drawer margin */
+  .prada-header header-drawer {
+    margin-left: 0 !important;
+    display: flex !important;
+  }
+
+  /* Ensure header-drawer's summary uses our button style */
+  .prada-header header-drawer summary.header__icon {
     display: flex;
     align-items: center;
     gap: 8px;
     color: #fff;
-    text-transform: uppercase;
-    font-size: 13px;
-    letter-spacing: 1px;
-    cursor: pointer;
-    text-decoration: none;
-  }
-  
-  .prada-menu-text, .prada-search-text {
-    color: #fff;
-    font-size: 13px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    padding: 8px 10px;
+    margin: 0;
+    opacity: 1;
   }
 
-  .prada-contact-link, .prada-cart-text {
-    color: #fff;
-    font-size: 13px;
-    letter-spacing: 1px;
-    text-decoration: none;
-    text-transform: uppercase;
+  .prada-header header-drawer summary.header__icon:hover {
+    opacity: 0.7;
   }
-  
-  .prada-header .svg-wrapper svg {
-    fill: #fff;
-    color: #fff;
+
+  .prada-header header-drawer summary .prada-menu-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 20px;
     height: 20px;
   }
-  
-  .prada-text-logo {
+
+  .prada-header header-drawer summary .prada-menu-icon-wrapper svg {
+    width: 20px;
+    height: 20px;
+    stroke: #fff;
     color: #fff;
-    font-family: 'Times New Roman', serif;
-    font-size: 32px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    margin: 0;
   }
-  
-  .prada-cart {
+
+  .prada-header header-drawer summary .prada-menu-text {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: capitalize;
+    color: #fff;
+    line-height: 1;
+  }
+
+  /* Search button in header (the details-modal summary) */
+  .prada-header .header__search summary.header__icon {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    padding: 8px 10px;
+  }
+
+  .prada-header .header__search summary .prada-search-icon-wrapper {
     display: flex;
     align-items: center;
-    gap: 5px;
-  }
-  
-  .header-wrapper--border-bottom {
-    border-bottom: none !important;
-  }
-  
-  .header-wrapper {
-    background: transparent !important;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
   }
 
-  .header__icons {
-    padding-right: 0 !important;
+  .prada-header .header__search summary .prada-search-icon-wrapper svg {
+    width: 18px;
+    height: 18px;
+    stroke: #fff;
+    color: #fff;
   }
 
+  .prada-header .header__search summary .prada-search-text {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: capitalize;
+    color: #fff;
+    line-height: 1;
+  }
+
+  /* Account icon override */
+  .prada-header .header__icon--account {
+    color: #fff !important;
+    padding: 8px 10px;
+  }
+
+  .prada-header .header__icon--account svg {
+    width: 18px;
+    height: 18px;
+    stroke: #fff;
+    color: #fff;
+  }
+
+  .prada-header .header__icon--account .svg-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Remove .small-hide from account on Prada header */
+  .prada-header .header__icon--account.small-hide {
+    display: flex !important;
+  }
+
+  /* Cart icon override */
+  .prada-header .header__icon--cart {
+    color: #fff !important;
+    padding: 8px 10px;
+    position: relative;
+  }
+
+  .prada-header .header__icon--cart svg {
+    width: 18px;
+    height: 18px;
+    stroke: #fff;
+    color: #fff;
+  }
+
+  .prada-header .header__icon--cart .svg-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Hide Dawn's default cart count bubble */
+  .prada-header .cart-count-bubble {
+    display: none !important;
+  }
+
+  /* ---- Responsive: Desktop (990px+) ---- */
+  @media screen and (min-width: 990px) {
+    header-drawer {
+      display: flex !important;
+    }
+  }
+
+  /* ---- Responsive: Mobile (< 990px) ---- */
   @media screen and (max-width: 989px) {
-    .prada-menu-text, .prada-search-text, .prada-contact-link {
-      display: none;
+    .prada-header {
+      padding: 10px 16px !important;
     }
+
+    /* Hide text labels on mobile */
+    .prada-menu-text,
+    .prada-search-text,
+    .prada-header-btn__label {
+      display: none !important;
+    }
+
+    /* Hide search, contact, wishlist, account on mobile */
+    .prada-header-left .header__search,
+    .prada-header-btn--contact,
+    .prada-header-btn--wishlist,
+    .prada-header .header__icon--account {
+      display: none !important;
+    }
+
     .prada-header-left {
-      gap: 10px;
+      flex: 0 0 auto;
     }
+
+    .prada-header-center {
+      flex: 1;
+      justify-content: center;
+    }
+
+    .prada-header-right {
+      flex: 0 0 auto;
+    }
+
+    .prada-text-logo {
+      font-size: 18px;
+      letter-spacing: 0.2em;
+    }
+
+    .prada-header-logo .header__heading-logo {
+      max-width: 110px;
+      max-height: 20px;
+    }
+  }
+
+  /* ---- Sticky header states ---- */
+  .shopify-section-header-sticky .header-wrapper {
+    background: rgba(0, 0, 0, 0.85) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .shopify-section-header-sticky .section-header {
+    position: fixed !important;
+  }
+
+  .shopify-section-header-hidden .header-wrapper {
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .animate .header-wrapper {
+    transition: transform 0.3s ease, background 0.3s ease;
   }
 </style>
 
@@ -239,8 +530,9 @@
       assign localization_forms = true
     endif
   -%}
-  <header class="header prada-header page-width{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}{% if has_app_block %} header--has-app{% endif %}{% if social_links %} header--has-social{% endif %}{% if shop.customer_accounts_enabled %} header--has-account{% endif %}{% if localization_forms %} header--has-localizations{% endif %}">
+  <header class="header prada-header{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}" role="banner">
     
+    {%- comment -%} LEFT: Menu + Search {%- endcomment -%}
     <div class="prada-header-left">
       {%- if section.settings.menu != blank -%}
         {% render 'header-drawer' %}
@@ -248,11 +540,12 @@
       {% render 'header-search', input_id: 'Search-In-Modal-1' %}
     </div>
 
+    {%- comment -%} CENTER: Logo {%- endcomment -%}
     <div class="prada-header-center">
       {%- if request.page_type == 'index' -%}
         <h1 class="header__heading">
       {%- endif -%}
-      <a href="{{ routes.root_url }}" class="header__heading-link link link--text focus-inset">
+      <a href="{{ routes.root_url }}" class="header__heading-link prada-header-logo link link--text focus-inset">
         {%- if settings.logo != blank -%}
           <div class="header__heading-logo-wrapper">
             {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
@@ -273,7 +566,7 @@
             }}
           </div>
         {%- else -%}
-          <span class="h2 prada-text-logo">{{ shop.name }}</span>
+          <span class="prada-text-logo">{{ shop.name }}</span>
         {%- endif -%}
       </a>
       {%- if request.page_type == 'index' -%}
@@ -281,57 +574,48 @@
       {%- endif -%}
     </div>
 
-    <div class="header__icons prada-header-right {% if section.settings.enable_country_selector or section.settings.enable_language_selector %} header__icons--localization header-localization{% endif %}">
-      <a href="/pages/contact" class="prada-contact-link header__icon link focus-inset">Contact us</a>
+    {%- comment -%} RIGHT: Contact us, Wishlist, Account, Cart {%- endcomment -%}
+    <div class="prada-header-right">
+      <a href="/pages/contact" class="prada-header-btn prada-header-btn--contact">
+        <span class="prada-header-btn__label">Contact us</span>
+      </a>
       
-      <a href="#" class="header__icon header__icon--wishlist link focus-inset">
-        <span class="svg-wrapper">{% render 'icon-heart' %}</span>
-        <span class="visually-hidden">Wishlist</span>
+      <a href="#" class="prada-header-btn prada-header-btn--wishlist" aria-label="View your wish list">
+        <span class="prada-header-btn__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </span>
       </a>
 
       {%- if shop.customer_accounts_enabled -%}
         <a
           href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
-          class="header__icon header__icon--account link focus-inset{% if section.settings.menu != blank %} small-hide{% endif %}"
+          class="prada-header-btn prada-header-btn--account"
           rel="nofollow"
+          aria-label="Account"
         >
-          {%- if section.settings.enable_customer_avatar -%}
-            <account-icon>
-              {%- if customer and customer.has_avatar? -%}
-                {{ customer | avatar }}
-              {%- else -%}
-                <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
-              {%- endif -%}
-            </account-icon>
-          {%- else -%}
-            <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
-          {%- endif -%}
-          <span class="visually-hidden">
-            {%- liquid
-              if customer
-                echo 'customer.account_fallback' | t
-              else
-                echo 'customer.log_in' | t
-              endif
-            -%}
+          <span class="prada-header-btn__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
           </span>
         </a>
       {%- endif -%}
 
-      <a href="{{ routes.cart_url }}" class="header__icon header__icon--cart link focus-inset prada-cart" id="cart-icon-bubble">
-        {% if cart == empty %}
-          <span class="svg-wrapper">{{ 'icon-cart-empty.svg' | inline_asset_content }}</span>
-        {% else %}
-          <span class="svg-wrapper">{{ 'icon-cart.svg' | inline_asset_content }}</span>
-        {% endif %}
-        <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>
-        <span class="prada-cart-text">
-          {%- if cart.item_count < 100 -%}
-            {{ cart.item_count }}
-          {%- else -%}
-            99+
-          {%- endif -%}
+      <a href="{{ routes.cart_url }}" class="prada-header-btn prada-header-btn--cart" id="cart-icon-bubble" aria-label="{{ 'templates.cart.cart' | t }}">
+        <span class="prada-header-btn__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
         </span>
+        {%- if cart.item_count > 0 -%}
+          <span class="prada-cart-badge" aria-hidden="true">{{ cart.item_count }}</span>
+        {%- endif -%}
+        <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
       </a>
     </div>
   </header>
