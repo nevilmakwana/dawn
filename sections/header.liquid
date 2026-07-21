@@ -417,25 +417,31 @@
       display: none !important;
     }
 
-    /* Hide search, contact, wishlist, account on mobile */
-    .prada-header-left .header__search,
-    .prada-header-btn--contact,
-    .prada-header-btn--wishlist,
-    .prada-header .header__icon--account {
+    /* Hide contact on mobile */
+    .prada-header-btn--contact {
       display: none !important;
     }
 
+    .prada-header-btn,
+    .prada-header header-drawer summary.header__icon {
+      padding: 6px 4px !important;
+    }
+
     .prada-header-left {
-      flex: 0 0 auto;
+      flex: 1;
+      justify-content: flex-start;
+      gap: 2px;
     }
 
     .prada-header-center {
-      flex: 1;
+      flex: 0 0 auto;
       justify-content: center;
     }
 
     .prada-header-right {
-      flex: 0 0 auto;
+      flex: 1;
+      justify-content: flex-end;
+      gap: 2px;
     }
 
     .prada-text-logo {
