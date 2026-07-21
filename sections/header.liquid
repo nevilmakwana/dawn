@@ -166,6 +166,9 @@
   .prada-header-btn__icon svg {
     width: 20px;
     height: 20px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 0.85;
     color: #fff;
   }
 
@@ -326,6 +329,9 @@
   .prada-header .header__search summary .prada-search-icon-wrapper svg {
     width: 18px;
     height: 18px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1;
     color: #fff;
   }
 
@@ -348,6 +354,9 @@
   .prada-header .header__icon--account svg {
     width: 18px;
     height: 18px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 0.85;
     color: #fff;
   }
 
@@ -374,6 +383,9 @@
   .prada-header .header__icon--cart svg {
     width: 18px;
     height: 18px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 0.85;
     color: #fff;
   }
 
@@ -600,7 +612,7 @@
       
       <a href="#" class="prada-header-btn prada-header-btn--wishlist" aria-label="View your wish list">
         <span class="prada-header-btn__icon">
-          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-wishlist prada-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1 7.8 7.8 7.8-7.8 1-1a5.5 5.5 0 000-7.8z"/></svg>
+          {{- 'prada-wishlist.svg' | inline_asset_content -}}
         </span>
       </a>
 
@@ -612,14 +624,14 @@
           aria-label="Account"
         >
           <span class="prada-header-btn__icon">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-account prada-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 22v-2a4 4 0 014-4h8a4 4 0 014 4v2"/></svg>
+            {{- 'prada-account.svg' | inline_asset_content -}}
           </span>
         </a>
       {%- endif -%}
 
       <a href="{{ routes.cart_url }}" class="prada-header-btn prada-header-btn--cart" id="cart-icon-bubble" aria-label="{{ 'templates.cart.cart' | t }}">
         <span class="prada-header-btn__icon">
-          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-cart prada-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h12l1 15H5l1-15z"/><path d="M9 6V4a3 3 0 016 0v2"/></svg>
+          {{- 'prada-cart.svg' | inline_asset_content -}}
         </span>
         {%- if cart.item_count > 0 -%}
           <span class="prada-cart-badge" aria-hidden="true">{{ cart.item_count }}</span>
