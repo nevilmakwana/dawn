@@ -608,6 +608,33 @@
   .prada-header-logo .default-logo {
     display: block !important;
   }
+
+  /* Morphing Hamburger Menu Animation */
+  .prada-morphing-icon {
+    overflow: visible;
+  }
+  .prada-morphing-icon .hamburger-line-1,
+  .prada-morphing-icon .hamburger-line-2 {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+  
+  details[open] > summary .prada-morphing-icon .hamburger-line-1 {
+    transform: translateY(4px) rotate(45deg);
+  }
+  details[open] > summary .prada-morphing-icon .hamburger-line-2 {
+    transform: translateY(-4px) rotate(-45deg);
+  }
+
+  /* Force morphing icon to stay visible and hide default close icon */
+  details[open] > summary .icon-hamburger.prada-morphing-icon {
+    display: block !important;
+  }
+  details[open] > summary .icon-close,
+  .prada-menu-icon-wrapper .icon-close {
+    display: none !important;
+  }
 </style>
 
 {%- style -%}
