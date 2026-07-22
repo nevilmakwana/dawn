@@ -819,6 +819,28 @@
       window.addEventListener('scroll', this.onScrollHandler, false);
 
       this.createObserver();
+      this.initHeroBannerDetection();
+    }
+
+    initHeroBannerDetection() {
+      const headerWrapper = this.querySelector('.header-wrapper') || document.querySelector('.header-wrapper');
+      if (!headerWrapper) return;
+
+      const banner = document.querySelector('.banner, .image-banner, .slideshow, [class*="banner"]');
+      if (banner) {
+        headerWrapper.classList.add('has-hero-banner');
+        const onScroll = () => {
+          const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+          const threshold = banner.offsetHeight / 2;
+          if (scrollY >= threshold) {
+            headerWrapper.classList.add('scrolled-past-hero');
+          } else {
+            headerWrapper.classList.remove('scrolled-past-hero');
+          }
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+      }
     }
 
     setHeaderHeight() {
