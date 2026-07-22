@@ -16,6 +16,11 @@
         "label": "t:settings_schema.logo.settings.logo_image.label"
       },
       {
+        "type": "image_picker",
+        "id": "logo_hover",
+        "label": "Logo image on hover (Black/Dark logo)"
+      },
+      {
         "type": "range",
         "id": "logo_width",
         "min": 50,

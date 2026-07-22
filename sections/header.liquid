@@ -502,6 +502,96 @@
   .animate .header-wrapper {
     transition: transform 0.3s ease, background 0.3s ease;
   }
+
+  /* Prada Hover Transition & Interactions */
+  .header-wrapper,
+  .prada-header-btn,
+  .prada-header-btn__label,
+  .prada-header-logo,
+  .prada-text-logo,
+  .prada-header header-drawer summary.header__icon,
+  .prada-header header-drawer summary .prada-menu-text,
+  .prada-header .header__search summary.header__icon,
+  .prada-header .header__search summary .prada-search-text,
+  .prada-header .header__icon--account,
+  .prada-header .header__icon--cart,
+  .prada-header-btn__icon svg,
+  .prada-header header-drawer summary .prada-menu-icon-wrapper svg,
+  .prada-header .header__search summary .prada-search-icon-wrapper svg,
+  .prada-header .header__icon--account svg,
+  .prada-header .header__icon--cart svg,
+  .prada-cart-badge {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, stroke 0.3s ease, opacity 0.3s ease !important;
+  }
+
+  /* When the header wrapper (or sticky wrapper) is hovered, background turns white */
+  .section-header:hover .header-wrapper,
+  .shopify-section-header-sticky .section-header:hover .header-wrapper {
+    background: #ffffff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  }
+
+  /* Make all text elements black on hover */
+  .section-header:hover .prada-header-btn,
+  .section-header:hover .prada-header-btn__label,
+  .section-header:hover .prada-header-logo,
+  .section-header:hover .prada-text-logo,
+  .section-header:hover .prada-header header-drawer summary.header__icon,
+  .section-header:hover .prada-header header-drawer summary .prada-menu-text,
+  .section-header:hover .prada-header .header__search summary.header__icon,
+  .section-header:hover .prada-header .header__search summary .prada-search-text,
+  .section-header:hover .prada-header .header__icon--account,
+  .section-header:hover .prada-header .header__icon--cart,
+  .shopify-section-header-sticky .section-header:hover .prada-header-btn,
+  .shopify-section-header-sticky .section-header:hover .prada-header-btn__label,
+  .shopify-section-header-sticky .section-header:hover .prada-header-logo,
+  .shopify-section-header-sticky .section-header:hover .prada-text-logo,
+  .shopify-section-header-sticky .section-header:hover .prada-header header-drawer summary.header__icon,
+  .shopify-section-header-sticky .section-header:hover .prada-header header-drawer summary .prada-menu-text,
+  .shopify-section-header-sticky .section-header:hover .prada-header .header__search summary.header__icon,
+  .shopify-section-header-sticky .section-header:hover .prada-header .header__search summary .prada-search-text,
+  .shopify-section-header-sticky .section-header:hover .prada-header .header__icon--account,
+  .shopify-section-header-sticky .section-header:hover .prada-header .header__icon--cart {
+    color: #000000 !important;
+  }
+
+  /* Make SVG icons change their stroke color to black on hover */
+  .section-header:hover .prada-header-btn__icon svg,
+  .section-header:hover .prada-header header-drawer summary .prada-menu-icon-wrapper svg,
+  .section-header:hover .prada-header .header__search summary .prada-search-icon-wrapper svg,
+  .section-header:hover .prada-header .header__icon--account svg,
+  .section-header:hover .prada-header .header__icon--cart svg,
+  .shopify-section-header-sticky .section-header:hover .prada-header-btn__icon svg,
+  .shopify-section-header-sticky .section-header:hover .prada-header header-drawer summary .prada-menu-icon-wrapper svg,
+  .shopify-section-header-sticky .section-header:hover .prada-header .header__search summary .prada-search-icon-wrapper svg,
+  .shopify-section-header-sticky .section-header:hover .prada-header .header__icon--account svg,
+  .shopify-section-header-sticky .section-header:hover .prada-header .header__icon--cart svg {
+    stroke: #000000 !important;
+  }
+
+  /* Cart badge invert colors on hover */
+  .section-header:hover .prada-cart-badge,
+  .shopify-section-header-sticky .section-header:hover .prada-cart-badge {
+    background: #000000 !important;
+    color: #ffffff !important;
+  }
+
+  /* Swap Logo images on Hover */
+  .prada-header-logo .hover-logo {
+    display: none !important;
+  }
+  .prada-header-logo .default-logo {
+    display: block !important;
+  }
+
+  .section-header:hover .prada-header-logo .has-hover-logo .default-logo,
+  .shopify-section-header-sticky .section-header:hover .prada-header-logo .has-hover-logo .default-logo {
+    display: none !important;
+  }
+  .section-header:hover .prada-header-logo .has-hover-logo .hover-logo,
+  .shopify-section-header-sticky .section-header:hover .prada-header-logo .has-hover-logo .hover-logo {
+    display: block !important;
+  }
 </style>
 
 {%- style -%}
@@ -593,7 +683,7 @@
       {%- endif -%}
       <a href="{{ routes.root_url }}" class="header__heading-link prada-header-logo link link--text focus-inset">
         {%- if settings.logo != blank -%}
-          <div class="header__heading-logo-wrapper">
+          <div class="header__heading-logo-wrapper{% if settings.logo_hover != blank %} has-hover-logo{% endif %}">
             {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
             {%- assign logo_height = settings.logo_width | divided_by: settings.logo.aspect_ratio -%}
             {% capture sizes %}(min-width: 750px) {{ settings.logo_width }}px, 50vw{% endcapture %}
@@ -602,7 +692,7 @@
               settings.logo
               | image_url: width: 600
               | image_tag:
-                class: 'header__heading-logo',
+                class: 'header__heading-logo default-logo',
                 widths: widths,
                 height: logo_height,
                 width: settings.logo_width,
@@ -610,6 +700,21 @@
                 sizes: sizes,
                 preload: true
             }}
+            {%- if settings.logo_hover != blank -%}
+              {%- assign logo_hover_height = settings.logo_width | divided_by: settings.logo_hover.aspect_ratio -%}
+              {{
+                settings.logo_hover
+                | image_url: width: 600
+                | image_tag:
+                  class: 'header__heading-logo hover-logo',
+                  widths: widths,
+                  height: logo_hover_height,
+                  width: settings.logo_width,
+                  alt: logo_alt,
+                  sizes: sizes,
+                  preload: true
+              }}
+            {%- endif -%}
           </div>
         {%- else -%}
           <span class="prada-text-logo">{{ shop.name }}</span>
