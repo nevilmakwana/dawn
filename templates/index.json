@@ -152,6 +152,7 @@
         "image_overlay_opacity": 0,
         "image_height": "large",
         "full_screen_height": true,
+        "show_full_media": true,
         "prada_link_button": true,
         "image_behavior": "none",
         "desktop_content_position": "bottom-center",

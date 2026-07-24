@@ -158,7 +158,7 @@
     #Banner-{{ section.id }} .banner__media > video {
       width: 100% !important;
       height: 100% !important;
-      object-fit: cover !important;
+      object-fit: {% if section.settings.show_full_media %}contain{% else %}cover{% endif %} !important;
     }
   {%- endif -%}
 {%- endstyle -%}
@@ -187,7 +187,7 @@
 
 <div
   id="Banner-{{ section.id }}"
-  class="banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if section.settings.video == blank and section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank and section.settings.mobile_video == blank %} banner--stacked{% endif %}{% if section.settings.image_height == 'adapt' and mobile_banner_aspect_ratio != blank %} banner--adapt{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
+  class="banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if section.settings.video == blank and section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank and section.settings.mobile_video == blank %} banner--stacked{% endif %}{% if section.settings.image_height == 'adapt' and mobile_banner_aspect_ratio != blank %} banner--adapt{% endif %}{% if section.settings.show_full_media %} banner--show-full-media{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
 >
   {%- if section.settings.video != blank -%}
     <div class="banner__media media{% if section.settings.mobile_video != blank %} small-hide{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
@@ -359,7 +359,7 @@
     },
     {
       "type": "paragraph",
-      "content": "Video plays muted, loops automatically, and covers the full banner."
+      "content": "Video plays muted and loops automatically. Enable Show full image or video to keep the full media visible without cropping."
     },
     {
       "type": "image_picker",
@@ -406,6 +406,13 @@
       "default": false,
       "label": "Full screen height",
       "info": "Makes this banner fill the full viewport height on desktop and mobile."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_media",
+      "default": false,
+      "label": "Show full image or video",
+      "info": "Keeps the entire media visible without cropping at every screen size."
     },
     {
       "type": "checkbox",

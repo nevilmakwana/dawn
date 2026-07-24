@@ -166,6 +166,17 @@
   width: 100%;
 }
 
+.banner--show-full-media .banner__media {
+  background: #000000;
+}
+
+.banner--show-full-media .banner__media > img,
+.banner--show-full-media .banner__media > svg,
+.banner--show-full-media .banner__media > video {
+  object-fit: contain !important;
+  object-position: center;
+}
+
 .banner__media-half {
   width: 50%;
 }
