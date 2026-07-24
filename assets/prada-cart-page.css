@@ -753,9 +753,20 @@
   }
 
   .prada-shopping-bag-footer__desktop-info {
+    display: flex;
     flex: 1 0 auto;
+    flex-direction: column;
+    min-height: 0;
     margin-top: 24px;
     border-top: 1px solid #dddddd;
+  }
+
+  .prada-shopping-bag-footer__desktop-disclosure:first-child {
+    flex: 1 0 auto;
+  }
+
+  .prada-shopping-bag-footer__desktop-disclosure:nth-child(2) {
+    margin-top: auto;
   }
 
   .prada-shopping-bag-footer__desktop-disclosure {
