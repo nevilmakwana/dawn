@@ -1,0 +1,46 @@
+{{ 'prada-wishlist-page.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'prada-wishlist-page.js' | asset_url }}" defer="defer"></script>
+
+<section class="prada-wishlist-page" data-prada-wishlist-page data-section-id="{{ section.id }}">
+  <h1 class="prada-wishlist-page__heading">
+    Wishlist (<span data-prada-wishlist-count>0</span>)
+  </h1>
+
+  <div class="prada-wishlist-page__grid" data-prada-wishlist-grid hidden></div>
+
+  <div class="prada-wishlist-page__empty" data-prada-wishlist-empty>
+    <p>Your wishlist is empty. Explore the collections, save your favourite items and collect them here.</p>
+    {%- if shop.customer_accounts_enabled and customer == null -%}
+      <a href="{{ routes.account_login_url }}">Log in or create your personal account</a>
+    {%- endif -%}
+  </div>
+
+  <div class="prada-wishlist-page__footer">
+    &copy; {{ shop.name | escape }} {{ 'now' | date: '%Y' }} |
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Prada wishlist page",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "Wishlist products",
+      "limit": 12
+    },
+    {
+      "type": "range",
+      "id": "fallback_products_limit",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Products shown until wishlist products are selected",
+      "default": 2
+    }
+  ]
+}
+{% endschema %}

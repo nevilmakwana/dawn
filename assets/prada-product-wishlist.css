@@ -1,0 +1,63 @@
+.prada-product-wishlist-button {
+  position: absolute;
+  z-index: 10;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #111111;
+  cursor: pointer;
+  pointer-events: auto !important;
+  place-items: center;
+}
+
+.prada-product-wishlist-button .svg-wrapper,
+.prada-product-wishlist-button svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+.prada-product-wishlist-button svg {
+  fill: transparent;
+  stroke: currentColor;
+  transition: fill 160ms ease, transform 160ms ease;
+}
+
+.prada-product-wishlist-button.is-active svg {
+  fill: currentColor;
+}
+
+.prada-product-wishlist-button:hover svg,
+.prada-product-wishlist-button:focus-visible svg {
+  transform: scale(1.08);
+}
+
+.prada-product-wishlist-button:focus-visible {
+  outline: 1px solid #111111;
+  outline-offset: 2px;
+}
+
+@media screen and (max-width: 749px) {
+  .prada-product-wishlist-button {
+    top: 5px;
+    right: 5px;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    min-height: 32px;
+  }
+
+  .prada-product-wishlist-button .svg-wrapper,
+  .prada-product-wishlist-button svg {
+    width: 21px;
+    height: 21px;
+  }
+}

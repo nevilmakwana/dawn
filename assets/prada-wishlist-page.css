@@ -1,0 +1,315 @@
+body:has(.prada-wishlist-page) .section-header .header-wrapper {
+  background: #ffffff !important;
+  border-bottom: 1px solid #d9d9d9 !important;
+}
+
+body:has(.prada-wishlist-page) .section-header .prada-header,
+body:has(.prada-wishlist-page) .section-header .prada-header-btn,
+body:has(.prada-wishlist-page) .section-header .prada-header-btn__label,
+body:has(.prada-wishlist-page) .section-header .prada-text-logo,
+body:has(.prada-wishlist-page) .section-header .prada-header .header__icon--account,
+body:has(.prada-wishlist-page) .section-header .prada-header .header__icon--cart,
+body:has(.prada-wishlist-page) .section-header .prada-header header-drawer summary.header__icon,
+body:has(.prada-wishlist-page) .section-header .prada-header header-drawer summary .prada-menu-text,
+body:has(.prada-wishlist-page) .section-header .prada-header .header__search summary.header__icon,
+body:has(.prada-wishlist-page) .section-header .prada-header .header__search summary .prada-search-text {
+  color: #111111 !important;
+}
+
+body:has(.prada-wishlist-page) .section-header .prada-header-btn__icon svg,
+body:has(.prada-wishlist-page) .section-header .prada-header .header__icon--account svg,
+body:has(.prada-wishlist-page) .section-header .prada-header .header__icon--cart svg,
+body:has(.prada-wishlist-page) .section-header .prada-header header-drawer summary .prada-menu-icon-wrapper svg,
+body:has(.prada-wishlist-page) .section-header .prada-header .header__search summary .svg-wrapper:not(.header__icon-close) svg,
+body:has(.prada-wishlist-page) .section-header .prada-header .header__search summary .prada-search-icon-wrapper svg {
+  color: #111111 !important;
+  stroke: #111111 !important;
+}
+
+body:has(.prada-wishlist-page) .section-header .prada-header-logo .header__heading-logo {
+  filter: brightness(0);
+}
+
+body:has(.prada-wishlist-page) .footer {
+  display: none !important;
+}
+
+.prada-wishlist-page {
+  --prada-wishlist-page-padding: 20px;
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  padding: 82px var(--prada-wishlist-page-padding) 0;
+  background: #ffffff;
+  color: #111111;
+}
+
+.prada-wishlist-page__heading {
+  margin: 0 0 24px;
+  color: #111111;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
+.prada-wishlist-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 451px));
+  gap: 20px;
+  align-items: start;
+  justify-content: start;
+}
+
+.prada-wishlist-page__grid[hidden],
+.prada-wishlist-page__empty[hidden] {
+  display: none !important;
+}
+
+.prada-wishlist-page__card {
+  min-width: 0;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.prada-wishlist-page__card.is-removing {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.prada-wishlist-page__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 0.8;
+  background: #f1f1f1;
+}
+
+.prada-wishlist-page__image-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.prada-wishlist-page__media img,
+.prada-wishlist-page__placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.prada-wishlist-page__remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #000000;
+  cursor: pointer;
+  place-items: center;
+}
+
+.prada-wishlist-page__remove .svg-wrapper,
+.prada-wishlist-page__remove svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+.prada-wishlist-page__remove svg {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+.prada-wishlist-page__details {
+  min-height: 56px;
+  padding-top: 10px;
+}
+
+.prada-wishlist-page__title {
+  display: block;
+  min-height: 0;
+  color: #111111;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+.prada-wishlist-page__title:hover,
+.prada-wishlist-page__title:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.prada-wishlist-page__price {
+  margin: 6px 0 0;
+  color: #111111;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.prada-wishlist-page__product-form,
+.prada-wishlist-page__form {
+  display: block;
+}
+
+.prada-wishlist-page__add {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid #000000;
+  border-radius: 0;
+  background: #000000;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.prada-wishlist-page__add:hover,
+.prada-wishlist-page__add:focus-visible {
+  background: #222222;
+}
+
+.prada-wishlist-page__add[disabled] {
+  border-color: #b3b3b3;
+  background: #b3b3b3;
+  cursor: not-allowed;
+}
+
+.prada-wishlist-page__add .loading__spinner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+}
+
+.prada-wishlist-page__add.loading > span:first-child {
+  visibility: hidden;
+}
+
+.prada-wishlist-page__empty {
+  display: flex;
+  min-height: 400px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.prada-wishlist-page__empty p {
+  max-width: 360px;
+  margin: 0 0 26px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.prada-wishlist-page__empty a {
+  color: #111111;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.prada-wishlist-page__footer {
+  min-height: 74px;
+  margin: auto calc(var(--prada-wishlist-page-padding) * -1) 0;
+  padding: 0 var(--prada-wishlist-page-padding) 16px;
+  border-top: 1px solid #d9d9d9;
+  color: #111111;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  display: flex;
+  align-items: flex-end;
+}
+
+@media screen and (min-width: 990px) {
+  .prada-wishlist-page {
+    padding-top: 96px;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .prada-wishlist-page {
+    --prada-wishlist-page-padding: 16px;
+    min-height: 100dvh;
+    padding: 70px var(--prada-wishlist-page-padding) 0;
+  }
+
+  .prada-wishlist-page__heading {
+    margin: 0 0 18px;
+    padding: 0;
+    font-size: 15px;
+  }
+
+  .prada-wishlist-page__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .prada-wishlist-page__remove {
+    top: 6px;
+    right: 6px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .prada-wishlist-page__remove .svg-wrapper,
+  .prada-wishlist-page__remove svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .prada-wishlist-page__details {
+    min-height: 78px;
+    padding-top: 9px;
+  }
+
+  .prada-wishlist-page,
+  .prada-wishlist-page__heading,
+  .prada-wishlist-page__title,
+  .prada-wishlist-page__price,
+  .prada-wishlist-page__add {
+    font-family: var(--font-body-family);
+    font-style: var(--font-body-style);
+  }
+
+  .prada-wishlist-page__price {
+    font-size: 13px;
+    font-weight: 400;
+  }
+
+  .prada-wishlist-page__title {
+    font-size: 13px;
+  }
+
+  .prada-wishlist-page__add {
+    min-height: 44px;
+    font-size: 13px;
+  }
+
+  .prada-wishlist-page__price {
+    margin-top: 6px;
+  }
+}

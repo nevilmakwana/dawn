@@ -218,12 +218,28 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
           const cartFooter = document.getElementById('main-cart-footer');
 
           if (cartFooter) cartFooter.classList.toggle('is-empty', parsedState.item_count === 0);
-          if (cartDrawerWrapper) cartDrawerWrapper.classList.toggle('is-empty', parsedState.item_count === 0);
+          if (cartDrawerWrapper) {
+            cartDrawerWrapper.classList.toggle('is-empty', parsedState.item_count === 0);
+            cartDrawerWrapper.classList.toggle('prada-cart-drawer--multiple', parsedState.items.length > 1);
+            window.PradaCartHeader?.update?.(parsedState.item_count);
+          }
+          document.querySelectorAll('[data-prada-shopping-bag-count]').forEach((count) => {
+            count.textContent = String(parsedState.item_count);
+          });
 
           sectionsToRender.forEach((section) => {
+            const sectionElement = document.getElementById(section.id);
+
+            // Keep the custom header cart button intact when cart page sections refresh.
+            if (section.id === 'cart-icon-bubble' && sectionElement?.classList.contains('prada-header-btn--cart')) {
+              window.PradaCartHeader?.update?.(parsedState.item_count);
+              return;
+            }
+
             const elementToReplace =
-              document.getElementById(section.id).querySelector(section.selector) ||
-              document.getElementById(section.id);
+              sectionElement?.querySelector(section.selector) ||
+              sectionElement;
+            if (!elementToReplace) return;
             elementToReplace.innerHTML = this.getSectionInnerHTML(
               parsedState.sections[section.section],
               section.selector

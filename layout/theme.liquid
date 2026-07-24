@@ -279,9 +279,12 @@
     {% endstyle %}
 
     {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'prada-drawer-scroll-lock.css' | asset_url | stylesheet_tag }}
+    {{ 'prada-product-wishlist.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'prada-product-wishlist.js' | asset_url }}" defer="defer"></script>
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 
-    {%- if settings.cart_type == 'drawer' -%}
+    {%- if settings.cart_type != 'page' -%}
       {{ 'component-cart-drawer.css' | asset_url | stylesheet_tag }}
       {{ 'component-cart.css' | asset_url | stylesheet_tag }}
       {{ 'component-totals.css' | asset_url | stylesheet_tag }}
@@ -326,7 +329,7 @@
       {{ 'accessibility.skip_to_text' | t }}
     </a>
 
-    {%- if settings.cart_type == 'drawer' -%}
+    {%- if settings.cart_type != 'page' -%}
       {%- render 'cart-drawer' -%}
     {%- endif -%}
 
@@ -398,7 +401,8 @@
       <script src="{{ 'predictive-search.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
 
-    {%- if settings.cart_type == 'drawer' -%}
+    <script src="{{ 'prada-drawer-scroll-lock.js' | asset_url }}" defer="defer"></script>
+    {%- if settings.cart_type != 'page' -%}
       <script src="{{ 'cart-drawer.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
   </body>

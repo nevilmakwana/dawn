@@ -13,12 +13,13 @@
       {
         "type": "image_picker",
         "id": "logo",
-        "label": "t:settings_schema.logo.settings.logo_image.label"
+        "label": "White logo"
       },
       {
         "type": "image_picker",
         "id": "logo_hover",
-        "label": "Logo image on hover (Black/Dark logo)"
+        "label": "Black logo",
+        "info": "Used when the header turns white on hover or scroll."
       },
       {
         "type": "range",
@@ -33,8 +34,8 @@
       {
         "type": "range",
         "id": "mobile_logo_width",
-        "min": 50,
-        "max": 250,
+        "min": 60,
+        "max": 220,
         "step": 5,
         "default": 90,
         "unit": "px",

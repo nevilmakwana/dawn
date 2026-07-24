@@ -8,17 +8,112 @@
 <header-drawer data-breakpoint="{% if section.settings.menu_type_desktop == 'drawer' %}desktop{% else %}tablet{% endif %}">
   <details id="Details-menu-drawer-container" class="menu-drawer-container">
     <summary
-      class="header__icon header__icon--menu header__icon--summary link focus-inset"
+      class="header__icon header__icon--menu header__icon--summary link prada-menu-summary"
       aria-label="{{ 'sections.header.menu' | t }}"
     >
       <span class="prada-menu-icon-wrapper">
-        {{- 'icon-hamburger.svg' | inline_asset_content -}}
-        {{- 'icon-close.svg' | inline_asset_content -}}
+        {{- 'prada-menu.svg' | inline_asset_content -}}
+        {{- 'prada-close.svg' | inline_asset_content -}}
       </span>
     </summary>
     <div id="menu-drawer" class="gradient menu-drawer motion-reduce color-{{ section.settings.menu_color_scheme }}">
       <div class="menu-drawer__inner-container">
         <div class="menu-drawer__navigation-container">
+          <nav class="prada-desktop-menu" aria-label="{{ 'sections.header.menu' | t }}">
+            <div class="prada-desktop-menu__toolbar">
+              <button type="button" class="prada-desktop-menu__toolbar-button" data-prada-drawer-close>
+                <span class="prada-desktop-menu__toolbar-icon">
+                  {{- 'prada-close.svg' | inline_asset_content -}}
+                </span>
+                <span>Close</span>
+              </button>
+              <button type="button" class="prada-desktop-menu__toolbar-button" data-prada-drawer-search>
+                <span class="prada-desktop-menu__toolbar-icon">
+                  {{- 'prada-search.svg' | inline_asset_content -}}
+                </span>
+                <span>Search</span>
+              </button>
+            </div>
+
+            <div class="prada-desktop-menu__primary" role="list">
+              {%- for link in section.settings.menu.links -%}
+                <div class="prada-desktop-menu__item{% if link.links != blank %} has-submenu{% endif %}" role="listitem">
+                  {%- if link.links != blank -%}
+                    <input
+                      class="prada-desktop-menu__primary-control"
+                      type="radio"
+                      name="PradaDesktopMenu-{{ section.id }}"
+                      id="PradaDesktopMenu-{{ section.id }}-{{ forloop.index }}"
+                    >
+                    <label class="prada-desktop-menu__primary-link" for="PradaDesktopMenu-{{ section.id }}-{{ forloop.index }}">
+                      <span>{{ link.title | escape }}</span>
+                      <span class="prada-desktop-menu__chevron" aria-hidden="true">&rarr;</span>
+                    </label>
+                    <div class="prada-desktop-menu__submenu" id="PradaDesktopMenuPanel-{{ section.id }}-{{ forloop.index }}" aria-label="{{ link.title | escape }}">
+                      <ul class="prada-desktop-menu__submenu-list" role="list">
+                        {%- for childlink in link.links -%}
+                          <li class="prada-desktop-menu__submenu-item{% if childlink.links != blank %} has-grandchildren{% endif %}">
+                            {%- if childlink.links != blank -%}
+                              <input
+                                class="prada-desktop-menu__submenu-control"
+                                type="radio"
+                                name="PradaDesktopSubMenu-{{ section.id }}-{{ forloop.parentloop.index }}"
+                                id="PradaDesktopSubMenu-{{ section.id }}-{{ forloop.parentloop.index }}-{{ forloop.index }}"
+                              >
+                              <label class="prada-desktop-menu__submenu-link" for="PradaDesktopSubMenu-{{ section.id }}-{{ forloop.parentloop.index }}-{{ forloop.index }}">
+                                <span>{{ childlink.title | escape }}</span>
+                                <span class="prada-desktop-menu__chevron" aria-hidden="true">&rarr;</span>
+                              </label>
+                              <div class="prada-desktop-menu__grandchild-panel" aria-label="{{ childlink.title | escape }}">
+                                <a class="prada-desktop-menu__view-all" href="{{ childlink.url }}">View all</a>
+                                <ul class="prada-desktop-menu__grandchild-list" role="list">
+                                  {%- for grandchildlink in childlink.links -%}
+                                    <li>
+                                      <a href="{{ grandchildlink.url }}"{% if grandchildlink.current %} aria-current="page"{% endif %}>
+                                        {{ grandchildlink.title | escape }}
+                                      </a>
+                                    </li>
+                                  {%- endfor -%}
+                                </ul>
+                              </div>
+                            {%- else -%}
+                              <a class="prada-desktop-menu__submenu-link" href="{{ childlink.url }}"{% if childlink.current %} aria-current="page"{% endif %}>
+                                {{ childlink.title | escape }}
+                              </a>
+                            {%- endif -%}
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    </div>
+                  {%- else -%}
+                    <a class="prada-desktop-menu__primary-link" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>
+                      <span>{{ link.title | escape }}</span>
+                    </a>
+                  {%- endif -%}
+                </div>
+              {%- endfor -%}
+            </div>
+
+            <div class="prada-desktop-menu__utility">
+              {%- if shop.customer_accounts_enabled -%}
+                <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" rel="nofollow">
+                  {{- 'prada-account.svg' | inline_asset_content -}}
+                  <span>{% if customer %}Account{% else %}Log in or Register{% endif %}</span>
+                </a>
+              {%- endif -%}
+              <a href="{{ routes.cart_url }}">
+                {{- 'prada-cart.svg' | inline_asset_content -}}
+                <span>Shopping bag</span>
+              </a>
+              <a href="#" aria-label="View your wish list">
+                {{- 'prada-wishlist.svg' | inline_asset_content -}}
+                <span>Wishlist</span>
+              </a>
+              <a href="/pages/contact">
+                <span>Contact us</span>
+              </a>
+            </div>
+          </nav>
           <nav class="menu-drawer__navigation">
             <ul class="menu-drawer__menu has-submenu list-menu" role="list">
               {%- for link in section.settings.menu.links -%}
@@ -293,3 +388,64 @@
     </div>
   </details>
 </header-drawer>
+
+<script>
+  if (!window.pradaDrawerToolbarBound) {
+    window.pradaDrawerToolbarBound = true;
+
+    function updatePradaDesktopMenuLevel(menuDrawer) {
+      if (!menuDrawer) return;
+
+      const activePrimaryControl = menuDrawer.querySelector('.prada-desktop-menu__primary-control:checked');
+      let level = '1';
+
+      if (activePrimaryControl) {
+        level = '2';
+        const activePrimaryItem = activePrimaryControl.closest('.prada-desktop-menu__item');
+        const activeSubmenuControl = activePrimaryItem && activePrimaryItem.querySelector('.prada-desktop-menu__submenu-control:checked');
+
+        if (activeSubmenuControl) level = '3';
+      }
+
+      menuDrawer.dataset.pradaMenuLevel = level;
+    }
+
+    document.addEventListener('change', function (event) {
+      const control = event.target;
+
+      if (!control.matches('.prada-desktop-menu__primary-control, .prada-desktop-menu__submenu-control')) return;
+
+      const menuDrawer = control.closest('.menu-drawer');
+      if (!menuDrawer) return;
+
+      if (control.matches('.prada-desktop-menu__primary-control')) {
+        menuDrawer.querySelectorAll('.prada-desktop-menu__submenu-control').forEach(function (submenuControl) {
+          submenuControl.checked = false;
+        });
+      }
+
+      updatePradaDesktopMenuLevel(menuDrawer);
+    });
+
+    document.addEventListener('click', function (event) {
+      const closeButton = event.target.closest('[data-prada-drawer-close]');
+      const searchButton = event.target.closest('[data-prada-drawer-search]');
+      const actionButton = closeButton || searchButton;
+
+      if (!actionButton) return;
+
+      const drawer = actionButton.closest('header-drawer');
+      const drawerSummary = drawer && drawer.querySelector('details > summary');
+
+      if (drawerSummary) drawerSummary.click();
+
+      if (searchButton) {
+        window.setTimeout(function () {
+          const header = drawer && drawer.closest('.prada-header');
+          const searchSummary = header && header.querySelector('.header__search details > summary');
+          if (searchSummary) searchSummary.click();
+        }, 0);
+      }
+    });
+  }
+</script>

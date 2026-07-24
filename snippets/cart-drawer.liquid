@@ -17,7 +17,7 @@
   }
 </style>
 
-<cart-drawer class="drawer{% if cart == empty %} is-empty{% endif %}">
+<cart-drawer class="drawer prada-cart-drawer{% if cart == empty %} is-empty{% endif %}{% if cart.items.size > 1 %} prada-cart-drawer--multiple{% endif %}">
   <div id="CartDrawer" class="cart-drawer">
     <div id="CartDrawer-Overlay" class="cart-drawer__overlay"></div>
     <div
@@ -29,9 +29,8 @@
     >
       {%- if cart == empty -%}
         <div class="drawer__inner-empty">
-          <div class="cart-drawer__warnings center{% if settings.cart_drawer_collection != blank %} cart-drawer__warnings--has-collection{% endif %}">
-            <div class="cart-drawer__empty-content">
-              <h2 class="cart__empty-text">{{ 'sections.cart.empty' | t }}</h2>
+          <div class="cart-drawer__warnings center">
+            <div class="prada-cart-drawer__empty-content">
               <button
                 class="drawer__close"
                 type="button"
@@ -42,27 +41,21 @@
                   {{- 'icon-close.svg' | inline_asset_content -}}
                 </span>
               </button>
-              <a href="{{ routes.all_products_collection_url }}" class="button">
-                {{ 'general.continue_shopping' | t }}
-              </a>
-
+              <p class="prada-cart-drawer__empty-message">Your shopping bag is empty</p>
               {%- if shop.customer_accounts_enabled and customer == null -%}
-                <p class="cart__login-title h3">{{ 'sections.cart.login.title' | t }}</p>
-                <p class="cart__login-paragraph">
-                  {{ 'sections.cart.login.paragraph_html' | t: link: routes.account_login_url }}
-                </p>
+                <a class="prada-cart-drawer__empty-login" href="{{ routes.account_login_url }}">
+                  Log in or create your personal account
+                </a>
               {%- endif -%}
             </div>
           </div>
-          {%- if settings.cart_drawer_collection != blank -%}
-            <div class="cart-drawer__collection">
-              {% render 'card-collection', card_collection: settings.cart_drawer_collection, columns: 1 %}
-            </div>
-          {%- endif -%}
         </div>
       {%- endif -%}
       <div class="drawer__header">
-        <h2 class="drawer__heading">{{ 'sections.cart.title' | t }}</h2>
+        <h2 class="drawer__heading">
+          <span class="prada-cart-drawer__heading-desktop">Your selection ({{ cart.item_count }})</span>
+          <span class="prada-cart-drawer__heading-mobile">Added to shopping bag ({{ cart.item_count }})</span>
+        </h2>
         <button
           class="drawer__close"
           type="button"
@@ -90,7 +83,10 @@
           <div id="CartDrawer-CartItems" class="drawer__contents js-contents">
             {%- if cart != empty -%}
               <div class="drawer__cart-items-wrapper">
-                <table class="cart-items" role="table">
+                <table
+                  class="cart-items prada-cart-drawer__items{% if cart.items.size > 1 %} prada-cart-drawer__items--multiple{% endif %}"
+                  role="table"
+                >
                   <thead role="rowgroup">
                     <tr role="row">
                       <th id="CartDrawer-ColumnProductImage" role="columnheader">
@@ -161,6 +157,35 @@
                               product: item.product,
                               modal_id: cart_disclosure_modal_id
                             -%}
+                          </div>
+
+                          <div class="prada-cart-drawer__item-info">
+                            {%- for option in item.options_with_values -%}
+                              {%- assign option_name = option.name | downcase -%}
+                              {%- if option_name contains 'color' or option_name contains 'colour' -%}
+                                <p class="prada-cart-drawer__option">{{ option.name | escape }}: {{ option.value | escape }}</p>
+                              {%- endif -%}
+                            {%- endfor -%}
+                            {%- for option in item.options_with_values -%}
+                              {%- assign option_name = option.name | downcase -%}
+                              {%- unless option_name contains 'color' or option_name contains 'colour' -%}
+                                <p class="prada-cart-drawer__option">{{ option.name | escape }}: {{ option.value | escape }}</p>
+                              {%- endunless -%}
+                            {%- endfor -%}
+                            <p class="prada-cart-drawer__quantity">Qty: {{ item.quantity }}</p>
+                            <p class="prada-cart-drawer__price">{{ item.final_price | money }}</p>
+                            <cart-remove-button
+                              class="prada-cart-drawer__remove-wrap"
+                              data-index="{{ item.index | plus: 1 }}"
+                            >
+                              <button
+                                type="button"
+                                class="prada-cart-drawer__remove"
+                                aria-label="{{ 'sections.cart.remove_title' | t: title: item.title | escape }}"
+                              >
+                                Remove
+                              </button>
+                            </cart-remove-button>
                           </div>
 
                           {%- if item.original_price != item.final_price -%}
@@ -527,7 +552,7 @@
           </div>
 
           <div class="totals" role="status">
-            <h2 class="totals__total">{{ 'sections.cart.estimated_total' | t }}</h2>
+            <h2 class="totals__total">Subtotal</h2>
             <p class="totals__total-value">{{ cart.total_price | money_with_currency }}</p>
           </div>
 
@@ -575,6 +600,7 @@
         <!-- CTAs -->
 
         <div class="cart__ctas" {{ block.shopify_attributes }}>
+          <a class="prada-cart-drawer__view-cart" href="{{ routes.cart_url }}">Go to shopping bag</a>
           <button
             type="submit"
             id="CartDrawer-Checkout"
@@ -585,7 +611,7 @@
               disabled
             {% endif %}
           >
-            {{ 'sections.cart.checkout' | t }}
+            Proceed to checkout
           </button>
         </div>
       </div>

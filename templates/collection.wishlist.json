@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "prada-wishlist-page",
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

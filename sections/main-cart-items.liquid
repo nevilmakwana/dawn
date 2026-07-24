@@ -4,6 +4,7 @@
 {{ 'component-price.css' | asset_url | stylesheet_tag }}
 {{ 'component-discounts.css' | asset_url | stylesheet_tag }}
 {{ 'quantity-popover.css' | asset_url | stylesheet_tag }}
+{{ 'prada-cart-page.css' | asset_url | stylesheet_tag }}
 
 {%- style -%}
   .section-{{ section.id }}-padding {
@@ -24,12 +25,17 @@
 {%- endunless -%}
 
 <script src="{{ 'quantity-popover.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'prada-cart-page.js' | asset_url }}" defer="defer"></script>
 
 <cart-items
-  class="gradient color-{{ section.settings.color_scheme }} isolate{% if cart == empty %} is-empty{% else %} section-{{ section.id }}-padding{% endif %}"
+  class="prada-shopping-bag-page gradient color-{{ section.settings.color_scheme }} isolate{% if cart == empty %} is-empty{% else %} section-{{ section.id }}-padding{% endif %}"
   view-event-payload="{{ cart | standard_event_data: 'view', context: 'page' | escape }}"
 >
   <div class="page-width">
+    <div class="prada-shopping-bag-page__mobile-heading">
+      <h1>Shopping bag (<span data-prada-shopping-bag-count>{{ cart.item_count }}</span>)</h1>
+    </div>
+
     <div class="title-wrapper-with-link">
       <h1 class="title title--primary">{{ 'sections.cart.title' | t }}</h1>
       <a href="{{ routes.all_products_collection_url }}" class="underlined-link">
@@ -136,7 +142,7 @@
                           </strong>
                         </div>
                       {%- else -%}
-                        <div class="product-option">
+                        <div class="product-option prada-shopping-bag-page__item-unit-price">
                           {{ item.original_price | money }}
                         </div>
                       {%- endif -%}
@@ -185,6 +191,8 @@
                           </li>
                         {%- endfor -%}
                       </ul>
+                      <p class="prada-shopping-bag-page__mobile-quantity">Quantity: {{ item.quantity }}</p>
+                      <p class="prada-shopping-bag-page__desktop-quantity">Quantity: {{ item.quantity }}</p>
                     </td>
 
                     <td class="cart-item__totals right medium-hide large-up-hide">
@@ -413,6 +421,38 @@
                           </span>
                         </div>
                       </quantity-popover>
+
+                      <div class="prada-shopping-bag-page__mobile-actions">
+                        <a href="{{ item.url }}" class="prada-shopping-bag-page__action">Edit</a>
+                        <cart-remove-button
+                          class="prada-shopping-bag-page__remove"
+                          data-index="{{ item.index | plus: 1 }}"
+                        >
+                          <button
+                            type="button"
+                            class="prada-shopping-bag-page__action"
+                            aria-label="{{ 'sections.cart.remove_title' | t: title: item.title | escape }}"
+                          >
+                            Remove
+                          </button>
+                        </cart-remove-button>
+                        <button
+                          type="button"
+                          class="prada-shopping-bag-page__action prada-shopping-bag-page__move-wishlist"
+                          data-prada-cart-move-to-wishlist
+                          data-product-id="{{ item.product.id }}"
+                          data-product-title="{{ item.product.title | escape }}"
+                          data-product-url="{{ item.url | escape }}"
+                          data-product-image="{% if item.image %}{{ item.image | image_url: width: 720 | escape }}{% endif %}"
+                          data-product-image-alt="{{ item.image.alt | default: item.product.title | escape }}"
+                          data-product-price="{{ item.final_price | money | escape }}"
+                          data-product-variant-id="{{ item.variant.id }}"
+                          data-product-available="{{ item.variant.available }}"
+                          aria-label="Move {{ item.product.title | escape }} to wishlist"
+                        >
+                          Move to wishlist
+                        </button>
+                      </div>
                     </td>
 
                     <td class="cart-item__totals right small-hide">

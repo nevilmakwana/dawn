@@ -1,0 +1,12 @@
+:root {
+  --prada-drawer-scrollbar-width: 0px;
+}
+
+body.prada-drawer-scroll-locked {
+  padding-right: var(--prada-drawer-scrollbar-width) !important;
+}
+
+body.prada-drawer-scroll-locked .section-header {
+  right: var(--prada-drawer-scrollbar-width) !important;
+  width: auto !important;
+}

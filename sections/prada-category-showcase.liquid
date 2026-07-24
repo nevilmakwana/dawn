@@ -1,0 +1,424 @@
+<section class="prada-category-showcase color-{{ section.settings.color_scheme }} gradient">
+  <div class="prada-category-showcase__intro">
+    {%- if section.settings.text != blank -%}
+      <div class="prada-category-showcase__text rte">
+        {{ section.settings.text }}
+      </div>
+    {%- endif -%}
+
+    <div class="prada-category-showcase__tabs" aria-label="Category tabs">
+      {%- if section.settings.women_label != blank -%}
+        <a
+          href="{{ section.settings.women_link | default: '#' }}"
+          class="prada-category-showcase__tab{% if section.settings.active_tab == 'women' %} is-active{% endif %}"
+        >
+          {{ section.settings.women_label }}
+        </a>
+      {%- endif -%}
+
+      {%- if section.settings.men_label != blank -%}
+        <a
+          href="{{ section.settings.men_link | default: '#' }}"
+          class="prada-category-showcase__tab{% if section.settings.active_tab == 'men' %} is-active{% endif %}"
+        >
+          {{ section.settings.men_label }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <div class="prada-category-showcase__grid">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign tile_image = block.settings.image
+        assign tile_url = block.settings.link
+        assign fallback_product = collections.all.products[forloop.index0]
+
+        if tile_image == blank and block.settings.product != blank
+          assign tile_image = block.settings.product.featured_media.preview_image
+        endif
+
+        if tile_image == blank and block.settings.collection != blank
+          if block.settings.collection.image != blank
+            assign tile_image = block.settings.collection.image
+          elsif block.settings.collection.products.first.featured_media.preview_image != blank
+            assign tile_image = block.settings.collection.products.first.featured_media.preview_image
+          endif
+        endif
+
+        if tile_image == blank and fallback_product != blank
+          assign tile_image = fallback_product.featured_media.preview_image
+        endif
+
+        if tile_url == blank and block.settings.product != blank
+          assign tile_url = block.settings.product.url
+        endif
+
+        if tile_url == blank and block.settings.collection != blank
+          assign tile_url = block.settings.collection.url
+        endif
+
+        if tile_url == blank and fallback_product != blank
+          assign tile_url = fallback_product.url
+        endif
+
+        if tile_url == blank
+          assign tile_url = routes.all_products_collection_url
+        endif
+      -%}
+
+      <a
+        class="prada-category-showcase__item"
+        href="{{ tile_url }}"
+        {{ block.shopify_attributes }}
+      >
+        <div class="prada-category-showcase__media">
+          {%- if tile_image != blank -%}
+            {{
+              tile_image
+              | image_url: width: 1100
+              | image_tag:
+                loading: 'lazy',
+                widths: '360, 480, 640, 800, 960, 1100',
+                sizes: '(min-width: 990px) 25vw, 50vw',
+                class: 'prada-category-showcase__image'
+            }}
+          {%- else -%}
+            {{ 'product-apparel-1' | placeholder_svg_tag: 'prada-category-showcase__placeholder placeholder-svg' }}
+          {%- endif -%}
+        </div>
+
+        <div class="prada-category-showcase__label">
+          {{ block.settings.title | escape }}
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    background: rgb(var(--color-background));
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase__intro {
+    min-height: {{ section.settings.intro_height }}px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 20px 46px;
+    text-align: center;
+    background: rgb(var(--color-background));
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase__text {
+    max-width: 680px;
+    color: rgb(var(--color-foreground));
+    font-size: 14px;
+    line-height: 1.28;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase__text p {
+    margin: 0;
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase__tabs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 26px;
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase__tab {
+    color: rgb(var(--color-foreground));
+    text-decoration: none;
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 600;
+    padding-bottom: 10px;
+    border-bottom: 1px solid transparent;
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase__tab.is-active {
+    border-bottom-color: currentColor;
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    background: #ffffff;
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase__item {
+    display: grid;
+    grid-template-rows: minmax(420px, {{ section.settings.tile_height }}px) 74px;
+    min-width: 0;
+    color: #000000;
+    text-decoration: none;
+    background: #ffffff;
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase__media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    background: {{ section.settings.tile_background }};
+    border-right: 1px solid #ffffff;
+    overflow: hidden;
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase__item:last-child .prada-category-showcase__media {
+    border-right: 0;
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase__placeholder {
+    width: 70%;
+    height: 70%;
+    opacity: 0.45;
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase__item:hover .prada-category-showcase__image {
+    transform: scale(1.025);
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase__label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 12px;
+    color: #000000;
+    background: #ffffff;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  @media screen and (max-width: 989px) {
+    #shopify-section-{{ section.id }} .prada-category-showcase__intro {
+      min-height: auto;
+      padding: 42px 24px 38px;
+    }
+
+    #shopify-section-{{ section.id }} .prada-category-showcase__text {
+      max-width: 520px;
+      font-size: 13px;
+    }
+
+    #shopify-section-{{ section.id }} .prada-category-showcase__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      background: #ffffff;
+    }
+
+    #shopify-section-{{ section.id }} .prada-category-showcase__item {
+      grid-template-rows: minmax(260px, 52vw) 58px;
+    }
+
+    #shopify-section-{{ section.id }} .prada-category-showcase__media {
+      border-right: 0;
+      border-bottom: 0;
+    }
+
+    #shopify-section-{{ section.id }} .prada-category-showcase__image {
+      width: 100%;
+      height: 100%;
+    }
+
+    #shopify-section-{{ section.id }} .prada-category-showcase__label {
+      min-height: 58px;
+      padding: 14px 8px;
+      font-size: 13px;
+    }
+  }
+
+  @media screen and (max-width: 520px) {
+    #shopify-section-{{ section.id }} .prada-category-showcase__intro {
+      padding: 36px 22px 32px;
+    }
+
+    #shopify-section-{{ section.id }} .prada-category-showcase__tabs {
+      margin-top: 22px;
+    }
+
+    #shopify-section-{{ section.id }} .prada-category-showcase__item {
+      grid-template-rows: minmax(238px, 61vw) 56px;
+    }
+
+    #shopify-section-{{ section.id }} .prada-category-showcase__label {
+      min-height: 56px;
+      padding: 13px 6px;
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Prada category showcase",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Intro text",
+      "default": "<p>Rooted in memory and shaped by transformation, evolving forms and refined details reveal new expressions of individuality.</p>"
+    },
+    {
+      "type": "text",
+      "id": "women_label",
+      "label": "Women label",
+      "default": "Women"
+    },
+    {
+      "type": "url",
+      "id": "women_link",
+      "label": "Women link"
+    },
+    {
+      "type": "text",
+      "id": "men_label",
+      "label": "Men label",
+      "default": "Men"
+    },
+    {
+      "type": "url",
+      "id": "men_link",
+      "label": "Men link"
+    },
+    {
+      "type": "select",
+      "id": "active_tab",
+      "label": "Active tab",
+      "default": "men",
+      "options": [
+        {
+          "value": "women",
+          "label": "Women"
+        },
+        {
+          "value": "men",
+          "label": "Men"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "intro_height",
+      "min": 150,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "label": "Intro height",
+      "default": 220
+    },
+    {
+      "type": "range",
+      "id": "tile_height",
+      "min": 420,
+      "max": 700,
+      "step": 20,
+      "unit": "px",
+      "label": "Desktop tile image height",
+      "default": 600
+    },
+    {
+      "type": "color",
+      "id": "tile_background",
+      "label": "Tile background",
+      "default": "#f3f3f3"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Men's Bags"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Fallback product"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Fallback collection"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [
+    {
+      "name": "Prada category showcase",
+      "blocks": [
+        {
+          "type": "category",
+          "settings": {
+            "title": "Men's Bags"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Men's Ready to Wear"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Men's Shoes"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Men's Accessories"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

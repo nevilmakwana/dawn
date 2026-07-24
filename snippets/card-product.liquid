@@ -569,6 +569,25 @@
           </div>
         </div>
       </div>
+      <button
+        class="prada-product-wishlist-button"
+        type="button"
+        data-prada-product-wishlist
+        data-product-id="{{ card_product.id }}"
+        data-product-title="{{ card_product.title | escape }}"
+        data-product-url="{{ card_product.url | escape }}"
+        data-product-image="{% if card_product.featured_media %}{{ card_product.featured_media | image_url: width: 720 | escape }}{% endif %}"
+        data-product-image-alt="{{ card_product.featured_media.alt | default: card_product.title | escape }}"
+        data-product-price="{{ card_product.price | money | escape }}"
+        data-product-variant-id="{{ card_product.selected_or_first_available_variant.id }}"
+        data-product-available="{{ card_product.available }}"
+        aria-label="Add {{ card_product.title | escape }} to wishlist"
+        aria-pressed="false"
+      >
+        <span class="svg-wrapper">
+          {{- 'prada-wishlist.svg' | inline_asset_content -}}
+        </span>
+      </button>
     </div>
   </product-component>
 {%- else -%}

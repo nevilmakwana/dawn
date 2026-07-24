@@ -1,28 +1,108 @@
+const updatePradaCartIcon = (itemCount) => {
+  const cartLink = document.querySelector('.prada-header-btn--cart#cart-icon-bubble');
+  if (!cartLink) return;
+
+  Array.from(cartLink.children).forEach((child) => {
+    if (
+      child.id === 'cart-icon-bubble' ||
+      child.classList.contains('cart-count-bubble') ||
+      child.classList.contains('svg-wrapper')
+    ) {
+      child.remove();
+    }
+  });
+
+  let badge = Array.from(cartLink.children).find((child) => child.classList.contains('prada-cart-badge'));
+
+  if (itemCount > 0) {
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'prada-cart-badge';
+      badge.setAttribute('aria-hidden', 'true');
+      cartLink.append(badge);
+    }
+    badge.textContent = String(itemCount);
+  } else {
+    badge?.remove();
+  }
+
+  cartLink.setAttribute('aria-label', itemCount > 0 ? `Cart (${itemCount})` : 'Cart');
+};
+
+window.PradaCartHeader = window.PradaCartHeader || {};
+window.PradaCartHeader.update = updatePradaCartIcon;
+
 class CartDrawer extends HTMLElement {
   constructor() {
     super();
 
     this.addEventListener('keyup', (evt) => evt.code === 'Escape' && this.close());
-    this.querySelector('#CartDrawer-Overlay').addEventListener('click', this.close.bind(this));
+    this.bindOverlay();
     this.setHeaderCartIconAccessibility();
   }
 
-  setHeaderCartIconAccessibility() {
-    const cartLink = document.querySelector('#cart-icon-bubble');
-    if (!cartLink) return;
+  bindOverlay() {
+    const overlay = this.querySelector('#CartDrawer-Overlay');
+    if (!overlay || overlay.dataset.cartDrawerBound) return;
 
-    cartLink.setAttribute('role', 'button');
-    cartLink.setAttribute('aria-haspopup', 'dialog');
-    cartLink.addEventListener('click', (event) => {
+    overlay.dataset.cartDrawerBound = 'true';
+    overlay.addEventListener('click', this.close.bind(this));
+  }
+
+  async refreshForHeader() {
+    const cartUrl = window.routes?.cart_url || '/cart';
+    const response = await fetch(`${cartUrl}?section_id=cart-drawer`);
+
+    if (!response.ok) throw new Error('Unable to refresh cart drawer');
+
+    const responseDocument = new DOMParser().parseFromString(await response.text(), 'text/html');
+    const sourceDrawer = responseDocument.querySelector('cart-drawer');
+    const sourceContents = sourceDrawer?.querySelector('#CartDrawer');
+    const targetContents = this.querySelector('#CartDrawer');
+
+    if (!sourceDrawer || !sourceContents || !targetContents) return;
+
+    targetContents.innerHTML = sourceContents.innerHTML;
+    this.classList.toggle('is-empty', sourceDrawer.classList.contains('is-empty'));
+    this.classList.toggle(
+      'prada-cart-drawer--multiple',
+      sourceDrawer.classList.contains('prada-cart-drawer--multiple'),
+    );
+    this.bindOverlay();
+  }
+
+  setHeaderCartIconAccessibility() {
+    if (this.headerCartControlBound) return;
+
+    this.headerCartControlBound = true;
+
+    const getCartLink = (target) => {
+      if (!(target instanceof Element)) return null;
+      return target.closest('#cart-icon-bubble.prada-header-btn--cart');
+    };
+
+    const openFromHeader = (event) => {
+      const cartLink = getCartLink(event.target);
+      if (!cartLink) return;
+
       event.preventDefault();
+      cartLink.setAttribute('role', 'button');
+      cartLink.setAttribute('aria-haspopup', 'dialog');
       this.open(cartLink);
+      this.refreshForHeader().catch(() => {});
+    };
+
+    document.addEventListener('click', openFromHeader);
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      openFromHeader(event);
     });
-    cartLink.addEventListener('keydown', (event) => {
-      if (event.code.toUpperCase() === 'SPACE') {
-        event.preventDefault();
-        this.open(cartLink);
-      }
-    });
+
+    const cartLink = document.querySelector('#cart-icon-bubble.prada-header-btn--cart');
+    if (cartLink) {
+      cartLink.setAttribute('role', 'button');
+      cartLink.setAttribute('aria-haspopup', 'dialog');
+    }
   }
 
   open(triggeredBy) {
@@ -47,7 +127,11 @@ class CartDrawer extends HTMLElement {
       { once: true },
     );
 
-    document.body.classList.add('overflow-hidden');
+    if (window.pradaDrawerScrollLock) {
+      window.pradaDrawerScrollLock.lock();
+    } else {
+      document.body.classList.add('overflow-hidden');
+    }
 
     // cart-drawer-items is a CartItems subclass that extends createViewEventElement.
     // Its `view-event-trigger="manual"` skips auto-dispatch on connect; we fire
@@ -58,7 +142,11 @@ class CartDrawer extends HTMLElement {
   close() {
     this.classList.remove('active');
     removeTrapFocus(this.activeElement);
-    document.body.classList.remove('overflow-hidden');
+    if (window.pradaDrawerScrollLock) {
+      window.pradaDrawerScrollLock.unlock();
+    } else {
+      document.body.classList.remove('overflow-hidden');
+    }
   }
 
   setSummaryAccessibility(cartDrawerNote) {
@@ -76,9 +164,20 @@ class CartDrawer extends HTMLElement {
     cartDrawerNote.parentElement.addEventListener('keyup', onKeyUpEscape);
   }
 
-  renderContents(parsedState) {
-    this.querySelector('.drawer__inner').classList.contains('is-empty') &&
-      this.querySelector('.drawer__inner').classList.remove('is-empty');
+  renderContents(parsedState, { shouldOpen = true } = {}) {
+    if (typeof parsedState.item_count === 'number') {
+      this.classList.toggle('is-empty', parsedState.item_count === 0);
+      updatePradaCartIcon(parsedState.item_count);
+    }
+    const sourceDrawer = parsedState.sections?.['cart-drawer']
+      ? this.getSectionDOM(parsedState.sections['cart-drawer'], 'cart-drawer')
+      : null;
+    if (sourceDrawer) {
+      this.classList.toggle(
+        'prada-cart-drawer--multiple',
+        sourceDrawer.classList.contains('prada-cart-drawer--multiple'),
+      );
+    }
     this.productId = parsedState.id;
     this.getSectionsToRender().forEach((section) => {
       const sectionElement = section.selector
@@ -89,10 +188,11 @@ class CartDrawer extends HTMLElement {
       sectionElement.innerHTML = this.getSectionInnerHTML(parsedState.sections[section.id], section.selector);
     });
 
-    setTimeout(() => {
-      this.querySelector('#CartDrawer-Overlay').addEventListener('click', this.close.bind(this));
-      this.open();
-    });
+    this.bindOverlay();
+
+    if (shouldOpen) {
+      setTimeout(() => this.open());
+    }
   }
 
   getSectionInnerHTML(html, selector = '.shopify-section') {
@@ -104,9 +204,6 @@ class CartDrawer extends HTMLElement {
       {
         id: 'cart-drawer',
         selector: '#CartDrawer',
-      },
-      {
-        id: 'cart-icon-bubble',
       },
     ];
   }
@@ -129,11 +226,6 @@ class CartDrawerItems extends CartItems {
         id: 'CartDrawer',
         section: 'cart-drawer',
         selector: '.drawer__inner',
-      },
-      {
-        id: 'cart-icon-bubble',
-        section: 'cart-icon-bubble',
-        selector: '.shopify-section',
       },
     ];
   }

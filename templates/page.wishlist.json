@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "main": {
+      "type": "prada-wishlist-page",
+      "settings": {
+        "fallback_products_limit": 2
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

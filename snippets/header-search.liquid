@@ -15,9 +15,9 @@
       aria-haspopup="dialog"
       aria-label="{{ 'general.search.search' | t }}"
     >
-      <span class="prada-search-icon-wrapper">
+      <span>
         <span class="svg-wrapper">
-          {{- 'icon-search.svg' | inline_asset_content -}}
+          {{- 'prada-search.svg' | inline_asset_content -}}
         </span>
         <span class="svg-wrapper header__icon-close">
           {{- 'icon-close.svg' | inline_asset_content -}}
@@ -48,7 +48,7 @@
               type="search"
               name="q"
               value="{{ search.terms | escape }}"
-              placeholder="{{ 'general.search.search' | t }}"
+              placeholder="{{ 'general.search.search' | t }} on {{ shop.name | escape }}"
               {%- if settings.predictive_search_enabled -%}
                 role="combobox"
                 aria-expanded="false"
@@ -75,7 +75,7 @@
             </button>
             <button class="search__button field__button" aria-label="{{ 'general.search.search' | t }}">
               <span class="svg-wrapper">
-                {{- 'icon-search.svg' | inline_asset_content -}}
+                {{- 'prada-search.svg' | inline_asset_content -}}
               </span>
             </button>
           </div>
@@ -98,10 +98,27 @@
           class="search-modal__close-button modal__close-button link link--text focus-inset"
           aria-label="{{ 'accessibility.close' | t }}"
         >
-          <span class="svg-wrapper">
+          <span class="prada-search-close-label">{{ 'accessibility.close' | t }}</span>
+          <span class="svg-wrapper prada-search-close-icon">
             {{- 'icon-close.svg' | inline_asset_content -}}
           </span>
         </button>
+        <div class="prada-mobile-search-links" aria-label="Quick links">
+          <div class="prada-mobile-search-links__group">
+            <p class="prada-mobile-search-links__heading">Collections</p>
+            <a href="{{ routes.search_url }}?q=Women%27s%20Bags">Women's Bags</a>
+            <a href="{{ routes.search_url }}?q=Women%27s%20Shoes">Women's Shoes</a>
+            <a href="{{ routes.search_url }}?q=Men%27s%20Shoes">Men's Shoes</a>
+            <a href="{{ routes.search_url }}?q=Men%27s%20Ready%20to%20Wear">Men's Ready to Wear</a>
+          </div>
+          <div class="prada-mobile-search-links__group">
+            <p class="prada-mobile-search-links__heading">Highlights</p>
+            <a href="{{ routes.search_url }}?q=New%20Arrivals">New Arrivals</a>
+            <a href="{{ routes.search_url }}?q=Scarves">Scarves</a>
+            <a href="{{ routes.search_url }}?q=Grey%20Home">Grey Home</a>
+            <a href="{{ routes.search_url }}?q=Kurtis">Kurtis</a>
+          </div>
+        </div>
       </div>
     </div>
   </details>

@@ -36,35 +36,149 @@
         "button"
       ],
       "settings": {
-        "image_overlay_opacity": 40,
+        "video": "shopify://files/videos/loop_m_DT.webm",
+        "image_overlay_opacity": 0,
         "image_height": "large",
-        "desktop_content_position": "bottom-center",
-        "show_text_box": false,
+        "full_screen_height": true,
         "image_behavior": "none",
+        "desktop_content_position": "bottom-center",
         "desktop_content_alignment": "center",
+        "show_text_box": false,
         "color_scheme": "scheme-3",
-        "mobile_content_alignment": "center",
         "stack_images_on_mobile": false,
+        "mobile_content_alignment": "center",
+        "show_text_below": false
+      }
+    },
+    "prada_category_showcase": {
+      "type": "prada-category-showcase",
+      "blocks": {
+        "category_bags": {
+          "type": "category",
+          "settings": {
+            "title": "Men's Bags",
+            "image": "shopify://shop_images/imgi_73_cq5dam.web.hebebed.600.600.jpg",
+            "product": "",
+            "collection": "",
+            "link": "shopify://collections/all"
+          }
+        },
+        "category_ready_to_wear": {
+          "type": "category",
+          "settings": {
+            "title": "Men's Ready to Wear",
+            "image": "shopify://shop_images/imgi_75_cq5dam.web.hebebed.600.600.jpg",
+            "product": "",
+            "collection": "",
+            "link": "shopify://collections/all"
+          }
+        },
+        "category_shoes": {
+          "type": "category",
+          "settings": {
+            "title": "Men's Shoes",
+            "image": "shopify://shop_images/imgi_81_cq5dam.web.hebebed.600.600.jpg",
+            "product": "",
+            "collection": "",
+            "link": "shopify://collections/all"
+          }
+        },
+        "category_accessories": {
+          "type": "category",
+          "settings": {
+            "title": "Men's Accessories",
+            "image": "shopify://shop_images/imgi_85_cq5dam.web.hebebed.600.600.jpg",
+            "product": "",
+            "collection": "",
+            "link": "shopify://collections/all"
+          }
+        }
+      },
+      "block_order": [
+        "category_bags",
+        "category_ready_to_wear",
+        "category_shoes",
+        "category_accessories"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "text": "<p>Rooted in memory and shaped by transformation, evolving forms and refined details reveal new expressions of individuality.</p>",
+        "women_label": "Women",
+        "women_link": "shopify://collections/all",
+        "men_label": "Men",
+        "men_link": "shopify://collections/all",
+        "active_tab": "men",
+        "intro_height": 220,
+        "tile_height": 600,
+        "tile_background": "#f3f3f3"
+      }
+    },
+    "prada_showcase_banner": {
+      "type": "image-banner",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Discover the collection",
+            "heading_size": "h1"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "Explore the latest pieces from Grey Exim.",
+            "text_style": "body"
+          }
+        },
+        "button": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "Discover",
+            "button_link_1": "shopify://collections/all",
+            "button_style_secondary_1": true,
+            "button_label_2": "",
+            "button_link_2": "",
+            "button_style_secondary_2": false
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "button"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/imgi_21_menu_DT.jpg",
+        "image_overlay_opacity": 0,
+        "image_height": "large",
+        "full_screen_height": true,
+        "prada_link_button": true,
+        "image_behavior": "none",
+        "desktop_content_position": "bottom-center",
+        "desktop_content_alignment": "center",
+        "show_text_box": false,
+        "color_scheme": "scheme-3",
+        "stack_images_on_mobile": false,
+        "mobile_content_alignment": "center",
         "show_text_below": false
       }
     },
     "featured_collection": {
       "type": "featured-collection",
       "settings": {
+        "collection": "all",
+        "products_to_show": 8,
         "title": "Featured products",
         "heading_size": "h2",
         "description": "",
         "show_description": false,
         "description_style": "body",
-        "collection": "all",
-        "products_to_show": 8,
         "columns_desktop": 4,
-        "color_scheme": "scheme-1",
+        "enable_desktop_slider": false,
         "full_width": false,
         "show_view_all": true,
         "view_all_style": "solid",
-        "enable_desktop_slider": false,
-        "swipe_on_mobile": false,
+        "color_scheme": "scheme-1",
         "image_ratio": "adapt",
         "image_shape": "default",
         "show_secondary_image": true,
@@ -72,6 +186,7 @@
         "show_rating": false,
         "quick_add": "none",
         "columns_mobile": "2",
+        "swipe_on_mobile": false,
         "padding_top": 44,
         "padding_bottom": 36
       }
@@ -79,6 +194,8 @@
   },
   "order": [
     "image_banner",
+    "prada_category_showcase",
+    "prada_showcase_banner",
     "featured_collection"
   ]
 }
