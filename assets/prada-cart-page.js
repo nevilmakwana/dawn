@@ -2,6 +2,14 @@
   if (window.pradaShoppingBagBound) return;
   window.pradaShoppingBagBound = true;
 
+  const openSecurePayments = (root = document) => {
+    const securePayments = root.querySelector('.prada-shopping-bag-footer__desktop-disclosure');
+    if (securePayments && !securePayments.open) securePayments.open = true;
+  };
+
+  openSecurePayments();
+  document.addEventListener('shopify:section:load', (event) => openSecurePayments(event.target));
+
   document.addEventListener('click', (event) => {
     const moveButton = event.target.closest('[data-prada-cart-move-to-wishlist]');
     if (!moveButton || moveButton.disabled || !window.PradaWishlist?.add) return;

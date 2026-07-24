@@ -424,6 +424,7 @@
     top: calc(var(--header-height, 72px) + 20px);
     grid-column: 2;
     align-self: start;
+    min-height: 490px;
     padding: 0 !important;
     background: #ffffff;
   }
@@ -700,6 +701,7 @@
   #MainContent:has(.prada-shopping-bag-page) .prada-shopping-bag-footer__contents,
   #MainContent:has(.prada-shopping-bag-page) .prada-shopping-bag-footer__desktop {
     display: block;
+    min-height: 490px;
     margin: 0;
     padding: 0 !important;
     border: 0;
@@ -711,6 +713,10 @@
   }
 
   .prada-shopping-bag-footer__desktop-summary {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-height: 490px;
     padding: 26px 25px 28px;
   }
 
@@ -747,6 +753,7 @@
   }
 
   .prada-shopping-bag-footer__desktop-info {
+    flex: 1 0 auto;
     margin-top: 24px;
     border-top: 1px solid #dddddd;
   }
