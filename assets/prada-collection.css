@@ -8,11 +8,20 @@
   color: var(--prada-ink);
 }
 
+/* Collection pages use a scrolling site header and a persistent catalogue bar. */
+body:has(.prada-collection) .section-header {
+  position: absolute !important;
+}
+
 .prada-collection * {
   box-sizing: border-box;
 }
 
 .prada-collection__header {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  background: #fff;
   border-bottom: 1px solid var(--prada-line);
 }
 
@@ -262,8 +271,8 @@
   display: block;
   width: 100%;
   height: 100%;
-  padding: clamp(1.6rem, 3vw, 4rem);
-  object-fit: contain;
+  padding: 0;
+  object-fit: cover;
 }
 
 .prada-product-tile__runway {
@@ -373,11 +382,6 @@
 
   .prada-collection__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .prada-product-tile__media img,
-  .prada-product-tile__placeholder {
-    padding: 1.25rem;
   }
 
   .prada-product-tile__runway {
