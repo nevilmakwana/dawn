@@ -437,8 +437,18 @@ body:has(.prada-collection) .section-header {
   }
 
   .prada-product-tile .prada-product-wishlist-button {
-    top: 1rem;
-    right: 1rem;
+    top: 0.8rem;
+    right: 0.8rem;
+    width: 2.8rem;
+    min-width: 2.8rem;
+    height: 2.8rem;
+    min-height: 2.8rem;
+  }
+
+  .prada-product-tile .prada-product-wishlist-button .svg-wrapper,
+  .prada-product-tile .prada-product-wishlist-button svg {
+    width: 1.7rem;
+    height: 1.7rem;
   }
 
   .prada-product-tile__carousel[data-prada-mobile-carousel] {
@@ -484,8 +494,8 @@ body:has(.prada-collection) .section-header {
   }
 
   .prada-product-tile__pagination-dot {
-    width: 0.8rem;
-    height: 0.8rem;
+    width: 0.6rem;
+    height: 0.6rem;
     border: 1px solid var(--prada-ink);
     border-radius: 50%;
     background: transparent;
@@ -496,12 +506,12 @@ body:has(.prada-collection) .section-header {
   }
 
   .prada-product-tile__information {
-    min-height: 8.4rem;
+    min-height: 7.8rem;
     padding: 1.1rem 1rem 1.3rem;
   }
 
   .prada-product-tile__title,
   .prada-product-tile__price {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 }
