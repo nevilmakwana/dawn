@@ -2,6 +2,8 @@
   --prada-ink: #0a0a0a;
   --prada-line: #dedede;
   --prada-media: #f2f2f2;
+  /* The site header is fixed, so collection controls need a reserved offset. */
+  padding-top: var(--header-height, 7rem);
   background: #fff;
   color: var(--prada-ink);
 }
@@ -248,7 +250,7 @@
 .prada-product-tile__media {
   position: relative;
   display: flex;
-  aspect-ratio: 1;
+  aspect-ratio: 4 / 5;
   align-items: center;
   justify-content: center;
   overflow: hidden;
