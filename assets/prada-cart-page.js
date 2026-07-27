@@ -314,18 +314,27 @@
         productOptions.every((option, index) => variant.options[index] === selectedOptions[index])
       );
 
-    const renderGallery = () => {
+    const getGalleryImages = () => {
       const selectedVariant = getSelectedVariant();
       const preferredImage = selectedVariant?.image;
-      const activeImage = preferredImage
-        ? { src: preferredImage, alt: data.title }
-        : images[activeImageIndex] || { src: '', alt: data.title };
+      if (!preferredImage) return images;
+
+      return [
+        { src: preferredImage, alt: data.title },
+        ...images.filter((galleryImage) => galleryImage.src !== preferredImage),
+      ];
+    };
+
+    const renderGallery = () => {
+      const galleryImages = getGalleryImages();
+      if (activeImageIndex >= galleryImages.length) activeImageIndex = 0;
+      const activeImage = galleryImages[activeImageIndex] || { src: '', alt: data.title };
 
       image.src = activeImage.src;
       image.alt = activeImage.alt || data.title;
-      previousButton.hidden = nextButton.hidden = images.length < 2 || Boolean(preferredImage);
-      dots.innerHTML = images.length > 1 && !preferredImage
-        ? images.map((_, index) => `<span class="${index === activeImageIndex ? 'is-active' : ''}"></span>`).join('')
+      previousButton.hidden = nextButton.hidden = galleryImages.length < 2;
+      dots.innerHTML = galleryImages.length > 1
+        ? galleryImages.map((_, index) => `<span class="${index === activeImageIndex ? 'is-active' : ''}"></span>`).join('')
         : '';
     };
 
@@ -392,6 +401,7 @@
       const colorButton = event.target.closest('.prada-cart-edit-modal__color-value');
       if (colorButton) {
         selectedOptions[Number(colorButton.dataset.optionIndex)] = colorButton.dataset.optionValue;
+        activeImageIndex = 0;
         renderOptions();
         return;
       }
@@ -404,13 +414,15 @@
       }
 
       if (event.target.closest('.prada-cart-edit-modal__gallery-arrow--previous')) {
-        activeImageIndex = (activeImageIndex - 1 + images.length) % images.length;
+        const galleryImages = getGalleryImages();
+        activeImageIndex = (activeImageIndex - 1 + galleryImages.length) % galleryImages.length;
         renderGallery();
         return;
       }
 
       if (event.target.closest('.prada-cart-edit-modal__gallery-arrow--next')) {
-        activeImageIndex = (activeImageIndex + 1) % images.length;
+        const galleryImages = getGalleryImages();
+        activeImageIndex = (activeImageIndex + 1) % galleryImages.length;
         renderGallery();
       }
     });
@@ -419,6 +431,7 @@
       const select = event.target.closest('.prada-cart-edit-modal__select');
       if (!select) return;
       selectedOptions[Number(select.dataset.optionIndex)] = select.value;
+      activeImageIndex = 0;
       renderOptions();
     });
 
