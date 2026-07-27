@@ -63,7 +63,7 @@ class CartNotification extends HTMLElement {
     removeTrapFocus(this.activeElement);
   }
 
-  renderContents(parsedState) {
+  renderContents(parsedState, { shouldOpen = true } = {}) {
     this.cartItemKey = parsedState.key;
     this.getSectionsToRender().forEach((section) => {
       document.getElementById(section.id).innerHTML = this.getSectionInnerHTML(
@@ -72,8 +72,14 @@ class CartNotification extends HTMLElement {
       );
     });
 
-    if (this.header) this.header.reveal();
-    this.open();
+    if (typeof parsedState.item_count === 'number') {
+      window.PradaCartHeader?.update?.(parsedState.item_count);
+    }
+
+    if (shouldOpen) {
+      if (this.header) this.header.reveal();
+      this.open();
+    }
   }
 
   getSectionsToRender() {
