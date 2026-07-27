@@ -96,7 +96,7 @@
 
       if (!desktopMediaQuery.matches) return;
 
-      const openDisclosure = disclosures.find((disclosure) => disclosure.open) || disclosures[0];
+      const openDisclosure = disclosures.find((disclosure) => disclosure.open);
 
       for (const disclosure of disclosures) {
         finishDisclosureState(disclosure, disclosure === openDisclosure);
@@ -113,20 +113,25 @@
         if (!desktopMediaQuery.matches) return;
 
         event.preventDefault();
-        if (disclosure.dataset.animating === 'true') return;
+        if (disclosureGroup.dataset.animating === 'true') return;
 
-        const currentlyOpen = disclosures.find((item) => item.open);
+        disclosureGroup.dataset.animating = 'true';
 
-        if (disclosure.open) {
-          await animateDisclosure(disclosure, false);
-          return;
+        try {
+          const openDisclosures = disclosures.filter((item) => item.open && item !== disclosure);
+
+          if (disclosure.open) {
+            await animateDisclosure(disclosure, false);
+            return;
+          }
+
+          await Promise.all([
+            ...openDisclosures.map((item) => animateDisclosure(item, false)),
+            animateDisclosure(disclosure, true),
+          ]);
+        } finally {
+          disclosureGroup.dataset.animating = 'false';
         }
-
-        if (currentlyOpen && currentlyOpen !== disclosure) {
-          await animateDisclosure(currentlyOpen, false);
-        }
-
-        await animateDisclosure(disclosure, true);
       });
     });
 
@@ -147,7 +152,7 @@
             return;
           }
 
-          const openDisclosure = groupDisclosures.find((disclosure) => disclosure.open) || groupDisclosures[0];
+          const openDisclosure = groupDisclosures.find((disclosure) => disclosure.open);
           groupDisclosures.forEach((disclosure) => {
             finishDisclosureState(disclosure, disclosure === openDisclosure);
           });
