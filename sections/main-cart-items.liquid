@@ -423,7 +423,14 @@
                       </quantity-popover>
 
                       <div class="prada-shopping-bag-page__mobile-actions">
-                        <a href="{{ item.url }}" class="prada-shopping-bag-page__action">Edit</a>
+                        <button
+                          type="button"
+                          class="prada-shopping-bag-page__action"
+                          data-prada-cart-edit
+                          data-prada-cart-edit-data="PradaCartEditData-{{ item.index | plus: 1 }}"
+                        >
+                          Edit
+                        </button>
                         <cart-remove-button
                           class="prada-shopping-bag-page__remove"
                           data-index="{{ item.index | plus: 1 }}"
@@ -453,6 +460,51 @@
                           Move to wishlist
                         </button>
                       </div>
+                      <script type="application/json" id="PradaCartEditData-{{ item.index | plus: 1 }}">
+                        {
+                          "line": {{ item.index | plus: 1 | json }},
+                          "key": {{ item.key | json }},
+                          "quantity": {{ item.quantity | json }},
+                          "variantId": {{ item.variant.id | json }},
+                          "title": {{ item.product.title | json }},
+                          "url": {{ item.url | json }},
+                          "price": {{ item.final_price | money | json }},
+                          "image": {% if item.image %}{{ item.image | image_url: width: 1200 | json }}{% else %}null{% endif %},
+                          "properties": {{ item.properties | json }},
+                          "sellingPlan": {% if item.selling_plan_allocation %}{{ item.selling_plan_allocation.selling_plan.id | json }}{% else %}null{% endif %},
+                          "options": [
+                            {% for option in item.product.options_with_values %}
+                              {
+                                "name": {{ option.name | json }},
+                                "values": [
+                                  {% for value in option.values %}
+                                    {{ value.name | json }}{% unless forloop.last %},{% endunless %}
+                                  {% endfor %}
+                                ]
+                              }{% unless forloop.last %},{% endunless %}
+                            {% endfor %}
+                          ],
+                          "variants": [
+                            {% for variant in item.product.variants %}
+                              {
+                                "id": {{ variant.id | json }},
+                                "available": {{ variant.available | json }},
+                                "price": {{ variant.price | money | json }},
+                                "options": [{{ variant.option1 | json }}, {{ variant.option2 | json }}, {{ variant.option3 | json }}],
+                                "image": {% if variant.image %}{{ variant.image | image_url: width: 1200 | json }}{% else %}null{% endif %}
+                              }{% unless forloop.last %},{% endunless %}
+                            {% endfor %}
+                          ],
+                          "images": [
+                            {% for image in item.product.images %}
+                              {
+                                "src": {{ image | image_url: width: 1200 | json }},
+                                "alt": {{ image.alt | default: item.product.title | json }}
+                              }{% unless forloop.last %},{% endunless %}
+                            {% endfor %}
+                          ]
+                        }
+                      </script>
                     </td>
 
                     <td class="cart-item__totals right small-hide">
