@@ -1115,13 +1115,39 @@
   .prada-cart-edit-modal__details {
     display: inline-block;
     margin-top: 20px;
+    padding: 0;
+    border: 0;
+    background: transparent;
     color: #111111;
+    cursor: pointer;
     font-family: var(--font-body-family);
     font-size: 13px;
     font-weight: 700;
     text-decoration: underline;
     text-underline-offset: 4px;
   }
+
+  .prada-cart-edit-modal__description {
+    margin-top: 22px;
+    padding: 20px 0 4px;
+    border-top: 1px solid #dedede;
+    color: #111111;
+    font-family: var(--font-body-family);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.45;
+  }
+
+  .prada-cart-edit-modal__description > :first-child { margin-top: 0; }
+  .prada-cart-edit-modal__description > :last-child { margin-bottom: 0; }
+  .prada-cart-edit-modal__description p { margin: 0 0 14px; }
+  .prada-cart-edit-modal__description ul,
+  .prada-cart-edit-modal__description ol {
+    margin: 0 0 14px;
+    padding-left: 20px;
+  }
+
+  .prada-cart-edit-modal__description li + li { margin-top: 3px; }
 
   .prada-cart-edit-modal__status {
     min-height: 20px;

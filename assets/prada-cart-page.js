@@ -283,7 +283,8 @@
             </div>
             <div class="prada-cart-edit-modal__options"></div>
             <p class="prada-cart-edit-modal__status" role="status"></p>
-            <a class="prada-cart-edit-modal__details" href="${escapeHtml(data.url || '#')}">Show details</a>
+            <button class="prada-cart-edit-modal__details" type="button" aria-expanded="false">Show details</button>
+            <div class="prada-cart-edit-modal__description" hidden></div>
           </div>
           <div class="prada-cart-edit-modal__actions">
             <button class="prada-cart-edit-modal__cancel" type="button">Cancel</button>
@@ -304,6 +305,8 @@
     const price = modal.querySelector('.prada-cart-edit-modal__price');
     const status = modal.querySelector('.prada-cart-edit-modal__status');
     const confirmButton = modal.querySelector('.prada-cart-edit-modal__confirm');
+    const detailsButton = modal.querySelector('.prada-cart-edit-modal__details');
+    const description = modal.querySelector('.prada-cart-edit-modal__description');
     let handleEscape;
 
     const getSelectedVariant = () =>
@@ -455,6 +458,23 @@
         status.textContent = 'We could not update this item. Please try again.';
         confirmButton.disabled = false;
       }
+    });
+
+    detailsButton.addEventListener('click', () => {
+      const isOpen = detailsButton.getAttribute('aria-expanded') === 'true';
+
+      if (isOpen) {
+        description.hidden = true;
+        detailsButton.setAttribute('aria-expanded', 'false');
+        detailsButton.textContent = 'Show details';
+        return;
+      }
+
+      description.innerHTML = data.description || '<p>Product details are not available for this item.</p>';
+      description.hidden = false;
+      detailsButton.setAttribute('aria-expanded', 'true');
+      detailsButton.textContent = 'Hide details';
+      window.requestAnimationFrame(() => description.scrollIntoView({ block: 'nearest', behavior: motionMediaQuery.matches ? 'auto' : 'smooth' }));
     });
 
     handleEscape = (event) => {

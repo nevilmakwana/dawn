@@ -468,6 +468,7 @@
                           "variantId": {{ item.variant.id | json }},
                           "title": {{ item.product.title | json }},
                           "url": {{ item.url | json }},
+                          "description": {{ item.product.description | json }},
                           "price": {{ item.final_price | money | json }},
                           "image": {% if item.image %}{{ item.image | image_url: width: 1200 | json }}{% else %}null{% endif %},
                           "properties": {{ item.properties | json }},
