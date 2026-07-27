@@ -1820,6 +1820,29 @@
           'animate',
           'scrolled-past-header'
         );
+
+        this.collectionHeaderHeight = Math.max(this.header.offsetHeight, 1);
+        this.collectionScrollHandler = () => {
+          if (this.collectionScrollFrame) return;
+
+          this.collectionScrollFrame = requestAnimationFrame(() => {
+            const progress = Math.min(window.scrollY / this.collectionHeaderHeight, 1);
+
+            // Slow the visual exit slightly while the header still scrolls in
+            // document flow. The catalogue bar therefore never changes size.
+            this.header.style.setProperty('--prada-collection-header-opacity', String(1 - progress));
+            this.header.style.setProperty('--prada-collection-header-offset', `${progress * this.collectionHeaderHeight * 0.16}px`);
+            this.collectionScrollFrame = null;
+          });
+        };
+        this.collectionHeaderResizeHandler = () => {
+          this.collectionHeaderHeight = Math.max(this.header.offsetHeight, 1);
+          this.collectionScrollHandler();
+        };
+
+        window.addEventListener('scroll', this.collectionScrollHandler, { passive: true });
+        window.addEventListener('resize', this.collectionHeaderResizeHandler, { passive: true });
+        this.collectionScrollHandler();
         return;
       }
 
@@ -1871,6 +1894,15 @@
     disconnectedCallback() {
       this.removeEventListener('preventHeaderReveal', this.hideHeaderOnScrollUp);
       window.removeEventListener('scroll', this.onScrollHandler);
+      if (this.collectionScrollHandler) {
+        window.removeEventListener('scroll', this.collectionScrollHandler);
+      }
+      if (this.collectionHeaderResizeHandler) {
+        window.removeEventListener('resize', this.collectionHeaderResizeHandler);
+      }
+      if (this.collectionScrollFrame) {
+        cancelAnimationFrame(this.collectionScrollFrame);
+      }
     }
 
     createObserver() {

@@ -11,6 +11,10 @@
 /* Keep the global header in document flow on catalogue pages. */
 body:has(.prada-collection) .section-header {
   position: relative !important;
+  opacity: var(--prada-collection-header-opacity, 1);
+  transform: translate3d(0, var(--prada-collection-header-offset, 0px), 0);
+  transition: opacity 160ms linear, transform 160ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
 }
 
 .prada-collection * {
@@ -100,6 +104,12 @@ body:has(.prada-collection) .section-header {
   font-weight: 700;
   line-height: 1;
   text-transform: uppercase;
+}
+
+.prada-collection__count {
+  font-family: var(--font-body-family);
+  font-weight: 300;
+  letter-spacing: 0;
 }
 
 .prada-collection__controls {
