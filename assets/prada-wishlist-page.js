@@ -15,6 +15,26 @@
     return button;
   };
 
+  const refreshCartHeaderCount = async (cartState) => {
+    if (typeof cartState?.item_count === 'number') {
+      window.PradaCartHeader?.update?.(cartState.item_count);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${window.routes?.cart_url || '/cart'}.js`, {
+        headers: { Accept: 'application/json' },
+      });
+      const cart = await response.json();
+
+      if (response.ok && typeof cart.item_count === 'number') {
+        window.PradaCartHeader?.update?.(cart.item_count);
+      }
+    } catch (_error) {
+      // The add-to-cart request has already succeeded; a later cart interaction will refresh the badge.
+    }
+  };
+
   const createProductCard = (item) => {
     const article = document.createElement('article');
     article.className = 'prada-wishlist-page__card';
@@ -149,6 +169,8 @@
         const cartState = await response.json();
 
         if (!response.ok || cartState.status) throw new Error(cartState.description || 'Unable to add this item to your bag.');
+
+        await refreshCartHeaderCount(cartState);
 
         if (cartDrawer && cartState.sections) {
           cartDrawer.renderContents(cartState, { shouldOpen: false });
