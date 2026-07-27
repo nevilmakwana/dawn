@@ -424,7 +424,6 @@
     top: calc(var(--header-height, 72px) + 20px);
     grid-column: 2;
     align-self: start;
-    min-height: 490px;
     padding: 0 !important;
     background: #ffffff;
   }
@@ -701,7 +700,6 @@
   #MainContent:has(.prada-shopping-bag-page) .prada-shopping-bag-footer__contents,
   #MainContent:has(.prada-shopping-bag-page) .prada-shopping-bag-footer__desktop {
     display: block;
-    min-height: 490px;
     margin: 0;
     padding: 0 !important;
     border: 0;
@@ -716,8 +714,18 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    min-height: 490px;
+    width: 100%;
+    max-width: none;
     padding: 26px 25px 28px;
+  }
+
+  .prada-shopping-bag-footer__desktop > * {
+    width: 100%;
+    max-width: none;
+  }
+
+  .prada-shopping-bag-footer__desktop > div:only-child {
+    margin-left: 0;
   }
 
   .prada-shopping-bag-footer__desktop-totals {
@@ -754,19 +762,9 @@
 
   .prada-shopping-bag-footer__desktop-info {
     display: flex;
-    flex: 1 0 auto;
     flex-direction: column;
-    min-height: 0;
     margin-top: 24px;
-    border-top: 1px solid #dddddd;
-  }
-
-  .prada-shopping-bag-footer__desktop-disclosure:first-child {
-    flex: 1 0 auto;
-  }
-
-  .prada-shopping-bag-footer__desktop-disclosure:nth-child(2) {
-    margin-top: auto;
+    border-top: 1px solid #d8d8d8;
   }
 
   .prada-shopping-bag-footer__desktop-disclosure {
@@ -779,9 +777,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 44px;
+    min-height: 42px;
     margin: 0;
-    padding: 0 2px 0 8px;
+    padding: 10px 2px 10px 8px;
     color: #111111;
     cursor: pointer;
     font-family: var(--font-body-family);
@@ -793,6 +791,12 @@
 
   .prada-shopping-bag-footer__desktop-disclosure summary::-webkit-details-marker {
     display: none;
+  }
+
+  .prada-shopping-bag-footer__desktop-disclosure summary:focus,
+  .prada-shopping-bag-footer__desktop-disclosure summary:focus-visible {
+    outline: none;
+    box-shadow: none;
   }
 
   .prada-shopping-bag-footer__desktop-disclosure summary::after {
@@ -810,11 +814,24 @@
   }
 
   .prada-shopping-bag-footer__desktop-disclosure-content {
-    padding: 0 8px 22px;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 8px;
     color: #111111;
     font-family: var(--font-body-family);
     font-size: 14px;
     line-height: 1.35;
+    opacity: 0;
+    transition:
+      max-height 260ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 180ms ease,
+      padding 260ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .prada-shopping-bag-footer__desktop-disclosure[open] .prada-shopping-bag-footer__desktop-disclosure-content {
+    max-height: 50rem;
+    padding: 0 8px 22px;
+    opacity: 1;
   }
 
   .prada-shopping-bag-footer__desktop-disclosure-content p {
@@ -824,6 +841,12 @@
   .prada-shopping-bag-footer__desktop-disclosure-content a {
     color: inherit;
     text-underline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .prada-shopping-bag-footer__desktop-disclosure-content {
+      transition: none;
+    }
   }
 
   .prada-shopping-bag-footer__payment-list {

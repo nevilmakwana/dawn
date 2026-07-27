@@ -70,29 +70,35 @@
             <details class="prada-shopping-bag-footer__desktop-disclosure" open>
               <summary>Secure payments</summary>
               <div class="prada-shopping-bag-footer__desktop-disclosure-content">
-                <p>Your payment details are protected with secure encryption.</p>
-                {%- if shop.enabled_payment_types.size > 0 -%}
-                  <ul class="prada-shopping-bag-footer__payment-list" role="list">
-                    {%- for type in shop.enabled_payment_types -%}
-                      <li>{{ type | payment_type_svg_tag: class: 'icon icon--full-color' }}</li>
-                    {%- endfor -%}
-                  </ul>
-                {%- endif -%}
-                <p>Available payment methods are shown at checkout.</p>
+                <div class="prada-shopping-bag-footer__desktop-disclosure-content-inner">
+                  <p>Your payment details are protected with secure encryption.</p>
+                  {%- if shop.enabled_payment_types.size > 0 -%}
+                    <ul class="prada-shopping-bag-footer__payment-list" role="list">
+                      {%- for type in shop.enabled_payment_types -%}
+                        <li>{{ type | payment_type_svg_tag: class: 'icon icon--full-color' }}</li>
+                      {%- endfor -%}
+                    </ul>
+                  {%- endif -%}
+                  <p>Available payment methods are shown at checkout.</p>
+                </div>
               </div>
             </details>
 
             <details class="prada-shopping-bag-footer__desktop-disclosure">
               <summary>Need help? Contact us</summary>
               <div class="prada-shopping-bag-footer__desktop-disclosure-content">
-                <p><a href="{{ routes.contact_url }}">Contact our customer care team</a> for assistance with your order.</p>
+                <div class="prada-shopping-bag-footer__desktop-disclosure-content-inner">
+                  <p><a href="{{ routes.contact_url }}">Contact our customer care team</a> for assistance with your order.</p>
+                </div>
               </div>
             </details>
 
             <details class="prada-shopping-bag-footer__desktop-disclosure">
               <summary>Free shipping and returns</summary>
               <div class="prada-shopping-bag-footer__desktop-disclosure-content">
-                <p>Shipping and return details are available at checkout.</p>
+                <div class="prada-shopping-bag-footer__desktop-disclosure-content-inner">
+                  <p>Shipping and return details are available at checkout.</p>
+                </div>
               </div>
             </details>
           </div>
