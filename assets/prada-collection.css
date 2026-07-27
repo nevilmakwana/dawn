@@ -385,7 +385,7 @@ body:has(.prada-collection) .section-header {
 
   .prada-collection__title {
     min-height: 5.1rem;
-    padding-left: 3.6rem;
+    padding-left: 3rem;
     font-size: 1.4rem;
   }
 
@@ -405,7 +405,7 @@ body:has(.prada-collection) .section-header {
   }
 
   .prada-collection__tab:first-child {
-    padding-left: 3.6rem;
+    padding-left: 3rem;
   }
 
   .prada-collection__tab.is-active::after {

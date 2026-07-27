@@ -10,9 +10,14 @@
   if section.settings.mobile_video != blank
     assign mobile_banner_aspect_ratio = section.settings.mobile_video.aspect_ratio
   endif
+
+  assign use_full_media_adapt = false
+  if section.settings.show_full_media and section.settings.image_2 == blank
+    assign use_full_media_adapt = true
+  endif
 -%}
 
-{%- if section.settings.image_height == 'adapt' and mobile_banner_aspect_ratio != blank -%}
+{%- if mobile_banner_aspect_ratio != blank and section.settings.image_height == 'adapt' or mobile_banner_aspect_ratio != blank and use_full_media_adapt -%}
   {%- style -%}
     @media screen and (max-width: 749px) {
       #Banner-{{ section.id }}::before,
@@ -26,7 +31,7 @@
   {%- endstyle -%}
 {%- endif -%}
 
-{%- if section.settings.image_height == 'adapt' and desktop_banner_aspect_ratio != blank -%}
+{%- if desktop_banner_aspect_ratio != blank and section.settings.image_height == 'adapt' or desktop_banner_aspect_ratio != blank and use_full_media_adapt -%}
   {%- style -%}
     @media screen and (min-width: 750px) {
       #Banner-{{ section.id }}::before,
@@ -117,7 +122,7 @@
     }
   {%- endif -%}
 
-  {%- if section.settings.full_screen_height -%}
+  {%- if section.settings.full_screen_height and use_full_media_adapt == false -%}
     #shopify-section-{{ section.id }},
     #Banner-{{ section.id }} {
       min-height: 100vh !important;
@@ -161,6 +166,51 @@
       object-fit: {% if section.settings.show_full_media %}contain{% else %}cover{% endif %} !important;
     }
   {%- endif -%}
+
+  {%- if section.settings.mobile_center_zoom -%}
+    @media screen and (max-width: 749px) {
+      #Banner-{{ section.id }} {
+        min-height: clamp(42rem, 78vh, 62rem) !important;
+        height: clamp(42rem, 78vh, 62rem) !important;
+      }
+
+      @supports (height: 78svh) {
+        #Banner-{{ section.id }} {
+          min-height: clamp(42rem, 78svh, 62rem) !important;
+          height: clamp(42rem, 78svh, 62rem) !important;
+        }
+      }
+
+      #Banner-{{ section.id }}::before,
+      #Banner-{{ section.id }} .banner__media::before,
+      #Banner-{{ section.id }}:not(.banner--mobile-bottom) .banner__content::before {
+        content: none !important;
+        padding-bottom: 0 !important;
+        display: none !important;
+      }
+
+      #Banner-{{ section.id }} .banner__media,
+      #Banner-{{ section.id }} .banner__content {
+        min-height: 100% !important;
+        height: 100% !important;
+      }
+
+      #Banner-{{ section.id }} .banner__media {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+      }
+
+      #Banner-{{ section.id }} .banner__media > img,
+      #Banner-{{ section.id }} .banner__media > svg,
+      #Banner-{{ section.id }} .banner__media > video {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        object-position: center center !important;
+      }
+    }
+  {%- endif -%}
 {%- endstyle -%}
 
 {%- liquid
@@ -187,7 +237,7 @@
 
 <div
   id="Banner-{{ section.id }}"
-  class="banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if section.settings.video == blank and section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank and section.settings.mobile_video == blank %} banner--stacked{% endif %}{% if section.settings.image_height == 'adapt' and mobile_banner_aspect_ratio != blank %} banner--adapt{% endif %}{% if section.settings.show_full_media %} banner--show-full-media{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
+  class="banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if section.settings.video == blank and section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank and section.settings.mobile_video == blank %} banner--stacked{% endif %}{% if mobile_banner_aspect_ratio != blank and section.settings.image_height == 'adapt' or mobile_banner_aspect_ratio != blank and use_full_media_adapt %} banner--adapt{% endif %}{% if section.settings.show_full_media %} banner--show-full-media{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
 >
   {%- if section.settings.video != blank -%}
     <div class="banner__media media{% if section.settings.mobile_video != blank %} small-hide{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
@@ -413,6 +463,13 @@
       "default": false,
       "label": "Show full image or video",
       "info": "Keeps the entire media visible without cropping at every screen size."
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_center_zoom",
+      "default": false,
+      "label": "Enable mobile center zoom",
+      "info": "On mobile, crops the image from the center so the banner feels more zoomed in."
     },
     {
       "type": "checkbox",
