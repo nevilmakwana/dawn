@@ -443,32 +443,45 @@
       status.textContent = 'Updating your shopping bag...';
 
       try {
-        const changeResponse = await fetch(`${routes.cart_change_url}`, {
-          ...fetchConfig(),
-          body: JSON.stringify({ id: data.key, quantity: Number(selectedVariant.id) === Number(data.variantId) ? selectedQuantity : 0 }),
-        });
+        const isVariantChange = Number(selectedVariant.id) !== Number(data.variantId);
 
-        if (!changeResponse.ok) throw new Error('Unable to update the shopping bag.');
+        if (isVariantChange) {
+          const itemToAdd = {
+            id: selectedVariant.id,
+            quantity: selectedQuantity,
+          };
 
-        if (Number(selectedVariant.id) !== Number(data.variantId)) {
+          if (data.properties && !Array.isArray(data.properties) && typeof data.properties === 'object') {
+            itemToAdd.properties = data.properties;
+          }
+
+          if (data.sellingPlan) itemToAdd.selling_plan = data.sellingPlan;
+
           const addResponse = await fetch(`${routes.cart_add_url}`, {
             ...fetchConfig(),
-            body: JSON.stringify({
-              items: [{
-                id: selectedVariant.id,
-                quantity: selectedQuantity,
-                properties: data.properties || {},
-                ...(data.sellingPlan ? { selling_plan: data.sellingPlan } : {}),
-              }],
-            }),
+            body: JSON.stringify({ items: [itemToAdd] }),
           });
-          if (!addResponse.ok) throw new Error('Unable to update the selected option.');
+          const addData = await addResponse.json();
+
+          if (!addResponse.ok || addData.status) {
+            throw new Error(addData.description || 'Unable to update the selected option.');
+          }
+        }
+
+        const changeResponse = await fetch(`${routes.cart_change_url}`, {
+          ...fetchConfig(),
+          body: JSON.stringify({ id: data.key, quantity: isVariantChange ? 0 : selectedQuantity }),
+        });
+        const changeData = await changeResponse.json();
+
+        if (!changeResponse.ok || changeData.status) {
+          throw new Error(changeData.description || 'Unable to update the shopping bag.');
         }
 
         window.location.reload();
       } catch (error) {
         console.error(error);
-        status.textContent = 'We could not update this item. Please try again.';
+        status.textContent = error.message || 'We could not update this item. Please try again.';
         confirmButton.disabled = false;
       }
     });
