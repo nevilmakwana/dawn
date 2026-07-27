@@ -10,20 +10,22 @@
 
   const finishDisclosureState = (disclosure, isOpen) => {
     const content = getDisclosureContent(disclosure);
-    if (!content) {
-      disclosure.open = isOpen;
-      return;
-    }
-
     disclosure.open = isOpen;
     disclosure.dataset.animating = 'false';
-    content.style.maxHeight = isOpen ? 'none' : '0px';
-    content.style.opacity = isOpen ? '1' : '0';
+    disclosure.style.height = '';
+    disclosure.style.overflow = '';
+    disclosure.style.transition = '';
+
+    if (!content) return;
+
+    content.style.opacity = '';
+    content.style.transition = '';
   };
 
   const animateDisclosure = (disclosure, shouldOpen) => {
     const content = getDisclosureContent(disclosure);
-    if (!content) {
+    const summary = disclosure.querySelector('summary');
+    if (!content || !summary) {
       disclosure.open = shouldOpen;
       return Promise.resolve();
     }
@@ -34,44 +36,53 @@
     }
 
     disclosure.dataset.animating = 'true';
-    content.style.overflow = 'hidden';
 
     return new Promise((resolve) => {
       let finished = false;
       const complete = () => {
         if (finished) return;
         finished = true;
-        content.removeEventListener('transitionend', onTransitionEnd);
+        disclosure.removeEventListener('transitionend', onTransitionEnd);
         finishDisclosureState(disclosure, shouldOpen);
         resolve();
       };
 
       const onTransitionEnd = (event) => {
-        if (event.target !== content || event.propertyName !== 'max-height') return;
+        if (event.target !== disclosure || event.propertyName !== 'height') return;
         complete();
       };
 
-      content.addEventListener('transitionend', onTransitionEnd);
+      disclosure.addEventListener('transitionend', onTransitionEnd);
+      disclosure.style.transition = 'none';
+      content.style.transition = 'none';
+      disclosure.style.overflow = 'hidden';
 
       if (shouldOpen) {
         disclosure.open = true;
-        content.style.maxHeight = '0px';
         content.style.opacity = '0';
+        disclosure.style.height = `${summary.offsetHeight}px`;
+        void disclosure.offsetHeight;
+
+        disclosure.style.transition = 'height 280ms cubic-bezier(0.22, 1, 0.36, 1)';
+        content.style.transition = 'opacity 220ms ease';
         requestAnimationFrame(() => {
-          content.style.maxHeight = `${content.scrollHeight}px`;
+          disclosure.style.height = `${summary.offsetHeight + content.offsetHeight}px`;
           content.style.opacity = '1';
         });
       } else {
-        const currentHeight = content.scrollHeight;
-        content.style.maxHeight = `${currentHeight}px`;
+        disclosure.style.height = `${disclosure.offsetHeight}px`;
         content.style.opacity = '1';
+        void disclosure.offsetHeight;
+
+        disclosure.style.transition = 'height 240ms cubic-bezier(0.4, 0, 0.2, 1)';
+        content.style.transition = 'opacity 160ms ease';
         requestAnimationFrame(() => {
-          content.style.maxHeight = '0px';
+          disclosure.style.height = `${summary.offsetHeight}px`;
           content.style.opacity = '0';
         });
       }
 
-      window.setTimeout(complete, 360);
+      window.setTimeout(complete, 420);
     });
   };
 
@@ -90,8 +101,7 @@
         disclosure.dataset.animating = 'false';
 
         if (!content) return;
-        content.style.maxHeight = '';
-        content.style.opacity = '';
+        finishDisclosureState(disclosure, disclosure.open);
       });
 
       if (!desktopMediaQuery.matches) return;
@@ -146,8 +156,7 @@
               const content = getDisclosureContent(disclosure);
               if (!content) return;
 
-              content.style.maxHeight = '';
-              content.style.opacity = '';
+              finishDisclosureState(disclosure, disclosure.open);
             });
             return;
           }
