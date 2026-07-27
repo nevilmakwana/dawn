@@ -1811,6 +1811,18 @@
 
       this.setHeaderHeight();
 
+      // Collection pages keep the site header in normal document flow. Their
+      // catalogue controls supply the persistent sticky navigation instead.
+      if (window.location.pathname.startsWith('/collections/')) {
+        this.header.classList.remove(
+          'shopify-section-header-hidden',
+          'shopify-section-header-sticky',
+          'animate',
+          'scrolled-past-header'
+        );
+        return;
+      }
+
       window.matchMedia('(max-width: 990px)').addEventListener('change', this.setHeaderHeight.bind(this));
 
       if (this.headerIsAlwaysSticky) {

@@ -2,15 +2,15 @@
   --prada-ink: #0a0a0a;
   --prada-line: #dedede;
   --prada-media: #f2f2f2;
-  /* The site header is fixed, so collection controls need a reserved offset. */
-  padding-top: var(--header-height, 7rem);
+  position: relative;
+  isolation: isolate;
   background: #fff;
   color: var(--prada-ink);
 }
 
-/* Collection pages use a scrolling site header and a persistent catalogue bar. */
+/* Keep the global header in document flow on catalogue pages. */
 body:has(.prada-collection) .section-header {
-  position: absolute !important;
+  position: relative !important;
 }
 
 .prada-collection * {
@@ -23,6 +23,8 @@ body:has(.prada-collection) .section-header {
   top: 0;
   background: #fff;
   border-bottom: 1px solid var(--prada-line);
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .prada-collection__navigation {
