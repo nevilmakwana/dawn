@@ -106,7 +106,6 @@
               <product-component view-event-payload="{{ product | standard_event_data: 'view', context: 'collection' | escape }}">
                 <article class="prada-product-tile">
                   <a class="prada-product-tile__media" href="{{ product.url }}">
-                    <span class="prada-product-tile__runway">From the runway</span>
                     {%- if product.featured_media -%}
                       <img
                         srcset="

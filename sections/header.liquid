@@ -1831,7 +1831,7 @@
             // Slow the visual exit slightly while the header still scrolls in
             // document flow. The catalogue bar therefore never changes size.
             this.header.style.setProperty('--prada-collection-header-opacity', String(1 - progress));
-            this.header.style.setProperty('--prada-collection-header-offset', `${progress * this.collectionHeaderHeight * 0.16}px`);
+            this.header.style.setProperty('--prada-collection-header-offset', `${progress * this.collectionHeaderHeight * 0.32}px`);
             this.collectionScrollFrame = null;
           });
         };
