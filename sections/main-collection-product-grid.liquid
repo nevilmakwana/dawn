@@ -103,10 +103,21 @@
         <ul class="prada-collection__grid" id="product-grid" data-id="{{ section.id }}" role="list">
           {%- for product in collection.products -%}
             {%- assign secondary_media = product.media[1] -%}
+            {%- assign has_secondary_image = false -%}
+            {%- if secondary_media and secondary_media.media_type == 'image' -%}
+              {%- assign has_secondary_image = true -%}
+            {%- endif -%}
             <li class="prada-collection__item">
               <product-component view-event-payload="{{ product | standard_event_data: 'view', context: 'collection' | escape }}">
                 <article class="prada-product-tile">
-                  <a class="prada-product-tile__media" href="{{ product.url }}">
+                  <div class="prada-product-tile__media">
+                    <a
+                      class="prada-product-tile__carousel"
+                      href="{{ product.url }}"
+                      {% if has_secondary_image %}
+                        data-prada-mobile-carousel
+                      {% endif %}
+                    >
                     {%- if product.featured_media -%}
                       <img
                         class="prada-product-tile__image"
@@ -124,7 +135,7 @@
                         width="{{ product.featured_media.width }}"
                         height="{{ product.featured_media.height }}"
                       >
-                      {%- if secondary_media and secondary_media.media_type == 'image' -%}
+                      {%- if has_secondary_image -%}
                         <img
                           class="prada-product-tile__image prada-product-tile__image--secondary"
                           srcset="
@@ -147,7 +158,15 @@
                     {%- else -%}
                       {{ 'product-apparel-2' | placeholder_svg_tag: 'prada-product-tile__placeholder' }}
                     {%- endif -%}
-                  </a>
+                    </a>
+
+                    {%- if has_secondary_image -%}
+                      <span class="prada-product-tile__pagination" aria-hidden="true">
+                        <span class="prada-product-tile__pagination-dot is-active"></span>
+                        <span class="prada-product-tile__pagination-dot"></span>
+                      </span>
+                    {%- endif -%}
+                  </div>
 
                   <button
                     class="prada-product-wishlist-button"
@@ -186,6 +205,46 @@
     </div>
   {%- endpaginate -%}
 </collection-component>
+
+<script>
+  if (!window.pradaCollectionCarouselSetup) {
+    window.pradaCollectionCarouselSetup = function (root) {
+      root.querySelectorAll('[data-prada-mobile-carousel]').forEach(function (carousel) {
+        if (carousel.dataset.pradaCarouselReady === 'true') return;
+
+        var dots = carousel.parentElement.querySelectorAll('.prada-product-tile__pagination-dot');
+        if (dots.length !== 2) return;
+
+        carousel.dataset.pradaCarouselReady = 'true';
+        var animationFrame;
+
+        function updatePagination() {
+          var secondImageIsActive = carousel.scrollLeft >= carousel.clientWidth / 2;
+          dots[0].classList.toggle('is-active', !secondImageIsActive);
+          dots[1].classList.toggle('is-active', secondImageIsActive);
+          animationFrame = undefined;
+        }
+
+        carousel.addEventListener(
+          'scroll',
+          function () {
+            if (animationFrame) return;
+            animationFrame = window.requestAnimationFrame(updatePagination);
+          },
+          { passive: true }
+        );
+
+        updatePagination();
+      });
+    };
+
+    document.addEventListener('shopify:section:load', function (event) {
+      window.pradaCollectionCarouselSetup(event.target);
+    });
+  }
+
+  window.pradaCollectionCarouselSetup(document);
+</script>
 
 {% schema %}
 {
