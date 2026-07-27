@@ -1,19 +1,4 @@
-{{ 'template-collection.css' | asset_url | stylesheet_tag }}
-{{ 'component-card.css' | asset_url | stylesheet_tag }}
-{{ 'component-price.css' | asset_url | stylesheet_tag }}
 {{ 'prada-collection.css' | asset_url | stylesheet_tag }}
-
-{%- unless section.settings.quick_add == 'none' -%}
-  {{ 'quick-add.css' | asset_url | stylesheet_tag }}
-{%- endunless -%}
-
-{%- if section.settings.quick_add == 'standard' -%}
-  <script src="{{ 'quick-add.js' | asset_url }}" defer="defer"></script>
-  <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
-{%- endif -%}
-
-<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
-<script src="{{ 'prada-collection.js' | asset_url }}" defer="defer"></script>
 
 <collection-component
   class="prada-collection"
@@ -44,85 +29,138 @@
       </div>
 
       <div class="prada-collection__toolbar">
-        <p class="prada-collection__count" aria-live="polite">
-          <span data-prada-collection-count>{{ collection.products_count }}</span> products
-        </p>
+        <p class="prada-collection__count">{{ collection.products_count }} products</p>
 
-        {%- if section.settings.enable_filtering or section.settings.enable_sorting -%}
-          <aside
-            class="prada-collection__filters"
-            id="main-collection-filters"
-            data-id="{{ section.id }}"
-            aria-label="Product filters and sorting"
-          >
-            {% render 'facets',
-              results: collection,
-              enable_filtering: section.settings.enable_filtering,
-              enable_sorting: section.settings.enable_sorting,
-              filter_type: 'horizontal',
-              paginate: paginate
-            %}
-          </aside>
-        {%- endif -%}
+        <form class="prada-collection__controls" action="{{ collection.url }}" method="get">
+          {%- if section.settings.enable_filtering and collection.filters != empty -%}
+            <details class="prada-collection__filter-menu">
+              <summary>Filters</summary>
+              <div class="prada-collection__filter-panel">
+                {%- for filter in collection.filters -%}
+                  {%- case filter.type -%}
+                    {%- when 'boolean', 'list' -%}
+                      <fieldset class="prada-collection__filter-group">
+                        <legend>{{ filter.label | escape }}</legend>
+                        {%- for value in filter.values limit: 12 -%}
+                          <label class="prada-collection__filter-option{% if value.count == 0 and value.active == false %} is-disabled{% endif %}">
+                            <input
+                              type="checkbox"
+                              name="{{ value.param_name }}"
+                              value="{{ value.value }}"
+                              {% if value.active %}checked{% endif %}
+                              {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                            >
+                            <span>{{ value.label | escape }}</span>
+                            <small>{{ value.count }}</small>
+                          </label>
+                        {%- endfor -%}
+                      </fieldset>
+                    {%- when 'price_range' -%}
+                      <fieldset class="prada-collection__filter-group">
+                        <legend>{{ filter.label | escape }}</legend>
+                        <div class="prada-collection__price-fields">
+                          <label>
+                            <span>Min</span>
+                            <input name="{{ filter.min_value.param_name }}" type="number" value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}" min="0">
+                          </label>
+                          <label>
+                            <span>Max</span>
+                            <input name="{{ filter.max_value.param_name }}" type="number" value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}" min="0">
+                          </label>
+                        </div>
+                      </fieldset>
+                  {%- endcase -%}
+                {%- endfor -%}
+                <button class="prada-collection__apply-filter" type="submit">Apply filters</button>
+              </div>
+            </details>
+            <span class="prada-collection__control-divider" aria-hidden="true">&middot;</span>
+          {%- endif -%}
+
+          {%- if section.settings.enable_sorting -%}
+            <label class="prada-collection__sort">
+              <span>Sort by:</span>
+              <select name="sort_by" aria-label="Sort products" onchange="this.form.submit()">
+                {%- for option in collection.sort_options -%}
+                  <option value="{{ option.value | escape }}" {% if option.value == collection.sort_by %}selected="selected"{% endif %}>
+                    {{ option.name | escape }}
+                  </option>
+                {%- endfor -%}
+              </select>
+            </label>
+          {%- endif -%}
+        </form>
       </div>
     </header>
 
-    <div
-      class="product-grid-container prada-collection__grid-container{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
-      id="ProductGridContainer"
-      {% if settings.animations_reveal_on_scroll %}
-        data-cascade
-      {% endif %}
-    >
+    <div class="prada-collection__grid-container" id="ProductGridContainer">
       {%- if collection.products.size == 0 -%}
-        <div class="collection collection--empty prada-collection__empty" id="product-grid" data-id="{{ section.id }}">
-          <div class="loading-overlay gradient"></div>
+        <div class="prada-collection__empty" id="product-grid" data-id="{{ section.id }}">
           <h2>{{ 'sections.collection_template.empty' | t }}</h2>
           <a href="{{ collection.url }}" class="underlined-link">View all products</a>
         </div>
       {%- else -%}
-        <div class="collection prada-collection__products">
-          <div class="loading-overlay gradient"></div>
-          <ul
-            id="product-grid"
-            data-id="{{ section.id }}"
-            class="grid product-grid prada-collection__grid grid--2-col-tablet-down grid--4-col-desktop"
-          >
-            {% assign skip_card_product_styles = false %}
-            {%- for product in collection.products -%}
-              {% assign lazy_load = false %}
-              {%- if forloop.index > 4 -%}
-                {% assign lazy_load = true %}
-              {%- endif -%}
-              <li
-                class="grid__item prada-collection__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
-                {% if settings.animations_reveal_on_scroll %}
-                  data-cascade
-                  style="--animation-order: {{ forloop.index }};"
-                {% endif %}
-              >
-                {% render 'card-product',
-                  card_product: product,
-                  media_aspect_ratio: 'square',
-                  image_shape: 'default',
-                  show_secondary_image: section.settings.show_secondary_image,
-                  show_vendor: false,
-                  show_rating: false,
-                  lazy_load: lazy_load,
-                  skip_styles: skip_card_product_styles,
-                  quick_add: section.settings.quick_add,
-                  section_id: section.id,
-                  product_view_context: 'collection'
-                %}
-              </li>
-              {% assign skip_card_product_styles = true %}
-            {%- endfor -%}
-          </ul>
+        <ul class="prada-collection__grid" id="product-grid" data-id="{{ section.id }}" role="list">
+          {%- for product in collection.products -%}
+            <li class="prada-collection__item">
+              <product-component view-event-payload="{{ product | standard_event_data: 'view', context: 'collection' | escape }}">
+                <article class="prada-product-tile">
+                  <a class="prada-product-tile__media" href="{{ product.url }}">
+                    <span class="prada-product-tile__runway">From the runway</span>
+                    {%- if product.featured_media -%}
+                      <img
+                        srcset="
+                          {%- if product.featured_media.width >= 360 -%}{{ product.featured_media | image_url: width: 360 }} 360w,{%- endif -%}
+                          {%- if product.featured_media.width >= 533 -%}{{ product.featured_media | image_url: width: 533 }} 533w,{%- endif -%}
+                          {%- if product.featured_media.width >= 720 -%}{{ product.featured_media | image_url: width: 720 }} 720w,{%- endif -%}
+                          {%- if product.featured_media.width >= 940 -%}{{ product.featured_media | image_url: width: 940 }} 940w,{%- endif -%}
+                          {{ product.featured_media | image_url }} {{ product.featured_media.width }}w
+                        "
+                        src="{{ product.featured_media | image_url: width: 720 }}"
+                        sizes="(min-width: 990px) 25vw, 50vw"
+                        alt="{{ product.featured_media.alt | default: product.title | escape }}"
+                        {% if forloop.index > 4 %}loading="lazy"{% endif %}
+                        width="{{ product.featured_media.width }}"
+                        height="{{ product.featured_media.height }}"
+                      >
+                    {%- else -%}
+                      {{ 'product-apparel-2' | placeholder_svg_tag: 'prada-product-tile__placeholder' }}
+                    {%- endif -%}
+                  </a>
 
-          {%- if paginate.pages > 1 -%}
-            {% render 'pagination', paginate: paginate, anchor: '' %}
-          {%- endif -%}
-        </div>
+                  <button
+                    class="prada-product-wishlist-button"
+                    type="button"
+                    data-prada-product-wishlist
+                    data-product-id="{{ product.id }}"
+                    data-product-title="{{ product.title | escape }}"
+                    data-product-url="{{ product.url | escape }}"
+                    data-product-image="{% if product.featured_media %}{{ product.featured_media | image_url: width: 720 | escape }}{% endif %}"
+                    data-product-image-alt="{{ product.featured_media.alt | default: product.title | escape }}"
+                    data-product-price="{{ product.price | money | escape }}"
+                    data-product-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                    data-product-available="{{ product.available }}"
+                    aria-label="Add {{ product.title | escape }} to wishlist"
+                    aria-pressed="false"
+                  >
+                    <span class="svg-wrapper">{{- 'prada-wishlist.svg' | inline_asset_content -}}</span>
+                  </button>
+
+                  <div class="prada-product-tile__information">
+                    <h2 class="prada-product-tile__title"><a href="{{ product.url }}">{{ product.title | escape }}</a></h2>
+                    <p class="prada-product-tile__price">
+                      {%- if product.price_varies -%}From {% endif -%}{{ product.price | money }}
+                    </p>
+                  </div>
+                </article>
+              </product-component>
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        {%- if paginate.pages > 1 -%}
+          {% render 'pagination', paginate: paginate, anchor: '' %}
+        {%- endif -%}
       {%- endif -%}
     </div>
   {%- endpaginate -%}
@@ -147,22 +185,6 @@
       "step": 4,
       "default": 16,
       "label": "Products per page"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_secondary_image",
-      "default": false,
-      "label": "Show second product image on hover"
-    },
-    {
-      "type": "select",
-      "id": "quick_add",
-      "default": "none",
-      "label": "Quick add",
-      "options": [
-        { "value": "none", "label": "None" },
-        { "value": "standard", "label": "Standard" }
-      ]
     },
     {
       "type": "checkbox",

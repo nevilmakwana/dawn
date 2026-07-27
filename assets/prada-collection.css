@@ -1,18 +1,24 @@
 .prada-collection {
-  --prada-collection-line: rgb(222, 222, 222);
+  --prada-ink: #0a0a0a;
+  --prada-line: #dedede;
+  --prada-media: #f2f2f2;
   background: #fff;
-  color: #0a0a0a;
+  color: var(--prada-ink);
+}
+
+.prada-collection * {
+  box-sizing: border-box;
 }
 
 .prada-collection__header {
-  border-bottom: 1px solid var(--prada-collection-line);
+  border-bottom: 1px solid var(--prada-line);
 }
 
 .prada-collection__navigation {
   display: grid;
-  grid-template-columns: minmax(15rem, 16.5vw) minmax(0, 1fr);
-  min-height: 5.5rem;
-  border-bottom: 1px solid var(--prada-collection-line);
+  grid-template-columns: minmax(17rem, 18vw) minmax(0, 1fr);
+  min-height: 5.6rem;
+  border-bottom: 1px solid var(--prada-line);
 }
 
 .prada-collection__title {
@@ -28,7 +34,6 @@
 .prada-collection__tabs {
   display: flex;
   align-items: stretch;
-  gap: 0;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -42,9 +47,9 @@
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
-  min-height: 5.5rem;
-  padding: 1.6rem 1.05rem;
-  color: rgba(10, 10, 10, 0.55);
+  min-height: 5.6rem;
+  padding: 1.5rem 1.05rem;
+  color: rgb(10 10 10 / 58%);
   font-size: 1.2rem;
   font-weight: 600;
   line-height: 1.2;
@@ -54,7 +59,7 @@
 
 .prada-collection__tab:hover,
 .prada-collection__tab.is-active {
-  color: #0a0a0a;
+  color: var(--prada-ink);
 }
 
 .prada-collection__tab.is-active::after {
@@ -63,7 +68,7 @@
   bottom: 0;
   left: 1.05rem;
   height: 2px;
-  background: #0a0a0a;
+  background: var(--prada-ink);
   content: '';
 }
 
@@ -75,112 +80,147 @@
   padding: 0 3.2rem;
 }
 
-.prada-collection__count {
+.prada-collection__count,
+.prada-collection__controls {
   margin: 0;
-  color: rgba(10, 10, 10, 0.7);
   font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.prada-collection__controls {
+  display: flex;
+  align-items: center;
+}
+
+.prada-collection__filter-menu {
+  position: relative;
+}
+
+.prada-collection__filter-menu summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.prada-collection__filter-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.prada-collection__filter-menu summary::after {
+  margin-left: 0.7rem;
+  content: '+';
+}
+
+.prada-collection__filter-menu[open] summary::after {
+  content: '-';
+}
+
+.prada-collection__control-divider {
+  margin: 0 0.8rem;
+}
+
+.prada-collection__sort {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.prada-collection__sort select {
+  max-width: 20rem;
+  border: 0;
+  background: transparent;
+  color: var(--prada-ink);
+  font: inherit;
+  text-transform: uppercase;
+}
+
+.prada-collection__filter-panel {
+  position: absolute;
+  z-index: 8;
+  top: calc(100% + 1.45rem);
+  right: 0;
+  width: min(32rem, calc(100vw - 3rem));
+  max-height: min(60rem, calc(100vh - 15rem));
+  overflow: auto;
+  padding: 1.6rem;
+  border: 1px solid var(--prada-line);
+  background: #fff;
+  box-shadow: 0 1.2rem 3rem rgb(0 0 0 / 12%);
+}
+
+.prada-collection__filter-group {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 1.5rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--prada-line);
+}
+
+.prada-collection__filter-group legend {
+  padding: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.prada-collection__filter-option {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+  font-size: 1.25rem;
+  font-weight: 500;
+  text-transform: none;
+}
+
+.prada-collection__filter-option.is-disabled {
+  color: rgb(10 10 10 / 35%);
+  cursor: default;
+}
+
+.prada-collection__filter-option input {
+  margin: 0;
+}
+
+.prada-collection__filter-option small {
+  color: rgb(10 10 10 / 58%);
+  font-size: 1.1rem;
+}
+
+.prada-collection__price-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.prada-collection__price-fields label {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 1.1rem;
   font-weight: 500;
   text-transform: uppercase;
 }
 
-.prada-collection__filters {
-  min-width: 0;
-}
-
-.prada-collection__filters .facets-container,
-.prada-collection__filters facet-filters-form,
-.prada-collection__filters .facets__form {
-  width: auto;
-}
-
-.prada-collection__filters .facets__form {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 1rem;
-}
-
-.prada-collection__filters .facets__wrapper {
-  display: flex;
-  align-items: center;
-}
-
-.prada-collection__filters .facets__heading {
-  margin: 0 0.9rem 0 0;
-  color: #0a0a0a;
-  font-size: 1.2rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.prada-collection__filters .facets__heading::after {
-  margin-left: 0.8rem;
-  content: '·';
-}
-
-.prada-collection__filters .facets__disclosure {
-  margin: 0;
-}
-
-.prada-collection__filters .facets__summary {
-  min-height: auto;
-  padding: 0.8rem 0;
-  color: #0a0a0a;
-  font-size: 1.2rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.prada-collection__filters .facets__summary .icon-caret {
-  width: 0.9rem;
-}
-
-.prada-collection__filters .facet-filters {
-  margin: 0;
-  padding: 0;
-}
-
-.prada-collection__filters .facet-filters__field {
-  display: flex;
-  align-items: center;
-}
-
-.prada-collection__filters .facet-filters__label {
-  margin: 0 0.85rem 0 0;
-  color: #0a0a0a;
-  font-size: 1.2rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.prada-collection__filters .select {
-  width: auto;
-  min-width: 12.5rem;
-}
-
-.prada-collection__filters .facet-filters__sort {
-  min-height: auto;
-  padding: 0.4rem 2rem 0.4rem 0;
-  border: 0;
-  background: transparent;
-  color: #0a0a0a;
-  font-size: 1.2rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.prada-collection__filters .product-count,
-.prada-collection__filters .active-facets,
-.prada-collection__filters .facet-filters__sort + .svg-wrapper {
-  display: none;
-}
-
-.prada-collection__grid-container {
-  position: relative;
-}
-
-.prada-collection__products {
+.prada-collection__price-fields input {
   width: 100%;
+  min-height: 3.8rem;
+  padding: 0.6rem;
+  border: 1px solid var(--prada-line);
+}
+
+.prada-collection__apply-filter {
+  width: 100%;
+  min-height: 4.2rem;
+  margin-top: 1.5rem;
+  border: 1px solid var(--prada-ink);
+  background: var(--prada-ink);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .prada-collection__grid {
@@ -189,65 +229,86 @@
   gap: 0;
   margin: 0;
   padding: 0;
+  list-style: none;
 }
 
-.prada-collection__grid .prada-collection__item {
-  width: auto;
-  max-width: none;
-  padding: 0;
+.prada-collection__item,
+.prada-collection__item product-component,
+.prada-product-tile {
+  display: block;
+  min-width: 0;
 }
 
-.prada-collection__item .card-wrapper {
-  height: 100%;
+.prada-product-tile {
+  position: relative;
   border-right: 1px solid #fff;
   border-bottom: 1px solid #fff;
 }
 
-.prada-collection__item .card,
-.prada-collection__item .card__inner,
-.prada-collection__item .card__content {
-  border-radius: 0;
-  box-shadow: none;
+.prada-product-tile__media {
+  position: relative;
+  display: flex;
+  aspect-ratio: 1;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--prada-media);
 }
 
-.prada-collection__item .card__inner {
-  background: #f3f3f3;
-}
-
-.prada-collection__item .card__media .media img {
-  object-fit: contain;
+.prada-product-tile__media img,
+.prada-product-tile__placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
   padding: clamp(1.6rem, 3vw, 4rem);
+  object-fit: contain;
 }
 
-.prada-collection__item .card__content {
-  min-height: 9.8rem;
-  padding: 1.45rem 1.6rem 1.7rem;
+.prada-product-tile__runway {
+  position: absolute;
+  z-index: 1;
+  top: 1.5rem;
+  left: 1rem;
+  color: rgb(10 10 10 / 72%);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1;
+  text-transform: uppercase;
+  transform: rotate(180deg);
+  writing-mode: vertical-rl;
+}
+
+.prada-product-tile .prada-product-wishlist-button {
+  z-index: 2;
+  top: 1.5rem;
+  right: 1.5rem;
+}
+
+.prada-product-tile__information {
+  min-height: 10rem;
+  padding: 1.55rem 1.6rem 1.9rem;
   background: #fff;
 }
 
-.prada-collection__item .card__information {
-  padding: 0;
-}
-
-.prada-collection__item .card__heading {
+.prada-product-tile__title {
   margin: 0;
-  color: #0a0a0a;
+  color: var(--prada-ink);
   font-size: 1.35rem;
   font-weight: 700;
   line-height: 1.35;
 }
 
-.prada-collection__item .price {
-  margin-top: 0.85rem;
-  color: #0a0a0a;
-  font-size: 1.35rem;
-  font-weight: 500;
+.prada-product-tile__title a {
+  color: inherit;
+  text-decoration: none;
 }
 
-.prada-collection__item .prada-product-wishlist-button {
-  z-index: 2;
-  top: 1.5rem;
-  right: 1.5rem;
+.prada-product-tile__price {
+  margin: 0.95rem 0 0;
+  color: var(--prada-ink);
+  font-size: 1.35rem;
+  font-weight: 500;
+  line-height: 1.2;
 }
 
 .prada-collection__empty {
@@ -261,12 +322,8 @@
   }
 
   .prada-collection__title {
-    min-height: 5.2rem;
+    min-height: 5.1rem;
     padding: 1.4rem 2rem 0.7rem;
-  }
-
-  .prada-collection__tabs {
-    border-bottom: 0;
   }
 
   .prada-collection__tab {
@@ -274,27 +331,7 @@
   }
 
   .prada-collection__toolbar {
-    min-height: 4.8rem;
     padding: 0 2rem;
-  }
-
-  .prada-collection__filters .facets-container > facet-filters-form {
-    display: none;
-  }
-
-  .prada-collection__filters .mobile-facets__wrapper {
-    margin: 0;
-  }
-
-  .prada-collection__filters .mobile-facets__open-wrapper {
-    padding: 0;
-  }
-
-  .prada-collection__filters .mobile-facets__open-label {
-    color: #0a0a0a;
-    font-size: 1.2rem;
-    font-weight: 700;
-    text-transform: uppercase;
   }
 }
 
@@ -319,30 +356,46 @@
     padding: 0 1.5rem;
   }
 
-  .prada-collection__count {
-    font-size: 1.1rem;
+  .prada-collection__count,
+  .prada-collection__controls {
+    font-size: 1.05rem;
+  }
+
+  .prada-collection__sort span {
+    display: none;
+  }
+
+  .prada-collection__sort select {
+    max-width: 12rem;
   }
 
   .prada-collection__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .prada-collection__item .card__content {
-    min-height: 8.3rem;
-    padding: 1rem;
-  }
-
-  .prada-collection__item .card__heading,
-  .prada-collection__item .price {
-    font-size: 1.2rem;
-  }
-
-  .prada-collection__item .card__media .media img {
+  .prada-product-tile__media img,
+  .prada-product-tile__placeholder {
     padding: 1.25rem;
   }
 
-  .prada-collection__item .prada-product-wishlist-button {
+  .prada-product-tile__runway {
+    top: 1rem;
+    left: 0.7rem;
+    font-size: 0.85rem;
+  }
+
+  .prada-product-tile .prada-product-wishlist-button {
     top: 1rem;
     right: 1rem;
+  }
+
+  .prada-product-tile__information {
+    min-height: 8.4rem;
+    padding: 1.1rem 1rem 1.3rem;
+  }
+
+  .prada-product-tile__title,
+  .prada-product-tile__price {
+    font-size: 1.2rem;
   }
 }

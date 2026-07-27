@@ -5,8 +5,6 @@
       "settings": {
         "products_per_page": 16,
         "subcategory_menu": "",
-        "show_secondary_image": false,
-        "quick_add": "none",
         "enable_filtering": true,
         "enable_sorting": true
       }
