@@ -102,12 +102,14 @@
       {%- else -%}
         <ul class="prada-collection__grid" id="product-grid" data-id="{{ section.id }}" role="list">
           {%- for product in collection.products -%}
+            {%- assign secondary_media = product.media[1] -%}
             <li class="prada-collection__item">
               <product-component view-event-payload="{{ product | standard_event_data: 'view', context: 'collection' | escape }}">
                 <article class="prada-product-tile">
                   <a class="prada-product-tile__media" href="{{ product.url }}">
                     {%- if product.featured_media -%}
                       <img
+                        class="prada-product-tile__image"
                         srcset="
                           {%- if product.featured_media.width >= 360 -%}{{ product.featured_media | image_url: width: 360 }} 360w,{%- endif -%}
                           {%- if product.featured_media.width >= 533 -%}{{ product.featured_media | image_url: width: 533 }} 533w,{%- endif -%}
@@ -122,6 +124,26 @@
                         width="{{ product.featured_media.width }}"
                         height="{{ product.featured_media.height }}"
                       >
+                      {%- if secondary_media and secondary_media.media_type == 'image' -%}
+                        <img
+                          class="prada-product-tile__image prada-product-tile__image--secondary"
+                          srcset="
+                            {%- if secondary_media.width >= 360 -%}{{ secondary_media | image_url: width: 360 }} 360w,{%- endif -%}
+                            {%- if secondary_media.width >= 533 -%}{{ secondary_media | image_url: width: 533 }} 533w,{%- endif -%}
+                            {%- if secondary_media.width >= 720 -%}{{ secondary_media | image_url: width: 720 }} 720w,{%- endif -%}
+                            {%- if secondary_media.width >= 940 -%}{{ secondary_media | image_url: width: 940 }} 940w,{%- endif -%}
+                            {{ secondary_media | image_url }} {{ secondary_media.width }}w
+                          "
+                          src="{{ secondary_media | image_url: width: 720 }}"
+                          sizes="(min-width: 990px) 25vw, 50vw"
+                          alt=""
+                          aria-hidden="true"
+                          loading="lazy"
+                          decoding="async"
+                          width="{{ secondary_media.width }}"
+                          height="{{ secondary_media.height }}"
+                        >
+                      {%- endif -%}
                     {%- else -%}
                       {{ 'product-apparel-2' | placeholder_svg_tag: 'prada-product-tile__placeholder' }}
                     {%- endif -%}
