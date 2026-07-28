@@ -66,7 +66,13 @@ class CartNotification extends HTMLElement {
   renderContents(parsedState, { shouldOpen = true } = {}) {
     this.cartItemKey = parsedState.key;
     this.getSectionsToRender().forEach((section) => {
-      document.getElementById(section.id).innerHTML = this.getSectionInnerHTML(
+      const sectionElement = document.getElementById(section.id);
+      if (!sectionElement) return;
+
+      // Keep the custom Prada cart icon intact; its badge is updated below.
+      if (section.id === 'cart-icon-bubble' && sectionElement.classList.contains('prada-header-btn--cart')) return;
+
+      sectionElement.innerHTML = this.getSectionInnerHTML(
         parsedState.sections[section.id],
         section.selector
       );

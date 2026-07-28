@@ -2,17 +2,9 @@ const updatePradaCartIcon = (itemCount) => {
   const cartLink = document.querySelector('.prada-header-btn--cart#cart-icon-bubble');
   if (!cartLink) return;
 
-  Array.from(cartLink.children).forEach((child) => {
-    if (
-      child.id === 'cart-icon-bubble' ||
-      child.classList.contains('cart-count-bubble') ||
-      child.classList.contains('svg-wrapper')
-    ) {
-      child.remove();
-    }
-  });
-
-  let badge = Array.from(cartLink.children).find((child) => child.classList.contains('prada-cart-badge'));
+  // The cart button owns the Prada SVG. Only manage its numeric badge here.
+  // Replacing or removing child markup makes Dawn's default cart SVG appear.
+  let badge = cartLink.querySelector(':scope > .prada-cart-badge');
 
   if (itemCount > 0) {
     if (!badge) {
@@ -26,6 +18,7 @@ const updatePradaCartIcon = (itemCount) => {
     badge?.remove();
   }
 
+  cartLink.querySelector(':scope > .cart-count-bubble')?.remove();
   cartLink.setAttribute('aria-label', itemCount > 0 ? `Cart (${itemCount})` : 'Cart');
 };
 
