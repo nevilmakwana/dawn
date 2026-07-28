@@ -1,3 +1,24 @@
+const updatePradaCartBadge = (itemCount) => {
+  const cartLink = document.querySelector('.prada-header-btn--cart#cart-icon-bubble');
+  if (!cartLink) return;
+
+  let badge = cartLink.querySelector(':scope > .prada-cart-badge');
+  if (itemCount > 0) {
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'prada-cart-badge';
+      badge.setAttribute('aria-hidden', 'true');
+      cartLink.append(badge);
+    }
+    badge.textContent = String(itemCount);
+  } else {
+    badge?.remove();
+  }
+
+  cartLink.querySelector(':scope > .cart-count-bubble')?.remove();
+  cartLink.setAttribute('aria-label', itemCount > 0 ? `Cart (${itemCount})` : 'Cart');
+};
+
 class CartNotification extends HTMLElement {
   constructor() {
     super();
@@ -79,12 +100,33 @@ class CartNotification extends HTMLElement {
     });
 
     if (typeof parsedState.item_count === 'number') {
-      window.PradaCartHeader?.update?.(parsedState.item_count);
+      this.updateHeaderCartBadge(parsedState.item_count);
+    } else {
+      // /cart/add.js returns a line item, not the cart total. Refresh the
+      // cart count so mobile add-to-cart updates the fixed Prada header badge.
+      void this.refreshHeaderCartBadge();
     }
 
     if (shouldOpen) {
       if (this.header) this.header.reveal();
       this.open();
+    }
+  }
+
+  updateHeaderCartBadge(itemCount) {
+    const update = window.PradaCartHeader?.update || updatePradaCartBadge;
+    update(itemCount);
+  }
+
+  async refreshHeaderCartBadge() {
+    try {
+      const response = await fetch(`${routes.cart_url}.js`);
+      if (!response.ok) return;
+
+      const cart = await response.json();
+      if (typeof cart?.item_count === 'number') this.updateHeaderCartBadge(cart.item_count);
+    } catch (error) {
+      // A badge refresh must never interrupt a successful add-to-cart action.
     }
   }
 
