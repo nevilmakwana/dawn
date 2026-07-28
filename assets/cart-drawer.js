@@ -22,8 +22,22 @@ const updatePradaCartIcon = (itemCount) => {
   cartLink.setAttribute('aria-label', itemCount > 0 ? `Cart (${itemCount})` : 'Cart');
 };
 
+const refreshPradaCartIcon = async () => {
+  try {
+    const cartUrl = window.routes?.cart_url || '/cart';
+    const response = await fetch(`${cartUrl}.js`, { headers: { Accept: 'application/json' } });
+    if (!response.ok) return;
+
+    const cart = await response.json();
+    if (typeof cart?.item_count === 'number') updatePradaCartIcon(cart.item_count);
+  } catch (_error) {
+    // A badge refresh must never interrupt a successful add-to-cart action.
+  }
+};
+
 window.PradaCartHeader = window.PradaCartHeader || {};
 window.PradaCartHeader.update = updatePradaCartIcon;
+window.PradaCartHeader.refresh = refreshPradaCartIcon;
 
 class CartDrawer extends HTMLElement {
   constructor() {
@@ -182,6 +196,7 @@ class CartDrawer extends HTMLElement {
     });
 
     this.bindOverlay();
+    void refreshPradaCartIcon();
 
     if (shouldOpen) {
       setTimeout(() => this.open());

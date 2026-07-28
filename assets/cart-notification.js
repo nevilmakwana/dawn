@@ -19,6 +19,23 @@ const updatePradaCartBadge = (itemCount) => {
   cartLink.setAttribute('aria-label', itemCount > 0 ? `Cart (${itemCount})` : 'Cart');
 };
 
+const refreshPradaCartBadge = async () => {
+  try {
+    const cartUrl = window.routes?.cart_url || '/cart';
+    const response = await fetch(`${cartUrl}.js`, { headers: { Accept: 'application/json' } });
+    if (!response.ok) return;
+
+    const cart = await response.json();
+    if (typeof cart?.item_count === 'number') updatePradaCartBadge(cart.item_count);
+  } catch (_error) {
+    // A badge refresh must never interrupt a successful add-to-cart action.
+  }
+};
+
+window.PradaCartHeader = window.PradaCartHeader || {};
+window.PradaCartHeader.update = updatePradaCartBadge;
+window.PradaCartHeader.refresh = refreshPradaCartBadge;
+
 class CartNotification extends HTMLElement {
   constructor() {
     super();
@@ -99,13 +116,11 @@ class CartNotification extends HTMLElement {
       );
     });
 
-    if (typeof parsedState.item_count === 'number') {
-      this.updateHeaderCartBadge(parsedState.item_count);
-    } else {
-      // /cart/add.js returns a line item, not the cart total. Refresh the
-      // cart count so mobile add-to-cart updates the fixed Prada header badge.
-      void this.refreshHeaderCartBadge();
-    }
+    if (typeof parsedState.item_count === 'number') this.updateHeaderCartBadge(parsedState.item_count);
+
+    // /cart/add.js returns a line item in some Dawn flows. Always reconcile
+    // against the cart state so the persistent header badge has the real total.
+    void this.refreshHeaderCartBadge();
 
     if (shouldOpen) {
       if (this.header) this.header.reveal();
@@ -119,15 +134,7 @@ class CartNotification extends HTMLElement {
   }
 
   async refreshHeaderCartBadge() {
-    try {
-      const response = await fetch(`${routes.cart_url}.js`);
-      if (!response.ok) return;
-
-      const cart = await response.json();
-      if (typeof cart?.item_count === 'number') this.updateHeaderCartBadge(cart.item_count);
-    } catch (error) {
-      // A badge refresh must never interrupt a successful add-to-cart action.
-    }
+    await window.PradaCartHeader?.refresh?.();
   }
 
   getSectionsToRender() {
