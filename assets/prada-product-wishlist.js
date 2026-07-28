@@ -4,7 +4,10 @@
 
   const storageKey = 'greyexim-wishlist-v1';
   const buttonSelector = '[data-prada-product-wishlist]';
+  const indicatorSelector = '[data-prada-wishlist-indicator]';
+  const notificationId = 'prada-wishlist-notification';
   let memoryItems = [];
+  let notificationTimer;
 
   const normaliseItem = (item) => {
     if (!item?.id || !item?.title || !item?.url) return null;
@@ -80,9 +83,69 @@
     });
   };
 
+  const syncHeaderIndicator = (items = getItems()) => {
+    const hasItems = items.length > 0;
+
+    document.querySelectorAll(indicatorSelector).forEach((indicator) => {
+      indicator.classList.toggle('is-visible', hasItems);
+    });
+
+    document.querySelectorAll('#wishlist-icon-bubble').forEach((link) => {
+      link.classList.toggle('has-wishlist-items', hasItems);
+    });
+  };
+
+  const getWishlistUrl = () => {
+    return document.querySelector('#wishlist-icon-bubble')?.href || '/collections/all?view=wishlist';
+  };
+
+  const getNotification = () => {
+    let notification = document.getElementById(notificationId);
+    if (notification) return notification;
+
+    notification = document.createElement('div');
+    notification.id = notificationId;
+    notification.className = 'prada-wishlist-notification';
+    notification.setAttribute('role', 'status');
+    notification.setAttribute('aria-live', 'polite');
+
+    const content = document.createElement('div');
+    content.className = 'prada-wishlist-notification__content';
+
+    const message = document.createElement('span');
+    message.className = 'prada-wishlist-notification__message';
+    message.textContent = 'Item added to wishlist';
+
+    const viewLink = document.createElement('a');
+    viewLink.className = 'prada-wishlist-notification__view';
+    viewLink.href = getWishlistUrl();
+    viewLink.textContent = 'View';
+
+    content.append(message, viewLink);
+    notification.append(content);
+    document.body.append(notification);
+
+    return notification;
+  };
+
+  const showAddedNotification = () => {
+    const notification = getNotification();
+    const viewLink = notification.querySelector('.prada-wishlist-notification__view');
+
+    if (viewLink) viewLink.href = getWishlistUrl();
+
+    window.clearTimeout(notificationTimer);
+    window.requestAnimationFrame(() => notification.classList.add('is-visible'));
+
+    notificationTimer = window.setTimeout(() => {
+      notification.classList.remove('is-visible');
+    }, 5000);
+  };
+
   const notify = () => {
     const items = getItems();
     syncButtons(items);
+    syncHeaderIndicator(items);
     document.dispatchEvent(new CustomEvent('prada:wishlist-updated', { detail: { items } }));
     return items;
   };
@@ -94,7 +157,9 @@
     const items = getItems().filter((savedItem) => savedItem.id !== normalisedItem.id);
     items.push(normalisedItem);
     setItems(items);
-    return notify();
+    const updatedItems = notify();
+    showAddedNotification();
+    return updatedItems;
   };
 
   const remove = (productId) => {
@@ -117,7 +182,7 @@
     get: getItems,
     has: (productId) => getItems().some((item) => item.id === String(productId)),
     remove,
-    sync: syncButtons,
+    sync: notify,
     toggle,
   };
 
@@ -134,8 +199,8 @@
     if (event.key === storageKey) notify();
   });
 
-  document.addEventListener('shopify:section:load', () => syncButtons());
+  document.addEventListener('shopify:section:load', () => notify());
 
-  syncButtons();
-  document.dispatchEvent(new CustomEvent('prada:wishlist-ready', { detail: { items: getItems() } }));
+  const initialItems = notify();
+  document.dispatchEvent(new CustomEvent('prada:wishlist-ready', { detail: { items: initialItems } }));
 })();
