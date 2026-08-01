@@ -452,21 +452,27 @@
 
     const mobileQuery = window.matchMedia('(max-width: 989px)');
     const mobileGallery = root.querySelector('.prada-product__media-list');
+    const mobilePanel = root.querySelector('.prada-product__panel');
     const scrollHint = root.querySelector('[data-prada-scroll-hint]');
     const sheetHandle = root.querySelector('[data-prada-sheet-handle]');
     let sheetTouchStart = 0;
 
-    const closeMobileSheet = () => root.classList.remove('mobile-info-open');
+    const closeMobileSheet = () => {
+      if (!mobileQuery.matches) return;
+      root.scrollTo({ top: Math.max(0, root.scrollHeight - root.clientHeight * 2), behavior: 'smooth' });
+    };
     const updateMobileGallery = () => {
-      if (!mobileQuery.matches || !mobileGallery || galleryMedia.length < 2) return;
-      const remaining = mobileGallery.scrollHeight - mobileGallery.scrollTop - mobileGallery.clientHeight;
-      const atLastMedia = remaining <= 8;
-      const hasStarted = mobileGallery.scrollTop > 10;
-      root.classList.toggle('mobile-info-open', atLastMedia);
-      if (scrollHint) scrollHint.classList.toggle('is-visible', hasStarted && !atLastMedia);
+      if (!mobileQuery.matches || !mobileGallery) return;
+      const panelTop = mobilePanel ? mobilePanel.offsetTop : root.scrollHeight;
+      const panelVisible = root.scrollTop + root.clientHeight * .45 >= panelTop;
+      const hasStarted = root.scrollTop > 10;
+      const galleryEnd = Math.max(0, panelTop - root.clientHeight);
+      const nearGalleryEnd = root.scrollTop >= galleryEnd - 12;
+      root.classList.toggle('mobile-info-visible', panelVisible);
+      if (scrollHint) scrollHint.classList.toggle('is-visible', hasStarted && !nearGalleryEnd && !panelVisible);
     };
 
-    mobileGallery?.addEventListener('scroll', updateMobileGallery, { passive: true });
+    root.addEventListener('scroll', updateMobileGallery, { passive: true });
     sheetHandle?.addEventListener('click', closeMobileSheet);
     sheetHandle?.addEventListener('touchstart', (event) => {
       sheetTouchStart = event.touches[0].clientY;
@@ -475,9 +481,10 @@
       if (event.changedTouches[0].clientY - sheetTouchStart > 45) closeMobileSheet();
     }, { passive: true });
     mobileQuery.addEventListener?.('change', () => {
-      if (!mobileQuery.matches) root.classList.remove('mobile-info-open');
+      if (!mobileQuery.matches) root.classList.remove('mobile-info-visible');
       else updateMobileGallery();
     });
+    updateMobileGallery();
 
     root.querySelectorAll('.prada-product__media video').forEach((video) => {
       video.controls = false;
