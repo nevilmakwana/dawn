@@ -19,7 +19,7 @@
     {%- if product.media.size > 0 -%}
       <div class="prada-product__media-list">
         {%- for media in product.media -%}
-          <figure class="prada-product__media" id="PradaMedia-{{ section.id }}-{{ forloop.index }}">
+          <figure class="prada-product__media prada-product__media--{{ media.media_type }}" id="PradaMedia-{{ section.id }}-{{ forloop.index }}">
             {%- case media.media_type -%}
               {%- when 'image' -%}
                 {{ media.preview_image | image_url: width: 1800 | image_tag:
@@ -29,9 +29,9 @@
                   alt: media.alt | default: product.title
                 }}
               {%- when 'video' -%}
-                {{ media | video_tag: controls: true, image_size: '1200x' }}
+                {{ media | video_tag: controls: true, autoplay: false, loop: false, muted: false, playsinline: true, preload: 'metadata', image_size: '1200x' }}
               {%- when 'external_video' -%}
-                {{ media | external_video_tag }}
+                {{ media | external_video_tag: loading: 'lazy' }}
               {%- when 'model' -%}
                 {{ media | model_viewer_tag: image_size: '1200x', reveal: 'interaction', toggleable: true }}
             {%- endcase -%}
@@ -42,7 +42,7 @@
       {%- if product.media.size > 1 -%}
         <nav class="prada-product__dots" aria-label="Choose product image">
           {%- for media in product.media -%}
-            <a href="#PradaMedia-{{ section.id }}-{{ forloop.index }}" aria-label="View image {{ forloop.index }}">
+            <a href="#PradaMedia-{{ section.id }}-{{ forloop.index }}" aria-label="View {{ media.media_type | replace: '_', ' ' }} {{ forloop.index }}">
               <span></span>
             </a>
           {%- endfor -%}
