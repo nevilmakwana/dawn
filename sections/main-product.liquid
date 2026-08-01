@@ -455,6 +455,16 @@
     const scrollHint = root.querySelector('[data-prada-scroll-hint]');
     const sheetHandle = root.querySelector('[data-prada-sheet-handle]');
     let sheetTouchStart = 0;
+    let onboardingTimer;
+
+    const playMobileOnboarding = () => {
+      if (!mobileQuery.matches || !mobileGallery || galleryMedia.length < 2) return;
+      window.clearTimeout(onboardingTimer);
+      root.classList.add('mobile-gallery-onboarding');
+      onboardingTimer = window.setTimeout(() => {
+        root.classList.remove('mobile-gallery-onboarding');
+      }, 2400);
+    };
 
     const closeMobileSheet = () => root.classList.remove('mobile-info-open');
     const updateMobileGallery = () => {
@@ -467,6 +477,10 @@
     };
 
     mobileGallery?.addEventListener('scroll', updateMobileGallery, { passive: true });
+    mobileGallery?.addEventListener('touchstart', () => {
+      window.clearTimeout(onboardingTimer);
+      root.classList.remove('mobile-gallery-onboarding');
+    }, { passive: true, once: true });
     sheetHandle?.addEventListener('click', closeMobileSheet);
     sheetHandle?.addEventListener('touchstart', (event) => {
       sheetTouchStart = event.touches[0].clientY;
@@ -478,6 +492,12 @@
       if (!mobileQuery.matches) root.classList.remove('mobile-info-open');
       else updateMobileGallery();
     });
+
+    if (document.readyState === 'complete') {
+      window.setTimeout(playMobileOnboarding, 280);
+    } else {
+      window.addEventListener('load', () => window.setTimeout(playMobileOnboarding, 280), { once: true });
+    }
 
     root.querySelectorAll('.prada-product__media video').forEach((video) => {
       video.controls = false;

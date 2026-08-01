@@ -82,10 +82,15 @@ html.prada-drawer-open, html.prada-drawer-open body { overflow: hidden; }
   .prada-product__media-list { display: block; height: 100%; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scroll-snap-type: y mandatory; scrollbar-width: none; }
   .prada-product__media-list::-webkit-scrollbar { display: none; }
   .prada-product__media { width: 100%; height: 100%; min-height: 100%; aspect-ratio: auto; scroll-snap-align: start; scroll-snap-stop: always; }
+  .prada-product__media:first-child img,
+  .prada-product__media:first-child video { transform: translate3d(0, 0, 0); transition: transform .72s cubic-bezier(.22, 1, .36, 1); }
+  .prada-product.mobile-gallery-onboarding .prada-product__media:first-child img,
+  .prada-product.mobile-gallery-onboarding .prada-product__media:first-child video { transform: translate3d(0, -14px, 0); }
   .prada-product__gallery > .prada-product__wishlist { display: none; }
   .prada-product__dots { position: absolute; left: 14px; bottom: 50%; flex-direction: column; transform: translateY(50%); }
   .prada-product__scroll-hint { position: absolute; z-index: 4; right: 0; bottom: 0; left: 0; display: block; padding: 15px 20px; background: rgba(20, 20, 20, .55); color: #fff; font-size: 14px; line-height: 1.2; font-weight: 600; text-align: center; opacity: 0; pointer-events: none; transform: translateY(100%); transition: opacity .3s ease, transform .42s cubic-bezier(.22, 1, .36, 1); }
   .prada-product__scroll-hint.is-visible { opacity: 1; transform: translateY(0); }
+  .prada-product.mobile-gallery-onboarding .prada-product__scroll-hint { opacity: 1; transform: translateY(0); }
   .prada-product__panel { min-height: 0; }
   .prada-product__info { position: static; width: auto; margin: 0; padding: 30px 20px 48px; }
   .prada-product__sheet-handle { display: none; }
@@ -108,6 +113,8 @@ html.prada-drawer-open, html.prada-drawer-open body { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .prada-product.mobile-info-open .prada-product__panel { animation-duration: .01ms; }
   .prada-product__scroll-hint { transition-duration: .01ms; }
+  .prada-product__media:first-child img,
+  .prada-product__media:first-child video { transition-duration: .01ms; }
 }
 
 @media screen and (min-width: 990px) and (max-width: 1199px) {
