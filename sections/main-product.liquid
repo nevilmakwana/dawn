@@ -456,6 +456,7 @@
     const sheetHandle = root.querySelector('[data-prada-sheet-handle]');
     let sheetTouchStart = 0;
     let onboardingTimer;
+    let scrollHintConsumed = false;
 
     const playMobileOnboarding = () => {
       if (!mobileQuery.matches || !mobileGallery || galleryMedia.length < 2) return;
@@ -463,6 +464,7 @@
       root.classList.add('mobile-gallery-onboarding');
       onboardingTimer = window.setTimeout(() => {
         root.classList.remove('mobile-gallery-onboarding');
+        scrollHintConsumed = true;
       }, 2400);
     };
 
@@ -473,13 +475,19 @@
       const atLastMedia = remaining <= 8;
       const hasStarted = mobileGallery.scrollTop > 10;
       root.classList.toggle('mobile-info-open', atLastMedia);
-      if (scrollHint) scrollHint.classList.toggle('is-visible', hasStarted && !atLastMedia);
+      if (hasStarted) {
+        scrollHintConsumed = true;
+        root.classList.remove('mobile-gallery-onboarding');
+      }
+      if (scrollHint) scrollHint.classList.toggle('is-visible', !scrollHintConsumed && hasStarted && !atLastMedia);
     };
 
     mobileGallery?.addEventListener('scroll', updateMobileGallery, { passive: true });
     mobileGallery?.addEventListener('touchstart', () => {
       window.clearTimeout(onboardingTimer);
+      scrollHintConsumed = true;
       root.classList.remove('mobile-gallery-onboarding');
+      scrollHint?.classList.remove('is-visible');
     }, { passive: true, once: true });
     sheetHandle?.addEventListener('click', closeMobileSheet);
     sheetHandle?.addEventListener('touchstart', (event) => {
