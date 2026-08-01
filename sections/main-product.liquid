@@ -93,6 +93,15 @@
                     {%- assign color_option_index = forloop.index0 -%}
                     {%- for value in option.values -%}
                       {%- assign swatch_image = blank -%}
+                      {%- assign configured_swatch = blank -%}
+                      {%- assign normalized_value = value | downcase | strip -%}
+                      {%- for block in section.blocks -%}
+                        {%- assign configured_value = block.settings.variant_value | downcase | strip -%}
+                        {%- if block.type == 'color_swatch' and configured_value == normalized_value -%}
+                          {%- assign configured_swatch = block.settings.swatch_color -%}
+                          {%- break -%}
+                        {%- endif -%}
+                      {%- endfor -%}
                       {%- for variant in product.variants -%}
                         {%- if variant.options[color_option_index] == value and variant.featured_media != blank -%}
                           {%- assign swatch_image = variant.featured_media.preview_image | image_url: width: 1800 -%}
@@ -108,7 +117,7 @@
                         data-prada-option-value="{{ value | escape }}"
                         {% if swatch_image != blank %}data-prada-image="{{ swatch_image }}"{% endif %}
                       >
-                        <span style="--swatch-color: {{ value | handle | replace: '-', ' ' }};{% if value.swatch.color != blank %} --swatch-color: {{ value.swatch.color }};{% endif %}"></span>
+                        <span style="--swatch-color: {% if configured_swatch != blank %}{{ configured_swatch }}{% elsif value.swatch.color != blank %}{{ value.swatch.color }}{% else %}{{ value | handle | replace: '-', ' ' }}{% endif %};"></span>
                       </button>
                     {%- endfor -%}
                   </div>
@@ -335,6 +344,26 @@
   "tag": "section",
   "class": "section-prada-product",
   "settings": [],
+  "blocks": [
+    {
+      "type": "color_swatch",
+      "name": "Color swatch",
+      "settings": [
+        {
+          "type": "text",
+          "id": "variant_value",
+          "label": "Variant color value",
+          "info": "Enter the exact product option value, for example Black or Desert Beige."
+        },
+        {
+          "type": "color",
+          "id": "swatch_color",
+          "label": "Swatch color",
+          "default": "#000000"
+        }
+      ]
+    }
+  ],
   "presets": [{ "name": "Prada product" }]
 }
 {% endschema %}
