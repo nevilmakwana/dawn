@@ -138,17 +138,20 @@
             {%- for option in product.options_with_values -%}
               {%- assign option_name = option.name | downcase -%}
               {%- unless option_name contains 'color' or option_name contains 'colour' -%}
-                <div class="prada-product__option">
-                  <span>{{ option.name }}</span>
+                <div class="prada-product__option{% if option_name contains 'size' %} prada-product__option--size{% endif %}">
+                  {%- unless option_name contains 'size' -%}<span>{{ option.name }}</span>{%- endunless -%}
                   <button
                     class="prada-product__option-trigger"
                     type="button"
                     data-prada-drawer-open="option-{{ forloop.index0 }}"
                     data-prada-drawer-label="Select {{ option.name | escape }}"
                   >
-                    <span data-prada-selected-value="{{ forloop.index0 }}">{{ option.selected_value }}</span>
+                    <span>{% if option_name contains 'size' %}Size&nbsp;&nbsp;{% endif %}<span data-prada-selected-value="{{ forloop.index0 }}">{{ option.selected_value }}</span></span>
                     <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5"/></svg>
                   </button>
+                  {%- if option_name contains 'size' -%}
+                    <button class="prada-product__size-chart-trigger" type="button" data-prada-drawer-open="size-chart" data-prada-drawer-label="Size chart">Size chart</button>
+                  {%- endif -%}
                   <select id="PradaOption-{{ section.id }}-{{ forloop.index0 }}" data-prada-option="{{ forloop.index0 }}" hidden aria-hidden="true" tabindex="-1">
                     {%- for value in option.values -%}
                       <option value="{{ value | escape }}" {% if option.selected_value == value %}selected{% endif %}>{{ value }}</option>
@@ -198,6 +201,13 @@
           <p>Shipping and return options are calculated at checkout.</p>
           {%- if shop.shipping_policy.body != blank -%}{{ shop.shipping_policy.body }}{%- endif -%}
         </div>
+        <div class="prada-product__drawer-pane prada-product__size-chart" data-prada-drawer-pane="size-chart" hidden>
+          {%- if section.settings.size_chart_image != blank -%}
+            {{ section.settings.size_chart_image | image_url: width: 1600 | image_tag: loading: 'lazy', widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 50vw, 100vw', alt: 'Size chart' }}
+          {%- else -%}
+            <p>Add a size chart image from the product section settings in Theme Editor.</p>
+          {%- endif -%}
+        </div>
         {%- for option in product.options_with_values -%}
           {%- assign drawer_option_name = option.name | downcase -%}
           {%- unless drawer_option_name contains 'color' or drawer_option_name contains 'colour' -%}
@@ -233,7 +243,8 @@
     if (!root) return;
 
     const variants = JSON.parse(document.getElementById('PradaVariants-{{ section.id }}').textContent);
-    const selectors = [...root.querySelectorAll('[data-prada-option]')];
+    const selectors = [...root.querySelectorAll('[data-prada-option]')]
+      .sort((a, b) => Number(a.dataset.pradaOption) - Number(b.dataset.pradaOption));
     const idInput = root.querySelector('[data-prada-variant-id]');
     const price = root.querySelector('[data-prada-price]');
     const status = root.querySelector('[data-prada-status]');
@@ -360,7 +371,13 @@
   "name": "Prada product",
   "tag": "section",
   "class": "section-prada-product",
-  "settings": [],
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "size_chart_image",
+      "label": "Size chart image"
+    }
+  ],
   "blocks": [
     {
       "type": "color_swatch",

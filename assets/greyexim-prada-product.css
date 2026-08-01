@@ -30,6 +30,9 @@
 .prada-product__option > span:first-child { padding: 0 16px; font-weight: 600; }
 .prada-product__option-trigger { display: flex; align-items: center; justify-content: space-between; width: 100%; height: 100%; min-height: 47px; padding: 0 16px; border: 0; border-left: 1px solid var(--prada-border); border-radius: 0; background: #fff; color: #111; font: inherit; text-align: left; cursor: pointer; }
 .prada-product__option-trigger svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.prada-product__option--size { grid-template-columns: minmax(0, 3fr) minmax(130px, 1fr); min-height: 56px; }
+.prada-product__option--size .prada-product__option-trigger { min-height: 55px; border-left: 0; }
+.prada-product__size-chart-trigger { height: 100%; min-height: 55px; padding: 0 18px; border: 0; border-left: 1px solid var(--prada-border); background: #fff; color: #111; font: inherit; font-size: 13px; font-weight: 600; text-transform: uppercase; cursor: pointer; }
 .prada-product__option--color { display: block; min-height: 0; margin: 22px 0 26px; padding: 0; border: 0; }
 .prada-product__color-heading { display: flex; align-items: baseline; gap: 10px; padding: 0 0 14px; font-size: 13px; }
 .prada-product__color-heading strong { font-weight: 700; }
@@ -37,7 +40,7 @@
 .prada-product__swatch { display: grid; place-items: center; width: 86px; height: 108px; padding: 3px; overflow: hidden; border: 1px solid #d8d8d8; border-radius: 0; background: #f3f3f3; cursor: pointer; }
 .prada-product__swatch > img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .prada-product__swatch > span { display: block; width: 100%; height: 100%; background: var(--swatch-color, #d8d8d8); }
-.prada-product__swatch.is-selected { border: 2px solid #111; padding: 2px; }
+.prada-product__swatch.is-selected, .prada-product__swatch[aria-pressed='true'] { border: 2px solid #111; padding: 2px; }
 .prada-product__status { margin: 16px 0 24px; font-size: 11px; line-height: 1.3; font-weight: 700; text-transform: uppercase; }
 .prada-product__submit { display: block; width: 100%; min-height: 46px; padding: 12px 20px; border: 1px solid #111; border-radius: 0; background: #111; color: #fff; font-size: 13px; line-height: 1.2; font-weight: 700; text-transform: uppercase; cursor: pointer; }
 .prada-product__submit:disabled { border-color: #b9b9b9; background: #b9b9b9; cursor: not-allowed; }
@@ -54,6 +57,8 @@
 .prada-product__drawer-close svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.6; }
 .prada-product__drawer-body { padding: 24px 48px 64px; }
 .prada-product__drawer-pane { max-width: 680px; font-size: 14px; line-height: 1.7; }
+.prada-product__size-chart { max-width: none; }
+.prada-product__size-chart img { display: block; width: 100%; height: auto; }
 .prada-product__choice-list { margin-top: -24px; }
 .prada-product__choice { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 72px; padding: 0 20px; border: 0; border-bottom: 1px solid var(--prada-border); background: #fff; color: #111; font: inherit; font-size: 16px; text-align: left; cursor: pointer; }
 .prada-product__choice svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; opacity: 0; }
