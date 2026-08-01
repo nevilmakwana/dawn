@@ -32,7 +32,7 @@
 .prada-product__status { margin: 16px 0 24px; font-size: 11px; line-height: 1.3; font-weight: 700; text-transform: uppercase; }
 .prada-product__submit { display: block; width: 100%; min-height: 46px; padding: 12px 20px; border: 1px solid #111; border-radius: 0; background: #111; color: #fff; font-size: 13px; line-height: 1.2; font-weight: 700; text-transform: uppercase; cursor: pointer; }
 .prada-product__submit:disabled { border-color: #b9b9b9; background: #b9b9b9; cursor: not-allowed; }
-.prada-product__drawer-trigger { display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 64px; padding: 0; border: 0; border-bottom: 1px solid var(--prada-border); background: transparent; color: inherit; font: inherit; font-size: 12px; font-weight: 600; text-align: left; cursor: pointer; }
+.prada-product__drawer-trigger { display: block; width: max-content; padding: 14px 0; border: 0; background: transparent; color: inherit; font: inherit; font-size: 12px; font-weight: 600; text-align: left; cursor: pointer; }
 .prada-product__drawer-shell { position: fixed; z-index: 1000; inset: 0; visibility: hidden; pointer-events: none; transition: visibility 0s linear .45s; }
 .prada-product__drawer-shell.is-open { visibility: visible; pointer-events: auto; transition-delay: 0s; }
 .prada-product__drawer-backdrop { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: rgba(0, 0, 0, .68); opacity: 0; cursor: default; transition: opacity .45s cubic-bezier(.22, 1, .36, 1); }
