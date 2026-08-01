@@ -743,6 +743,17 @@ summary::-webkit-details-marker {
   box-shadow: var(--focused-base-box-shadow);
 }
 
+/* Do not draw focus rectangles after mouse or touch interaction. */
+html.using-pointer *:focus,
+html.using-pointer *:focus-visible,
+html.using-pointer *.focused,
+html.using-pointer *.focus-inset,
+html.using-pointer *.focus-offset {
+  outline: 0 !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+
 /*
   Focus ring - inset
 */
