@@ -51,8 +51,8 @@
 
 .prada-wishlist-indicator {
   position: absolute;
-  right: 3px;
-  bottom: 3px;
+  right: 8px;
+  bottom: 8px;
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -154,8 +154,8 @@
   }
 
   .prada-wishlist-indicator {
-    right: 1px;
-    bottom: 1px;
+    right: 5px;
+    bottom: 5px;
     width: 5px;
     height: 5px;
   }
