@@ -88,7 +88,7 @@ html.prada-drawer-open, html.prada-drawer-open body { overflow: hidden; }
   .prada-product__media:first-child video { transform: translate3d(0, 0, 0); transition: transform .72s cubic-bezier(.22, 1, .36, 1); }
   .prada-product.mobile-gallery-onboarding .prada-product__media:first-child img,
   .prada-product.mobile-gallery-onboarding .prada-product__media:first-child video { transform: translate3d(0, -14px, 0); }
-  .prada-product__gallery > .prada-product__wishlist { top: 14px; right: 14px; display: grid; }
+  .prada-product__gallery > .prada-product__wishlist { top: 14px; right: 14px; display: grid; color: #000; }
   .prada-product__dots { position: absolute; left: 14px; bottom: 50%; flex-direction: column; transform: translateY(50%); }
   .prada-product__scroll-hint { position: absolute; z-index: 4; right: 0; bottom: 0; left: 0; display: block; padding: 15px 20px; background: rgba(20, 20, 20, .55); color: #fff; font-size: 14px; line-height: 1.2; font-weight: 600; text-align: center; opacity: 0; pointer-events: none; transform: translateY(100%); transition: opacity .3s ease, transform .42s cubic-bezier(.22, 1, .36, 1); }
   .prada-product__scroll-hint.is-visible { opacity: 1; transform: translateY(0); }
