@@ -81,17 +81,23 @@
         {%- unless product.has_only_default_variant -%}
           <div class="prada-product__options">
             {%- for option in product.options_with_values -%}
-              <label class="prada-product__option" for="PradaOption-{{ section.id }}-{{ forloop.index0 }}">
+              <div class="prada-product__option">
                 <span>{{ option.name }}</span>
-                <span class="prada-product__select-wrap">
-                  <select id="PradaOption-{{ section.id }}-{{ forloop.index0 }}" data-prada-option="{{ forloop.index0 }}">
-                    {%- for value in option.values -%}
-                      <option value="{{ value | escape }}" {% if option.selected_value == value %}selected{% endif %}>{{ value }}</option>
-                    {%- endfor -%}
-                  </select>
+                <button
+                  class="prada-product__option-trigger"
+                  type="button"
+                  data-prada-drawer-open="option-{{ forloop.index0 }}"
+                  data-prada-drawer-label="Select {{ option.name | escape }}"
+                >
+                  <span data-prada-selected-value="{{ forloop.index0 }}">{{ option.selected_value }}</span>
                   <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5"/></svg>
-                </span>
-              </label>
+                </button>
+                <select id="PradaOption-{{ section.id }}-{{ forloop.index0 }}" data-prada-option="{{ forloop.index0 }}" hidden aria-hidden="true" tabindex="-1">
+                  {%- for value in option.values -%}
+                    <option value="{{ value | escape }}" {% if option.selected_value == value %}selected{% endif %}>{{ value }}</option>
+                  {%- endfor -%}
+                </select>
+              </div>
             {%- endfor -%}
           </div>
         {%- endunless -%}
@@ -134,6 +140,26 @@
           <p>Shipping and return options are calculated at checkout.</p>
           {%- if shop.shipping_policy.body != blank -%}{{ shop.shipping_policy.body }}{%- endif -%}
         </div>
+        {%- for option in product.options_with_values -%}
+          <div class="prada-product__drawer-pane" data-prada-drawer-pane="option-{{ forloop.index0 }}" hidden>
+            <div class="prada-product__choice-list" role="listbox" aria-label="{{ option.name | escape }}">
+              {%- assign option_index = forloop.index0 -%}
+              {%- for value in option.values -%}
+                <button
+                  class="prada-product__choice{% if option.selected_value == value %} is-selected{% endif %}"
+                  type="button"
+                  role="option"
+                  aria-selected="{% if option.selected_value == value %}true{% else %}false{% endif %}"
+                  data-prada-option-choice="{{ option_index }}"
+                  data-prada-option-value="{{ value | escape }}"
+                >
+                  <span>{{ value }}</span>
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m4 10 4 4 8-9"/></svg>
+                </button>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endfor -%}
       </div>
     </aside>
   </div>
@@ -171,6 +197,15 @@
 
       idInput.value = variant.id;
       price.innerHTML = `${variant.compare_at_price > variant.price ? `<s>${formatMoney(variant.compare_at_price)}</s>` : ''}<span>${formatMoney(variant.price)}</span>`;
+      selectors.forEach((selector, index) => {
+        const selectedValue = root.querySelector(`[data-prada-selected-value="${index}"]`);
+        if (selectedValue) selectedValue.textContent = selector.value;
+        root.querySelectorAll(`[data-prada-option-choice="${index}"]`).forEach((choice) => {
+          const selected = choice.dataset.pradaOptionValue === selector.value;
+          choice.classList.toggle('is-selected', selected);
+          choice.setAttribute('aria-selected', selected ? 'true' : 'false');
+        });
+      });
       submit.disabled = !variant.available;
       submitText.textContent = variant.available ? 'Add to bag' : 'Available soon';
       status.textContent = variant.available ? 'Available online' : 'Soon available online';
@@ -203,7 +238,7 @@
         drawerTrigger = trigger;
         const paneName = trigger.dataset.pradaDrawerOpen;
         drawerPanes.forEach((pane) => pane.hidden = pane.dataset.pradaDrawerPane !== paneName);
-        drawerTitle.textContent = paneName === 'details' ? 'Product details' : 'Free shipping and returns';
+        drawerTitle.textContent = trigger.dataset.pradaDrawerLabel || (paneName === 'details' ? 'Product details' : 'Free shipping and returns');
         drawerShell.setAttribute('aria-hidden', 'false');
         document.documentElement.classList.add('prada-drawer-open');
         requestAnimationFrame(() => {
@@ -214,6 +249,14 @@
     });
 
     root.querySelectorAll('[data-prada-drawer-close]').forEach((button) => button.addEventListener('click', closeDrawer));
+    root.querySelectorAll('[data-prada-option-choice]').forEach((choice) => {
+      choice.addEventListener('click', () => {
+        const selector = selectors[Number(choice.dataset.pradaOptionChoice)];
+        selector.value = choice.dataset.pradaOptionValue;
+        selector.dispatchEvent(new Event('change', { bubbles: true }));
+        closeDrawer();
+      });
+    });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && drawerShell.classList.contains('is-open')) closeDrawer();
     });
