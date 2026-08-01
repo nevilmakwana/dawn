@@ -3,6 +3,10 @@
 {%- liquid
   assign current_variant = product.selected_or_first_available_variant
   assign form_id = 'PradaProductForm-' | append: section.id
+  assign detail_fit = product.metafields.custom.description_fit
+  assign detail_materials = product.metafields.custom.materials
+  assign detail_care = product.metafields.custom.care_guide
+  assign detail_delivery = product.metafields.custom.delivery_and_payment
 -%}
 
 <section
@@ -172,7 +176,7 @@
         </button>
       {%- endform -%}
 
-      {%- if product.description != blank -%}
+      {%- if product.description != blank or detail_fit != blank or detail_materials != blank or detail_care != blank or detail_delivery != blank -%}
         <button class="prada-product__drawer-trigger" type="button" data-prada-drawer-open="details">
           <span>Product details</span>
         </button>
@@ -195,7 +199,39 @@
       </header>
       <div class="prada-product__drawer-body">
         <div class="prada-product__drawer-pane rte" data-prada-drawer-pane="details" hidden>
-          {{ product.description }}
+          {%- if detail_fit != blank or product.description != blank -%}
+            <section class="prada-product__metafield-section">
+              <h3>Description &amp; fit</h3>
+              <div>
+                {%- if detail_fit != blank -%}
+                  {{ detail_fit | metafield_tag }}
+                {%- else -%}
+                  {{ product.description }}
+                {%- endif -%}
+              </div>
+            </section>
+          {%- endif -%}
+
+          {%- if detail_materials != blank -%}
+            <details class="prada-product__drawer-accordion">
+              <summary><span>Materials</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5"/></svg></summary>
+              <div>{{ detail_materials | metafield_tag }}</div>
+            </details>
+          {%- endif -%}
+
+          {%- if detail_care != blank -%}
+            <details class="prada-product__drawer-accordion">
+              <summary><span>Care guide</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5"/></svg></summary>
+              <div>{{ detail_care | metafield_tag }}</div>
+            </details>
+          {%- endif -%}
+
+          {%- if detail_delivery != blank -%}
+            <details class="prada-product__drawer-accordion">
+              <summary><span>Delivery and payment</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5"/></svg></summary>
+              <div>{{ detail_delivery | metafield_tag }}</div>
+            </details>
+          {%- endif -%}
         </div>
         <div class="prada-product__drawer-pane rte" data-prada-drawer-pane="shipping" hidden>
           <p>Shipping and return options are calculated at checkout.</p>
