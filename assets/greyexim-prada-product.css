@@ -4,7 +4,9 @@
 .prada-product__media-list { margin: 0; padding: 0; }
 .prada-product__media { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: auto; min-height: 0; aspect-ratio: 4 / 5; margin: 0; overflow: hidden; scroll-margin-top: var(--header-height, 72px); background: #f1f1f1; }
 .prada-product__media img, .prada-product__media video, .prada-product__media iframe, .prada-product__media model-viewer, .prada-product__media svg { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; border: 0; }
-.prada-product__media--video video { background: #000; }
+.prada-product__media--video video { object-fit: cover; background: #000; pointer-events: none; }
+.prada-product__media--video video::-webkit-media-controls { display: none !important; }
+.prada-product__media--video video::-webkit-media-controls-enclosure { display: none !important; }
 .prada-product__media--external_video iframe { position: absolute; inset: 0; }
 .prada-product__wishlist { position: absolute; z-index: 2; top: 24px; right: 24px; display: grid; place-items: center; width: 40px; height: 40px; padding: 8px; border: 0; background: transparent; cursor: pointer; }
 .prada-product__wishlist svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; }

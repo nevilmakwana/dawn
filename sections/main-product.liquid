@@ -29,9 +29,9 @@
                   alt: media.alt | default: product.title
                 }}
               {%- when 'video' -%}
-                {{ media | video_tag: controls: true, autoplay: false, loop: false, muted: false, playsinline: true, preload: 'metadata', image_size: '1200x' }}
+                {{ media | video_tag: controls: false, autoplay: true, loop: true, muted: true, playsinline: true, preload: 'metadata', image_size: '1200x' }}
               {%- when 'external_video' -%}
-                {{ media | external_video_tag: loading: 'lazy' }}
+                {{ media | external_video_tag: autoplay: true, loop: true, muted: true, loading: 'lazy' }}
               {%- when 'model' -%}
                 {{ media | model_viewer_tag: image_size: '1200x', reveal: 'interaction', toggleable: true }}
             {%- endcase -%}
@@ -166,6 +166,22 @@
       button.addEventListener('click', () => {
         const active = button.getAttribute('aria-pressed') !== 'true';
         root.querySelectorAll('.prada-product__wishlist').forEach((item) => item.setAttribute('aria-pressed', active));
+      });
+    });
+
+    root.querySelectorAll('.prada-product__media video').forEach((video) => {
+      video.controls = false;
+      video.muted = true;
+      video.defaultMuted = true;
+      video.volume = 0;
+      video.setAttribute('muted', '');
+      video.setAttribute('playsinline', '');
+      video.play().catch(() => {});
+      video.addEventListener('volumechange', () => {
+        if (!video.muted || video.volume !== 0) {
+          video.muted = true;
+          video.volume = 0;
+        }
       });
     });
   })();
