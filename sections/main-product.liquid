@@ -452,9 +452,12 @@
 
     const mobileQuery = window.matchMedia('(max-width: 989px)');
     const mobileGallery = root.querySelector('.prada-product__media-list');
+    const mobilePanel = root.querySelector('.prada-product__panel');
     const scrollHint = root.querySelector('[data-prada-scroll-hint]');
     const sheetHandle = root.querySelector('[data-prada-sheet-handle]');
     let sheetTouchStart = 0;
+    let galleryTouchStart = 0;
+    let galleryTouchStartedAtEnd = false;
     let onboardingTimer;
     let scrollHintConsumed = false;
 
@@ -468,13 +471,22 @@
       }, 2400);
     };
 
-    const closeMobileSheet = () => root.classList.remove('mobile-info-open');
+    const closeMobileSheet = () => {
+      if (!root.classList.contains('mobile-info-open') || root.classList.contains('mobile-info-closing')) return;
+      root.classList.add('mobile-info-closing');
+      window.setTimeout(() => root.classList.remove('mobile-info-open', 'mobile-info-closing'), 420);
+    };
+    const openMobileSheet = () => {
+      if (!mobileQuery.matches || root.classList.contains('mobile-info-open')) return;
+      root.classList.remove('mobile-info-closing');
+      root.classList.add('mobile-info-open');
+      mobilePanel?.scrollTo({ top: 0 });
+    };
     const updateMobileGallery = () => {
       if (!mobileQuery.matches || !mobileGallery || galleryMedia.length < 2) return;
       const remaining = mobileGallery.scrollHeight - mobileGallery.scrollTop - mobileGallery.clientHeight;
       const atLastMedia = remaining <= 8;
       const hasStarted = mobileGallery.scrollTop > 10;
-      root.classList.toggle('mobile-info-open', atLastMedia);
       if (hasStarted) {
         scrollHintConsumed = true;
         root.classList.remove('mobile-gallery-onboarding');
@@ -483,21 +495,30 @@
     };
 
     mobileGallery?.addEventListener('scroll', updateMobileGallery, { passive: true });
-    mobileGallery?.addEventListener('touchstart', () => {
+    mobileGallery?.addEventListener('touchstart', (event) => {
       window.clearTimeout(onboardingTimer);
       scrollHintConsumed = true;
       root.classList.remove('mobile-gallery-onboarding');
       scrollHint?.classList.remove('is-visible');
-    }, { passive: true, once: true });
+      galleryTouchStart = event.touches[0].clientY;
+      const remaining = mobileGallery.scrollHeight - mobileGallery.scrollTop - mobileGallery.clientHeight;
+      galleryTouchStartedAtEnd = remaining <= 8;
+    }, { passive: true });
+    mobileGallery?.addEventListener('touchend', (event) => {
+      const upwardDistance = galleryTouchStart - event.changedTouches[0].clientY;
+      if (galleryTouchStartedAtEnd && upwardDistance > 45) openMobileSheet();
+      galleryTouchStartedAtEnd = false;
+    }, { passive: true });
     sheetHandle?.addEventListener('click', closeMobileSheet);
-    sheetHandle?.addEventListener('touchstart', (event) => {
+    mobilePanel?.addEventListener('touchstart', (event) => {
       sheetTouchStart = event.touches[0].clientY;
     }, { passive: true });
-    sheetHandle?.addEventListener('touchend', (event) => {
-      if (event.changedTouches[0].clientY - sheetTouchStart > 45) closeMobileSheet();
+    mobilePanel?.addEventListener('touchend', (event) => {
+      const downwardDistance = event.changedTouches[0].clientY - sheetTouchStart;
+      if (mobilePanel.scrollTop <= 2 && downwardDistance > 60) closeMobileSheet();
     }, { passive: true });
     mobileQuery.addEventListener?.('change', () => {
-      if (!mobileQuery.matches) root.classList.remove('mobile-info-open');
+      if (!mobileQuery.matches) root.classList.remove('mobile-info-open', 'mobile-info-closing');
       else updateMobileGallery();
     });
 
