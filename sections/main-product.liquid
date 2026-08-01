@@ -384,6 +384,45 @@
       if (event.key === 'Escape' && drawerShell.classList.contains('is-open')) closeDrawer();
     });
 
+    root.querySelectorAll('.prada-product__drawer-accordion').forEach((accordion) => {
+      const summary = accordion.querySelector('summary');
+      let animation = null;
+
+      summary.addEventListener('click', (event) => {
+        event.preventDefault();
+        animation?.cancel();
+
+        const startHeight = `${accordion.getBoundingClientRect().height}px`;
+        if (accordion.open) {
+          const endHeight = `${summary.getBoundingClientRect().height}px`;
+          accordion.classList.add('is-closing');
+          animation = accordion.animate(
+            { height: [startHeight, endHeight] },
+            { duration: 360, easing: 'cubic-bezier(.22, 1, .36, 1)' }
+          );
+          animation.onfinish = () => {
+            accordion.open = false;
+            accordion.classList.remove('is-closing');
+            accordion.style.height = '';
+            animation = null;
+          };
+        } else {
+          accordion.open = true;
+          accordion.classList.add('is-opening');
+          const endHeight = `${accordion.scrollHeight}px`;
+          animation = accordion.animate(
+            { height: [startHeight, endHeight] },
+            { duration: 420, easing: 'cubic-bezier(.22, 1, .36, 1)' }
+          );
+          animation.onfinish = () => {
+            accordion.classList.remove('is-opening');
+            accordion.style.height = '';
+            animation = null;
+          };
+        }
+      });
+    });
+
     const galleryMedia = [...root.querySelectorAll('.prada-product__media')];
     const galleryDots = [...root.querySelectorAll('[data-prada-dot]')];
     if (galleryMedia.length > 1 && galleryDots.length === galleryMedia.length) {

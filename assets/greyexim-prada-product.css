@@ -60,7 +60,7 @@
 .prada-product__metafield-section { padding-bottom: 30px; }
 .prada-product__metafield-section h3 { margin: 0 0 22px; font-size: 14px; line-height: 1.35; font-weight: 700; }
 .prada-product__metafield-section .metafield-rich_text_field > :first-child { margin-top: 0; }
-.prada-product__drawer-accordion { border-top: 1px solid var(--prada-border); }
+.prada-product__drawer-accordion { overflow: hidden; border-top: 1px solid var(--prada-border); }
 .prada-product__drawer-accordion:last-child { border-bottom: 1px solid var(--prada-border); }
 .prada-product__drawer-accordion summary { display: flex; align-items: center; justify-content: space-between; min-height: 72px; list-style: none; font-size: 14px; font-weight: 600; cursor: pointer; }
 .prada-product__drawer-accordion summary::-webkit-details-marker { display: none; }
