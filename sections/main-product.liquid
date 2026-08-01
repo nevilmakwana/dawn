@@ -43,7 +43,7 @@
       {%- if product.media.size > 1 -%}
         <nav class="prada-product__dots" aria-label="Choose product image">
           {%- for media in product.media -%}
-            <a href="#PradaMedia-{{ section.id }}-{{ forloop.index }}" aria-label="View {{ media.media_type | replace: '_', ' ' }} {{ forloop.index }}">
+            <a href="#PradaMedia-{{ section.id }}-{{ forloop.index }}" data-prada-dot="{{ forloop.index0 }}" aria-label="View {{ media.media_type | replace: '_', ' ' }} {{ forloop.index }}"{% if forloop.first %} class="is-active" aria-current="true"{% endif %}>
               <span></span>
             </a>
           {%- endfor -%}
@@ -347,6 +347,37 @@
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && drawerShell.classList.contains('is-open')) closeDrawer();
     });
+
+    const galleryMedia = [...root.querySelectorAll('.prada-product__media')];
+    const galleryDots = [...root.querySelectorAll('[data-prada-dot]')];
+    if (galleryMedia.length > 1 && galleryDots.length === galleryMedia.length) {
+      const visibility = new Map();
+      const setActiveDot = (activeIndex) => {
+        galleryDots.forEach((dot, index) => {
+          const active = index === activeIndex;
+          dot.classList.toggle('is-active', active);
+          if (active) dot.setAttribute('aria-current', 'true');
+          else dot.removeAttribute('aria-current');
+        });
+      };
+
+      const mediaObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => visibility.set(entry.target, entry.intersectionRatio));
+        let activeIndex = 0;
+        let highestVisibility = -1;
+        galleryMedia.forEach((media, index) => {
+          const ratio = visibility.get(media) || 0;
+          if (ratio > highestVisibility) {
+            highestVisibility = ratio;
+            activeIndex = index;
+          }
+        });
+        setActiveDot(activeIndex);
+      }, { threshold: [0, .15, .3, .5, .7, .9, 1] });
+
+      galleryMedia.forEach((media) => mediaObserver.observe(media));
+      galleryDots.forEach((dot, index) => dot.addEventListener('click', () => setActiveDot(index)));
+    }
 
     root.querySelectorAll('.prada-product__media video').forEach((video) => {
       video.controls = false;
