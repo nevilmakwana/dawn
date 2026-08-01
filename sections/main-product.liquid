@@ -106,20 +106,36 @@
       {%- endform -%}
 
       {%- if product.description != blank -%}
-        <details class="prada-product__detail">
-          <summary>Product details <span>+</span></summary>
-          <div class="prada-product__detail-content rte">{{ product.description }}</div>
-        </details>
+        <button class="prada-product__drawer-trigger" type="button" data-prada-drawer-open="details">
+          <span>Product details</span><span aria-hidden="true">+</span>
+        </button>
       {%- endif -%}
 
-      <details class="prada-product__detail">
-        <summary>Shipping and returns <span>+</span></summary>
-        <div class="prada-product__detail-content rte">
+      <button class="prada-product__drawer-trigger" type="button" data-prada-drawer-open="shipping">
+        <span>Free shipping and returns</span><span aria-hidden="true">+</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="prada-product__drawer-shell" data-prada-drawer aria-hidden="true">
+    <button class="prada-product__drawer-backdrop" type="button" data-prada-drawer-close aria-label="Close information panel"></button>
+    <aside class="prada-product__drawer" role="dialog" aria-modal="true" aria-labelledby="PradaDrawerTitle-{{ section.id }}">
+      <header class="prada-product__drawer-header">
+        <h2 id="PradaDrawerTitle-{{ section.id }}" data-prada-drawer-title></h2>
+        <button class="prada-product__drawer-close" type="button" data-prada-drawer-close aria-label="Close information panel">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg>
+        </button>
+      </header>
+      <div class="prada-product__drawer-body">
+        <div class="prada-product__drawer-pane rte" data-prada-drawer-pane="details" hidden>
+          {{ product.description }}
+        </div>
+        <div class="prada-product__drawer-pane rte" data-prada-drawer-pane="shipping" hidden>
           <p>Shipping and return options are calculated at checkout.</p>
           {%- if shop.shipping_policy.body != blank -%}{{ shop.shipping_policy.body }}{%- endif -%}
         </div>
-      </details>
-    </div>
+      </div>
+    </aside>
   </div>
 </section>
 
@@ -167,6 +183,39 @@
         const active = button.getAttribute('aria-pressed') !== 'true';
         root.querySelectorAll('.prada-product__wishlist').forEach((item) => item.setAttribute('aria-pressed', active));
       });
+    });
+
+    const drawerShell = root.querySelector('[data-prada-drawer]');
+    const drawerTitle = root.querySelector('[data-prada-drawer-title]');
+    const drawerPanes = [...root.querySelectorAll('[data-prada-drawer-pane]')];
+    let drawerTrigger = null;
+
+    const closeDrawer = () => {
+      drawerShell.classList.remove('is-open');
+      drawerShell.setAttribute('aria-hidden', 'true');
+      document.documentElement.classList.remove('prada-drawer-open');
+      window.setTimeout(() => drawerPanes.forEach((pane) => pane.hidden = true), 450);
+      drawerTrigger?.focus({ preventScroll: true });
+    };
+
+    root.querySelectorAll('[data-prada-drawer-open]').forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        drawerTrigger = trigger;
+        const paneName = trigger.dataset.pradaDrawerOpen;
+        drawerPanes.forEach((pane) => pane.hidden = pane.dataset.pradaDrawerPane !== paneName);
+        drawerTitle.textContent = paneName === 'details' ? 'Product details' : 'Free shipping and returns';
+        drawerShell.setAttribute('aria-hidden', 'false');
+        document.documentElement.classList.add('prada-drawer-open');
+        requestAnimationFrame(() => {
+          drawerShell.classList.add('is-open');
+          root.querySelector('[data-prada-drawer-close]').focus({ preventScroll: true });
+        });
+      });
+    });
+
+    root.querySelectorAll('[data-prada-drawer-close]').forEach((button) => button.addEventListener('click', closeDrawer));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && drawerShell.classList.contains('is-open')) closeDrawer();
     });
 
     root.querySelectorAll('.prada-product__media video').forEach((video) => {
