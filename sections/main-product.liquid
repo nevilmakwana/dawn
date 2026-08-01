@@ -52,6 +52,7 @@
             </a>
           {%- endfor -%}
         </nav>
+        <div class="prada-product__scroll-hint" data-prada-scroll-hint aria-hidden="true">Scroll more pictures</div>
       {%- endif -%}
     {%- else -%}
       <figure class="prada-product__media prada-product__media--placeholder">
@@ -61,6 +62,9 @@
   </div>
 
   <div class="prada-product__panel">
+    <button class="prada-product__sheet-handle" type="button" data-prada-sheet-handle aria-label="Close product information">
+      <span></span>
+    </button>
     <div class="prada-product__info">
       <div class="prada-product__heading-row">
         <h1>{{ product.title | escape }}</h1>
@@ -445,6 +449,35 @@
       galleryMedia.forEach((media) => mediaObserver.observe(media));
       galleryDots.forEach((dot, index) => dot.addEventListener('click', () => setActiveDot(index)));
     }
+
+    const mobileQuery = window.matchMedia('(max-width: 989px)');
+    const mobileGallery = root.querySelector('.prada-product__media-list');
+    const scrollHint = root.querySelector('[data-prada-scroll-hint]');
+    const sheetHandle = root.querySelector('[data-prada-sheet-handle]');
+    let sheetTouchStart = 0;
+
+    const closeMobileSheet = () => root.classList.remove('mobile-info-open');
+    const updateMobileGallery = () => {
+      if (!mobileQuery.matches || !mobileGallery || galleryMedia.length < 2) return;
+      const remaining = mobileGallery.scrollHeight - mobileGallery.scrollTop - mobileGallery.clientHeight;
+      const atLastMedia = remaining <= 8;
+      const hasStarted = mobileGallery.scrollTop > 10;
+      root.classList.toggle('mobile-info-open', atLastMedia);
+      if (scrollHint) scrollHint.classList.toggle('is-visible', hasStarted && !atLastMedia);
+    };
+
+    mobileGallery?.addEventListener('scroll', updateMobileGallery, { passive: true });
+    sheetHandle?.addEventListener('click', closeMobileSheet);
+    sheetHandle?.addEventListener('touchstart', (event) => {
+      sheetTouchStart = event.touches[0].clientY;
+    }, { passive: true });
+    sheetHandle?.addEventListener('touchend', (event) => {
+      if (event.changedTouches[0].clientY - sheetTouchStart > 45) closeMobileSheet();
+    }, { passive: true });
+    mobileQuery.addEventListener?.('change', () => {
+      if (!mobileQuery.matches) root.classList.remove('mobile-info-open');
+      else updateMobileGallery();
+    });
 
     root.querySelectorAll('.prada-product__media video').forEach((video) => {
       video.controls = false;
