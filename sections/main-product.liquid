@@ -62,10 +62,6 @@
 
   <div class="prada-product__panel">
     <div class="prada-product__info">
-      {%- if product.vendor != blank -%}
-        <p class="prada-product__eyebrow">{{ product.vendor | escape }}</p>
-      {%- endif -%}
-
       <div class="prada-product__heading-row">
         <h1>{{ product.title | escape }}</h1>
         <button class="prada-product__wishlist prada-product__wishlist--mobile" type="button" aria-label="Add {{ product.title | escape }} to wishlist" aria-pressed="false">
@@ -166,10 +162,6 @@
             {%- endfor -%}
           </div>
         {%- endunless -%}
-
-        <p class="prada-product__status" data-prada-status>
-          {%- if current_variant.available -%}Available online{%- else -%}Soon available online{%- endif -%}
-        </p>
 
         <button class="prada-product__submit" type="submit" name="add" {% unless current_variant.available %}disabled{% endunless %} data-prada-submit>
           <span data-prada-submit-text>{%- if current_variant.available -%}Add to bag{%- else -%}Available soon{%- endif -%}</span>
@@ -312,7 +304,7 @@
       if (!variant) {
         submit.disabled = true;
         submitText.textContent = 'Unavailable';
-        status.textContent = 'This combination is unavailable';
+        if (status) status.textContent = 'This combination is unavailable';
         return;
       }
 
@@ -330,7 +322,7 @@
       });
       submit.disabled = !variant.available;
       submitText.textContent = variant.available ? 'Add to bag' : 'Available soon';
-      status.textContent = variant.available ? 'Available online' : 'Soon available online';
+      if (status) status.textContent = variant.available ? 'Available online' : 'Soon available online';
       window.history.replaceState({}, '', `${root.dataset.productUrl}?variant=${variant.id}`);
     };
 
