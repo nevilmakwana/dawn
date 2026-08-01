@@ -81,10 +81,11 @@
 
         {%- unless product.has_only_default_variant -%}
           <div class="prada-product__options">
+            {%- comment -%}Color is intentionally rendered first, regardless of Shopify option order.{%- endcomment -%}
             {%- for option in product.options_with_values -%}
               {%- assign option_name = option.name | downcase -%}
-              <div class="prada-product__option{% if option_name contains 'color' or option_name contains 'colour' %} prada-product__option--color{% endif %}">
-                {%- if option_name contains 'color' or option_name contains 'colour' -%}
+              {%- if option_name contains 'color' or option_name contains 'colour' -%}
+                <div class="prada-product__option prada-product__option--color">
                   <div class="prada-product__color-heading">
                     <strong>{{ option.name }}</strong>
                     <span data-prada-selected-value="{{ forloop.index0 }}">{{ option.selected_value }}</span>
@@ -117,11 +118,27 @@
                         data-prada-option-value="{{ value | escape }}"
                         {% if swatch_image != blank %}data-prada-image="{{ swatch_image }}"{% endif %}
                       >
-                        <span style="--swatch-color: {% if configured_swatch != blank %}{{ configured_swatch }}{% elsif value.swatch.color != blank %}{{ value.swatch.color }}{% else %}{{ value | handle | replace: '-', ' ' }}{% endif %};"></span>
+                        {%- if swatch_image != blank -%}
+                          <img src="{{ swatch_image }}" alt="" loading="lazy" width="84" height="105">
+                        {%- else -%}
+                          <span style="--swatch-color: {% if configured_swatch != blank %}{{ configured_swatch }}{% elsif value.swatch.color != blank %}{{ value.swatch.color }}{% else %}{{ value | handle | replace: '-', ' ' }}{% endif %};"></span>
+                        {%- endif -%}
                       </button>
                     {%- endfor -%}
                   </div>
-                {%- else -%}
+                  <select id="PradaOption-{{ section.id }}-{{ forloop.index0 }}" data-prada-option="{{ forloop.index0 }}" hidden aria-hidden="true" tabindex="-1">
+                    {%- for value in option.values -%}
+                      <option value="{{ value | escape }}" {% if option.selected_value == value %}selected{% endif %}>{{ value }}</option>
+                    {%- endfor -%}
+                  </select>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+
+            {%- for option in product.options_with_values -%}
+              {%- assign option_name = option.name | downcase -%}
+              {%- unless option_name contains 'color' or option_name contains 'colour' -%}
+                <div class="prada-product__option">
                   <span>{{ option.name }}</span>
                   <button
                     class="prada-product__option-trigger"
@@ -132,13 +149,13 @@
                     <span data-prada-selected-value="{{ forloop.index0 }}">{{ option.selected_value }}</span>
                     <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5"/></svg>
                   </button>
-                {%- endif -%}
-                <select id="PradaOption-{{ section.id }}-{{ forloop.index0 }}" data-prada-option="{{ forloop.index0 }}" hidden aria-hidden="true" tabindex="-1">
-                  {%- for value in option.values -%}
-                    <option value="{{ value | escape }}" {% if option.selected_value == value %}selected{% endif %}>{{ value }}</option>
-                  {%- endfor -%}
-                </select>
-              </div>
+                  <select id="PradaOption-{{ section.id }}-{{ forloop.index0 }}" data-prada-option="{{ forloop.index0 }}" hidden aria-hidden="true" tabindex="-1">
+                    {%- for value in option.values -%}
+                      <option value="{{ value | escape }}" {% if option.selected_value == value %}selected{% endif %}>{{ value }}</option>
+                    {%- endfor -%}
+                  </select>
+                </div>
+              {%- endunless -%}
             {%- endfor -%}
           </div>
         {%- endunless -%}
