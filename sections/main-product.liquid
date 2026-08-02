@@ -515,7 +515,12 @@
     }, { passive: true });
     mobilePanel?.addEventListener('touchend', (event) => {
       const downwardDistance = event.changedTouches[0].clientY - sheetTouchStart;
-      if (mobilePanel.scrollTop <= 2 && downwardDistance > 60) closeMobileSheet();
+      const upwardDistance = sheetTouchStart - event.changedTouches[0].clientY;
+      if (!root.classList.contains('mobile-info-open') && upwardDistance > 45) {
+        openMobileSheet();
+      } else if (mobilePanel.scrollTop <= 2 && downwardDistance > 60) {
+        closeMobileSheet();
+      }
     }, { passive: true });
     mobileQuery.addEventListener?.('change', () => {
       if (!mobileQuery.matches) root.classList.remove('mobile-info-open', 'mobile-info-closing');
