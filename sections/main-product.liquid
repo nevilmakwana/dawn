@@ -456,6 +456,7 @@
     const scrollHint = root.querySelector('[data-prada-scroll-hint]');
     const sheetHandle = root.querySelector('[data-prada-sheet-handle]');
     let sheetTouchStart = 0;
+    let handleDragY = 0;
     let galleryTouchStart = 0;
     let galleryTouchStartedAtEnd = false;
     let onboardingTimer;
@@ -474,7 +475,11 @@
     const closeMobileSheet = () => {
       if (!root.classList.contains('mobile-info-open') || root.classList.contains('mobile-info-closing')) return;
       root.classList.add('mobile-info-closing');
-      window.setTimeout(() => root.classList.remove('mobile-info-open', 'mobile-info-closing'), 420);
+      root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
+      window.setTimeout(() => {
+        root.classList.remove('mobile-info-open', 'mobile-info-closing');
+        root.style.removeProperty('--mobile-sheet-drag-y');
+      }, 420);
     };
     const openMobileSheet = () => {
       if (!mobileQuery.matches || root.classList.contains('mobile-info-open')) return;
@@ -510,6 +515,31 @@
       galleryTouchStartedAtEnd = false;
     }, { passive: true });
     sheetHandle?.addEventListener('click', closeMobileSheet);
+    sheetHandle?.addEventListener('touchstart', (event) => {
+      event.stopPropagation();
+      sheetTouchStart = event.touches[0].clientY;
+      handleDragY = 0;
+      root.style.setProperty('--mobile-sheet-drag-y', '0px');
+      root.classList.remove('mobile-info-settling');
+      root.classList.add('mobile-info-dragging');
+    }, { passive: true });
+    sheetHandle?.addEventListener('touchmove', (event) => {
+      event.stopPropagation();
+      handleDragY = Math.max(0, event.touches[0].clientY - sheetTouchStart);
+      root.style.setProperty('--mobile-sheet-drag-y', `${handleDragY}px`);
+      if (handleDragY > 0) event.preventDefault();
+    }, { passive: false });
+    sheetHandle?.addEventListener('touchend', (event) => {
+      event.stopPropagation();
+      if (handleDragY > 70) {
+        closeMobileSheet();
+      } else {
+        root.classList.remove('mobile-info-dragging');
+        root.classList.add('mobile-info-settling');
+        root.style.setProperty('--mobile-sheet-drag-y', '0px');
+        window.setTimeout(() => root.classList.remove('mobile-info-settling'), 280);
+      }
+    }, { passive: true });
     mobilePanel?.addEventListener('touchstart', (event) => {
       sheetTouchStart = event.touches[0].clientY;
     }, { passive: true });
