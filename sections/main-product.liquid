@@ -489,7 +489,6 @@
       });
       window.setTimeout(() => {
         root.classList.remove('mobile-info-open', 'mobile-info-closing');
-        root.style.removeProperty('--mobile-sheet-drag-y');
       }, 420);
     };
     const openMobileSheet = () => {
@@ -542,7 +541,6 @@
       suppressHandleClick = false;
       sheetTouchStart = event.touches[0].clientY;
       handleDragY = 0;
-      root.style.setProperty('--mobile-sheet-drag-y', '0px');
       root.classList.remove('mobile-info-settling');
       root.classList.add('mobile-info-dragging');
     }, { passive: true });
@@ -551,21 +549,26 @@
       event.stopPropagation();
       handleDragY = Math.max(0, event.touches[0].clientY - sheetTouchStart);
       if (handleDragY > 5) suppressHandleClick = true;
-      root.style.setProperty('--mobile-sheet-drag-y', `${handleDragY}px`);
-      if (handleDragY > 0) event.preventDefault();
-    }, { passive: false });
+    }, { passive: true });
     sheetHandle?.addEventListener('touchend', (event) => {
       if (!handleIsDragging) return;
       event.stopPropagation();
       handleIsDragging = false;
+      handleDragY = Math.max(handleDragY, event.changedTouches[0].clientY - sheetTouchStart);
+      if (handleDragY > 5) suppressHandleClick = true;
       if (handleDragY > 70) {
         closeMobileSheet();
       } else {
-        root.classList.remove('mobile-info-dragging');
-        root.classList.add('mobile-info-settling');
-        root.style.setProperty('--mobile-sheet-drag-y', '0px');
-        window.setTimeout(() => root.classList.remove('mobile-info-settling'), 280);
+        root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
+        window.requestAnimationFrame(() => mobilePanel?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
       }
+      window.setTimeout(() => { suppressHandleClick = false; }, 500);
+    }, { passive: true });
+    sheetHandle?.addEventListener('touchcancel', () => {
+      handleIsDragging = false;
+      handleDragY = 0;
+      suppressHandleClick = true;
+      root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
       window.setTimeout(() => { suppressHandleClick = false; }, 500);
     }, { passive: true });
     mobilePanel?.addEventListener('touchstart', (event) => {
