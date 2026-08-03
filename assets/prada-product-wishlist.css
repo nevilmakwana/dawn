@@ -154,8 +154,8 @@
   }
 
   .prada-wishlist-indicator {
-    right: 3px;
-    bottom: 3px;
+    right: -1px;
+    bottom: 0;
     width: 5px;
     height: 5px;
   }
