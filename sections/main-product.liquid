@@ -460,6 +460,7 @@
     let galleryTouchStart = 0;
     let galleryTouchStartedAtEnd = false;
     let onboardingTimer;
+    let sheetDockTimer;
     let scrollHintConsumed = false;
 
     const playMobileOnboarding = () => {
@@ -474,11 +475,13 @@
 
     const closeMobileSheet = () => {
       if (!root.classList.contains('mobile-info-open') || root.classList.contains('mobile-info-closing')) return;
+      window.clearTimeout(sheetDockTimer);
       root.classList.add('mobile-info-closing');
       root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
       window.setTimeout(() => {
-        root.classList.remove('mobile-info-open', 'mobile-info-closing');
+        root.classList.remove('mobile-info-open', 'mobile-info-closing', 'mobile-info-docked');
         root.style.removeProperty('--mobile-sheet-drag-y');
+        galleryMedia[galleryMedia.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 420);
     };
     const openMobileSheet = () => {
@@ -486,6 +489,12 @@
       root.classList.remove('mobile-info-closing');
       root.classList.add('mobile-info-open');
       mobilePanel?.scrollTo({ top: 0 });
+      window.clearTimeout(sheetDockTimer);
+      sheetDockTimer = window.setTimeout(() => {
+        if (!root.classList.contains('mobile-info-open') || root.classList.contains('mobile-info-closing')) return;
+        root.classList.add('mobile-info-docked');
+        mobilePanel?.scrollIntoView({ block: 'start' });
+      }, 560);
     };
     const updateMobileGallery = () => {
       if (!mobileQuery.matches || !mobileGallery || galleryMedia.length < 2) return;
@@ -548,12 +557,12 @@
       const upwardDistance = sheetTouchStart - event.changedTouches[0].clientY;
       if (!root.classList.contains('mobile-info-open') && upwardDistance > 45) {
         openMobileSheet();
-      } else if (mobilePanel.scrollTop <= 2 && downwardDistance > 60) {
+      } else if (!root.classList.contains('mobile-info-docked') && mobilePanel.scrollTop <= 2 && downwardDistance > 60) {
         closeMobileSheet();
       }
     }, { passive: true });
     mobileQuery.addEventListener?.('change', () => {
-      if (!mobileQuery.matches) root.classList.remove('mobile-info-open', 'mobile-info-closing');
+      if (!mobileQuery.matches) root.classList.remove('mobile-info-open', 'mobile-info-closing', 'mobile-info-docked');
       else updateMobileGallery();
     });
 
