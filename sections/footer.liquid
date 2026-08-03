@@ -27,7 +27,7 @@
   }
 {%- endstyle -%}
 
-<footer class="footer color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding">
+<footer class="footer color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding{% if request.page_type == 'product' %} footer--prada-product{% endif %}">
   {%- liquid
     assign has_social_icons = true
     if settings.social_facebook_link == blank and settings.social_instagram_link == blank and settings.social_youtube_link == blank and settings.social_tiktok_link == blank and settings.social_twitter_link == blank and settings.social_pinterest_link == blank and settings.social_snapchat_link == blank and settings.social_tumblr_link == blank and settings.social_vimeo_link == blank
@@ -319,6 +319,154 @@
       </div>
     </div>
   </div>
+
+  {%- if request.page_type == 'product' -%}
+    <div class="prada-mobile-footer">
+      <section class="prada-mobile-footer__newsletter" aria-labelledby="PradaMobileNewsletterHeading-{{ section.id }}">
+        <h2 id="PradaMobileNewsletterHeading-{{ section.id }}">Subscribe to our newsletter</h2>
+        {%- form 'customer', id: 'PradaMobileNewsletter', class: 'prada-mobile-footer__newsletter-form' -%}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <div class="prada-mobile-footer__field">
+            <input
+              id="PradaMobileNewsletterEmail-{{ section.id }}"
+              type="email"
+              name="contact[email]"
+              value="{{ form.email }}"
+              aria-label="Email address"
+              autocomplete="email"
+              placeholder="Insert your e-mail address *"
+              required
+            >
+            <button type="submit" name="commit" aria-label="Subscribe">
+              <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 16h23M20 8l8 8-8 8" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            </button>
+          </div>
+          {%- if form.errors -%}
+            <small>{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</small>
+          {%- elsif form.posted_successfully? -%}
+            <small>Thank you for subscribing.</small>
+          {%- endif -%}
+        {%- endform -%}
+        <p class="prada-mobile-footer__privacy">
+          By clicking on &ldquo;Subscribe&rdquo;, you confirm that you have read and understood our
+          {%- if shop.privacy_policy != blank -%}
+            <a href="{{ shop.privacy_policy.url }}"> Privacy Statement</a>
+          {%- else -%}
+            <a href="{{ routes.root_url }}policies/privacy-policy"> Privacy Statement</a>
+          {%- endif -%}
+          and that you want to receive marketing communications.
+        </p>
+        {%- if section.settings.show_social and has_social_icons -%}
+          {%- render 'social-icons', class: 'footer__list-social' -%}
+        {%- endif -%}
+      </section>
+
+      <details class="prada-mobile-footer__accordion">
+        <summary><span>Contact us</span><span class="prada-mobile-footer__chevron" aria-hidden="true"></span></summary>
+        <div class="prada-mobile-footer__accordion-content">
+          <ul>
+            <li><a href="/pages/contact">Contact Grey Exim</a></li>
+            {%- if shop.email != blank -%}<li><a href="mailto:{{ shop.email | escape }}">{{ shop.email | escape }}</a></li>{%- endif -%}
+          </ul>
+        </div>
+      </details>
+
+      <details class="prada-mobile-footer__accordion">
+        <summary><span>Services</span><span class="prada-mobile-footer__chevron" aria-hidden="true"></span></summary>
+        <div class="prada-mobile-footer__accordion-content">
+          <ul>
+            {%- if shop.shipping_policy != blank -%}<li><a href="{{ shop.shipping_policy.url }}">Shipping</a></li>{%- endif -%}
+            {%- if shop.refund_policy != blank -%}<li><a href="{{ shop.refund_policy.url }}">Returns and refunds</a></li>{%- endif -%}
+            <li><a href="{{ routes.cart_url }}">Shopping bag</a></li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="prada-mobile-footer__accordion">
+        <summary><span>Company</span><span class="prada-mobile-footer__chevron" aria-hidden="true"></span></summary>
+        <div class="prada-mobile-footer__accordion-content">
+          <ul>
+            <li><a href="{{ routes.root_url }}">Grey Exim</a></li>
+            <li><a href="{{ routes.all_products_collection_url }}">All products</a></li>
+            <li><a href="/pages/contact">Contact us</a></li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="prada-mobile-footer__accordion">
+        <summary><span>Legal terms and conditions</span><span class="prada-mobile-footer__chevron" aria-hidden="true"></span></summary>
+        <div class="prada-mobile-footer__accordion-content">
+          <ul>
+            {%- for policy in shop.policies -%}
+              {%- if policy != blank -%}<li><a href="{{ policy.url }}">{{ policy.title | escape }}</a></li>{%- endif -%}
+            {%- endfor -%}
+          </ul>
+        </div>
+      </details>
+
+      <div class="prada-mobile-footer__utility">
+        <a class="prada-mobile-footer__link" href="/pages/contact">Store locator</a>
+      </div>
+      <div class="prada-mobile-footer__utility">
+        <span>Shipping to: {{ localization.country.name | escape }} / {{ localization.language.endonym_name | escape }}</span>
+      </div>
+      <div class="prada-mobile-footer__utility prada-mobile-footer__copyright">
+        <span>&copy; {{ shop.name | escape }} {{ 'now' | date: '%Y' }}</span>
+      </div>
+      <div class="prada-mobile-footer__legal">
+        {%- if shop.privacy_policy != blank -%}<a href="{{ shop.privacy_policy.url }}">Privacy policy</a>{%- endif -%}
+        {%- if shop.terms_of_service != blank -%}<a href="{{ shop.terms_of_service.url }}">Terms of service</a>{%- endif -%}
+      </div>
+    </div>
+
+    <script>
+      (() => {
+        const footer = document.currentScript?.previousElementSibling;
+        if (!footer?.classList.contains('prada-mobile-footer') || footer.dataset.accordionsReady === 'true') return;
+        footer.dataset.accordionsReady = 'true';
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+        footer.querySelectorAll('.prada-mobile-footer__accordion').forEach((details) => {
+          const summary = details.querySelector('summary');
+          const content = details.querySelector('.prada-mobile-footer__accordion-content');
+          if (!summary || !content) return;
+
+          summary.addEventListener('click', (event) => {
+            if (!window.matchMedia('(max-width: 989px)').matches) return;
+            event.preventDefault();
+            details._pradaFooterAnimation?.cancel();
+
+            if (reducedMotion.matches || typeof content.animate !== 'function') {
+              details.open = !details.open;
+              return;
+            }
+
+            if (details.open) {
+              const startHeight = content.getBoundingClientRect().height;
+              details._pradaFooterAnimation = content.animate(
+                [{ height: `${startHeight}px`, opacity: 1 }, { height: '0px', opacity: 0 }],
+                { duration: 280, easing: 'cubic-bezier(.4, 0, 1, 1)' }
+              );
+              details._pradaFooterAnimation.onfinish = () => {
+                details.open = false;
+                details._pradaFooterAnimation = null;
+              };
+            } else {
+              details.open = true;
+              const endHeight = content.getBoundingClientRect().height;
+              details._pradaFooterAnimation = content.animate(
+                [{ height: '0px', opacity: 0 }, { height: `${endHeight}px`, opacity: 1 }],
+                { duration: 320, easing: 'cubic-bezier(.22, 1, .36, 1)' }
+              );
+              details._pradaFooterAnimation.onfinish = () => {
+                details._pradaFooterAnimation = null;
+              };
+            }
+          });
+        });
+      })();
+    </script>
+  {%- endif -%}
 </footer>
 
 {% schema %}

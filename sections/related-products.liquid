@@ -34,6 +34,7 @@
       <ul
         class="grid product-grid grid--{{ section.settings.columns_desktop }}-col-desktop grid--{{ section.settings.columns_mobile }}-col-tablet-down"
         role="list"
+        data-prada-related-list
       >
         {% assign skip_card_product_styles = false %}
         {% for recommendation in recommendations.products %}
@@ -48,16 +49,88 @@
               skip_styles: skip_card_product_styles,
               product_view_context: 'recommendation'
             %}
+            {%- for option in recommendation.options_with_values -%}
+              {%- assign related_option_name = option.name | downcase -%}
+              {%- if related_option_name contains 'color' or related_option_name contains 'colour' -%}
+                <div class="prada-related-colors" aria-label="Available {{ option.name | escape }}">
+                  {%- for value in option.values limit: 3 -%}
+                    {%- assign related_swatch_color = value.swatch.color | default: '#e7e7e7' -%}
+                    <span
+                      class="prada-related-colors__swatch"
+                      style="--prada-related-color: {{ related_swatch_color }};"
+                      title="{{ value | escape }}"
+                    ></span>
+                  {%- endfor -%}
+                </div>
+                {%- break -%}
+              {%- endif -%}
+            {%- endfor -%}
           </li>
           {%- assign skip_card_product_styles = true -%}
         {% endfor %}
       </ul>
+      {%- assign related_page_count = recommendations.products_count | plus: 1 | divided_by: 2 -%}
+      {%- if related_page_count > 1 -%}
+        <nav class="prada-related-pagination" aria-label="Recommended product pages" data-prada-related-pagination>
+          {%- for page_number in (1..related_page_count) -%}
+            <button
+              type="button"
+              data-prada-related-page="{{ forloop.index0 }}"
+              aria-label="View recommended products page {{ page_number }}"
+              {% if forloop.first %}class="is-active" aria-current="true"{% endif %}
+            ></button>
+          {%- endfor -%}
+        </nav>
+      {%- endif -%}
     {% endif %}
   </product-recommendations>
   {% if section.settings.image_shape == 'arch' %}
     {{ 'mask-arch.svg' | inline_asset_content }}
   {%- endif -%}
 </div>
+
+<script>
+  (() => {
+    const recommendations = document.querySelector('product-recommendations[data-section-id="{{ section.id }}"]');
+    if (!recommendations || recommendations.dataset.pradaPaginationObserver === 'true') return;
+    recommendations.dataset.pradaPaginationObserver = 'true';
+
+    const initialisePagination = () => {
+      const list = recommendations.querySelector('[data-prada-related-list]');
+      const dots = Array.from(recommendations.querySelectorAll('[data-prada-related-page]'));
+      if (!list || !dots.length || list.dataset.pradaPaginationReady === 'true') return false;
+      list.dataset.pradaPaginationReady = 'true';
+
+      let frame;
+      const setActivePage = () => {
+        frame = undefined;
+        const page = Math.max(0, Math.min(dots.length - 1, Math.round(list.scrollLeft / Math.max(1, list.clientWidth))));
+        dots.forEach((dot, index) => {
+          const active = index === page;
+          dot.classList.toggle('is-active', active);
+          if (active) dot.setAttribute('aria-current', 'true');
+          else dot.removeAttribute('aria-current');
+        });
+      };
+
+      list.addEventListener('scroll', () => {
+        if (!frame) frame = window.requestAnimationFrame(setActivePage);
+      }, { passive: true });
+      dots.forEach((dot, index) => dot.addEventListener('click', () => {
+        list.scrollTo({ left: index * list.clientWidth, behavior: 'smooth' });
+      }));
+      setActivePage();
+      return true;
+    };
+
+    if (!initialisePagination()) {
+      const observer = new MutationObserver(() => {
+        if (initialisePagination()) observer.disconnect();
+      });
+      observer.observe(recommendations, { childList: true, subtree: true });
+    }
+  })();
+</script>
 
 {% schema %}
 {

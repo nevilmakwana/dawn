@@ -1,4 +1,5 @@
 {{ 'greyexim-prada-product.css' | asset_url | stylesheet_tag }}
+{{ 'greyexim-prada-mobile-flow.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
   assign current_variant = product.selected_or_first_available_variant
@@ -62,7 +63,7 @@
   </div>
 
   <div class="prada-product__panel">
-    <button class="prada-product__sheet-handle" type="button" data-prada-sheet-handle aria-label="Close product information">
+    <button class="prada-product__sheet-handle" type="button" data-prada-sheet-handle aria-label="Open product information" aria-expanded="false">
       <span></span>
     </button>
     <div class="prada-product__info">
@@ -171,6 +172,8 @@
           <span data-prada-submit-text>{%- if current_variant.available -%}Add to bag{%- else -%}Available soon{%- endif -%}</span>
         </button>
       {%- endform -%}
+
+      <a class="prada-product__store-link" href="/pages/contact">Find in store</a>
 
       {%- if product.description != blank or detail_fit != blank or detail_materials != blank or detail_care != blank or detail_delivery != blank -%}
         <button class="prada-product__drawer-trigger" type="button" data-prada-drawer-open="details">
@@ -459,8 +462,9 @@
     let handleDragY = 0;
     let galleryTouchStart = 0;
     let galleryTouchStartedAtEnd = false;
+    let handleIsDragging = false;
+    let suppressHandleClick = false;
     let onboardingTimer;
-    let sheetDockTimer;
     let scrollHintConsumed = false;
 
     const playMobileOnboarding = () => {
@@ -475,26 +479,26 @@
 
     const closeMobileSheet = () => {
       if (!root.classList.contains('mobile-info-open') || root.classList.contains('mobile-info-closing')) return;
-      window.clearTimeout(sheetDockTimer);
       root.classList.add('mobile-info-closing');
       root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
+      sheetHandle?.setAttribute('aria-expanded', 'false');
+      sheetHandle?.setAttribute('aria-label', 'Open product information');
+      mobileGallery?.scrollTo({ top: mobileGallery.scrollHeight - mobileGallery.clientHeight, behavior: 'auto' });
+      window.requestAnimationFrame(() => {
+        (root.closest('.shopify-section') || root).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
       window.setTimeout(() => {
-        root.classList.remove('mobile-info-open', 'mobile-info-closing', 'mobile-info-docked');
+        root.classList.remove('mobile-info-open', 'mobile-info-closing');
         root.style.removeProperty('--mobile-sheet-drag-y');
-        galleryMedia[galleryMedia.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 420);
     };
     const openMobileSheet = () => {
       if (!mobileQuery.matches || root.classList.contains('mobile-info-open')) return;
       root.classList.remove('mobile-info-closing');
       root.classList.add('mobile-info-open');
-      mobilePanel?.scrollTo({ top: 0 });
-      window.clearTimeout(sheetDockTimer);
-      sheetDockTimer = window.setTimeout(() => {
-        if (!root.classList.contains('mobile-info-open') || root.classList.contains('mobile-info-closing')) return;
-        root.classList.add('mobile-info-docked');
-        mobilePanel?.scrollIntoView({ block: 'start' });
-      }, 560);
+      sheetHandle?.setAttribute('aria-expanded', 'true');
+      sheetHandle?.setAttribute('aria-label', 'Close product information');
+      window.requestAnimationFrame(() => mobilePanel?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
     };
     const updateMobileGallery = () => {
       if (!mobileQuery.matches || !mobileGallery || galleryMedia.length < 2) return;
@@ -523,9 +527,19 @@
       if (galleryTouchStartedAtEnd && upwardDistance > 45) openMobileSheet();
       galleryTouchStartedAtEnd = false;
     }, { passive: true });
-    sheetHandle?.addEventListener('click', closeMobileSheet);
+    sheetHandle?.addEventListener('click', () => {
+      if (suppressHandleClick) {
+        suppressHandleClick = false;
+        return;
+      }
+      if (root.classList.contains('mobile-info-open')) closeMobileSheet();
+      else openMobileSheet();
+    });
     sheetHandle?.addEventListener('touchstart', (event) => {
+      if (!root.classList.contains('mobile-info-open')) return;
       event.stopPropagation();
+      handleIsDragging = true;
+      suppressHandleClick = false;
       sheetTouchStart = event.touches[0].clientY;
       handleDragY = 0;
       root.style.setProperty('--mobile-sheet-drag-y', '0px');
@@ -533,13 +547,17 @@
       root.classList.add('mobile-info-dragging');
     }, { passive: true });
     sheetHandle?.addEventListener('touchmove', (event) => {
+      if (!handleIsDragging) return;
       event.stopPropagation();
       handleDragY = Math.max(0, event.touches[0].clientY - sheetTouchStart);
+      if (handleDragY > 5) suppressHandleClick = true;
       root.style.setProperty('--mobile-sheet-drag-y', `${handleDragY}px`);
       if (handleDragY > 0) event.preventDefault();
     }, { passive: false });
     sheetHandle?.addEventListener('touchend', (event) => {
+      if (!handleIsDragging) return;
       event.stopPropagation();
+      handleIsDragging = false;
       if (handleDragY > 70) {
         closeMobileSheet();
       } else {
@@ -548,21 +566,19 @@
         root.style.setProperty('--mobile-sheet-drag-y', '0px');
         window.setTimeout(() => root.classList.remove('mobile-info-settling'), 280);
       }
+      window.setTimeout(() => { suppressHandleClick = false; }, 500);
     }, { passive: true });
     mobilePanel?.addEventListener('touchstart', (event) => {
       sheetTouchStart = event.touches[0].clientY;
     }, { passive: true });
     mobilePanel?.addEventListener('touchend', (event) => {
-      const downwardDistance = event.changedTouches[0].clientY - sheetTouchStart;
       const upwardDistance = sheetTouchStart - event.changedTouches[0].clientY;
       if (!root.classList.contains('mobile-info-open') && upwardDistance > 45) {
         openMobileSheet();
-      } else if (!root.classList.contains('mobile-info-docked') && mobilePanel.scrollTop <= 2 && downwardDistance > 60) {
-        closeMobileSheet();
       }
     }, { passive: true });
     mobileQuery.addEventListener?.('change', () => {
-      if (!mobileQuery.matches) root.classList.remove('mobile-info-open', 'mobile-info-closing', 'mobile-info-docked');
+      if (!mobileQuery.matches) root.classList.remove('mobile-info-open', 'mobile-info-closing');
       else updateMobileGallery();
     });
 

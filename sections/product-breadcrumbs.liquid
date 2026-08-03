@@ -1,0 +1,35 @@
+{%- liquid
+  assign breadcrumb_collection = collection
+  if breadcrumb_collection == blank
+    assign breadcrumb_collection = product.collections.first
+  endif
+-%}
+
+<nav class="prada-mobile-breadcrumbs" aria-label="Breadcrumb">
+  <a href="{{ routes.root_url }}">{{ shop.name | escape }}</a>
+  <span aria-hidden="true">/</span>
+  {%- if breadcrumb_collection != blank -%}
+    <a href="{{ breadcrumb_collection.url }}">{{ breadcrumb_collection.title | escape }}</a>
+  {%- else -%}
+    <a href="{{ routes.all_products_collection_url }}">Products</a>
+  {%- endif -%}
+  {%- if product.type != blank -%}
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{{ product.type | escape }}</span>
+  {%- endif -%}
+</nav>
+
+{% schema %}
+{
+  "name": "Product breadcrumbs",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [],
+  "presets": [
+    {
+      "name": "Product breadcrumbs"
+    }
+  ]
+}
+{% endschema %}
