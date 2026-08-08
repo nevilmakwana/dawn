@@ -327,9 +327,14 @@
         const headerHeight = Number.parseFloat(
           getComputedStyle(document.documentElement).getPropertyValue('--header-height')
         ) || 72;
-        const lastMediaTop = lastMedia.offsetTop;
-        gallery.style.setProperty('--prada-last-media-top', `${lastMediaTop}px`);
-        desktopWishlist.classList.toggle('is-on-last-media', lastMedia.getBoundingClientRect().top <= headerHeight + 24);
+        const lastMediaRect = lastMedia.getBoundingClientRect();
+        const releaseDepth = lastMedia.offsetHeight * 0.3;
+        const releasePoint = lastMedia.offsetTop + releaseDepth;
+        gallery.style.setProperty('--prada-wishlist-release-point', `${releasePoint}px`);
+        desktopWishlist.classList.toggle(
+          'is-on-last-media',
+          lastMediaRect.top + releaseDepth <= headerHeight + 24
+        );
       });
     };
 

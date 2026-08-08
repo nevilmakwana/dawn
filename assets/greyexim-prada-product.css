@@ -11,7 +11,7 @@
 .prada-product__media--video video::-webkit-media-controls-enclosure { display: none !important; }
 .prada-product__media--external_video iframe { position: absolute; inset: 0; }
 .prada-product__wishlist { position: sticky; z-index: 2; top: calc(var(--header-height, 72px) + 24px); display: grid; place-items: center; width: 32px; height: 32px; margin-right: 24px; margin-bottom: -32px; margin-left: auto; padding: 6px; border: 0; background: transparent; color: #000; cursor: pointer; }
-.prada-product__wishlist.is-on-last-media { position: absolute; top: calc(var(--prada-last-media-top, 0px) + 24px); right: 24px; margin: 0; }
+.prada-product__wishlist.is-on-last-media { position: absolute; top: var(--prada-wishlist-release-point, 0px); right: 24px; margin: 0; }
 .prada-product__wishlist svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; }
 .prada-product__wishlist[aria-pressed='true'] svg { fill: currentColor; }
 .prada-product__wishlist--mobile { display: none; }
