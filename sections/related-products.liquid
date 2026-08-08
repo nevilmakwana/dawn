@@ -69,6 +69,14 @@
           {%- assign skip_card_product_styles = true -%}
         {% endfor %}
       </ul>
+      <div class="prada-related-arrows" aria-label="Recommended products carousel controls">
+        <button type="button" data-prada-related-arrow="previous" aria-label="Previous recommended products">
+          <span aria-hidden="true">&#8249;</span>
+        </button>
+        <button type="button" data-prada-related-arrow="next" aria-label="Next recommended products">
+          <span aria-hidden="true">&#8250;</span>
+        </button>
+      </div>
       {%- assign related_page_count = recommendations.products_count | plus: 1 | divided_by: 2 -%}
       {%- if related_page_count > 1 -%}
         <nav class="prada-related-pagination" aria-label="Recommended product pages" data-prada-related-pagination>
@@ -98,6 +106,7 @@
     const initialisePagination = () => {
       const list = recommendations.querySelector('[data-prada-related-list]');
       const dots = Array.from(recommendations.querySelectorAll('[data-prada-related-page]'));
+      const arrows = Array.from(recommendations.querySelectorAll('[data-prada-related-arrow]'));
       if (!list || !dots.length || list.dataset.pradaPaginationReady === 'true') return false;
       list.dataset.pradaPaginationReady = 'true';
 
@@ -118,6 +127,10 @@
       }, { passive: true });
       dots.forEach((dot, index) => dot.addEventListener('click', () => {
         list.scrollTo({ left: index * list.clientWidth, behavior: 'smooth' });
+      }));
+      arrows.forEach((arrow) => arrow.addEventListener('click', () => {
+        const direction = arrow.dataset.pradaRelatedArrow === 'previous' ? -1 : 1;
+        list.scrollBy({ left: direction * list.clientWidth, behavior: 'smooth' });
       }));
       setActivePage();
       return true;

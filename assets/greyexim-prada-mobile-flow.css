@@ -1,13 +1,107 @@
 /* Product-page-only mobile continuation: information -> recommendations -> breadcrumb -> footer. */
 .prada-related-pagination,
+.prada-related-arrows,
 .prada-mobile-breadcrumbs,
 .prada-mobile-footer {
   display: none;
 }
 
 @media screen and (min-width: 990px) {
-  main[data-template='product'] .related-products .product-grid > .grid__item:nth-child(n + 5) {
+  main[data-template='product'] .related-products {
+    position: relative;
+    width: 100%;
+    max-width: none;
+    padding: 0 0 36px;
+  }
+
+  main[data-template='product'] .related-products__heading {
+    margin: 0;
+    padding: 26px 24px 48px;
+    font-size: 24px;
+    line-height: 1.25;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  main[data-template='product'] .related-products .product-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  main[data-template='product'] .related-products .product-grid::-webkit-scrollbar {
     display: none;
+  }
+
+  main[data-template='product'] .related-products .product-grid > .grid__item {
+    flex: 0 0 calc((100% - 3px) / 4);
+    width: calc((100% - 3px) / 4);
+    max-width: calc((100% - 3px) / 4);
+    padding: 0;
+    scroll-snap-align: start;
+  }
+
+  main[data-template='product'] .related-products .card-wrapper,
+  main[data-template='product'] .related-products .card,
+  main[data-template='product'] .related-products .card__inner {
+    border: 0;
+    border-radius: 0;
+    background: #fff;
+  }
+
+  main[data-template='product'] .related-products .card__inner {
+    --ratio-percent: 125% !important;
+  }
+
+  main[data-template='product'] .related-products .card__media,
+  main[data-template='product'] .related-products .card__media .media {
+    background: #f2f2f2;
+  }
+
+  main[data-template='product'] .related-products .card__media .media > img {
+    object-fit: contain;
+    object-position: center;
+  }
+
+  main[data-template='product'] .related-products .card > .card__content {
+    padding: 16px 16px 10px;
+  }
+
+  main[data-template='product'] .related-products .card__information {
+    padding: 0;
+  }
+
+  .prada-related-arrows {
+    position: absolute;
+    z-index: 3;
+    top: calc(50% + 30px);
+    right: 12px;
+    left: 12px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+
+  .prada-related-arrows button {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 52px;
+    padding: 0;
+    border: 0;
+    background: rgba(255, 255, 255, .72);
+    color: #111;
+    font-size: 34px;
+    line-height: 1;
+    cursor: pointer;
+    pointer-events: auto;
   }
 }
 
@@ -15,11 +109,11 @@
   main[data-template='product'] .related-products {
     width: 100%;
     max-width: none;
-    padding: 88px 0 36px;
+    padding: 42px 0 28px;
   }
 
   main[data-template='product'] .related-products__heading {
-    margin: 0 18px 54px;
+    margin: 0 18px 34px;
     font-size: 20px;
     line-height: 1.3;
     font-weight: 600;
