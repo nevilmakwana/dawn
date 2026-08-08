@@ -11,6 +11,7 @@
 .prada-product__media--video video::-webkit-media-controls-enclosure { display: none !important; }
 .prada-product__media--external_video iframe { position: absolute; inset: 0; }
 .prada-product__wishlist { position: sticky; z-index: 2; top: calc(var(--header-height, 72px) + 24px); display: grid; place-items: center; width: 32px; height: 32px; margin-right: 24px; margin-bottom: -32px; margin-left: auto; padding: 6px; border: 0; background: transparent; color: #000; cursor: pointer; }
+.prada-product__wishlist.is-on-last-media { position: absolute; top: calc(var(--prada-last-media-top, 0px) + 24px); right: 24px; margin: 0; }
 .prada-product__wishlist svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; }
 .prada-product__wishlist[aria-pressed='true'] svg { fill: currentColor; }
 .prada-product__wishlist--mobile { display: none; }
@@ -89,7 +90,8 @@ html.prada-drawer-open, html.prada-drawer-open body { overflow: hidden; }
   .prada-product__media:first-child video { transform: translate3d(0, 0, 0); transition: transform .72s cubic-bezier(.22, 1, .36, 1); }
   .prada-product.mobile-gallery-onboarding .prada-product__media:first-child img,
   .prada-product.mobile-gallery-onboarding .prada-product__media:first-child video { transform: translate3d(0, -14px, 0); }
-  .prada-product__gallery > .prada-product__wishlist { position: absolute; top: 14px; right: 14px; display: grid; width: 40px; height: 40px; margin: 0; padding: 8px; color: #000; }
+  .prada-product__gallery > .prada-product__wishlist,
+  .prada-product__gallery > .prada-product__wishlist.is-on-last-media { position: absolute; top: 14px; right: 14px; display: grid; width: 40px; height: 40px; margin: 0; padding: 8px; color: #000; }
   .prada-product__gallery > .prada-product__wishlist svg { width: 24px; height: 24px; }
   .prada-product__dots { position: absolute; left: 14px; bottom: 50%; flex-direction: column; transform: translateY(50%); }
   .prada-product__scroll-hint { position: absolute; z-index: 4; right: 0; bottom: 0; left: 0; display: block; padding: 15px 20px; background: rgba(20, 20, 20, .55); color: #fff; font-size: 14px; line-height: 1.2; font-weight: 600; text-align: center; opacity: 0; pointer-events: none; transform: translate3d(0, 100%, 0); transition: opacity .58s cubic-bezier(.22, 1, .36, 1), transform .68s cubic-bezier(.22, 1, .36, 1); will-change: opacity, transform; }

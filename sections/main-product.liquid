@@ -311,6 +311,32 @@
     const root = document.getElementById('PradaProduct-{{ section.id }}');
     if (!root) return;
 
+    const gallery = root.querySelector('.prada-product__gallery');
+    const desktopWishlist = gallery?.querySelector(':scope > .prada-product__wishlist');
+    const lastMedia = gallery?.querySelector('.prada-product__media:last-child');
+    let wishlistFrame;
+
+    const syncDesktopWishlist = () => {
+      window.cancelAnimationFrame(wishlistFrame);
+      wishlistFrame = window.requestAnimationFrame(() => {
+        if (!gallery || !desktopWishlist || !lastMedia || !window.matchMedia('(min-width: 990px)').matches) {
+          desktopWishlist?.classList.remove('is-on-last-media');
+          return;
+        }
+
+        const headerHeight = Number.parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue('--header-height')
+        ) || 72;
+        const lastMediaTop = lastMedia.offsetTop;
+        gallery.style.setProperty('--prada-last-media-top', `${lastMediaTop}px`);
+        desktopWishlist.classList.toggle('is-on-last-media', lastMedia.getBoundingClientRect().top <= headerHeight + 24);
+      });
+    };
+
+    document.addEventListener('scroll', syncDesktopWishlist, { passive: true });
+    window.addEventListener('resize', syncDesktopWishlist, { passive: true });
+    syncDesktopWishlist();
+
     const variants = JSON.parse(document.getElementById('PradaVariants-{{ section.id }}').textContent);
     const selectors = [...root.querySelectorAll('[data-prada-option]')]
       .sort((a, b) => Number(a.dataset.pradaOption) - Number(b.dataset.pradaOption));
