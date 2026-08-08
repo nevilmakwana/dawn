@@ -15,10 +15,12 @@
     disclosure.style.height = '';
     disclosure.style.overflow = '';
     disclosure.style.transition = '';
+    delete disclosure.dataset.closing;
 
     if (!content) return;
 
     content.style.opacity = '';
+    content.style.transform = '';
     content.style.transition = '';
   };
 
@@ -36,6 +38,7 @@
     }
 
     disclosure.dataset.animating = 'true';
+    disclosure.dataset.closing = shouldOpen ? 'false' : 'true';
 
     return new Promise((resolve) => {
       let finished = false;
@@ -60,29 +63,33 @@
       if (shouldOpen) {
         disclosure.open = true;
         content.style.opacity = '0';
+        content.style.transform = 'translateY(-8px)';
         disclosure.style.height = `${summary.offsetHeight}px`;
         void disclosure.offsetHeight;
 
-        disclosure.style.transition = 'height 280ms cubic-bezier(0.22, 1, 0.36, 1)';
-        content.style.transition = 'opacity 220ms ease';
+        disclosure.style.transition = 'height 380ms cubic-bezier(0.22, 1, 0.36, 1)';
+        content.style.transition = 'opacity 260ms ease 55ms, transform 340ms cubic-bezier(0.22, 1, 0.36, 1)';
         requestAnimationFrame(() => {
           disclosure.style.height = `${summary.offsetHeight + content.offsetHeight}px`;
           content.style.opacity = '1';
+          content.style.transform = 'translateY(0)';
         });
       } else {
         disclosure.style.height = `${disclosure.offsetHeight}px`;
         content.style.opacity = '1';
+        content.style.transform = 'translateY(0)';
         void disclosure.offsetHeight;
 
-        disclosure.style.transition = 'height 240ms cubic-bezier(0.4, 0, 0.2, 1)';
-        content.style.transition = 'opacity 160ms ease';
+        disclosure.style.transition = 'height 320ms cubic-bezier(0.4, 0, 0.2, 1)';
+        content.style.transition = 'opacity 190ms ease, transform 280ms cubic-bezier(0.4, 0, 0.2, 1)';
         requestAnimationFrame(() => {
           disclosure.style.height = `${summary.offsetHeight}px`;
           content.style.opacity = '0';
+          content.style.transform = 'translateY(-8px)';
         });
       }
 
-      window.setTimeout(complete, 420);
+      window.setTimeout(complete, 500);
     });
   };
 
