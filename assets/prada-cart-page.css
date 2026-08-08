@@ -765,7 +765,6 @@
     flex-direction: column;
     margin-top: 24px;
     border-top: 1px solid #d8d8d8;
-    interpolate-size: allow-keywords;
   }
 
   .prada-shopping-bag-footer__desktop-disclosure {
@@ -775,28 +774,35 @@
     overflow: hidden;
   }
 
-  .prada-shopping-bag-footer__desktop-disclosure::details-content {
-    block-size: 0;
-    overflow: hidden;
+  .prada-shopping-bag-footer__desktop-disclosure-content {
+    display: grid;
+    grid-template-rows: 0fr;
     opacity: 0;
     transition:
-      block-size 420ms cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 240ms ease,
-      content-visibility 420ms allow-discrete;
+      grid-template-rows 440ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 260ms ease;
   }
 
-  .prada-shopping-bag-footer__desktop-disclosure[open]::details-content {
-    block-size: auto;
+  .prada-shopping-bag-footer__desktop-disclosure.is-open .prada-shopping-bag-footer__desktop-disclosure-content {
+    grid-template-rows: 1fr;
     opacity: 1;
   }
 
-  .prada-shopping-bag-footer__desktop-disclosure summary {
+  .prada-shopping-bag-footer__desktop-disclosure-content-inner {
+    min-height: 0;
+    overflow: hidden;
+    padding: 0 8px 22px;
+  }
+
+  .prada-shopping-bag-footer__desktop-disclosure-trigger {
     display: flex;
     align-items: center;
     justify-content: space-between;
     min-height: 42px;
     margin: 0;
     padding: 10px 2px 10px 8px;
+    border: 0;
+    background: transparent;
     color: #111111;
     cursor: pointer;
     font-family: var(--font-body-family);
@@ -804,19 +810,16 @@
     font-weight: 700;
     line-height: 1.3;
     list-style: none;
+    text-align: left;
   }
 
-  .prada-shopping-bag-footer__desktop-disclosure summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .prada-shopping-bag-footer__desktop-disclosure summary:focus,
-  .prada-shopping-bag-footer__desktop-disclosure summary:focus-visible {
+  .prada-shopping-bag-footer__desktop-disclosure-trigger:focus,
+  .prada-shopping-bag-footer__desktop-disclosure-trigger:focus-visible {
     outline: none;
     box-shadow: none;
   }
 
-  .prada-shopping-bag-footer__desktop-disclosure summary::after {
+  .prada-shopping-bag-footer__desktop-disclosure-trigger::after {
     width: 7px;
     height: 7px;
     margin-left: 16px;
@@ -827,12 +830,12 @@
     transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .prada-shopping-bag-footer__desktop-disclosure[open] summary::after {
+  .prada-shopping-bag-footer__desktop-disclosure.is-open .prada-shopping-bag-footer__desktop-disclosure-trigger::after {
     transform: rotate(225deg) translate(-1px, -2px);
   }
 
   .prada-shopping-bag-footer__desktop-disclosure-content {
-    padding: 0 8px 22px;
+    padding: 0;
     color: #111111;
     font-family: var(--font-body-family);
     font-size: 14px;
@@ -852,8 +855,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .prada-shopping-bag-footer__desktop-disclosure,
-    .prada-shopping-bag-footer__desktop-disclosure::details-content,
-    .prada-shopping-bag-footer__desktop-disclosure summary::after,
+    .prada-shopping-bag-footer__desktop-disclosure-trigger::after,
     .prada-shopping-bag-footer__desktop-disclosure-content {
       transition: none !important;
     }
