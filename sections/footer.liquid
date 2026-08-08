@@ -27,7 +27,7 @@
   }
 {%- endstyle -%}
 
-<footer class="footer color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding{% if request.page_type == 'product' %} footer--prada-product{% endif %}">
+<footer class="footer footer--greyexim color-{{ section.settings.color_scheme }} gradient{% if request.page_type == 'product' %} footer--prada-product{% endif %}">
   {%- liquid
     assign has_social_icons = true
     if settings.social_facebook_link == blank and settings.social_instagram_link == blank and settings.social_youtube_link == blank and settings.social_tiktok_link == blank and settings.social_twitter_link == blank and settings.social_pinterest_link == blank and settings.social_snapchat_link == blank and settings.social_tumblr_link == blank and settings.social_vimeo_link == blank
@@ -41,7 +41,78 @@
     if section.blocks.size == 1 and section.blocks[0].type == 'brand_information' and brand_empty and has_social_icons == false and section.settings.newsletter_enable == false and section.settings.enable_follow_on_shop == false
       assign only_empty_brand = true
     endif
+
+    assign greyexim_footer_logo = settings.logo_hover
+    if greyexim_footer_logo == blank
+      assign greyexim_footer_logo = settings.logo
+    endif
+
+    assign greyexim_privacy_url = routes.root_url | append: 'policies/privacy-policy'
+    if shop.privacy_policy != blank
+      assign greyexim_privacy_url = shop.privacy_policy.url
+    endif
   -%}
+
+  <div id="GreyeximFooter" class="greyexim-footer">
+    <div class="greyexim-footer__main">
+      <a class="greyexim-footer__brand" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }} home">
+        {%- if greyexim_footer_logo != blank -%}
+          {%- assign greyexim_footer_logo_height = 160 | divided_by: greyexim_footer_logo.aspect_ratio -%}
+          {{
+            greyexim_footer_logo
+            | image_url: width: 400
+            | image_tag:
+              class: 'greyexim-footer__logo',
+              loading: 'lazy',
+              widths: '130, 160, 260, 320, 400',
+              sizes: '(max-width: 749px) 130px, 160px',
+              height: greyexim_footer_logo_height,
+              width: 160,
+              alt: shop.name
+          }}
+        {%- else -%}
+          <span class="greyexim-footer__wordmark">{{ shop.name | escape }}</span>
+        {%- endif -%}
+      </a>
+
+      <nav class="greyexim-footer__group greyexim-footer__group--navigate" aria-labelledby="GreyeximFooterNavigate-{{ section.id }}">
+        <h2 id="GreyeximFooterNavigate-{{ section.id }}">Navigate</h2>
+        <ul>
+          <li><a href="{{ routes.all_products_collection_url }}">Store</a></li>
+          <li><a href="/pages/style-guide">Style guide</a></li>
+          <li><a href="/pages/contact">Got questions?</a></li>
+        </ul>
+      </nav>
+
+      <nav class="greyexim-footer__group greyexim-footer__group--social" aria-labelledby="GreyeximFooterSocial-{{ section.id }}">
+        <h2 id="GreyeximFooterSocial-{{ section.id }}">Social</h2>
+        <ul>
+          <li><a href="{{ settings.social_instagram_link | default: routes.root_url }}">Instagram</a></li>
+          <li><a href="{{ settings.social_twitter_link | default: routes.root_url }}">X</a></li>
+          <li><a href="{{ section.settings.linkedin_link | default: routes.root_url }}">LinkedIn</a></li>
+        </ul>
+      </nav>
+
+      <nav class="greyexim-footer__group greyexim-footer__group--info" aria-labelledby="GreyeximFooterInfo-{{ section.id }}">
+        <h2 id="GreyeximFooterInfo-{{ section.id }}">Info</h2>
+        <ul>
+          <li><a href="/pages/about-us">About Grey Exim</a></li>
+          <li><a href="/blogs/news">Blogs</a></li>
+          <li><a href="/pages/contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="greyexim-footer__bottom">
+      <p class="greyexim-footer__copyright">&copy; {{ 'now' | date: '%Y' }} {{ shop.name | escape }}. All rights reserved.</p>
+      <div class="greyexim-footer__language" aria-label="Current language: {{ localization.language.endonym_name | escape }}">
+        <span>{{ localization.language.iso_code | upcase }}</span>
+        <svg viewBox="0 0 14 8" aria-hidden="true"><path d="m1 1 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </div>
+      <a class="greyexim-footer__legal" href="{{ greyexim_privacy_url }}">Legal &amp; Privacy</a>
+    </div>
+  </div>
+
   {%- if section.blocks.size > 0
     or section.settings.newsletter_enable
     or section.settings.show_social
@@ -639,6 +710,11 @@
       "default": true,
       "label": "t:sections.footer.settings.show_policy.label",
       "info": "t:sections.footer.settings.show_policy.info"
+    },
+    {
+      "type": "url",
+      "id": "linkedin_link",
+      "label": "LinkedIn link"
     },
     {
       "type": "header",
