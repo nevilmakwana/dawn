@@ -8,6 +8,10 @@
   assign detail_materials = product.metafields.custom.materials
   assign detail_care = product.metafields.custom.care_guide
   assign detail_delivery = product.metafields.custom.delivery_and_payment
+  assign wishlist_media = current_variant.featured_media
+  if wishlist_media == blank
+    assign wishlist_media = product.featured_media
+  endif
 -%}
 
 <section
@@ -15,9 +19,25 @@
   id="PradaProduct-{{ section.id }}"
   data-section-id="{{ section.id }}"
   data-product-url="{{ product.url }}"
+  data-wishlist-fallback-image="{% if product.featured_media %}{{ product.featured_media.preview_image | image_url: width: 720 | escape }}{% endif %}"
+  data-wishlist-fallback-image-alt="{{ product.featured_media.alt | default: product.title | escape }}"
 >
   <div class="prada-product__gallery" aria-label="{{ product.title | escape }} gallery">
-    <button class="prada-product__wishlist" type="button" aria-label="Add {{ product.title | escape }} to wishlist" aria-pressed="false">
+    <button
+      class="prada-product__wishlist"
+      type="button"
+      data-prada-product-wishlist
+      data-product-id="{{ product.id }}"
+      data-product-title="{{ product.title | escape }}"
+      data-product-url="{{ product.url | escape }}?variant={{ current_variant.id }}"
+      data-product-image="{% if wishlist_media %}{{ wishlist_media.preview_image | image_url: width: 720 | escape }}{% endif %}"
+      data-product-image-alt="{{ wishlist_media.alt | default: product.title | escape }}"
+      data-product-price="{{ current_variant.price | money | escape }}"
+      data-product-variant-id="{{ current_variant.id }}"
+      data-product-available="{{ current_variant.available }}"
+      aria-label="Add {{ product.title | escape }} to wishlist"
+      aria-pressed="false"
+    >
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"/></svg>
     </button>
 
@@ -69,7 +89,21 @@
     <div class="prada-product__info">
       <div class="prada-product__heading-row">
         <h1>{{ product.title | escape }}</h1>
-        <button class="prada-product__wishlist prada-product__wishlist--mobile" type="button" aria-label="Add {{ product.title | escape }} to wishlist" aria-pressed="false">
+        <button
+          class="prada-product__wishlist prada-product__wishlist--mobile"
+          type="button"
+          data-prada-product-wishlist
+          data-product-id="{{ product.id }}"
+          data-product-title="{{ product.title | escape }}"
+          data-product-url="{{ product.url | escape }}?variant={{ current_variant.id }}"
+          data-product-image="{% if wishlist_media %}{{ wishlist_media.preview_image | image_url: width: 720 | escape }}{% endif %}"
+          data-product-image-alt="{{ wishlist_media.alt | default: product.title | escape }}"
+          data-product-price="{{ current_variant.price | money | escape }}"
+          data-product-variant-id="{{ current_variant.id }}"
+          data-product-available="{{ current_variant.available }}"
+          aria-label="Add {{ product.title | escape }} to wishlist"
+          aria-pressed="false"
+        >
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"/></svg>
         </button>
       </div>
@@ -330,16 +364,23 @@
       submit.disabled = !variant.available;
       submitText.textContent = variant.available ? 'Add to bag' : 'Available soon';
       if (status) status.textContent = variant.available ? 'Available online' : 'Soon available online';
+      root.querySelectorAll('[data-prada-product-wishlist]').forEach((button) => {
+        button.dataset.productVariantId = String(variant.id);
+        button.dataset.productUrl = `${root.dataset.productUrl}?variant=${variant.id}`;
+        button.dataset.productPrice = formatMoney(variant.price);
+        button.dataset.productAvailable = String(variant.available);
+
+        const variantImage = variant.featured_image?.src || variant.featured_media?.preview_image?.src;
+        button.dataset.productImage = variantImage || root.dataset.wishlistFallbackImage || '';
+
+        const variantImageAlt = variant.featured_image?.alt || variant.featured_media?.alt;
+        button.dataset.productImageAlt =
+          variantImageAlt || root.dataset.wishlistFallbackImageAlt || button.dataset.productTitle;
+      });
       window.history.replaceState({}, '', `${root.dataset.productUrl}?variant=${variant.id}`);
     };
 
     selectors.forEach((selector) => selector.addEventListener('change', updateVariant));
-    root.querySelectorAll('.prada-product__wishlist').forEach((button) => {
-      button.addEventListener('click', () => {
-        const active = button.getAttribute('aria-pressed') !== 'true';
-        root.querySelectorAll('.prada-product__wishlist').forEach((item) => item.setAttribute('aria-pressed', active));
-      });
-    });
 
     const drawerShell = root.querySelector('[data-prada-drawer]');
     const drawerTitle = root.querySelector('[data-prada-drawer-title]');
