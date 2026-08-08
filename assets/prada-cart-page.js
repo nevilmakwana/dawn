@@ -10,24 +10,6 @@
     if (!disclosureGroup || disclosureGroup.dataset.pradaAccordionBound === 'true') return;
 
     disclosureGroup.dataset.pradaAccordionBound = 'true';
-
-    const disclosures = Array.from(disclosureGroup.querySelectorAll('.prada-shopping-bag-footer__desktop-disclosure'));
-
-    disclosures.forEach((disclosure) => {
-      const trigger = disclosure.querySelector('.prada-shopping-bag-footer__desktop-disclosure-trigger');
-      if (!trigger) return;
-
-      trigger.addEventListener('click', () => {
-        const shouldOpen = !disclosure.classList.contains('is-open');
-
-        disclosures.forEach((item) => {
-          const itemTrigger = item.querySelector('.prada-shopping-bag-footer__desktop-disclosure-trigger');
-          const isActive = item === disclosure && shouldOpen;
-          item.classList.toggle('is-open', isActive);
-          itemTrigger?.setAttribute('aria-expanded', String(isActive));
-        });
-      });
-    });
   };
 
   bindDesktopAccordion();
