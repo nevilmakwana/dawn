@@ -22,7 +22,6 @@
         <a href="{{ section.settings.track_order_url | default: routes.root_url }}">Track your order</a>
         <a href="{{ section.settings.returns_url | default: routes.root_url }}">Returns</a>
         <a href="{{ section.settings.faq_url | default: routes.root_url }}">FAQ</a>
-        <a href="{{ section.settings.appointment_url | default: routes.root_url }}">Book an appointment</a>
       </nav>
       {%- if section.settings.opening_hours != blank -%}
         <div class="prada-contact-page__hours">{{ section.settings.opening_hours }}</div>
@@ -253,15 +252,10 @@
       "label": "FAQ link"
     },
     {
-      "type": "url",
-      "id": "appointment_url",
-      "label": "Book an appointment link"
-    },
-    {
       "type": "richtext",
       "id": "opening_hours",
       "label": "Client service opening hours",
-      "default": "<p><strong>Client Service Opening Hours:</strong><br/>Monday - Saturday: 9 am - 10 pm<br/>Sunday: 9 am - 8 pm</p>"
+      "default": "<p><strong>Client Service Opening Hours:</strong><br/>Monday - Saturday: 10 am - 07 pm<br/>Sunday: Closed</p>"
     },
     {
       "type": "inline_richtext",
