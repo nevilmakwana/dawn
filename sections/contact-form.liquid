@@ -14,7 +14,7 @@
   }
 {%- endstyle -%}
 
-<div class="color-{{ section.settings.color_scheme }} gradient">
+<div class="color-{{ section.settings.color_scheme }} gradient" id="send-us-email">
   <div class="contact page-width page-width--narrow section-{{ section.id }}-padding">
     {%- if section.settings.heading != blank -%}
       <h2 class="title title-wrapper--no-top-margin inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
@@ -52,6 +52,20 @@
         </ul>
       {%- endif -%}
       <div class="contact__fields">
+        <div class="field">
+          <select class="field__input" id="ContactForm-reason" name="contact[Reason for contact]" required>
+            <option value="" selected disabled>Reason for contact*</option>
+            <option value="Product inquiry">Product inquiry</option>
+            <option value="Order support">Order support</option>
+            <option value="Wholesale inquiry">Wholesale inquiry</option>
+            <option value="General inquiry">General inquiry</option>
+          </select>
+          <label class="visually-hidden" for="ContactForm-reason">Reason for contact</label>
+        </div>
+        <div class="field">
+          <input class="field__input" type="text" id="ContactForm-subject" name="contact[Subject]" placeholder="Subject*" required>
+          <label class="field__label" for="ContactForm-subject">Subject*</label>
+        </div>
         <div class="field">
           <input
             class="field__input"

@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="{{ 'component-list-menu.css' | asset_url }}" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="{{ 'component-search.css' | asset_url }}" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="{{ 'component-menu-drawer.css' | asset_url }}" media="print" onload="this.media='all'">
+{{ 'prada-contact-drawer.css' | asset_url | stylesheet_tag }}
 <link
   rel="stylesheet"
   href="{{ 'component-cart-notification.css' | asset_url }}"
@@ -1748,7 +1749,7 @@
 
     {%- comment -%} RIGHT: Contact us, Wishlist, Account, Cart {%- endcomment -%}
     <div class="prada-header-right">
-      <a href="/pages/contact" class="prada-header-btn prada-header-btn--contact">
+      <a href="/pages/contact#send-us-email" class="prada-header-btn prada-header-btn--contact" data-prada-contact-open aria-controls="PradaContactDrawer-{{ section.id }}" aria-haspopup="dialog">
         <span class="prada-header-btn__label">Contact us</span>
       </a>
       
@@ -1789,6 +1790,25 @@
     </div>
   </header>
 </{{ header_tag }}>
+
+<aside class="prada-contact-drawer" id="PradaContactDrawer-{{ section.id }}" data-prada-contact-drawer aria-hidden="true">
+  <button class="prada-contact-drawer__overlay" type="button" data-prada-contact-close tabindex="-1" aria-label="Close contact panel"></button>
+  <div class="prada-contact-drawer__panel" data-prada-contact-panel role="dialog" aria-modal="true" aria-labelledby="PradaContactTitle-{{ section.id }}">
+    <button class="prada-contact-drawer__close" type="button" data-prada-contact-close aria-label="Close contact panel">&times;</button>
+    <h2 class="prada-contact-drawer__title" id="PradaContactTitle-{{ section.id }}">{{ section.settings.contact_drawer_heading | escape }}</h2>
+    <a class="prada-contact-drawer__action" href="/pages/contact#send-us-email">
+      <span class="prada-contact-drawer__action-text">
+        <strong>{{ section.settings.contact_email_label | escape }}</strong>
+        {%- if section.settings.contact_company_email != blank -%}<span class="prada-contact-drawer__email">{{ section.settings.contact_company_email | escape }}</span>{%- endif -%}
+      </span>
+      <span class="prada-contact-drawer__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14"></rect><path d="m3 6 9 7 9-7"></path></svg>
+      </span>
+    </a>
+    {%- if section.settings.contact_drawer_note != blank -%}<div class="prada-contact-drawer__note">{{ section.settings.contact_drawer_note }}</div>{%- endif -%}
+  </div>
+</aside>
+<script src="{{ 'prada-contact-drawer.js' | asset_url }}" defer="defer"></script>
 
 {%- if settings.cart_type == 'notification' -%}
   {%- render 'cart-notification',
@@ -2139,6 +2159,34 @@
     {
       "type": "header",
       "content": "t:sections.header.settings.header__utilities.content"
+    },
+    {
+      "type": "header",
+      "content": "Contact drawer"
+    },
+    {
+      "type": "text",
+      "id": "contact_drawer_heading",
+      "label": "Heading",
+      "default": "Client Service"
+    },
+    {
+      "type": "text",
+      "id": "contact_email_label",
+      "label": "Email action label",
+      "default": "Send us an e-mail"
+    },
+    {
+      "type": "text",
+      "id": "contact_company_email",
+      "label": "Company email",
+      "default": "support@greyexim.com"
+    },
+    {
+      "type": "richtext",
+      "id": "contact_drawer_note",
+      "label": "Contact note",
+      "default": "<p>Send your inquiry through our contact form and our team will respond by e-mail.</p>"
     },
     {
       "type": "checkbox",
