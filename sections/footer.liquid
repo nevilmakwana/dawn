@@ -67,7 +67,17 @@
         {%- if form.posted_successfully? -%}<small class="prada-footer__message">Thank you for subscribing.</small>{%- endif -%}
       {%- endform -%}
       <p class="prada-footer__privacy">By clicking on “Subscribe”, you confirm that you have read and understood our <a href="{{ greyexim_privacy_url }}">Privacy Statement</a> and that you want to receive the newsletter and other marketing communications as set out therein.</p>
-      {%- if section.settings.show_social and has_social_icons -%}{%- render 'social-icons', class: 'prada-footer__social' -%}{%- endif -%}
+      {%- if section.settings.show_social -%}
+        <ul class="prada-footer__social" role="list" aria-label="Social media">
+          <li><a href="{{ settings.social_facebook_link | default: '#' }}" aria-label="Facebook">{{ 'icon-facebook.svg' | inline_asset_content }}</a></li>
+          <li><a href="{{ settings.social_twitter_link | default: '#' }}" aria-label="X"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4l14 16M19 4 5 20"/></svg></a></li>
+          <li><a href="{{ settings.social_instagram_link | default: '#' }}" aria-label="Instagram">{{ 'icon-instagram.svg' | inline_asset_content }}</a></li>
+          <li><a href="{{ settings.social_youtube_link | default: '#' }}" aria-label="YouTube">{{ 'icon-youtube.svg' | inline_asset_content }}</a></li>
+          <li><a href="{{ section.settings.spotify_link | default: '#' }}" aria-label="Spotify"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M7.5 9.4c3.2-1 6.9-.7 9.4.7M8.2 12.2c2.7-.8 5.9-.5 8 .6M8.8 14.8c2.2-.6 4.7-.4 6.5.5"/></svg></a></li>
+          <li><a href="{{ section.settings.discord_link | default: '#' }}" aria-label="Discord"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 7.3a12 12 0 0 1 9.6 0c1.4 2 2.2 4.3 2.4 6.8-1.4 1.4-3 2.3-4.8 2.8l-.9-1.2m-3 0-.9 1.2c-1.8-.5-3.4-1.4-4.8-2.8.2-2.5 1-4.8 2.4-6.8Z"/><circle cx="9.2" cy="12" r="1"/><circle cx="14.8" cy="12" r="1"/></svg></a></li>
+          <li><a href="{{ settings.social_tiktok_link | default: '#' }}" aria-label="TikTok">{{ 'icon-tiktok.svg' | inline_asset_content }}</a></li>
+        </ul>
+      {%- endif -%}
     </section>
 
     <details class="prada-footer__group prada-footer__group--contact" open>
@@ -88,15 +98,18 @@
     <details class="prada-footer__group prada-footer__group--legal" open>
       <summary><span>Legal terms and conditions</span><span class="prada-footer__chevron" aria-hidden="true"></span></summary>
       <div class="prada-footer__group-content"><ul>
-        {%- for policy in shop.policies -%}{%- if policy != blank -%}<li><a href="{{ policy.url }}">{{ policy.title | escape }}</a></li>{%- endif -%}{%- endfor -%}
-        <li><a href="{{ routes.search_url }}">Sitemap</a></li>
+        <li><a href="{{ greyexim_privacy_url }}">Privacy Statement</a></li>
+        <li><a href="{{ greyexim_privacy_url }}#cookies">Cookie Policy</a></li>
+        <li><button type="button" class="prada-footer__cookie-settings" data-cookie-settings>Cookie settings</button></li>
+        <li><a href="{{ shop.terms_of_service.url | default: routes.root_url }}">Terms of sale</a></li>
+        <li><a href="{{ routes.root_url }}sitemap.xml">Sitemap</a></li>
       </ul></div>
     </details>
 
     <div class="prada-footer__bottom">
       <p>&copy; {{ shop.name | escape }} 2007 - {{ 'now' | date: '%Y' }}</p>
       <div class="prada-footer__shipping" aria-label="Current shipping destination and language">
-        <span class="prada-footer__globe" aria-hidden="true">&#8853;</span>
+        <svg class="prada-footer__globe" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.2 3.6 8.5S14.4 18.2 12 20.5M12 3.5C9.6 5.8 8.4 8.7 8.4 12s1.2 6.2 3.6 8.5"/></svg>
         <span>Shipping to: {{ localization.country.name | escape }} / {{ localization.language.endonym_name | escape }}</span>
       </div>
     </div>
@@ -139,6 +152,14 @@
             group._footerAnimation.onfinish = () => { group._footerAnimation = null; };
           }
         });
+      });
+
+      footer.querySelector('[data-cookie-settings]')?.addEventListener('click', () => {
+        if (window.Shopify?.customerPrivacy?.showPreferences) {
+          window.Shopify.customerPrivacy.showPreferences();
+        } else {
+          document.dispatchEvent(new CustomEvent('shopify:open-cookie-preferences'));
+        }
       });
     })();
   </script>
@@ -751,6 +772,16 @@
       "id": "contact_email",
       "label": "Contact email",
       "default": "care@greyexim.com"
+    },
+    {
+      "type": "url",
+      "id": "spotify_link",
+      "label": "Spotify link"
+    },
+    {
+      "type": "url",
+      "id": "discord_link",
+      "label": "Discord link"
     },
     {
       "type": "header",
