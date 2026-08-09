@@ -41,6 +41,7 @@
 /* Grey Exim client-service inquiry page. */
 #send-us-email {
   scroll-margin-top: calc(var(--header-height, 72px) + 20px);
+  overflow-x: clip;
 }
 
 #send-us-email .contact {
@@ -310,4 +311,19 @@
 #send-us-email .text-area::placeholder {
   color: #000;
   opacity: 1;
+}
+
+/* Prada fields use a single in-field prompt; suppress Dawn's duplicate floating label. */
+#send-us-email .field > .field__label,
+#send-us-email .field > .form__label {
+  display: none;
+}
+
+#send-us-email .field__input,
+#send-us-email .text-area {
+  padding: 0 14px;
+}
+
+#send-us-email .text-area {
+  padding-top: 14px;
 }
