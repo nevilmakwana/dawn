@@ -4,6 +4,7 @@
 {{ 'component-list-menu.css' | asset_url | stylesheet_tag }}
 {{ 'component-list-payment.css' | asset_url | stylesheet_tag }}
 {{ 'component-list-social.css' | asset_url | stylesheet_tag }}
+{{ 'prada-footer.css' | asset_url | stylesheet_tag }}
 
 {%- style -%}
   .footer {
@@ -53,65 +54,94 @@
     endif
   -%}
 
-  <div id="GreyeximFooter" class="greyexim-footer">
-    <div class="greyexim-footer__main">
-      <a class="greyexim-footer__brand" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }} home">
-        {%- if greyexim_footer_logo != blank -%}
-          {%- assign greyexim_footer_logo_height = 160 | divided_by: greyexim_footer_logo.aspect_ratio -%}
-          {{
-            greyexim_footer_logo
-            | image_url: width: 400
-            | image_tag:
-              class: 'greyexim-footer__logo',
-              loading: 'lazy',
-              widths: '130, 160, 260, 320, 400',
-              sizes: '(max-width: 749px) 130px, 160px',
-              height: greyexim_footer_logo_height,
-              width: 160,
-              alt: shop.name
-          }}
-        {%- else -%}
-          <span class="greyexim-footer__wordmark">{{ shop.name | escape }}</span>
-        {%- endif -%}
-      </a>
+  <div id="GreyeximFooter" class="prada-footer">
+    <section class="prada-footer__newsletter" aria-labelledby="PradaFooterNewsletter-{{ section.id }}">
+      <h2 id="PradaFooterNewsletter-{{ section.id }}">Subscribe to our newsletter</h2>
+      {%- form 'customer', id: 'PradaFooterNewsletterForm', class: 'prada-footer__newsletter-form' -%}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <div class="prada-footer__field">
+          <input type="email" name="contact[email]" value="{{ form.email }}" autocomplete="email" placeholder="Insert your e-mail address *" aria-label="Email address" required>
+          <button type="submit" name="commit" aria-label="Subscribe"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 16h25M20 8l8 8-8 8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+        </div>
+        {%- if form.errors -%}<small class="prada-footer__message">{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</small>{%- endif -%}
+        {%- if form.posted_successfully? -%}<small class="prada-footer__message">Thank you for subscribing.</small>{%- endif -%}
+      {%- endform -%}
+      <p class="prada-footer__privacy">By clicking on “Subscribe”, you confirm that you have read and understood our <a href="{{ greyexim_privacy_url }}">Privacy Statement</a> and that you want to receive the newsletter and other marketing communications as set out therein.</p>
+      {%- if section.settings.show_social and has_social_icons -%}{%- render 'social-icons', class: 'prada-footer__social' -%}{%- endif -%}
+    </section>
 
-      <nav class="greyexim-footer__group greyexim-footer__group--navigate" aria-labelledby="GreyeximFooterNavigate-{{ section.id }}">
-        <h2 id="GreyeximFooterNavigate-{{ section.id }}">Navigate</h2>
-        <ul>
-          <li><a href="{{ routes.all_products_collection_url }}">Store</a></li>
-          <li><a href="/pages/style-guide">Style guide</a></li>
-          <li><a href="/pages/contact">Got questions?</a></li>
-        </ul>
-      </nav>
+    <details class="prada-footer__group prada-footer__group--contact" open>
+      <summary><span>Contact us</span><span class="prada-footer__chevron" aria-hidden="true"></span></summary>
+      <div class="prada-footer__group-content"><a href="mailto:{{ section.settings.contact_email | default: shop.email | escape }}">{{ section.settings.contact_email | default: shop.email | escape }}</a></div>
+    </details>
 
-      <nav class="greyexim-footer__group greyexim-footer__group--social" aria-labelledby="GreyeximFooterSocial-{{ section.id }}">
-        <h2 id="GreyeximFooterSocial-{{ section.id }}">Social</h2>
-        <ul>
-          <li><a href="{{ settings.social_instagram_link | default: routes.root_url }}">Instagram</a></li>
-          <li><a href="{{ settings.social_twitter_link | default: routes.root_url }}">X</a></li>
-          <li><a href="{{ section.settings.linkedin_link | default: routes.root_url }}">LinkedIn</a></li>
-        </ul>
-      </nav>
+    <details class="prada-footer__group prada-footer__group--services" open>
+      <summary><span>Services</span><span class="prada-footer__chevron" aria-hidden="true"></span></summary>
+      <div class="prada-footer__group-content"><ul>
+        <li><a href="/pages/contact">Online services</a></li>
+        <li><a href="/pages/contact?view=track-order">Track your order</a></li>
+        <li><a href="/pages/contact?view=returns">Returns</a></li>
+        <li><a href="{{ shop.shipping_policy.url | default: routes.root_url }}">Shipping and delivery</a></li>
+      </ul></div>
+    </details>
 
-      <nav class="greyexim-footer__group greyexim-footer__group--info" aria-labelledby="GreyeximFooterInfo-{{ section.id }}">
-        <h2 id="GreyeximFooterInfo-{{ section.id }}">Info</h2>
-        <ul>
-          <li><a href="/pages/about-us">About Grey Exim</a></li>
-          <li><a href="/blogs/news">Blogs</a></li>
-          <li><a href="/pages/contact">Contact</a></li>
-        </ul>
-      </nav>
-    </div>
+    <details class="prada-footer__group prada-footer__group--legal" open>
+      <summary><span>Legal terms and conditions</span><span class="prada-footer__chevron" aria-hidden="true"></span></summary>
+      <div class="prada-footer__group-content"><ul>
+        {%- for policy in shop.policies -%}{%- if policy != blank -%}<li><a href="{{ policy.url }}">{{ policy.title | escape }}</a></li>{%- endif -%}{%- endfor -%}
+        <li><a href="{{ routes.search_url }}">Sitemap</a></li>
+      </ul></div>
+    </details>
 
-    <div class="greyexim-footer__bottom">
-      <p class="greyexim-footer__copyright">&copy; {{ 'now' | date: '%Y' }} {{ shop.name | escape }}. All rights reserved.</p>
-      <div class="greyexim-footer__language" aria-label="Current language: {{ localization.language.endonym_name | escape }}">
-        <span>{{ localization.language.iso_code | upcase }}</span>
-        <svg viewBox="0 0 14 8" aria-hidden="true"><path d="m1 1 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+    <div class="prada-footer__bottom">
+      <p>&copy; {{ shop.name | escape }} 2007 - {{ 'now' | date: '%Y' }}</p>
+      <div class="prada-footer__shipping" aria-label="Current shipping destination and language">
+        <span class="prada-footer__globe" aria-hidden="true">&#8853;</span>
+        <span>Shipping to: {{ localization.country.name | escape }} / {{ localization.language.endonym_name | escape }}</span>
       </div>
-      <a class="greyexim-footer__legal" href="{{ greyexim_privacy_url }}">Legal &amp; Privacy</a>
     </div>
   </div>
+
+  <script>
+    (() => {
+      const footer = document.getElementById('GreyeximFooter');
+      if (!footer || footer.dataset.ready === 'true') return;
+      footer.dataset.ready = 'true';
+      const mobile = window.matchMedia('(max-width: 989px)');
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const groups = [...footer.querySelectorAll('.prada-footer__group')];
+
+      const syncGroups = () => groups.forEach((group) => { group.open = !mobile.matches; });
+      syncGroups();
+      mobile.addEventListener?.('change', syncGroups);
+
+      groups.forEach((group) => {
+        const summary = group.querySelector('summary');
+        const content = group.querySelector('.prada-footer__group-content');
+        if (!summary || !content) return;
+        summary.addEventListener('click', (event) => {
+          if (!mobile.matches || reducedMotion.matches || typeof content.animate !== 'function') return;
+          event.preventDefault();
+          group._footerAnimation?.cancel();
+          if (group.open) {
+            group._footerAnimation = content.animate(
+              [{ height: `${content.offsetHeight}px`, opacity: 1 }, { height: '0px', opacity: 0 }],
+              { duration: 240, easing: 'cubic-bezier(.4, 0, 1, 1)' }
+            );
+            group._footerAnimation.onfinish = () => { group.open = false; group._footerAnimation = null; };
+          } else {
+            group.open = true;
+            const height = content.offsetHeight;
+            group._footerAnimation = content.animate(
+              [{ height: '0px', opacity: 0 }, { height: `${height}px`, opacity: 1 }],
+              { duration: 280, easing: 'cubic-bezier(.22, 1, .36, 1)' }
+            );
+            group._footerAnimation.onfinish = () => { group._footerAnimation = null; };
+          }
+        });
+      });
+    })();
+  </script>
 
   {%- if section.blocks.size > 0
     or section.settings.newsletter_enable
@@ -391,7 +421,7 @@
     </div>
   </div>
 
-  {%- if request.page_type == 'product' -%}
+  {%- if false -%}
     <div class="prada-mobile-footer">
       <section class="prada-mobile-footer__newsletter" aria-labelledby="PradaMobileNewsletterHeading-{{ section.id }}">
         <h2 id="PradaMobileNewsletterHeading-{{ section.id }}">Subscribe to our newsletter</h2>
@@ -715,6 +745,12 @@
       "type": "url",
       "id": "linkedin_link",
       "label": "LinkedIn link"
+    },
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "Contact email",
+      "default": "care@greyexim.com"
     },
     {
       "type": "header",
