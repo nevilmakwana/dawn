@@ -45,3 +45,13 @@
   .prada-faq__accordions summary { min-height: 64px; padding: 18px; }
   .prada-faq__answer { padding: 0 18px 24px; }
 }
+
+.prada-faq,
+.prada-faq__sidebar a,
+.prada-faq__suggested a,
+.prada-faq__topic-list a,
+.prada-faq__back,
+.prada-faq__accordions summary,
+.prada-faq__answer {
+  color: #000;
+}

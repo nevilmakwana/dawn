@@ -59,7 +59,7 @@
 
 .prada-track-order__intro {
   max-width: 600px;
-  color: #4a4a4a;
+  color: #000;
   font-size: 10.4px;
   line-height: 1.35;
 }
@@ -85,7 +85,7 @@
   z-index: 1;
   top: 8px;
   left: 10px;
-  color: #444;
+  color: #000;
   font-size: 9px;
   line-height: 1;
   pointer-events: none;
@@ -207,4 +207,22 @@
   .prada-track-order__fields { grid-template-columns: 1fr; }
   .prada-track-order__questions { margin-top: 56px; }
   .prada-track-order__question-list { display: grid; }
+}
+
+.prada-track-order,
+.prada-track-order__sidebar a,
+.prada-track-order__intro,
+.prada-track-order__fields span,
+.prada-track-order__fields input,
+.prada-track-order__questions,
+.prada-track-order__question-list a,
+.prada-track-order__faq-link,
+.prada-track-order__success,
+.prada-track-order__error {
+  color: #000;
+}
+
+.prada-track-order__fields input::placeholder {
+  color: #000;
+  opacity: 1;
 }
