@@ -16,6 +16,9 @@
 
 <div class="color-{{ section.settings.color_scheme }} gradient" id="send-us-email">
   <div class="contact page-width page-width--narrow section-{{ section.id }}-padding">
+    {%- if section.settings.page_title != blank -%}
+      <h1 class="contact__page-title">{{ section.settings.page_title | escape }}</h1>
+    {%- endif -%}
     {%- if section.settings.heading != blank -%}
       <h2 class="title title-wrapper--no-top-margin inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
         {{ section.settings.heading }}
@@ -158,6 +161,12 @@
     "groups": ["header", "footer"]
   },
   "settings": [
+    {
+      "type": "text",
+      "id": "page_title",
+      "default": "Contact Us",
+      "label": "Page title"
+    },
     {
       "type": "inline_richtext",
       "id": "heading",

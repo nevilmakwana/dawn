@@ -6,7 +6,7 @@
   pointer-events: none;
 }
 
-.prada-contact-drawer.is-open { visibility: visible; pointer-events: auto; }
+.prada-contact-drawer.is-visible { visibility: visible; pointer-events: auto; }
 
 .prada-contact-drawer__overlay {
   position: absolute;

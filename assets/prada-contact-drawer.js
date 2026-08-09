@@ -6,20 +6,29 @@
   const panel = drawer.querySelector('[data-prada-contact-panel]');
   const closeButton = drawer.querySelector('[data-prada-contact-close]');
   let opener = null;
+  let closeTimer = null;
 
   const close = () => {
     drawer.classList.remove('is-open');
     drawer.setAttribute('aria-hidden', 'true');
     document.documentElement.classList.remove('prada-contact-open');
+    window.clearTimeout(closeTimer);
+    closeTimer = window.setTimeout(() => drawer.classList.remove('is-visible'), 440);
     opener?.focus({ preventScroll: true });
   };
 
   const open = (trigger) => {
     opener = trigger;
-    drawer.classList.add('is-open');
+    window.clearTimeout(closeTimer);
+    drawer.classList.add('is-visible');
     drawer.setAttribute('aria-hidden', 'false');
     document.documentElement.classList.add('prada-contact-open');
-    window.requestAnimationFrame(() => closeButton?.focus({ preventScroll: true }));
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        drawer.classList.add('is-open');
+        closeButton?.focus({ preventScroll: true });
+      });
+    });
   };
 
   document.addEventListener('click', (event) => {
