@@ -213,6 +213,24 @@
 
 #send-us-email .prada-contact-phone .field__input { padding-left: 11px; }
 
+#send-us-email .prada-contact-select--stacked { position: relative; }
+
+#send-us-email .prada-contact-select__label {
+  position: absolute;
+  z-index: 1;
+  top: 7px;
+  left: 11px;
+  color: #000;
+  font-size: 7.2px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+#send-us-email .prada-contact-select--stacked select.field__input {
+  padding-top: 12px;
+  padding-bottom: 0;
+}
+
 #send-us-email .text-area { min-height: 112px; }
 
 #send-us-email .prada-contact-page__counter {
@@ -287,6 +305,8 @@
   #send-us-email .prada-contact-phone { grid-template-columns: 64px minmax(0, 1fr); }
   #send-us-email .prada-contact-phone__code { min-height: 54px; font-size: 13px; }
   #send-us-email .text-area { min-height: 140px; }
+  #send-us-email .prada-contact-select__label { top: 9px; left: 14px; font-size: 9px; }
+  #send-us-email .prada-contact-select--stacked select.field__input { padding-top: 15px; }
   #send-us-email .prada-contact-page__counter,
   #send-us-email .prada-contact-page__privacy { font-size: 9px; }
 }

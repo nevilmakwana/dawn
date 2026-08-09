@@ -152,9 +152,10 @@
           <input type="tel" id="ContactForm-phone" class="field__input" autocomplete="tel" name="contact[Phone number]" value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}" placeholder="Phone number">
           <label class="visually-hidden" for="ContactForm-phone">Phone number</label>
         </div>
-        <div class="field">
+        <div class="field prada-contact-select--stacked">
+          <span class="prada-contact-select__label">Location*</span>
           <select class="field__input" id="ContactForm-location" name="contact[Location]" required>
-            <option value="India" selected>Location* — India</option>
+            <option value="India" selected>India</option>
             <option value="United States">United States</option>
             <option value="United Kingdom">United Kingdom</option>
             <option value="United Arab Emirates">United Arab Emirates</option>
@@ -172,9 +173,10 @@
           </select>
           <label class="visually-hidden" for="ContactForm-state">State or Province</label>
         </div>
-        <div class="field">
+        <div class="field prada-contact-select--stacked">
+          <span class="prada-contact-select__label">Language</span>
           <select class="field__input" id="ContactForm-language" name="contact[Language]">
-            <option value="English" selected>Language — English</option>
+            <option value="English" selected>English</option>
             <option value="Hindi">Hindi</option>
             <option value="Gujarati">Gujarati</option>
           </select>
