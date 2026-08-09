@@ -1,0 +1,40 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-track-order",
+      "blocks": {
+        "question_1": {
+          "type": "question",
+          "settings": {
+            "text": "How long will it take to receive my order?",
+            "link": "/pages/faq"
+          }
+        },
+        "question_2": {
+          "type": "question",
+          "settings": {
+            "text": "Are there any restrictions on deliveries?",
+            "link": "/pages/faq"
+          }
+        },
+        "question_3": {
+          "type": "question",
+          "settings": {
+            "text": "How can I track the shipment of my order?",
+            "link": "/pages/faq"
+          }
+        }
+      },
+      "block_order": ["question_1", "question_2", "question_3"],
+      "settings": {
+        "heading": "Check your order status",
+        "intro": "<p>If you are already registered, log in to your account. If you placed the order as a guest, fill in the fields below. If you have recently made a purchase, it may take a few minutes for your order to be processed and for the delivery confirmation email to arrive.</p>",
+        "questions_heading": "Suggested Questions",
+        "returns_url": "/policies/refund-policy",
+        "faq_url": "/pages/faq",
+        "opening_hours": "<p><strong>Client Service Opening Hours:</strong><br/>Monday - Saturday: 10 am - 07 pm<br/>Sunday: Closed</p>"
+      }
+    }
+  },
+  "order": ["main"]
+}

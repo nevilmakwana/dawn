@@ -1,0 +1,133 @@
+{{ 'section-track-order.css' | asset_url | stylesheet_tag }}
+
+<section class="prada-track-order">
+  <aside class="prada-track-order__sidebar" aria-label="Client service navigation">
+    <nav>
+      <a href="/pages/contact#send-us-email">Contact us</a>
+      <a class="is-active" href="/pages/contact?view=track-order">Track your order</a>
+      <a href="{{ section.settings.returns_url | default: routes.root_url }}">Returns</a>
+      <a href="{{ section.settings.faq_url | default: routes.root_url }}">FAQ</a>
+    </nav>
+    <div class="prada-track-order__hours">{{ section.settings.opening_hours }}</div>
+  </aside>
+
+  <div class="prada-track-order__main">
+    <div class="prada-track-order__content">
+      <h1>{{ section.settings.heading | escape }}</h1>
+      <div class="prada-track-order__intro">
+        {{ section.settings.intro }}
+        {%- if shop.customer_accounts_enabled -%}
+          <a href="{{ routes.account_login_url }}">Log in</a>
+        {%- endif -%}
+      </div>
+
+      {%- form 'contact', id: 'TrackOrderForm', class: 'prada-track-order__form' -%}
+        <input type="hidden" name="contact[Request type]" value="Order tracking request">
+        <input type="hidden" name="contact[body]" value="A customer has requested help tracking an order.">
+        {%- if form.posted_successfully? -%}
+          <p class="prada-track-order__success" tabindex="-1" autofocus>Your tracking request has been received. Our client service team will contact you.</p>
+        {%- endif -%}
+        {%- if form.errors -%}
+          <p class="prada-track-order__error" role="alert">Please enter a valid email address and order number.</p>
+        {%- endif -%}
+        <div class="prada-track-order__fields">
+          <label>
+            <span>E-mail*</span>
+            <input type="email" name="contact[email]" autocomplete="email" required value="{% if customer %}{{ customer.email }}{% endif %}">
+          </label>
+          <label>
+            <span>Order number*</span>
+            <input type="text" name="contact[Order number]" autocomplete="off" required>
+          </label>
+        </div>
+        <button type="submit">Continue</button>
+      {%- endform -%}
+
+      <div class="prada-track-order__questions">
+        <h2>{{ section.settings.questions_heading | escape }}</h2>
+        <div class="prada-track-order__question-list">
+          {%- for block in section.blocks -%}
+            <a href="{{ block.settings.link | default: section.settings.faq_url | default: routes.root_url }}" {{ block.shopify_attributes }}>
+              {{ block.settings.text | escape }}
+            </a>
+          {%- endfor -%}
+        </div>
+        <a class="prada-track-order__faq-link" href="{{ section.settings.faq_url | default: routes.root_url }}">View all FAQs</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Prada track order",
+  "tag": "section",
+  "class": "section-prada-track-order",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Check your order status"
+    },
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "Introduction",
+      "default": "<p>If you are already registered, log in to your account. If you placed the order as a guest, fill in the fields below. If you have recently made a purchase, it may take a few minutes for your order to be processed and for the delivery confirmation email to arrive.</p>"
+    },
+    {
+      "type": "text",
+      "id": "questions_heading",
+      "label": "Questions heading",
+      "default": "Suggested Questions"
+    },
+    {
+      "type": "url",
+      "id": "returns_url",
+      "label": "Returns link"
+    },
+    {
+      "type": "url",
+      "id": "faq_url",
+      "label": "FAQ link"
+    },
+    {
+      "type": "richtext",
+      "id": "opening_hours",
+      "label": "Client service opening hours",
+      "default": "<p><strong>Client Service Opening Hours:</strong><br/>Monday - Saturday: 10 am - 07 pm<br/>Sunday: Closed</p>"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Suggested question",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Question",
+          "default": "How long will it take to receive my order?"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Prada track order",
+      "blocks": [
+        { "type": "question", "settings": { "text": "How long will it take to receive my order?" } },
+        { "type": "question", "settings": { "text": "Are there any restrictions on deliveries?" } },
+        { "type": "question", "settings": { "text": "How can I track the shipment of my order?" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
