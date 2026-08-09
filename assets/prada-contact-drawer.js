@@ -13,7 +13,7 @@
     drawer.setAttribute('aria-hidden', 'true');
     document.documentElement.classList.remove('prada-contact-open');
     window.clearTimeout(closeTimer);
-    closeTimer = window.setTimeout(() => drawer.classList.remove('is-visible'), 440);
+    closeTimer = window.setTimeout(() => drawer.classList.remove('is-visible'), 310);
     opener?.focus({ preventScroll: true });
   };
 
@@ -23,11 +23,9 @@
     drawer.classList.add('is-visible');
     drawer.setAttribute('aria-hidden', 'false');
     document.documentElement.classList.add('prada-contact-open');
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        drawer.classList.add('is-open');
-        closeButton?.focus({ preventScroll: true });
-      });
+    window.setTimeout(() => {
+      drawer.classList.add('is-open');
+      closeButton?.focus({ preventScroll: true });
     });
   };
 
