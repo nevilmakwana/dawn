@@ -110,8 +110,3 @@ html.prada-contact-open body { overflow: hidden; }
   .prada-contact-drawer__title { font-size: 20px; }
   .prada-contact-drawer__action { min-height: 68px; }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .prada-contact-drawer__overlay,
-  .prada-contact-drawer__panel { transition-duration: .01ms; }
-}
