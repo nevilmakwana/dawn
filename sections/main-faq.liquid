@@ -1,0 +1,169 @@
+{{ 'section-faq.css' | asset_url | stylesheet_tag }}
+
+{%- assign topic_keys = 'online,account,returns,shipments' | split: ',' -%}
+
+<section class="prada-faq" data-prada-faq>
+  <aside class="prada-faq__sidebar" aria-label="Client service navigation">
+    <nav>
+      <a href="/pages/contact#send-us-email">Contact us</a>
+      <a href="/pages/contact?view=track-order">Track your order</a>
+      <a href="/pages/contact?view=returns">Returns</a>
+      <a class="is-active" href="/pages/contact?view=faq">FAQ</a>
+    </nav>
+    <div class="prada-faq__hours">{{ section.settings.opening_hours }}</div>
+  </aside>
+
+  <div class="prada-faq__main">
+    <div class="prada-faq__overview" data-faq-overview>
+      <div class="prada-faq__content">
+        <h1>{{ section.settings.suggested_heading | escape }}</h1>
+        <div class="prada-faq__suggested">
+          {%- for block in section.blocks -%}
+            {%- if block.settings.suggested -%}
+              <a href="#faq-{{ block.id }}" data-faq-question-link data-faq-topic="{{ block.settings.topic }}">{{ block.settings.question | escape }}</a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+
+        <div class="prada-faq__topics">
+          <h2>{{ section.settings.topics_heading | escape }}</h2>
+          <div class="prada-faq__topic-list">
+            <a href="#topic-online" data-faq-topic-link="online"><span aria-hidden="true">▢</span><strong>Online purchase</strong><b aria-hidden="true">›</b></a>
+            <a href="#topic-account" data-faq-topic-link="account"><span aria-hidden="true">♙</span><strong>Personal account</strong><b aria-hidden="true">›</b></a>
+            <a href="#topic-returns" data-faq-topic-link="returns"><span aria-hidden="true">↩</span><strong>Returns</strong><b aria-hidden="true">›</b></a>
+            <a href="#topic-shipments" data-faq-topic-link="shipments"><span aria-hidden="true">▱</span><strong>Shipments</strong><b aria-hidden="true">›</b></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="prada-faq__details" data-faq-details hidden>
+      <div class="prada-faq__detail-content">
+        <button class="prada-faq__back" type="button" data-faq-back><span aria-hidden="true">‹</span> FAQs</button>
+        {%- for topic_key in topic_keys -%}
+          {%- case topic_key -%}
+            {%- when 'online' -%}{%- assign topic_title = 'Online Purchases' -%}
+            {%- when 'account' -%}{%- assign topic_title = 'Personal Account' -%}
+            {%- when 'returns' -%}{%- assign topic_title = 'Returns' -%}
+            {%- when 'shipments' -%}{%- assign topic_title = 'Shipments' -%}
+          {%- endcase -%}
+          <div class="prada-faq__topic-panel" data-faq-panel="{{ topic_key }}" hidden>
+            <h2>{{ topic_title }}</h2>
+            <div class="prada-faq__accordions">
+              {%- for block in section.blocks -%}
+                {%- if block.settings.topic == topic_key -%}
+                  <details id="faq-{{ block.id }}" {{ block.shopify_attributes }}>
+                    <summary>
+                      <span>{{ block.settings.question | escape }}</span>
+                      <span class="prada-faq__chevron" aria-hidden="true"></span>
+                    </summary>
+                    <div class="prada-faq__answer">{{ block.settings.answer }}</div>
+                  </details>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (() => {
+    const root = document.querySelector('#shopify-section-{{ section.id }} [data-prada-faq]');
+    if (!root) return;
+    const overview = root.querySelector('[data-faq-overview]');
+    const details = root.querySelector('[data-faq-details]');
+    const panels = Array.from(root.querySelectorAll('[data-faq-panel]'));
+
+    const showOverview = (updateHistory = true) => {
+      details.hidden = true;
+      overview.hidden = false;
+      panels.forEach((panel) => panel.hidden = true);
+      if (updateHistory) history.pushState({}, '', `${location.pathname}${location.search}`);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const showTopic = (topic, questionId, updateHistory = true) => {
+      const panel = panels.find((item) => item.dataset.faqPanel === topic);
+      if (!panel) return;
+      overview.hidden = true;
+      details.hidden = false;
+      panels.forEach((item) => item.hidden = item !== panel);
+      panel.querySelectorAll('details').forEach((item) => item.open = item.id === questionId);
+      if (updateHistory) history.pushState({}, '', questionId ? `#${questionId}` : `#topic-${topic}`);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    root.addEventListener('click', (event) => {
+      const question = event.target.closest('[data-faq-question-link]');
+      const topic = event.target.closest('[data-faq-topic-link]');
+      if (question) {
+        event.preventDefault();
+        showTopic(question.dataset.faqTopic, question.hash.slice(1));
+      } else if (topic) {
+        event.preventDefault();
+        showTopic(topic.dataset.faqTopicLink);
+      } else if (event.target.closest('[data-faq-back]')) {
+        showOverview();
+      }
+    });
+
+    const applyHash = () => {
+      const hash = location.hash.slice(1);
+      if (hash.startsWith('topic-')) return showTopic(hash.replace('topic-', ''), null, false);
+      const question = hash && root.querySelector(`#${CSS.escape(hash)}`);
+      if (question) {
+        const blockLink = root.querySelector(`[href="#${CSS.escape(hash)}"]`);
+        showTopic(blockLink?.dataset.faqTopic || question.closest('[data-faq-panel]')?.dataset.faqPanel, hash, false);
+      } else showOverview(false);
+    };
+
+    window.addEventListener('popstate', applyHash);
+    applyHash();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Prada FAQ",
+  "tag": "section",
+  "class": "section-prada-faq",
+  "max_blocks": 50,
+  "settings": [
+    { "type": "text", "id": "suggested_heading", "label": "Suggested heading", "default": "Suggested Questions" },
+    { "type": "text", "id": "topics_heading", "label": "Topics heading", "default": "Topics" },
+    {
+      "type": "richtext",
+      "id": "opening_hours",
+      "label": "Client service opening hours",
+      "default": "<p><strong>Client Service Opening Hours:</strong><br/>Monday - Saturday: 10 am - 07 pm<br/>Sunday: Closed</p>"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ question",
+      "settings": [
+        {
+          "type": "select",
+          "id": "topic",
+          "label": "Topic",
+          "default": "online",
+          "options": [
+            { "value": "online", "label": "Online purchase" },
+            { "value": "account", "label": "Personal account" },
+            { "value": "returns", "label": "Returns" },
+            { "value": "shipments", "label": "Shipments" }
+          ]
+        },
+        { "type": "text", "id": "question", "label": "Question", "default": "How can I place an online order?" },
+        { "type": "richtext", "id": "answer", "label": "Answer", "default": "<p>Add the items to your shopping bag, verify your selection and proceed to checkout.</p>" },
+        { "type": "checkbox", "id": "suggested", "label": "Show in Suggested Questions", "default": false }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Prada FAQ" }]
+}
+{% endschema %}

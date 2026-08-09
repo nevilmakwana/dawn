@@ -1,0 +1,47 @@
+.section-prada-faq { margin: 0; }
+.prada-faq { display: grid; grid-template-columns: 266px minmax(0, 1fr); min-height: 100svh; padding-top: var(--header-height, 72px); background: #fff; color: #111; }
+.prada-faq__sidebar { display: flex; flex-direction: column; min-height: calc(100svh - var(--header-height, 72px)); padding: 46px 18px 20px; border-right: 1px solid #d8d8d8; }
+.prada-faq__sidebar nav { display: grid; gap: 26px; }
+.prada-faq__sidebar a { width: max-content; color: #111; font-size: 10.4px; line-height: 1.25; text-decoration: none; }
+.prada-faq__sidebar a:hover, .prada-faq__sidebar a.is-active { text-decoration: underline; text-underline-offset: 4px; }
+.prada-faq__hours { margin-top: auto; font-size: 8.8px; line-height: 1.45; }
+.prada-faq__hours p { margin: 0; }
+.prada-faq__main { min-width: 0; }
+.prada-faq__content, .prada-faq__detail-content { width: min(calc(100% - 52px), 600px); margin: 0 auto; padding: 96px 0 52px; }
+.prada-faq__content h1, .prada-faq__topics h2, .prada-faq__topic-panel > h2 { margin: 0 0 25px; font-size: 16px; line-height: 1.25; font-weight: 600; }
+.prada-faq__suggested { display: flex; flex-wrap: wrap; gap: 12px; }
+.prada-faq__suggested a { display: flex; align-items: center; min-height: 40px; padding: 10px 13px; border: 1px solid #e0e0e0; color: #111; font-size: 10.4px; line-height: 1.25; text-decoration: none; }
+.prada-faq__suggested a:hover { border-color: #111; }
+.prada-faq__topics { margin-top: 78px; }
+.prada-faq__topic-list { border: 1px solid #d8d8d8; }
+.prada-faq__topic-list a { display: grid; grid-template-columns: 28px 1fr 16px; align-items: center; min-height: 56px; padding: 0 20px; border-bottom: 1px solid #d8d8d8; color: #111; font-size: 11px; text-decoration: none; }
+.prada-faq__topic-list a:last-child { border-bottom: 0; }
+.prada-faq__topic-list strong { font-weight: 600; }
+.prada-faq__topic-list b { font-size: 20px; font-weight: 400; text-align: right; }
+.prada-faq__back { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 28px; padding: 0; border: 0; background: transparent; color: #111; font-size: 11px; cursor: pointer; }
+.prada-faq__back span { font-size: 20px; }
+.prada-faq__accordions { border: 1px solid #111; }
+.prada-faq__accordions details { border-bottom: 1px solid #d8d8d8; }
+.prada-faq__accordions details:last-child { border-bottom: 0; }
+.prada-faq__accordions summary { display: flex; align-items: center; justify-content: space-between; min-height: 54px; padding: 16px 24px; list-style: none; font-size: 11px; line-height: 1.3; font-weight: 600; cursor: pointer; }
+.prada-faq__accordions summary::-webkit-details-marker { display: none; }
+.prada-faq__chevron { width: 7px; height: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); transition: transform .2s ease; }
+.prada-faq__accordions details[open] .prada-faq__chevron { transform: rotate(225deg); }
+.prada-faq__answer { padding: 0 24px 28px; font-size: 11px; line-height: 1.5; }
+.prada-faq__answer p { margin: 0 0 14px; }
+.prada-faq__answer p:last-child { margin-bottom: 0; }
+
+@media screen and (max-width: 989px) {
+  .prada-faq { display: block; padding-top: var(--header-height, 56px); }
+  .prada-faq__sidebar { display: block; min-height: 0; padding: 18px; overflow-x: auto; border-right: 0; border-bottom: 1px solid #d8d8d8; scrollbar-width: none; }
+  .prada-faq__sidebar::-webkit-scrollbar { display: none; }
+  .prada-faq__sidebar nav { display: flex; width: max-content; gap: 26px; }
+  .prada-faq__sidebar a { font-size: 13px; }
+  .prada-faq__hours { display: none; }
+  .prada-faq__content, .prada-faq__detail-content { width: min(calc(100% - 36px), 600px); padding: 54px 0 48px; }
+  .prada-faq__content h1, .prada-faq__topics h2, .prada-faq__topic-panel > h2 { font-size: 20px; }
+  .prada-faq__suggested a, .prada-faq__topic-list a, .prada-faq__back, .prada-faq__accordions summary, .prada-faq__answer { font-size: 13px; }
+  .prada-faq__topic-list a { min-height: 68px; }
+  .prada-faq__accordions summary { min-height: 64px; padding: 18px; }
+  .prada-faq__answer { padding: 0 18px 24px; }
+}

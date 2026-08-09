@@ -1,0 +1,23 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-faq",
+      "blocks": {
+        "faq_1": { "type": "faq", "settings": { "topic": "online", "question": "How can I place an online order?", "answer": "<p>Once you have added the items to your shopping bag, verify your selection and proceed to checkout.</p><p>If your order contains more than one product, the products may be shipped in multiple shipments.</p>", "suggested": true } },
+        "faq_2": { "type": "faq", "settings": { "topic": "online", "question": "When can I consider my order as confirmed?", "answer": "<p>Your order is confirmed when you receive the order confirmation email.</p>", "suggested": false } },
+        "faq_3": { "type": "faq", "settings": { "topic": "online", "question": "Can I modify or cancel my online order?", "answer": "<p>Contact Client Service as soon as possible. Once processing has started, an order may no longer be changed.</p>", "suggested": false } },
+        "faq_4": { "type": "faq", "settings": { "topic": "account", "question": "What are the advantages of registering for My Account?", "answer": "<p>Your account lets you review orders, save details and manage your profile.</p>", "suggested": true } },
+        "faq_5": { "type": "faq", "settings": { "topic": "returns", "question": "Can I return a product purchased online?", "answer": "<p>Eligible online purchases can be returned within the stated return period and conditions.</p>", "suggested": true } },
+        "faq_6": { "type": "faq", "settings": { "topic": "shipments", "question": "How much does shipping cost and how long does it take?", "answer": "<p>Shipping timing and cost are shown at checkout based on the delivery destination.</p>", "suggested": true } },
+        "faq_7": { "type": "faq", "settings": { "topic": "shipments", "question": "How can I track the shipment of my order?", "answer": "<p>Use the tracking link in your shipping confirmation email or submit a request through Track your order.</p>", "suggested": false } }
+      },
+      "block_order": ["faq_1", "faq_2", "faq_3", "faq_4", "faq_5", "faq_6", "faq_7"],
+      "settings": {
+        "suggested_heading": "Suggested Questions",
+        "topics_heading": "Topics",
+        "opening_hours": "<p><strong>Client Service Opening Hours:</strong><br/>Monday - Saturday: 10 am - 07 pm<br/>Sunday: Closed</p>"
+      }
+    }
+  },
+  "order": ["main"]
+}

@@ -21,7 +21,7 @@
         <a class="is-active" href="/pages/contact#send-us-email">Contact us</a>
         <a href="/pages/contact?view=track-order">Track your order</a>
         <a href="/pages/contact?view=returns">Returns</a>
-        <a href="{{ section.settings.faq_url | default: routes.root_url }}">FAQ</a>
+        <a href="/pages/contact?view=faq">FAQ</a>
       </nav>
       {%- if section.settings.opening_hours != blank -%}
         <div class="prada-contact-page__hours">{{ section.settings.opening_hours }}</div>
