@@ -15,10 +15,20 @@
 {%- endstyle -%}
 
 <div class="color-{{ section.settings.color_scheme }} gradient" id="send-us-email">
+  <div class="prada-contact-page">
+    <aside class="prada-contact-page__sidebar" aria-label="Client service navigation">
+      <nav>
+        <a class="is-active" href="/pages/contact#send-us-email">Contact us</a>
+        <a href="{{ section.settings.track_order_url | default: routes.root_url }}">Track your order</a>
+        <a href="{{ section.settings.returns_url | default: routes.root_url }}">Returns</a>
+        <a href="{{ section.settings.faq_url | default: routes.root_url }}">FAQ</a>
+        <a href="{{ section.settings.appointment_url | default: routes.root_url }}">Book an appointment</a>
+      </nav>
+      {%- if section.settings.opening_hours != blank -%}
+        <div class="prada-contact-page__hours">{{ section.settings.opening_hours }}</div>
+      {%- endif -%}
+    </aside>
   <div class="contact page-width page-width--narrow section-{{ section.id }}-padding">
-    {%- if section.settings.page_title != blank -%}
-      <h1 class="contact__page-title">{{ section.settings.page_title | escape }}</h1>
-    {%- endif -%}
     {%- if section.settings.heading != blank -%}
       <h2 class="title title-wrapper--no-top-margin inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
         {{ section.settings.heading }}
@@ -66,20 +76,42 @@
           <label class="visually-hidden" for="ContactForm-reason">Reason for contact</label>
         </div>
         <div class="field">
-          <input class="field__input" type="text" id="ContactForm-subject" name="contact[Subject]" placeholder="Subject*" required>
-          <label class="field__label" for="ContactForm-subject">Subject*</label>
+          <select class="field__input" id="ContactForm-details" name="contact[Details]" required>
+            <option value="" selected disabled>Details*</option>
+            <option value="Product information">Product information</option>
+            <option value="Availability">Availability</option>
+            <option value="Shipping and delivery">Shipping and delivery</option>
+            <option value="Payment">Payment</option>
+            <option value="Other">Other</option>
+          </select>
+          <label class="visually-hidden" for="ContactForm-details">Details</label>
+        </div>
+        <div class="field">
+          <select class="field__input" id="ContactForm-title" name="contact[Title]">
+            <option value="" selected>Title</option>
+            <option value="Mr.">Mr.</option>
+            <option value="Ms.">Ms.</option>
+            <option value="Mrs.">Mrs.</option>
+            <option value="Prefer not to say">Prefer not to say</option>
+          </select>
+          <label class="visually-hidden" for="ContactForm-title">Title</label>
+        </div>
+        <div class="field">
+          <input class="field__input" autocomplete="family-name" type="text" id="ContactForm-last-name" name="contact[Last name]" placeholder="Last name*" required>
+          <label class="field__label" for="ContactForm-last-name">Last name*</label>
         </div>
         <div class="field">
           <input
             class="field__input"
-            autocomplete="name"
+            autocomplete="given-name"
             type="text"
             id="ContactForm-name"
-            name="contact[{{ 'templates.contact.form.name' | t }}]"
+            name="contact[First name]"
             value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
-            placeholder="{{ 'templates.contact.form.name' | t }}"
+            placeholder="First name*"
+            required
           >
-          <label class="field__label" for="ContactForm-name">{{ 'templates.contact.form.name' | t }}</label>
+          <label class="field__label" for="ContactForm-name">First name*</label>
         </div>
         <div class="field field--with-error">
           <input
@@ -97,6 +129,7 @@
               aria-describedby="ContactForm-email-error"
             {% endif %}
             placeholder="{{ 'templates.contact.form.email' | t }}"
+            required
           >
           <label class="field__label" for="ContactForm-email">
             {{- 'templates.contact.form.email' | t }}
@@ -115,19 +148,47 @@
             </small>
           {%- endif -%}
         </div>
-      </div>
-      <div class="field">
-        <input
-          type="tel"
-          id="ContactForm-phone"
-          class="field__input"
-          autocomplete="tel"
-          name="contact[{{ 'templates.contact.form.phone' | t }}]"
-          pattern="[0-9\-]*"
-          value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
-          placeholder="{{ 'templates.contact.form.phone' | t }}"
-        >
-        <label class="field__label" for="ContactForm-phone">{{ 'templates.contact.form.phone' | t }}</label>
+        <div class="field prada-contact-phone">
+          <span class="prada-contact-phone__code">+91</span>
+          <input type="tel" id="ContactForm-phone" class="field__input" autocomplete="tel" name="contact[Phone number]" value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}" placeholder="Phone number">
+          <label class="visually-hidden" for="ContactForm-phone">Phone number</label>
+        </div>
+        <div class="field">
+          <select class="field__input" id="ContactForm-location" name="contact[Location]" required>
+            <option value="India" selected>Location* — India</option>
+            <option value="United States">United States</option>
+            <option value="United Kingdom">United Kingdom</option>
+            <option value="United Arab Emirates">United Arab Emirates</option>
+            <option value="Other">Other</option>
+          </select>
+          <label class="visually-hidden" for="ContactForm-location">Location</label>
+        </div>
+        <div class="field">
+          <select class="field__input" id="ContactForm-state" name="contact[State or Province]" required>
+            <option value="" selected disabled>State/Province*</option>
+            <option value="Gujarat">Gujarat</option>
+            <option value="Maharashtra">Maharashtra</option>
+            <option value="Delhi">Delhi</option>
+            <option value="Other">Other</option>
+          </select>
+          <label class="visually-hidden" for="ContactForm-state">State or Province</label>
+        </div>
+        <div class="field">
+          <select class="field__input" id="ContactForm-language" name="contact[Language]">
+            <option value="English" selected>Language — English</option>
+            <option value="Hindi">Hindi</option>
+            <option value="Gujarati">Gujarati</option>
+          </select>
+          <label class="visually-hidden" for="ContactForm-language">Language</label>
+        </div>
+        <div class="field">
+          <input class="field__input" type="text" id="ContactForm-subject" name="contact[Subject]" placeholder="Subject*" required>
+          <label class="field__label" for="ContactForm-subject">Subject*</label>
+        </div>
+        <div class="field">
+          <input class="field__input" type="text" id="ContactForm-order-number" name="contact[Order number]" placeholder="Order number">
+          <label class="field__label" for="ContactForm-order-number">Order number</label>
+        </div>
       </div>
       <div class="field">
         <textarea
@@ -135,20 +196,25 @@
           id="ContactForm-body"
           class="text-area field__input"
           name="contact[{{ 'templates.contact.form.comment' | t }}]"
-          placeholder="{{ 'templates.contact.form.comment' | t }}"
+          placeholder="Additional info*"
+          maxlength="200"
+          required
         >
           {{- form.body -}}
         </textarea>
         <label class="form__label field__label" for="ContactForm-body">
-          {{- 'templates.contact.form.comment' | t -}}
+          Additional info*
         </label>
+        <span class="prada-contact-page__counter">200 characters max</span>
       </div>
+      <p class="prada-contact-page__privacy">By submitting this form, you confirm that the information provided will be used to respond to and manage your request.</p>
       <div class="contact__button">
         <button type="submit" class="button">
           {{ 'templates.contact.form.send' | t }}
         </button>
       </div>
     {%- endform -%}
+  </div>
   </div>
 </div>
 
@@ -166,6 +232,36 @@
       "id": "page_title",
       "default": "Contact Us",
       "label": "Page title"
+    },
+    {
+      "type": "header",
+      "content": "Client service navigation"
+    },
+    {
+      "type": "url",
+      "id": "track_order_url",
+      "label": "Track your order link"
+    },
+    {
+      "type": "url",
+      "id": "returns_url",
+      "label": "Returns link"
+    },
+    {
+      "type": "url",
+      "id": "faq_url",
+      "label": "FAQ link"
+    },
+    {
+      "type": "url",
+      "id": "appointment_url",
+      "label": "Book an appointment link"
+    },
+    {
+      "type": "richtext",
+      "id": "opening_hours",
+      "label": "Client service opening hours",
+      "default": "<p><strong>Client Service Opening Hours:</strong><br/>Monday - Saturday: 9 am - 10 pm<br/>Sunday: 9 am - 8 pm</p>"
     },
     {
       "type": "inline_richtext",
