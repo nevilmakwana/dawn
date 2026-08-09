@@ -20,7 +20,7 @@
       <nav>
         <a class="is-active" href="/pages/contact#send-us-email">Contact us</a>
         <a href="/pages/contact?view=track-order">Track your order</a>
-        <a href="{{ section.settings.returns_url | default: routes.root_url }}">Returns</a>
+        <a href="/pages/contact?view=returns">Returns</a>
         <a href="{{ section.settings.faq_url | default: routes.root_url }}">FAQ</a>
       </nav>
       {%- if section.settings.opening_hours != blank -%}

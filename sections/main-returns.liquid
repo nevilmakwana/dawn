@@ -1,11 +1,11 @@
 {{ 'section-track-order.css' | asset_url | stylesheet_tag }}
 
-<section class="prada-track-order">
+<section class="prada-track-order prada-returns">
   <aside class="prada-track-order__sidebar" aria-label="Client service navigation">
     <nav>
       <a href="/pages/contact#send-us-email">Contact us</a>
-      <a class="is-active" href="/pages/contact?view=track-order">Track your order</a>
-      <a href="/pages/contact?view=returns">Returns</a>
+      <a href="/pages/contact?view=track-order">Track your order</a>
+      <a class="is-active" href="/pages/contact?view=returns">Returns</a>
       <a href="{{ section.settings.faq_url | default: routes.root_url }}">FAQ</a>
     </nav>
     <div class="prada-track-order__hours">{{ section.settings.opening_hours }}</div>
@@ -21,11 +21,11 @@
         {%- endif -%}
       </div>
 
-      {%- form 'contact', id: 'TrackOrderForm', class: 'prada-track-order__form' -%}
-        <input type="hidden" name="contact[Request type]" value="Order tracking request">
-        <input type="hidden" name="contact[body]" value="A customer has requested help tracking an order.">
+      {%- form 'contact', id: 'ReturnOrderForm', class: 'prada-track-order__form' -%}
+        <input type="hidden" name="contact[Request type]" value="Order return request">
+        <input type="hidden" name="contact[body]" value="A customer has requested help returning an order.">
         {%- if form.posted_successfully? -%}
-          <p class="prada-track-order__success" tabindex="-1" autofocus>Your tracking request has been received. Our client service team will contact you.</p>
+          <p class="prada-track-order__success" tabindex="-1" autofocus>Your return request has been received. Our client service team will contact you.</p>
         {%- endif -%}
         {%- if form.errors -%}
           <p class="prada-track-order__error" role="alert">Please enter a valid email address and order number.</p>
@@ -60,32 +60,27 @@
 
 {% schema %}
 {
-  "name": "Prada track order",
+  "name": "Prada returns",
   "tag": "section",
-  "class": "section-prada-track-order",
+  "class": "section-prada-returns",
   "settings": [
     {
       "type": "text",
       "id": "heading",
       "label": "Heading",
-      "default": "Check your order status"
+      "default": "Return your order"
     },
     {
       "type": "richtext",
       "id": "intro",
       "label": "Introduction",
-      "default": "<p>If you are already registered, log in to your account. If you placed the order as a guest, fill in the fields below. If you have recently made a purchase, it may take a few minutes for your order to be processed and for the delivery confirmation email to arrive.</p>"
+      "default": "<p>Free returns for purchases made online within 30 days of delivery, provided the return conditions are met. If you have already registered, log in to your account. If you placed the order as a guest, please fill in the following fields:</p>"
     },
     {
       "type": "text",
       "id": "questions_heading",
       "label": "Questions heading",
       "default": "Suggested Questions"
-    },
-    {
-      "type": "url",
-      "id": "returns_url",
-      "label": "Returns link"
     },
     {
       "type": "url",
@@ -103,13 +98,13 @@
     {
       "type": "question",
       "name": "Suggested question",
-      "limit": 6,
+      "limit": 8,
       "settings": [
         {
           "type": "text",
           "id": "text",
           "label": "Question",
-          "default": "How long will it take to receive my order?"
+          "default": "Can I return a product purchased online?"
         },
         {
           "type": "url",
@@ -121,12 +116,7 @@
   ],
   "presets": [
     {
-      "name": "Prada track order",
-      "blocks": [
-        { "type": "question", "settings": { "text": "How long will it take to receive my order?" } },
-        { "type": "question", "settings": { "text": "Are there any restrictions on deliveries?" } },
-        { "type": "question", "settings": { "text": "How can I track the shipment of my order?" } }
-      ]
+      "name": "Prada returns"
     }
   ]
 }

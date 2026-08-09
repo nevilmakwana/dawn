@@ -5,7 +5,7 @@
       "settings": {
         "page_title": "Contact Us",
         "track_order_url": "/pages/contact?view=track-order",
-        "returns_url": "/policies/refund-policy",
+        "returns_url": "/pages/contact?view=returns",
         "faq_url": "/pages/faq",
         "opening_hours": "<p><strong>Client Service Opening Hours:</strong><br/>Monday - Saturday: 10 am - 07 pm<br/>Sunday: Closed</p>",
         "heading": "Send us an email",
