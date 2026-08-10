@@ -531,6 +531,7 @@
     const scrollHint = root.querySelector('[data-prada-scroll-hint]');
     const sheetHandle = root.querySelector('[data-prada-sheet-handle]');
     let sheetTouchStart = 0;
+    let panelTouchStartX = 0;
     let handleDragY = 0;
     let galleryTouchStart = 0;
     let galleryTouchStartedAtEnd = false;
@@ -645,10 +646,15 @@
     }, { passive: true });
     mobilePanel?.addEventListener('touchstart', (event) => {
       sheetTouchStart = event.touches[0].clientY;
+      panelTouchStartX = event.touches[0].clientX;
     }, { passive: true });
     mobilePanel?.addEventListener('touchend', (event) => {
-      const upwardDistance = sheetTouchStart - event.changedTouches[0].clientY;
-      if (!root.classList.contains('mobile-info-open') && upwardDistance > 45) {
+      const verticalDistance = sheetTouchStart - event.changedTouches[0].clientY;
+      const horizontalDistance = Math.abs(panelTouchStartX - event.changedTouches[0].clientX);
+      const isVerticalGesture = Math.abs(verticalDistance) > horizontalDistance;
+      if (root.classList.contains('mobile-info-open') && isVerticalGesture && verticalDistance < -70) {
+        closeMobileSheet();
+      } else if (!root.classList.contains('mobile-info-open') && isVerticalGesture && verticalDistance > 45) {
         openMobileSheet();
       }
     }, { passive: true });
