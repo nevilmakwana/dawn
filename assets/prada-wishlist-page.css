@@ -35,7 +35,7 @@ body:has(.prada-wishlist-page) .footer {
 }
 
 .prada-wishlist-page {
-  --prada-wishlist-page-padding: 20px;
+  --prada-wishlist-page-padding: 24px;
   display: flex;
   min-height: 100dvh;
   flex-direction: column;
@@ -56,7 +56,7 @@ body:has(.prada-wishlist-page) .footer {
 
 .prada-wishlist-page__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 451px));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 444px));
   gap: 20px;
   align-items: start;
   justify-content: start;
