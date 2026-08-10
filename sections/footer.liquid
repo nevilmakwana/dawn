@@ -189,9 +189,19 @@
       let localizationTrigger = null;
 
       if (countryCurrency) {
+        const enabledCurrencies = window.seloConverterConfig?.general?.selectedCurrencies || ['INR'];
+        [...countryCurrency.options].forEach((option) => {
+          if (!enabledCurrencies.includes(option.value)) option.remove();
+        });
         const preferredCurrency = localStorage.getItem('selo_currency_preference')?.toUpperCase();
         if (preferredCurrency && [...countryCurrency.options].some((option) => option.value === preferredCurrency)) {
           countryCurrency.value = preferredCurrency;
+        } else {
+          const storeCurrency = document.getElementById('seloConverterData')?.dataset.storeCurrency || 'INR';
+          countryCurrency.value = [...countryCurrency.options].some((option) => option.value === storeCurrency)
+            ? storeCurrency
+            : countryCurrency.options[0]?.value;
+          localStorage.setItem('selo_currency_preference', countryCurrency.value);
         }
       }
 
@@ -303,11 +313,43 @@
         }, 80);
       });
 
+      const getInitializedSelo = () => new Promise((resolve) => {
+        let attempts = 0;
+        const check = () => {
+          const instance = window.seloConverter?.getInstance?.();
+          if (instance?.isInitialized || attempts >= 100) return resolve(instance?.isInitialized ? instance : null);
+          attempts += 1;
+          window.setTimeout(check, 50);
+        };
+        check();
+      });
+
+      const applySeloCurrency = async (currencyCode) => {
+        const selo = await getInitializedSelo();
+        if (!selo) {
+          localStorage.setItem('selo_currency_preference', currencyCode);
+          window.location.reload();
+          return false;
+        }
+        await selo.handleCurrencyChange(currencyCode);
+        return true;
+      };
+
       if (localizationForm && countryCurrency) {
-        localizationForm.addEventListener('submit', (event) => {
+        localizationForm.addEventListener('submit', async (event) => {
           event.preventDefault();
-          localStorage.setItem('selo_currency_preference', countryCurrency.value);
-          localizationForm.submit();
+          const confirmButton = localizationForm.querySelector('[type="submit"]');
+          const localeSelect = localizationForm.querySelector('[name="locale_code"]');
+          const localeChanged = localeSelect?.value !== {{ localization.language.iso_code | json }};
+          if (confirmButton) confirmButton.disabled = true;
+          await applySeloCurrency(countryCurrency.value);
+          updateShippingLabel();
+          if (localeChanged) {
+            localizationForm.submit();
+          } else {
+            closeLocalization();
+            if (confirmButton) confirmButton.disabled = false;
+          }
         });
       }
 
