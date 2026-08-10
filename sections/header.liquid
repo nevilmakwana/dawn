@@ -737,21 +737,52 @@
       width: calc(33.333% - 72px);
     }
 
-    .prada-desktop-menu__utility a {
+    .prada-desktop-menu__utility a,
+    .prada-desktop-menu__utility button {
       display: inline-flex;
       align-items: center;
       gap: 14px;
+      width: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
       color: #111111;
       text-decoration: none;
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit;
       font-size: 13px;
       font-weight: 500;
       line-height: 1.2;
     }
 
     .prada-desktop-menu__utility a:hover,
-    .prada-desktop-menu__utility a:focus-visible {
+    .prada-desktop-menu__utility a:focus-visible,
+    .prada-desktop-menu__utility button:hover,
+    .prada-desktop-menu__utility button:focus-visible {
       text-decoration: underline;
       text-underline-offset: 4px;
+    }
+
+    .prada-desktop-menu__utility-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+      color: #2449ff;
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .prada-desktop-menu__utility-count > span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .prada-desktop-menu__utility-count.is-hidden {
+      display: none;
     }
 
     .prada-desktop-menu__utility svg {

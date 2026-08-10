@@ -208,7 +208,8 @@
 
       document.addEventListener('click', (event) => {
         const opener = event.target.closest('[data-prada-localization-open]');
-        if (opener?.getAttribute('aria-controls') === localizationDrawer?.id) openLocalization(opener);
+        const controls = opener?.getAttribute('aria-controls');
+        if (opener && (!controls || controls === localizationDrawer?.id)) openLocalization(opener);
       });
       footer.querySelectorAll('[data-prada-localization-close]').forEach((closer) => closer.addEventListener('click', closeLocalization));
       document.addEventListener('keydown', (event) => {

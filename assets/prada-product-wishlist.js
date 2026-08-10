@@ -93,6 +93,12 @@
     document.querySelectorAll('#wishlist-icon-bubble').forEach((link) => {
       link.classList.toggle('has-wishlist-items', hasItems);
     });
+
+    document.querySelectorAll('[data-prada-drawer-wishlist-count]').forEach((count) => {
+      count.classList.toggle('is-hidden', !hasItems);
+      count.lastChild.textContent = String(items.length);
+      count.setAttribute('aria-label', `${items.length} items in wishlist`);
+    });
   };
 
   const getWishlistUrl = () => {

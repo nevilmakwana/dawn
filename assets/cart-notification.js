@@ -17,6 +17,12 @@ const updatePradaCartBadge = (itemCount) => {
 
   cartLink.querySelector(':scope > .cart-count-bubble')?.remove();
   cartLink.setAttribute('aria-label', itemCount > 0 ? `Cart (${itemCount})` : 'Cart');
+
+  document.querySelectorAll('[data-prada-drawer-cart-count]').forEach((count) => {
+    count.classList.toggle('is-hidden', itemCount === 0);
+    count.lastChild.textContent = String(itemCount);
+    count.setAttribute('aria-label', `${itemCount} items in shopping bag`);
+  });
 };
 
 const refreshPradaCartBadge = async () => {
