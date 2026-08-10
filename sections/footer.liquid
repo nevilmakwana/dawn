@@ -118,42 +118,12 @@
           {%- form 'localization', id: 'PradaLocalizationForm', class: 'prada-localization-drawer__form' -%}
             <label class="prada-localization-drawer__field">
               <span class="visually-hidden">Country or region</span>
-              <select aria-label="Country and currency" data-prada-country-currency>
-                <option value="AED">United Arab Emirates — AED د.إ</option>
-                <option value="AUD">Australia — AUD $</option>
-                <option value="BRL">Brazil — BRL R$</option>
-                <option value="CAD">Canada — CAD $</option>
-                <option value="CHF">Switzerland — CHF</option>
-                <option value="CNY">China — CNY ¥</option>
-                <option value="DKK">Denmark — DKK kr</option>
-                <option value="EUR">Europe — EUR €</option>
-                <option value="GBP">United Kingdom — GBP £</option>
-                <option value="HKD">Hong Kong — HKD $</option>
-                <option value="IDR">Indonesia — IDR Rp</option>
-                <option value="INR" selected>India — INR ₹</option>
-                <option value="JPY">Japan — JPY ¥</option>
-                <option value="KRW">South Korea — KRW ₩</option>
-                <option value="MXN">Mexico — MXN $</option>
-                <option value="MYR">Malaysia — MYR RM</option>
-                <option value="NOK">Norway — NOK kr</option>
-                <option value="NZD">New Zealand — NZD $</option>
-                <option value="PHP">Philippines — PHP ₱</option>
-                <option value="PLN">Poland — PLN zł</option>
-                <option value="SAR">Saudi Arabia — SAR ر.س</option>
-                <option value="SEK">Sweden — SEK kr</option>
-                <option value="SGD">Singapore — SGD $</option>
-                <option value="THB">Thailand — THB ฿</option>
-                <option value="TWD">Taiwan — TWD $</option>
-                <option value="USD">United States — USD $</option>
-                <option value="VND">Vietnam — VND ₫</option>
-                <option value="ZAR">South Africa — ZAR R</option>
-                {% comment %}
+              <select name="country_code" aria-label="Country and currency" data-prada-country-currency>
                 {%- for country in localization.available_countries -%}
                   <option value="{{ country.iso_code }}" data-currency-code="{{ country.currency.iso_code }}"{% if country.iso_code == localization.country.iso_code %} selected{% endif %}>
                     {{- country.name }} — {{ country.currency.iso_code }} {{ country.currency.symbol -}}
                   </option>
                 {%- endfor -%}
-                {% endcomment %}
               </select>
             </label>
             <label class="prada-localization-drawer__field">
@@ -169,7 +139,7 @@
             <input type="hidden" name="return_to" value="{{ request.path }}">
             <button type="submit" class="prada-localization-drawer__confirm">Confirm</button>
           {%- endform -%}
-          <p class="prada-localization-drawer__note">Displayed prices follow the selected Selo currency. Checkout currency depends on Shopify Markets and Shopify Payments.</p>
+          <p class="prada-localization-drawer__note">Prices, currency and checkout follow the Shopify Market assigned to the selected destination.</p>
         </div>
       </aside>
     </div>
@@ -184,26 +154,8 @@
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
       const groups = [...footer.querySelectorAll('.prada-footer__group')];
       const localizationDrawer = footer.querySelector('[data-prada-localization-drawer]');
-      const localizationForm = localizationDrawer?.querySelector('.prada-localization-drawer__form');
       const countryCurrency = localizationDrawer?.querySelector('[data-prada-country-currency]');
       let localizationTrigger = null;
-
-      if (countryCurrency) {
-        const enabledCurrencies = window.seloConverterConfig?.general?.selectedCurrencies || ['INR'];
-        [...countryCurrency.options].forEach((option) => {
-          if (!enabledCurrencies.includes(option.value)) option.remove();
-        });
-        const preferredCurrency = localStorage.getItem('selo_currency_preference')?.toUpperCase();
-        if (preferredCurrency && [...countryCurrency.options].some((option) => option.value === preferredCurrency)) {
-          countryCurrency.value = preferredCurrency;
-        } else {
-          const storeCurrency = document.getElementById('seloConverterData')?.dataset.storeCurrency || 'INR';
-          countryCurrency.value = [...countryCurrency.options].some((option) => option.value === storeCurrency)
-            ? storeCurrency
-            : countryCurrency.options[0]?.value;
-          localStorage.setItem('selo_currency_preference', countryCurrency.value);
-        }
-      }
 
       const updateShippingLabel = () => {
         if (!countryCurrency) return;
@@ -213,156 +165,29 @@
           label.textContent = `Shipping to: ${destination} / ${language}`;
         });
       };
-      countryCurrency?.addEventListener('change', updateShippingLabel);
+      const preferredLocalesByCountry = {
+        AE: ['ar', 'en'], AU: ['en'], BR: ['pt-BR', 'pt'], CA: ['en', 'fr'], CH: ['de', 'fr', 'it'],
+        CN: ['zh-CN', 'zh'], DE: ['de'], DK: ['da'], ES: ['es'], FR: ['fr'], GB: ['en'], HK: ['zh-TW', 'en'],
+        ID: ['id', 'en'], IN: ['hi', 'en'], IT: ['it'], JP: ['ja'], KR: ['ko'], MX: ['es'], MY: ['ms', 'en'],
+        NL: ['nl'], NO: ['nb', 'no'], NZ: ['en'], PH: ['en'], PL: ['pl'], PT: ['pt-PT', 'pt'], SA: ['ar', 'en'],
+        SE: ['sv'], SG: ['en'], TH: ['th'], TW: ['zh-TW', 'zh'], US: ['en'], VN: ['vi'], ZA: ['en']
+      };
+
+      const selectPreferredLanguage = () => {
+        const languageSelect = localizationDrawer?.querySelector('[name="locale_code"]');
+        if (!countryCurrency || !languageSelect) return;
+        const available = [...languageSelect.options].map((option) => option.value);
+        const preferred = preferredLocalesByCountry[countryCurrency.value] || [];
+        const match = preferred.find((locale) => available.includes(locale));
+        if (match) languageSelect.value = match;
+      };
+
+      countryCurrency?.addEventListener('change', () => {
+        selectPreferredLanguage();
+        updateShippingLabel();
+      });
+      localizationDrawer?.querySelector('[name="locale_code"]')?.addEventListener('change', updateShippingLabel);
       updateShippingLabel();
-
-      const elementIsVisible = (element) => {
-        if (!element) return false;
-        const style = window.getComputedStyle(element);
-        return style.display !== 'none' && style.visibility !== 'hidden';
-      };
-
-      const currencyCodeFrom = (element) => {
-        const match = element?.textContent?.toUpperCase().match(/\b[A-Z]{3}\b/);
-        return match?.[0] || '';
-      };
-
-      const queryIncludingShadowRoots = (selector, root = document) => {
-        const matches = [...root.querySelectorAll(selector)];
-        root.querySelectorAll('*').forEach((element) => {
-          if (element.shadowRoot) matches.push(...queryIncludingShadowRoots(selector, element.shadowRoot));
-        });
-        return matches;
-      };
-
-      const fixedContainer = (element) => {
-        let current = element;
-        while (current && current !== document.body) {
-          if (window.getComputedStyle(current).position === 'fixed') return current;
-          current = current.parentElement || current.getRootNode?.().host || null;
-        }
-        return null;
-      };
-
-      const seloCurrencyControl = () => {
-        const codes = [...(countryCurrency?.options || [])].map((option) => option.dataset.currencyCode);
-        return queryIncludingShadowRoots('button, [role="button"]').find((element) => {
-          if (localizationDrawer?.contains(element) || !elementIsVisible(element)) return false;
-          return fixedContainer(element) && codes.includes(currencyCodeFrom(element));
-        });
-      };
-
-      const markSeloWidget = () => {
-        [...document.body.querySelectorAll('*')].forEach((element) => {
-          if (localizationDrawer?.contains(element) || footer.contains(element)) return;
-          const style = window.getComputedStyle(element);
-          if (style.position !== 'fixed' || style.display === 'none' || style.visibility === 'hidden') return;
-          const bounds = element.getBoundingClientRect();
-          const isBottomRightControl = bounds.width >= 64 && bounds.width <= 420
-            && bounds.height >= 32 && bounds.height <= 320
-            && bounds.right >= window.innerWidth - 40
-            && bounds.bottom >= window.innerHeight - 40;
-          if (isBottomRightControl) element.dataset.greyeximSeloWidget = '';
-        });
-
-        queryIncludingShadowRoots('iframe').forEach((frame) => {
-          const identity = `${frame.src || ''} ${frame.title || ''} ${frame.name || ''}`.toLowerCase();
-          const container = fixedContainer(frame);
-          const bounds = container?.getBoundingClientRect();
-          const isCornerWidget = bounds && bounds.width <= 420 && bounds.height <= 640
-            && bounds.right >= window.innerWidth - 32 && bounds.bottom >= window.innerHeight - 32;
-          if (container && (/(selo|currency)/.test(identity) || isCornerWidget)) {
-            container.dataset.greyeximSeloWidget = '';
-          }
-        });
-
-        const control = seloCurrencyControl();
-        if (!control) return;
-        const widget = fixedContainer(control);
-        if (!widget) return;
-        widget.dataset.greyeximSeloWidget = '';
-      };
-
-      const syncSeloCurrency = (currencyCode) => new Promise((resolve) => {
-        if (!currencyCode) return resolve();
-
-        const nativeSelect = queryIncludingShadowRoots('select').find((select) => {
-          if (localizationDrawer?.contains(select) || !fixedContainer(select)) return false;
-          return [...select.options].some((option) => currencyCodeFrom(option) === currencyCode);
-        });
-        if (nativeSelect) {
-          const option = [...nativeSelect.options].find((item) => currencyCodeFrom(item) === currencyCode);
-          if (option) {
-            nativeSelect.value = option.value;
-            nativeSelect.dispatchEvent(new Event('change', { bubbles: true }));
-          }
-          return window.setTimeout(resolve, 180);
-        }
-
-        const control = seloCurrencyControl();
-        if (!control || currencyCodeFrom(control) === currencyCode) return resolve();
-        control.click();
-        window.setTimeout(() => {
-          const option = queryIncludingShadowRoots('button, [role="option"], [role="menuitem"], li').find((element) => {
-            if (localizationDrawer?.contains(element) || element === control || !elementIsVisible(element)) return false;
-            const isPopupOption = element.matches('[role="option"], [role="menuitem"]') || fixedContainer(element);
-            return isPopupOption && currencyCodeFrom(element) === currencyCode;
-          });
-          option?.click();
-          window.setTimeout(resolve, 180);
-        }, 80);
-      });
-
-      const getInitializedSelo = () => new Promise((resolve) => {
-        let attempts = 0;
-        const check = () => {
-          const instance = window.seloConverter?.getInstance?.();
-          if (instance?.isInitialized || attempts >= 100) return resolve(instance?.isInitialized ? instance : null);
-          attempts += 1;
-          window.setTimeout(check, 50);
-        };
-        check();
-      });
-
-      const applySeloCurrency = async (currencyCode) => {
-        const selo = await getInitializedSelo();
-        if (!selo) {
-          localStorage.setItem('selo_currency_preference', currencyCode);
-          window.location.reload();
-          return false;
-        }
-        await selo.handleCurrencyChange(currencyCode);
-        return true;
-      };
-
-      if (localizationForm && countryCurrency) {
-        localizationForm.addEventListener('submit', async (event) => {
-          event.preventDefault();
-          const confirmButton = localizationForm.querySelector('[type="submit"]');
-          const localeSelect = localizationForm.querySelector('[name="locale_code"]');
-          const localeChanged = localeSelect?.value !== {{ localization.language.iso_code | json }};
-          if (confirmButton) confirmButton.disabled = true;
-          await applySeloCurrency(countryCurrency.value);
-          updateShippingLabel();
-          if (localeChanged) {
-            localizationForm.submit();
-          } else {
-            closeLocalization();
-            if (confirmButton) confirmButton.disabled = false;
-          }
-        });
-      }
-
-      markSeloWidget();
-      const seloObserver = new MutationObserver(markSeloWidget);
-      seloObserver.observe(document.body, { childList: true, subtree: true });
-      window.addEventListener('load', markSeloWidget, { once: true });
-      let seloScanCount = 0;
-      const seloScanTimer = window.setInterval(() => {
-        markSeloWidget();
-        seloScanCount += 1;
-        if (seloScanCount >= 60) window.clearInterval(seloScanTimer);
-      }, 500);
 
       const closeLocalization = () => {
         if (!localizationDrawer?.classList.contains('is-open')) return;
