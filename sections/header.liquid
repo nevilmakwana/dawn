@@ -97,7 +97,34 @@
 
   @media screen and (min-width: 990px) {
     .prada-header {
-      padding: 12px 24px !important;
+      height: 68px !important;
+      min-height: 68px !important;
+      padding: 0 24px !important;
+    }
+
+    .prada-header header-drawer summary.header__icon,
+    .prada-header .header__search summary.header__icon {
+      min-width: 32px !important;
+      height: 44px !important;
+      padding: 6px 8px !important;
+    }
+
+    .prada-header header-drawer summary .prada-menu-icon-wrapper,
+    .prada-header header-drawer summary .prada-menu-icon-wrapper svg {
+      width: 16px !important;
+      height: 16px !important;
+    }
+
+    .prada-header .header__search summary .svg-wrapper:not(.header__icon-close),
+    .prada-header .header__search summary .prada-search-icon-wrapper,
+    .prada-header .header__search summary .svg-wrapper:not(.header__icon-close) svg,
+    .prada-header .header__search summary .prada-search-icon-wrapper svg {
+      width: 17px !important;
+      height: 17px !important;
+    }
+
+    .prada-header-logo .header__heading-logo {
+      max-height: 30px;
     }
   }
 
