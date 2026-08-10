@@ -1692,6 +1692,28 @@
       height: 17px !important;
       transform: none !important;
     }
+
+    body sticky-header.header-wrapper,
+    body div.header-wrapper,
+    body header.header.prada-header {
+      box-sizing: border-box !important;
+      block-size: 68px !important;
+      min-block-size: 68px !important;
+      max-block-size: 68px !important;
+    }
+
+    body header.header.prada-header {
+      padding-block: 0 !important;
+      overflow: visible !important;
+    }
+
+    body header.header.prada-header .prada-menu-icon-wrapper,
+    body header.header.prada-header .prada-menu-glyph,
+    body header.header.prada-header .prada-close-glyph {
+      inline-size: 15px !important;
+      block-size: 15px !important;
+      scale: 1 !important;
+    }
   }
 {%- endstyle -%}
 
@@ -1718,6 +1740,7 @@
     data-sticky-type="{{ section.settings.sticky_header_type }}"
   {% endif %}
   class="header-wrapper color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator %} header-wrapper--border-bottom{% endif %}"
+  style="--prada-desktop-header-height: 68px;"
 >
   {%- liquid
     assign social_links = false
@@ -1731,7 +1754,7 @@
       assign localization_forms = true
     endif
   -%}
-  <header class="header prada-header{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}" role="banner">
+  <header class="header prada-header{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}" role="banner" data-prada-compact-header>
     
     {%- comment -%} LEFT: Menu + Search {%- endcomment -%}
     <div class="prada-header-left">
@@ -1833,6 +1856,48 @@
     </div>
   </header>
 </{{ header_tag }}>
+
+<script>
+  (() => {
+    const shell = document.currentScript.previousElementSibling;
+    if (!shell?.classList.contains('header-wrapper')) return;
+    const header = shell.querySelector('[data-prada-compact-header]');
+    const section = shell.closest('.section-header');
+    const desktop = window.matchMedia('(min-width: 990px)');
+    const properties = ['height', 'min-height', 'max-height'];
+
+    const syncCompactHeader = () => {
+      [section, shell, header].filter(Boolean).forEach((element) => {
+        properties.forEach((property) => {
+          if (desktop.matches) element.style.setProperty(property, '68px', 'important');
+          else element.style.removeProperty(property);
+        });
+      });
+
+      if (header) {
+        if (desktop.matches) {
+          header.style.setProperty('padding-top', '0', 'important');
+          header.style.setProperty('padding-bottom', '0', 'important');
+        } else {
+          header.style.removeProperty('padding-top');
+          header.style.removeProperty('padding-bottom');
+        }
+
+        header.querySelectorAll('.prada-menu-icon-wrapper, .prada-menu-glyph, .prada-close-glyph').forEach((icon) => {
+          ['width', 'height'].forEach((property) => {
+            if (desktop.matches) icon.style.setProperty(property, '15px', 'important');
+            else icon.style.removeProperty(property);
+          });
+          if (desktop.matches) icon.style.setProperty('transform', 'none', 'important');
+          else icon.style.removeProperty('transform');
+        });
+      }
+    };
+
+    syncCompactHeader();
+    desktop.addEventListener?.('change', syncCompactHeader);
+  })();
+</script>
 
 <aside class="prada-contact-drawer" id="PradaContactDrawer-{{ section.id }}" data-prada-contact-drawer aria-hidden="true">
   <button class="prada-contact-drawer__overlay" type="button" data-prada-contact-close tabindex="-1" aria-label="Close contact panel"></button>
