@@ -1,0 +1,198 @@
+body:has(.prada-shipping-policy) .footer {
+  margin-top: 0;
+}
+
+.prada-shipping-policy {
+  display: grid;
+  grid-template-columns: 296px minmax(0, 1fr);
+  min-height: calc(100vh - var(--header-height, 88px));
+  border-top: 1px solid #dedede;
+  color: #0b0b0b;
+  background: #fff;
+}
+
+.prada-shipping-policy__sidebar {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 48px 20px 24px;
+  border-right: 1px solid #d8d8d8;
+}
+
+.prada-shipping-policy__nav {
+  display: grid;
+  gap: 30px;
+}
+
+.prada-shipping-policy__nav a {
+  width: fit-content;
+  color: #111;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.prada-shipping-policy__nav a:hover,
+.prada-shipping-policy__nav a:focus-visible,
+.prada-shipping-policy__nav a[aria-current='page'] {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.prada-shipping-policy__support {
+  margin: auto 0 0;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.prada-shipping-policy__main {
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: 38px 26px 88px;
+}
+
+.prada-shipping-policy__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 27px;
+  color: #111;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.prada-shipping-policy__back::before {
+  content: '‹';
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 0.7;
+}
+
+.prada-shipping-policy__heading {
+  margin: 0 0 27px;
+  color: #111;
+  font-family: inherit;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.prada-shipping-policy__lead {
+  margin-bottom: 24px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.prada-shipping-policy__lead:empty {
+  display: none;
+}
+
+.prada-shipping-policy__accordion {
+  border: 1px solid #cfcfcf;
+}
+
+.prada-shipping-policy__item + .prada-shipping-policy__item {
+  border-top: 1px solid #cfcfcf;
+}
+
+.prada-shipping-policy__item summary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 60px;
+  padding: 17px 48px 17px 27px;
+  color: #111;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  cursor: pointer;
+  list-style: none;
+}
+
+.prada-shipping-policy__item summary::-webkit-details-marker {
+  display: none;
+}
+
+.prada-shipping-policy__item summary::after {
+  content: '⌄';
+  position: absolute;
+  top: 50%;
+  right: 27px;
+  font-size: 17px;
+  font-weight: 400;
+  transform: translateY(-55%);
+}
+
+.prada-shipping-policy__item[open] {
+  outline: 1px solid #111;
+  outline-offset: -1px;
+}
+
+.prada-shipping-policy__item[open] summary::after {
+  content: '⌃';
+}
+
+.prada-shipping-policy__answer {
+  padding: 0 27px 27px;
+  color: #111;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.prada-shipping-policy__answer > :first-child {
+  margin-top: 0;
+}
+
+.prada-shipping-policy__answer > :last-child {
+  margin-bottom: 0;
+}
+
+.prada-shipping-policy__answer ul,
+.prada-shipping-policy__answer ol {
+  padding-left: 18px;
+}
+
+.prada-shipping-policy__answer a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+@media screen and (max-width: 749px) {
+  .prada-shipping-policy {
+    display: block;
+    min-height: 0;
+  }
+
+  .prada-shipping-policy__sidebar {
+    display: none;
+  }
+
+  .prada-shipping-policy__main {
+    width: 100%;
+    padding: 30px 16px 64px;
+  }
+
+  .prada-shipping-policy__back {
+    margin-bottom: 24px;
+  }
+
+  .prada-shipping-policy__heading {
+    margin-bottom: 24px;
+    font-size: 20px;
+  }
+
+  .prada-shipping-policy__item summary {
+    min-height: 58px;
+    padding: 16px 44px 16px 16px;
+  }
+
+  .prada-shipping-policy__item summary::after {
+    right: 17px;
+  }
+
+  .prada-shipping-policy__answer {
+    padding: 0 16px 22px;
+  }
+}
