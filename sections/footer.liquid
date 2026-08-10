@@ -195,6 +195,18 @@
       };
 
       const markSeloWidget = () => {
+        [...document.body.querySelectorAll('*')].forEach((element) => {
+          if (localizationDrawer?.contains(element) || footer.contains(element)) return;
+          const style = window.getComputedStyle(element);
+          if (style.position !== 'fixed' || style.display === 'none' || style.visibility === 'hidden') return;
+          const bounds = element.getBoundingClientRect();
+          const isBottomRightControl = bounds.width >= 64 && bounds.width <= 420
+            && bounds.height >= 32 && bounds.height <= 320
+            && bounds.right >= window.innerWidth - 40
+            && bounds.bottom >= window.innerHeight - 40;
+          if (isBottomRightControl) element.dataset.greyeximSeloWidget = '';
+        });
+
         queryIncludingShadowRoots('iframe').forEach((frame) => {
           const identity = `${frame.src || ''} ${frame.title || ''} ${frame.name || ''}`.toLowerCase();
           const container = fixedContainer(frame);
@@ -258,6 +270,12 @@
       const seloObserver = new MutationObserver(markSeloWidget);
       seloObserver.observe(document.body, { childList: true, subtree: true });
       window.addEventListener('load', markSeloWidget, { once: true });
+      let seloScanCount = 0;
+      const seloScanTimer = window.setInterval(() => {
+        markSeloWidget();
+        seloScanCount += 1;
+        if (seloScanCount >= 60) window.clearInterval(seloScanTimer);
+      }, 500);
 
       const closeLocalization = () => {
         if (!localizationDrawer?.classList.contains('is-open')) return;
