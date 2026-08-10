@@ -71,7 +71,8 @@
     title.textContent = item.title;
 
     const price = document.createElement('p');
-    price.className = 'prada-wishlist-page__price';
+    price.className = 'prada-wishlist-page__price money';
+    price.dataset.currencyPrice = '';
     price.textContent = item.price;
     details.append(title, price);
 

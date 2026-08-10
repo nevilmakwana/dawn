@@ -173,7 +173,7 @@
                               {%- endunless -%}
                             {%- endfor -%}
                             <p class="prada-cart-drawer__quantity">Qty: {{ item.quantity }}</p>
-                            <p class="prada-cart-drawer__price">{{ item.final_price | money }}</p>
+                            <p class="prada-cart-drawer__price money" data-currency-price>{{ item.final_price | money }}</p>
                             <cart-remove-button
                               class="prada-cart-drawer__remove-wrap"
                               data-index="{{ item.index | plus: 1 }}"

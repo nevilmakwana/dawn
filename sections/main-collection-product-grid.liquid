@@ -188,7 +188,7 @@
 
                   <div class="prada-product-tile__information">
                     <h2 class="prada-product-tile__title"><a href="{{ product.url }}">{{ product.title | escape }}</a></h2>
-                    <p class="prada-product-tile__price">
+                    <p class="prada-product-tile__price money" data-currency-price>
                       {%- if product.price_varies -%}From {% endif -%}{{ product.price | money }}
                     </p>
                   </div>

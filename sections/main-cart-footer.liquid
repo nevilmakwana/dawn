@@ -28,7 +28,7 @@
       <div class="prada-shopping-bag-footer__mobile-summary">
         <div class="prada-shopping-bag-footer__mobile-totals">
           <span>Subtotal</span>
-          <span>{{ cart.total_price | money }}</span>
+          <span class="money" data-currency-price>{{ cart.total_price | money }}</span>
         </div>
         <button
           type="submit"
@@ -48,7 +48,7 @@
         <div class="prada-shopping-bag-footer__desktop-summary">
           <div class="prada-shopping-bag-footer__desktop-totals">
             <span>Subtotal</span>
-            <span>{{ cart.total_price | money }}</span>
+            <span class="money" data-currency-price>{{ cart.total_price | money }}</span>
           </div>
 
           <button
