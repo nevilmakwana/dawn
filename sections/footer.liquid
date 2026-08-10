@@ -169,24 +169,43 @@
         return match?.[0] || '';
       };
 
+      const queryIncludingShadowRoots = (selector, root = document) => {
+        const matches = [...root.querySelectorAll(selector)];
+        root.querySelectorAll('*').forEach((element) => {
+          if (element.shadowRoot) matches.push(...queryIncludingShadowRoots(selector, element.shadowRoot));
+        });
+        return matches;
+      };
+
       const fixedContainer = (element) => {
         let current = element;
         while (current && current !== document.body) {
           if (window.getComputedStyle(current).position === 'fixed') return current;
-          current = current.parentElement;
+          current = current.parentElement || current.getRootNode?.().host || null;
         }
         return null;
       };
 
       const seloCurrencyControl = () => {
         const codes = [...(countryCurrency?.options || [])].map((option) => option.dataset.currencyCode);
-        return [...document.querySelectorAll('button, [role="button"]')].find((element) => {
+        return queryIncludingShadowRoots('button, [role="button"]').find((element) => {
           if (localizationDrawer?.contains(element) || !elementIsVisible(element)) return false;
           return fixedContainer(element) && codes.includes(currencyCodeFrom(element));
         });
       };
 
       const markSeloWidget = () => {
+        queryIncludingShadowRoots('iframe').forEach((frame) => {
+          const identity = `${frame.src || ''} ${frame.title || ''} ${frame.name || ''}`.toLowerCase();
+          const container = fixedContainer(frame);
+          const bounds = container?.getBoundingClientRect();
+          const isCornerWidget = bounds && bounds.width <= 420 && bounds.height <= 640
+            && bounds.right >= window.innerWidth - 32 && bounds.bottom >= window.innerHeight - 32;
+          if (container && (/(selo|currency)/.test(identity) || isCornerWidget)) {
+            container.dataset.greyeximSeloWidget = '';
+          }
+        });
+
         const control = seloCurrencyControl();
         if (!control) return;
         const widget = fixedContainer(control);
@@ -197,7 +216,7 @@
       const syncSeloCurrency = (currencyCode) => new Promise((resolve) => {
         if (!currencyCode) return resolve();
 
-        const nativeSelect = [...document.querySelectorAll('select')].find((select) => {
+        const nativeSelect = queryIncludingShadowRoots('select').find((select) => {
           if (localizationDrawer?.contains(select) || !fixedContainer(select)) return false;
           return [...select.options].some((option) => currencyCodeFrom(option) === currencyCode);
         });
@@ -214,7 +233,7 @@
         if (!control || currencyCodeFrom(control) === currencyCode) return resolve();
         control.click();
         window.setTimeout(() => {
-          const option = [...document.querySelectorAll('button, [role="option"], [role="menuitem"], li')].find((element) => {
+          const option = queryIncludingShadowRoots('button, [role="option"], [role="menuitem"], li').find((element) => {
             if (localizationDrawer?.contains(element) || element === control || !elementIsVisible(element)) return false;
             const isPopupOption = element.matches('[role="option"], [role="menuitem"]') || fixedContainer(element);
             return isPopupOption && currencyCodeFrom(element) === currencyCode;
@@ -238,7 +257,7 @@
       markSeloWidget();
       const seloObserver = new MutationObserver(markSeloWidget);
       seloObserver.observe(document.body, { childList: true, subtree: true });
-      window.setTimeout(() => seloObserver.disconnect(), 10000);
+      window.addEventListener('load', markSeloWidget, { once: true });
 
       const closeLocalization = () => {
         if (!localizationDrawer?.classList.contains('is-open')) return;
