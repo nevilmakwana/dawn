@@ -89,14 +89,14 @@ html.prada-drawer-open, html.prada-drawer-open body { overflow: hidden; }
   .prada-product__media:first-child img,
   .prada-product__media:first-child video { transform: translate3d(0, 0, 0); transition: transform .72s cubic-bezier(.22, 1, .36, 1); }
   .prada-product.mobile-gallery-onboarding .prada-product__media:first-child img,
-  .prada-product.mobile-gallery-onboarding .prada-product__media:first-child video { transform: translate3d(0, -14px, 0); }
+  .prada-product.mobile-gallery-onboarding .prada-product__media:first-child video { animation: prada-mobile-gallery-nudge 3.2s cubic-bezier(.22, 1, .36, 1) both; }
   .prada-product__gallery > .prada-product__wishlist,
   .prada-product__gallery > .prada-product__wishlist.is-on-last-media { position: absolute; top: 14px; right: 14px; display: grid; width: 40px; height: 40px; margin: 0; padding: 8px; color: #000; }
   .prada-product__gallery > .prada-product__wishlist svg { width: 24px; height: 24px; }
   .prada-product__dots { position: absolute; left: 14px; bottom: 50%; flex-direction: column; transform: translateY(50%); }
   .prada-product__scroll-hint { position: absolute; z-index: 4; right: 0; bottom: 0; left: 0; display: block; padding: 15px 20px; background: rgba(20, 20, 20, .55); color: #fff; font-size: 14px; line-height: 1.2; font-weight: 600; text-align: center; opacity: 0; pointer-events: none; transform: translate3d(0, 100%, 0); transition: opacity .58s cubic-bezier(.22, 1, .36, 1), transform .68s cubic-bezier(.22, 1, .36, 1); will-change: opacity, transform; }
   .prada-product__scroll-hint.is-visible { opacity: 1; transform: translateY(0); }
-  .prada-product.mobile-gallery-onboarding .prada-product__scroll-hint { opacity: 1; transform: translateY(0); }
+  .prada-product.mobile-gallery-onboarding .prada-product__scroll-hint { animation: prada-mobile-scroll-hint 3.2s cubic-bezier(.22, 1, .36, 1) both; }
   .prada-product__panel { position: relative; z-index: 0; min-height: 0; overflow: visible; border-radius: 4px 4px 0 0; background: #fff; scroll-margin-top: var(--header-height, 56px); }
   .prada-product__info { position: static; width: auto; margin: 0; padding: 16px 18px 84px; }
   .prada-product__sheet-handle { position: sticky; z-index: 1; top: var(--header-height, 56px); display: grid; place-items: center; width: 100%; height: 42px; padding: 0; border: 0; background: #fff; cursor: grab; touch-action: pan-y; }
@@ -117,10 +117,24 @@ html.prada-drawer-open, html.prada-drawer-open body { overflow: hidden; }
   .prada-product__drawer-body { padding: 32px 20px; }
 }
 
+@keyframes prada-mobile-gallery-nudge {
+  0%, 12%, 100% { transform: translate3d(0, 0, 0); }
+  30%, 78% { transform: translate3d(0, -18px, 0); }
+}
+
+@keyframes prada-mobile-scroll-hint {
+  0%, 12% { opacity: 0; transform: translate3d(0, 100%, 0); }
+  30%, 78% { opacity: 1; transform: translate3d(0, 0, 0); }
+  100% { opacity: 0; transform: translate3d(0, 100%, 0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .prada-product__scroll-hint { transition-duration: .01ms; }
   .prada-product__media:first-child img,
   .prada-product__media:first-child video { transition-duration: .01ms; }
+  .prada-product.mobile-gallery-onboarding .prada-product__scroll-hint,
+  .prada-product.mobile-gallery-onboarding .prada-product__media:first-child img,
+  .prada-product.mobile-gallery-onboarding .prada-product__media:first-child video { animation-duration: .01ms; }
 }
 
 @media screen and (min-width: 990px) and (max-width: 1199px) {

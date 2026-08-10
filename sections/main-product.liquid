@@ -547,7 +547,7 @@
       onboardingTimer = window.setTimeout(() => {
         root.classList.remove('mobile-gallery-onboarding');
         scrollHintConsumed = true;
-      }, 2400);
+      }, 3200);
     };
 
     const closeMobileSheet = () => {
@@ -664,9 +664,9 @@
     });
 
     if (document.readyState === 'complete') {
-      window.setTimeout(playMobileOnboarding, 280);
+      window.setTimeout(playMobileOnboarding, 650);
     } else {
-      window.addEventListener('load', () => window.setTimeout(playMobileOnboarding, 280), { once: true });
+      window.addEventListener('load', () => window.setTimeout(playMobileOnboarding, 650), { once: true });
     }
 
     root.querySelectorAll('.prada-product__media video').forEach((video) => {
