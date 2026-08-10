@@ -105,7 +105,7 @@
       <p>&copy; {{ shop.name | escape }} 2007 - {{ 'now' | date: '%Y' }}</p>
       <button type="button" class="prada-footer__shipping" data-prada-localization-open aria-haspopup="dialog" aria-controls="PradaLocalizationDrawer-{{ section.id }}">
         <svg class="prada-footer__globe" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.2 3.6 8.5S14.4 18.2 12 20.5M12 3.5C9.6 5.8 8.4 8.7 8.4 12s1.2 6.2 3.6 8.5"/></svg>
-        <span>Shipping to: {{ localization.country.name | escape }} / {{ localization.language.endonym_name | escape }}</span>
+        <span>Shipping to: {{ localization.country.name | escape }} — {{ localization.country.currency.iso_code }} / {{ localization.language.endonym_name | escape }}</span>
       </button>
     </div>
 
@@ -118,9 +118,9 @@
           {%- form 'localization', id: 'PradaLocalizationForm', class: 'prada-localization-drawer__form' -%}
             <label class="prada-localization-drawer__field">
               <span class="visually-hidden">Country or region</span>
-              <select name="country_code" aria-label="Country or region">
+              <select name="country_code" aria-label="Country and currency" data-prada-country-currency>
                 {%- for country in localization.available_countries -%}
-                  <option value="{{ country.iso_code }}"{% if country.iso_code == localization.country.iso_code %} selected{% endif %}>
+                  <option value="{{ country.iso_code }}" data-currency-code="{{ country.currency.iso_code }}"{% if country.iso_code == localization.country.iso_code %} selected{% endif %}>
                     {{- country.name }} — {{ country.currency.iso_code }} {{ country.currency.symbol -}}
                   </option>
                 {%- endfor -%}
@@ -154,7 +154,88 @@
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
       const groups = [...footer.querySelectorAll('.prada-footer__group')];
       const localizationDrawer = footer.querySelector('[data-prada-localization-drawer]');
+      const localizationForm = localizationDrawer?.querySelector('.prada-localization-drawer__form');
+      const countryCurrency = localizationDrawer?.querySelector('[data-prada-country-currency]');
       let localizationTrigger = null;
+
+      const elementIsVisible = (element) => {
+        if (!element) return false;
+        const style = window.getComputedStyle(element);
+        return style.display !== 'none' && style.visibility !== 'hidden';
+      };
+
+      const currencyCodeFrom = (element) => {
+        const match = element?.textContent?.toUpperCase().match(/\b[A-Z]{3}\b/);
+        return match?.[0] || '';
+      };
+
+      const seloCurrencyControl = () => {
+        const codes = [...(countryCurrency?.options || [])].map((option) => option.dataset.currencyCode);
+        return [...document.querySelectorAll('button, [role="button"]')].find((element) => {
+          if (localizationDrawer?.contains(element) || !elementIsVisible(element)) return false;
+          return codes.includes(currencyCodeFrom(element));
+        });
+      };
+
+      const markSeloWidget = () => {
+        const control = seloCurrencyControl();
+        if (!control) return;
+        let widget = control;
+        let parent = control.parentElement;
+        while (parent && parent !== document.body) {
+          if (window.getComputedStyle(parent).position === 'fixed') {
+            widget = parent;
+            break;
+          }
+          parent = parent.parentElement;
+        }
+        widget.dataset.greyeximSeloWidget = '';
+      };
+
+      const syncSeloCurrency = (currencyCode) => new Promise((resolve) => {
+        if (!currencyCode) return resolve();
+
+        const nativeSelect = [...document.querySelectorAll('select')].find((select) => {
+          if (localizationDrawer?.contains(select)) return false;
+          return [...select.options].some((option) => currencyCodeFrom(option) === currencyCode);
+        });
+        if (nativeSelect) {
+          const option = [...nativeSelect.options].find((item) => currencyCodeFrom(item) === currencyCode);
+          if (option) {
+            nativeSelect.value = option.value;
+            nativeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+          return window.setTimeout(resolve, 180);
+        }
+
+        const control = seloCurrencyControl();
+        if (!control || currencyCodeFrom(control) === currencyCode) return resolve();
+        control.click();
+        window.setTimeout(() => {
+          const option = [...document.querySelectorAll('button, [role="option"], [role="menuitem"], li')].find((element) => {
+            if (localizationDrawer?.contains(element) || element === control || !elementIsVisible(element)) return false;
+            return currencyCodeFrom(element) === currencyCode;
+          });
+          option?.click();
+          window.setTimeout(resolve, 180);
+        }, 80);
+      });
+
+      if (localizationForm && countryCurrency) {
+        localizationForm.addEventListener('submit', async (event) => {
+          if (localizationForm.dataset.currencySynced === 'true') return;
+          event.preventDefault();
+          const selected = countryCurrency.options[countryCurrency.selectedIndex];
+          await syncSeloCurrency(selected?.dataset.currencyCode);
+          localizationForm.dataset.currencySynced = 'true';
+          localizationForm.submit();
+        });
+      }
+
+      markSeloWidget();
+      const seloObserver = new MutationObserver(markSeloWidget);
+      seloObserver.observe(document.body, { childList: true, subtree: true });
+      window.setTimeout(() => seloObserver.disconnect(), 10000);
 
       const closeLocalization = () => {
         if (!localizationDrawer?.classList.contains('is-open')) return;
@@ -588,7 +669,7 @@
         <a class="prada-mobile-footer__link" href="/pages/contact">Store locator</a>
       </div>
       <div class="prada-mobile-footer__utility">
-        <button type="button" class="prada-mobile-footer__localization" data-prada-localization-open aria-haspopup="dialog" aria-controls="PradaLocalizationDrawer-{{ section.id }}">Shipping to: {{ localization.country.name | escape }} / {{ localization.language.endonym_name | escape }}</button>
+        <button type="button" class="prada-mobile-footer__localization" data-prada-localization-open aria-haspopup="dialog" aria-controls="PradaLocalizationDrawer-{{ section.id }}">Shipping to: {{ localization.country.name | escape }} — {{ localization.country.currency.iso_code }} / {{ localization.language.endonym_name | escape }}</button>
       </div>
       <div class="prada-mobile-footer__utility prada-mobile-footer__copyright">
         <span>&copy; {{ shop.name | escape }} {{ 'now' | date: '%Y' }}</span>

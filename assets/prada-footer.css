@@ -207,6 +207,11 @@
 
 .prada-localization-open { overflow: hidden; }
 
+[data-greyexim-selo-widget] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 .prada-localization-drawer {
   position: fixed;
   z-index: 6000;
