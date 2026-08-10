@@ -97,9 +97,9 @@ html.prada-drawer-open, html.prada-drawer-open body { overflow: hidden; }
   .prada-product__scroll-hint { position: absolute; z-index: 4; right: 0; bottom: 0; left: 0; display: block; padding: 15px 20px; background: rgba(20, 20, 20, .55); color: #fff; font-size: 14px; line-height: 1.2; font-weight: 600; text-align: center; opacity: 0; pointer-events: none; transform: translate3d(0, 100%, 0); transition: opacity .58s cubic-bezier(.22, 1, .36, 1), transform .68s cubic-bezier(.22, 1, .36, 1); will-change: opacity, transform; }
   .prada-product__scroll-hint.is-visible { opacity: 1; transform: translateY(0); }
   .prada-product.mobile-gallery-onboarding .prada-product__scroll-hint { opacity: 1; transform: translateY(0); }
-  .prada-product__panel { position: relative; min-height: 0; overflow: visible; border-radius: 4px 4px 0 0; background: #fff; scroll-margin-top: var(--header-height, 56px); }
+  .prada-product__panel { position: relative; z-index: 0; min-height: 0; overflow: visible; border-radius: 4px 4px 0 0; background: #fff; scroll-margin-top: var(--header-height, 56px); }
   .prada-product__info { position: static; width: auto; margin: 0; padding: 16px 18px 84px; }
-  .prada-product__sheet-handle { position: sticky; z-index: 5; top: var(--header-height, 56px); display: grid; place-items: center; width: 100%; height: 42px; padding: 0; border: 0; background: #fff; cursor: grab; touch-action: pan-y; }
+  .prada-product__sheet-handle { position: sticky; z-index: 1; top: var(--header-height, 56px); display: grid; place-items: center; width: 100%; height: 42px; padding: 0; border: 0; background: #fff; cursor: grab; touch-action: pan-y; }
   .prada-product.mobile-info-open .prada-product__panel { box-shadow: 0 -10px 28px rgba(0, 0, 0, .08); }
   .prada-product__sheet-handle span { display: block; width: 54px; height: 3px; border-radius: 3px; background: #111; }
   .prada-product__heading-row h1 { font-size: 20px; line-height: 1.32; }

@@ -1743,7 +1743,7 @@
     body:has([id^='MainProduct-']) .section-header {
       position: fixed !important;
       inset: 0 0 auto !important;
-      z-index: 1300 !important;
+      z-index: 5000 !important;
       isolation: isolate;
     }
 
@@ -1752,6 +1752,10 @@
       z-index: 1 !important;
       background: #ffffff !important;
       border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
+    }
+
+    body:has([id^='MainProduct-']) .section-header .prada-header {
+      background: #ffffff !important;
     }
 
     body:has([id^='MainProduct-']) #MainContent {
