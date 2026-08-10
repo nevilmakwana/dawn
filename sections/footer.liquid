@@ -169,26 +169,28 @@
         return match?.[0] || '';
       };
 
+      const fixedContainer = (element) => {
+        let current = element;
+        while (current && current !== document.body) {
+          if (window.getComputedStyle(current).position === 'fixed') return current;
+          current = current.parentElement;
+        }
+        return null;
+      };
+
       const seloCurrencyControl = () => {
         const codes = [...(countryCurrency?.options || [])].map((option) => option.dataset.currencyCode);
         return [...document.querySelectorAll('button, [role="button"]')].find((element) => {
           if (localizationDrawer?.contains(element) || !elementIsVisible(element)) return false;
-          return codes.includes(currencyCodeFrom(element));
+          return fixedContainer(element) && codes.includes(currencyCodeFrom(element));
         });
       };
 
       const markSeloWidget = () => {
         const control = seloCurrencyControl();
         if (!control) return;
-        let widget = control;
-        let parent = control.parentElement;
-        while (parent && parent !== document.body) {
-          if (window.getComputedStyle(parent).position === 'fixed') {
-            widget = parent;
-            break;
-          }
-          parent = parent.parentElement;
-        }
+        const widget = fixedContainer(control);
+        if (!widget) return;
         widget.dataset.greyeximSeloWidget = '';
       };
 
@@ -196,7 +198,7 @@
         if (!currencyCode) return resolve();
 
         const nativeSelect = [...document.querySelectorAll('select')].find((select) => {
-          if (localizationDrawer?.contains(select)) return false;
+          if (localizationDrawer?.contains(select) || !fixedContainer(select)) return false;
           return [...select.options].some((option) => currencyCodeFrom(option) === currencyCode);
         });
         if (nativeSelect) {
@@ -214,7 +216,8 @@
         window.setTimeout(() => {
           const option = [...document.querySelectorAll('button, [role="option"], [role="menuitem"], li')].find((element) => {
             if (localizationDrawer?.contains(element) || element === control || !elementIsVisible(element)) return false;
-            return currencyCodeFrom(element) === currencyCode;
+            const isPopupOption = element.matches('[role="option"], [role="menuitem"]') || fixedContainer(element);
+            return isPopupOption && currencyCodeFrom(element) === currencyCode;
           });
           option?.click();
           window.setTimeout(resolve, 180);
