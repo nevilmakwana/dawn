@@ -97,34 +97,7 @@
 
   @media screen and (min-width: 990px) {
     .prada-header {
-      height: 68px !important;
-      min-height: 68px !important;
-      padding: 0 24px !important;
-    }
-
-    .prada-header header-drawer summary.header__icon,
-    .prada-header .header__search summary.header__icon {
-      min-width: 32px !important;
-      height: 44px !important;
-      padding: 6px 8px !important;
-    }
-
-    .prada-header header-drawer summary .prada-menu-icon-wrapper,
-    .prada-header header-drawer summary .prada-menu-icon-wrapper svg {
-      width: 16px !important;
-      height: 16px !important;
-    }
-
-    .prada-header .header__search summary .svg-wrapper:not(.header__icon-close),
-    .prada-header .header__search summary .prada-search-icon-wrapper,
-    .prada-header .header__search summary .svg-wrapper:not(.header__icon-close) svg,
-    .prada-header .header__search summary .prada-search-icon-wrapper svg {
-      width: 17px !important;
-      height: 17px !important;
-    }
-
-    .prada-header-logo .header__heading-logo {
-      max-height: 30px;
+      padding: 12px 24px !important;
     }
   }
 
@@ -1675,6 +1648,49 @@
     .header {
       padding-top: {{ section.settings.padding_top }}px;
       padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+
+    /* Final desktop sizing: keep this after generated theme settings so they cannot override it. */
+    .section-header,
+    .section-header .header-wrapper,
+    .section-header .header-wrapper > header.prada-header,
+    .section-header .header-wrapper > .prada-header {
+      height: 68px !important;
+      min-height: 68px !important;
+      max-height: 68px !important;
+    }
+
+    .section-header .prada-header {
+      box-sizing: border-box !important;
+      padding: 0 24px !important;
+    }
+
+    .section-header .prada-header-logo .header__heading-logo {
+      width: 160px !important;
+      max-width: 160px !important;
+      max-height: 30px !important;
+      object-fit: contain !important;
+    }
+
+    .section-header .prada-header header-drawer > details > summary .prada-menu-icon-wrapper,
+    .section-header .prada-header header-drawer > details > summary .prada-menu-glyph,
+    .section-header .prada-header header-drawer > details > summary .prada-close-glyph {
+      width: 15px !important;
+      height: 15px !important;
+      transform: none !important;
+    }
+
+    .section-header .prada-header header-drawer > details > summary .prada-menu-glyph {
+      transform: none !important;
+    }
+
+    .section-header .prada-header .header__search summary .svg-wrapper:not(.header__icon-close),
+    .section-header .prada-header .header__search summary .svg-wrapper:not(.header__icon-close) svg,
+    .section-header .prada-header .header__search summary .prada-search-icon-wrapper,
+    .section-header .prada-header .header__search summary .prada-search-icon-wrapper svg {
+      width: 17px !important;
+      height: 17px !important;
+      transform: none !important;
     }
   }
 {%- endstyle -%}
