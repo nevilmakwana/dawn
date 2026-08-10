@@ -184,10 +184,130 @@
   gap: 10px;
   min-width: 310px;
   padding: 0 28px;
+  border: 0;
   border-left: 1px solid #ddd;
   font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.prada-mobile-footer__localization {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.prada-localization-open { overflow: hidden; }
+
+.prada-localization-drawer {
+  position: fixed;
+  z-index: 6000;
+  inset: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.prada-localization-drawer.is-open {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.prada-localization-drawer__overlay {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, .68);
+  opacity: 0;
+  transition: opacity 320ms ease;
+}
+
+.prada-localization-drawer.is-open .prada-localization-drawer__overlay { opacity: 1; }
+
+.prada-localization-drawer__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(50vw, 960px);
+  height: 100dvh;
+  overflow-y: auto;
+  background: #fff;
+  color: #000;
+  transform: translate3d(100%, 0, 0);
+  transition: transform 420ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.prada-localization-drawer.is-open .prada-localization-drawer__panel { transform: translate3d(0, 0, 0); }
+
+.prada-localization-drawer__close {
+  position: absolute;
+  top: 42px;
+  right: 42px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #000;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.prada-localization-drawer__content {
+  width: min(100% - 64px, 600px);
+  margin: 0 auto;
+  padding-top: clamp(150px, 25vh, 260px);
+}
+
+.prada-localization-drawer__content h2 {
+  margin: 0 0 32px;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-transform: none;
+}
+
+.prada-localization-drawer__form { display: grid; gap: 16px; }
+
+.prada-localization-drawer__field select {
+  width: 100%;
+  min-height: 58px;
+  padding: 0 52px 0 14px;
+  border: 1px solid #111;
+  border-radius: 0;
+  background-color: #fff;
+  color: #000;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.prada-localization-drawer__confirm {
+  min-height: 58px;
+  margin-top: 8px;
+  border: 1px solid #000;
+  border-radius: 0;
+  background: #000;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.prada-localization-drawer__note {
+  margin: 26px 8px 0;
+  font-size: 10px;
+  line-height: 1.45;
 }
 
 .prada-footer__globe {
@@ -201,6 +321,10 @@
 }
 
 @media screen and (max-width: 989px) {
+  .prada-localization-drawer__panel { width: 100%; }
+  .prada-localization-drawer__close { top: 18px; right: 18px; }
+  .prada-localization-drawer__content { width: calc(100% - 36px); padding-top: 110px; }
+
   .prada-footer {
     display: block;
     font-size: 10px;

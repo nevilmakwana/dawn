@@ -103,10 +103,45 @@
 
     <div class="prada-footer__bottom">
       <p>&copy; {{ shop.name | escape }} 2007 - {{ 'now' | date: '%Y' }}</p>
-      <div class="prada-footer__shipping" aria-label="Current shipping destination and language">
+      <button type="button" class="prada-footer__shipping" data-prada-localization-open aria-haspopup="dialog" aria-controls="PradaLocalizationDrawer-{{ section.id }}">
         <svg class="prada-footer__globe" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.2 3.6 8.5S14.4 18.2 12 20.5M12 3.5C9.6 5.8 8.4 8.7 8.4 12s1.2 6.2 3.6 8.5"/></svg>
         <span>Shipping to: {{ localization.country.name | escape }} / {{ localization.language.endonym_name | escape }}</span>
-      </div>
+      </button>
+    </div>
+
+    <div id="PradaLocalizationDrawer-{{ section.id }}" class="prada-localization-drawer" data-prada-localization-drawer role="dialog" aria-modal="true" aria-labelledby="PradaLocalizationTitle-{{ section.id }}" aria-hidden="true">
+      <button type="button" class="prada-localization-drawer__overlay" data-prada-localization-close aria-label="Close location and language selector"></button>
+      <aside class="prada-localization-drawer__panel">
+        <button type="button" class="prada-localization-drawer__close" data-prada-localization-close aria-label="Close location and language selector">&times;</button>
+        <div class="prada-localization-drawer__content">
+          <h2 id="PradaLocalizationTitle-{{ section.id }}">Select location and language</h2>
+          {%- form 'localization', id: 'PradaLocalizationForm', class: 'prada-localization-drawer__form' -%}
+            <label class="prada-localization-drawer__field">
+              <span class="visually-hidden">Country or region</span>
+              <select name="country_code" aria-label="Country or region">
+                {%- for country in localization.available_countries -%}
+                  <option value="{{ country.iso_code }}"{% if country.iso_code == localization.country.iso_code %} selected{% endif %}>
+                    {{- country.name }} — {{ country.currency.iso_code }} {{ country.currency.symbol -}}
+                  </option>
+                {%- endfor -%}
+              </select>
+            </label>
+            <label class="prada-localization-drawer__field">
+              <span class="visually-hidden">Language</span>
+              <select name="language_code" aria-label="Language">
+                {%- for language in localization.available_languages -%}
+                  <option value="{{ language.iso_code }}"{% if language.iso_code == localization.language.iso_code %} selected{% endif %}>
+                    {{- language.endonym_name | capitalize -}}
+                  </option>
+                {%- endfor -%}
+              </select>
+            </label>
+            <input type="hidden" name="return_to" value="{{ request.path }}">
+            <button type="submit" class="prada-localization-drawer__confirm">Confirm</button>
+          {%- endform -%}
+          <p class="prada-localization-drawer__note">Prices and currency follow the Shopify Market assigned to the selected destination.</p>
+        </div>
+      </aside>
     </div>
   </div>
 
@@ -118,6 +153,34 @@
       const mobile = window.matchMedia('(max-width: 989px)');
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
       const groups = [...footer.querySelectorAll('.prada-footer__group')];
+      const localizationDrawer = footer.querySelector('[data-prada-localization-drawer]');
+      let localizationTrigger = null;
+
+      const closeLocalization = () => {
+        if (!localizationDrawer?.classList.contains('is-open')) return;
+        localizationDrawer.classList.remove('is-open');
+        localizationDrawer.setAttribute('aria-hidden', 'true');
+        document.documentElement.classList.remove('prada-localization-open');
+        localizationTrigger?.focus();
+      };
+
+      const openLocalization = (trigger) => {
+        if (!localizationDrawer) return;
+        localizationTrigger = trigger;
+        localizationDrawer.classList.add('is-open');
+        localizationDrawer.setAttribute('aria-hidden', 'false');
+        document.documentElement.classList.add('prada-localization-open');
+        window.requestAnimationFrame(() => localizationDrawer.querySelector('select')?.focus());
+      };
+
+      document.addEventListener('click', (event) => {
+        const opener = event.target.closest('[data-prada-localization-open]');
+        if (opener?.getAttribute('aria-controls') === localizationDrawer?.id) openLocalization(opener);
+      });
+      footer.querySelectorAll('[data-prada-localization-close]').forEach((closer) => closer.addEventListener('click', closeLocalization));
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && localizationDrawer?.classList.contains('is-open')) closeLocalization();
+      });
 
       const syncGroups = () => groups.forEach((group) => { group.open = !mobile.matches; });
       syncGroups();
@@ -525,7 +588,7 @@
         <a class="prada-mobile-footer__link" href="/pages/contact">Store locator</a>
       </div>
       <div class="prada-mobile-footer__utility">
-        <span>Shipping to: {{ localization.country.name | escape }} / {{ localization.language.endonym_name | escape }}</span>
+        <button type="button" class="prada-mobile-footer__localization" data-prada-localization-open aria-haspopup="dialog" aria-controls="PradaLocalizationDrawer-{{ section.id }}">Shipping to: {{ localization.country.name | escape }} / {{ localization.language.endonym_name | escape }}</button>
       </div>
       <div class="prada-mobile-footer__utility prada-mobile-footer__copyright">
         <span>&copy; {{ shop.name | escape }} {{ 'now' | date: '%Y' }}</span>
