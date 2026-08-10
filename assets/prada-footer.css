@@ -240,6 +240,7 @@
   overflow-y: auto;
   background: #fff;
   color: #000;
+  font-family: Arial, Helvetica, sans-serif;
   transform: translate3d(100%, 0, 0);
   transition: transform 420ms cubic-bezier(.22, 1, .36, 1);
 }
@@ -248,15 +249,16 @@
 
 .prada-localization-drawer__close {
   position: absolute;
-  top: 42px;
-  right: 42px;
-  width: 36px;
-  height: 36px;
+  top: 32px;
+  right: 32px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   border: 0;
   background: transparent;
   color: #000;
-  font-size: 28px;
+  font-size: 20px;
+  font-weight: 700;
   line-height: 1;
   cursor: pointer;
 }
@@ -264,12 +266,12 @@
 .prada-localization-drawer__content {
   width: min(100% - 64px, 600px);
   margin: 0 auto;
-  padding-top: clamp(150px, 25vh, 260px);
+  padding-top: 135px;
 }
 
 .prada-localization-drawer__content h2 {
   margin: 0 0 32px;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
   line-height: 1.25;
   text-transform: none;
@@ -277,28 +279,66 @@
 
 .prada-localization-drawer__form { display: grid; gap: 16px; }
 
+.prada-localization-drawer__field {
+  position: relative;
+  display: block;
+}
+
+.prada-localization-drawer__field::before {
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  right: 46px;
+  bottom: 12px;
+  width: 1px;
+  background: #999;
+  content: '';
+  pointer-events: none;
+}
+
+.prada-localization-drawer__field::after {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  right: 20px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #000;
+  border-bottom: 2px solid #000;
+  content: '';
+  pointer-events: none;
+  transform: translateY(-70%) rotate(45deg);
+}
+
 .prada-localization-drawer__field select {
   width: 100%;
-  min-height: 58px;
+  min-height: 56px;
   padding: 0 52px 0 14px;
   border: 1px solid #111;
   border-radius: 0;
   background-color: #fff;
   color: #000;
   font: inherit;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.prada-localization-drawer__field select:focus-visible {
+  outline: 2px solid #1d16ff;
+  outline-offset: -3px;
 }
 
 .prada-localization-drawer__confirm {
-  min-height: 58px;
+  min-height: 56px;
   margin-top: 8px;
   border: 1px solid #000;
   border-radius: 0;
   background: #000;
   color: #fff;
   font: inherit;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   cursor: pointer;
@@ -323,7 +363,7 @@
 @media screen and (max-width: 989px) {
   .prada-localization-drawer__panel { width: 100%; }
   .prada-localization-drawer__close { top: 18px; right: 18px; }
-  .prada-localization-drawer__content { width: calc(100% - 36px); padding-top: 110px; }
+  .prada-localization-drawer__content { width: calc(100% - 36px); padding-top: 96px; }
 
   .prada-footer {
     display: block;
