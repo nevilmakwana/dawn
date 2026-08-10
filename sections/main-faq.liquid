@@ -20,11 +20,7 @@
         <div class="prada-faq__suggested">
           {%- for block in section.blocks -%}
             {%- if block.settings.suggested -%}
-              {%- if block.settings.topic == 'shipments' -%}
-                <a href="/pages/contact?view=shipping-policy">{{ block.settings.question | escape }}</a>
-              {%- else -%}
-                <a href="#faq-{{ block.id }}" data-faq-question-link data-faq-topic="{{ block.settings.topic }}">{{ block.settings.question | escape }}</a>
-              {%- endif -%}
+              <a href="#faq-{{ block.id }}" data-faq-question-link data-faq-topic="{{ block.settings.topic }}">{{ block.settings.question | escape }}</a>
             {%- endif -%}
           {%- endfor -%}
         </div>
@@ -35,7 +31,7 @@
             <a href="#topic-online" data-faq-topic-link="online"><span aria-hidden="true">▢</span><strong>Online purchase</strong><b aria-hidden="true">›</b></a>
             <a href="#topic-account" data-faq-topic-link="account"><span aria-hidden="true">♙</span><strong>Personal account</strong><b aria-hidden="true">›</b></a>
             <a href="#topic-returns" data-faq-topic-link="returns"><span aria-hidden="true">↩</span><strong>Returns</strong><b aria-hidden="true">›</b></a>
-            <a href="/pages/contact?view=shipping-policy"><span aria-hidden="true">▱</span><strong>Shipments</strong><b aria-hidden="true">›</b></a>
+            <a href="#topic-shipments" data-faq-topic-link="shipments"><span aria-hidden="true">▱</span><strong>Shipments</strong><b aria-hidden="true">›</b></a>
           </div>
         </div>
       </div>
