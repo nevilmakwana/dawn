@@ -4,7 +4,7 @@ body:has(.prada-shipping-policy) .footer {
 
 .prada-shipping-policy {
   display: grid;
-  grid-template-columns: 296px minmax(0, 1fr);
+  grid-template-columns: 15.45vw minmax(0, 1fr);
   min-height: calc(100vh - var(--header-height, 88px));
   border-top: 1px solid #dedede;
   color: #0b0b0b;
@@ -47,13 +47,15 @@ body:has(.prada-shipping-policy) .footer {
 }
 
 .prada-shipping-policy__main {
-  width: min(100%, 720px);
+  width: 34.8vw;
+  max-width: calc(100% - 52px);
   margin: 0 auto;
-  padding: 38px 26px 88px;
+  padding: 86px 26px 88px;
 }
 
 .prada-shipping-policy__back {
-  display: inline-flex;
+  display: inline-flex !important;
+  visibility: visible !important;
   align-items: center;
   gap: 11px;
   margin-bottom: 27px;
@@ -74,7 +76,7 @@ body:has(.prada-shipping-policy) .footer {
   margin: 0 0 27px;
   color: #111;
   font-family: inherit;
-  font-size: 21px;
+  font-size: 20px;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -101,7 +103,7 @@ body:has(.prada-shipping-policy) .footer {
   position: relative;
   display: flex;
   align-items: center;
-  min-height: 60px;
+  min-height: 61px;
   padding: 17px 48px 17px 27px;
   color: #111;
   font-size: 13px;
