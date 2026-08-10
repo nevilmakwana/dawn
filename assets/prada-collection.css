@@ -432,6 +432,11 @@ body:has(.prada-collection) .section-header {
     font-size: 1.05rem;
   }
 
+  .prada-collection__filter-menu,
+  .prada-collection__control-divider {
+    display: none !important;
+  }
+
   .prada-collection__sort span {
     display: none;
   }
