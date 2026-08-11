@@ -40,6 +40,7 @@
 .prada-footer__group--contact { grid-area: contact; }
 .prada-footer__group--services { grid-area: services; }
 .prada-footer__group--legal { grid-area: legal; }
+.prada-footer__group--company { display: none; }
 
 .prada-footer h2,
 .prada-footer summary {
@@ -367,23 +368,50 @@
 
   .prada-footer {
     display: block;
-    font-size: 10px;
+    font-size: 12px;
+    line-height: 1.4;
   }
 
   .prada-footer__newsletter,
   .prada-footer__group {
     min-height: 0;
-    padding: 29px 15px;
+    padding-inline: 16px;
   }
 
-  .prada-footer__newsletter { padding-top: 28px; padding-bottom: 35px; }
-  .prada-footer h2 { margin-bottom: 23px; }
+  .prada-footer__newsletter { padding-top: 38px; padding-bottom: 42px; }
+  .prada-footer h2 {
+    margin-bottom: 30px;
+    font-size: 12px;
+    line-height: 1.2;
+  }
   .prada-footer__field { max-width: none; }
-  .prada-footer__privacy { max-width: none; margin-top: 16px; }
+  .prada-footer__field input {
+    height: 42px;
+    font-size: 14px;
+  }
+  .prada-footer__field button {
+    width: 42px;
+    height: 42px;
+  }
+  .prada-footer__field svg { width: 30px; height: 30px; }
+  .prada-footer__privacy {
+    max-width: none;
+    margin: 18px 0 32px;
+    font-size: 10px;
+    line-height: 1.45;
+  }
+  .prada-footer__social { gap: 24px; }
+  .prada-footer__social a { width: 18px; height: 18px; }
+  .prada-footer__social svg,
+  .prada-footer__social .icon { width: 17px; height: 17px; }
 
   .prada-footer__group {
+    padding-top: 0;
+    padding-bottom: 0;
     border-top: 1px solid #ddd;
   }
+
+  .prada-footer__group--company { display: block; }
 
   .prada-footer__group:last-of-type { border-bottom: 1px solid #ddd; }
 
@@ -391,27 +419,34 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 42px;
-    margin: -15px 0;
+    min-height: 76px;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.2;
     cursor: pointer;
     pointer-events: auto;
   }
 
   .prada-footer__chevron {
     display: block;
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-right: 1.5px solid #000;
     border-bottom: 1.5px solid #000;
     transform: rotate(45deg);
-    transition: transform .25s ease;
+    transition: transform 320ms cubic-bezier(.22, 1, .36, 1);
   }
 
   .prada-footer__group[open] .prada-footer__chevron { transform: rotate(225deg); }
 
   .prada-footer__group-content {
-    padding: 29px 0 3px;
+    padding: 0 0 30px;
     overflow: hidden;
+    will-change: height;
+  }
+
+  .prada-footer__group-content ul {
+    gap: 14px;
   }
 
   .prada-footer__bottom {
@@ -425,16 +460,16 @@
     justify-content: center;
     width: 100%;
     min-width: 0;
-    min-height: 68px;
-    padding: 15px;
+    min-height: 78px;
+    padding: 18px 16px;
     border: 0;
     border-bottom: 1px solid #ddd;
   }
 
   .prada-footer__bottom p {
     width: 100%;
-    min-height: 58px;
-    padding: 23px 15px;
+    min-height: 68px;
+    padding: 26px 16px;
     text-align: center;
   }
 }

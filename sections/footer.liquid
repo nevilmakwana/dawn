@@ -90,6 +90,15 @@
       </ul></div>
     </details>
 
+    <details class="prada-footer__group prada-footer__group--company" open>
+      <summary><span>Company</span><span class="prada-footer__chevron" aria-hidden="true"></span></summary>
+      <div class="prada-footer__group-content"><ul>
+        <li><a href="{{ routes.root_url }}">Grey Exim</a></li>
+        <li><a href="{{ routes.all_products_collection_url }}">All products</a></li>
+        <li><a href="/pages/contact">Contact us</a></li>
+      </ul></div>
+    </details>
+
     <details class="prada-footer__group prada-footer__group--legal" open>
       <summary><span>Legal terms and conditions</span><span class="prada-footer__chevron" aria-hidden="true"></span></summary>
       <div class="prada-footer__group-content"><ul>
@@ -230,16 +239,16 @@
           group._footerAnimation?.cancel();
           if (group.open) {
             group._footerAnimation = content.animate(
-              [{ height: `${content.offsetHeight}px`, opacity: 1 }, { height: '0px', opacity: 0 }],
-              { duration: 240, easing: 'cubic-bezier(.4, 0, 1, 1)' }
+              [{ height: `${content.offsetHeight}px` }, { height: '0px' }],
+              { duration: 320, easing: 'cubic-bezier(.4, 0, .2, 1)' }
             );
             group._footerAnimation.onfinish = () => { group.open = false; group._footerAnimation = null; };
           } else {
             group.open = true;
             const height = content.offsetHeight;
             group._footerAnimation = content.animate(
-              [{ height: '0px', opacity: 0 }, { height: `${height}px`, opacity: 1 }],
-              { duration: 280, easing: 'cubic-bezier(.22, 1, .36, 1)' }
+              [{ height: '0px' }, { height: `${height}px` }],
+              { duration: 320, easing: 'cubic-bezier(.4, 0, .2, 1)' }
             );
             group._footerAnimation.onfinish = () => { group._footerAnimation = null; };
           }
