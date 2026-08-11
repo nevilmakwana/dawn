@@ -332,6 +332,11 @@
     const tabs = [...root.querySelectorAll('[data-prada-category-tab]')];
     const tiles = [...root.querySelectorAll('[data-prada-category-tile]')];
     let transitionTimer;
+    const motion = {
+      duration: 780,
+      easing: 'cubic-bezier(0.76, 0, 0.24, 1)',
+      fill: 'forwards'
+    };
 
     tabs.forEach((tab) => tab.addEventListener('click', () => {
       const next = tab.dataset.pradaCategoryTab;
@@ -341,6 +346,7 @@
       const incoming = tiles.filter((tile) => tile.dataset.pradaCategoryTile === next);
 
       clearTimeout(transitionTimer);
+      tiles.forEach((tile) => tile.getAnimations().forEach((animation) => animation.cancel()));
       tiles.forEach((tile) => tile.classList.remove('is-entering', 'is-leaving', 'is-preparing'));
       incoming.forEach((tile) => tile.classList.add('is-preparing'));
       viewport.offsetWidth;
@@ -359,6 +365,25 @@
         tile.classList.remove('is-preparing');
         tile.classList.add('is-entering');
       });
+
+      outgoing.forEach((tile, index) => {
+        tile.animate(
+          [
+            { transform: 'translate3d(0, 0, 0)' },
+            { transform: 'translate3d(-100%, 0, 0)' }
+          ],
+          { ...motion, delay: index * 22 }
+        );
+      });
+      incoming.forEach((tile, index) => {
+        tile.animate(
+          [
+            { transform: 'translate3d(100%, 0, 0)' },
+            { transform: 'translate3d(0, 0, 0)' }
+          ],
+          { ...motion, delay: index * 22 }
+        );
+      });
       tiles.forEach((tile) => {
         const active = tile.dataset.pradaCategoryTile === next;
         tile.setAttribute('aria-hidden', String(!active));
@@ -373,7 +398,7 @@
           tile.classList.remove('is-entering');
           tile.classList.add('is-active');
         });
-      }, 900);
+      }, 920);
     }));
   })();
 </script>
