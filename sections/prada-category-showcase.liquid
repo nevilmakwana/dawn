@@ -202,22 +202,42 @@
 
   #shopify-section-{{ section.id }} .prada-category-showcase__item.is-leaving {
     z-index: 2;
-    transform: translate3d(-100%, 0, 0);
     pointer-events: none;
-    animation: prada-category-slide-out-{{ section.id }} 680ms cubic-bezier(0.76, 0, 0.24, 1) both;
   }
 
-  #shopify-section-{{ section.id }} .prada-category-showcase__item.is-entering {
-    animation: prada-category-slide-in-{{ section.id }} 680ms cubic-bezier(0.76, 0, 0.24, 1) both;
+  #shopify-section-{{ section.id }} [data-direction='forward'] .prada-category-showcase__item.is-leaving {
+    animation: prada-category-out-left-{{ section.id }} 400ms linear both;
   }
 
-  @keyframes prada-category-slide-out-{{ section.id }} {
+  #shopify-section-{{ section.id }} [data-direction='forward'] .prada-category-showcase__item.is-entering {
+    animation: prada-category-in-right-{{ section.id }} 400ms linear both;
+  }
+
+  #shopify-section-{{ section.id }} [data-direction='backward'] .prada-category-showcase__item.is-leaving {
+    animation: prada-category-out-right-{{ section.id }} 400ms linear both;
+  }
+
+  #shopify-section-{{ section.id }} [data-direction='backward'] .prada-category-showcase__item.is-entering {
+    animation: prada-category-in-left-{{ section.id }} 400ms linear both;
+  }
+
+  @keyframes prada-category-out-left-{{ section.id }} {
     from { transform: translate3d(0, 0, 0); }
     to { transform: translate3d(-100%, 0, 0); }
   }
 
-  @keyframes prada-category-slide-in-{{ section.id }} {
+  @keyframes prada-category-in-right-{{ section.id }} {
     from { transform: translate3d(100%, 0, 0); }
+    to { transform: translate3d(0, 0, 0); }
+  }
+
+  @keyframes prada-category-out-right-{{ section.id }} {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(100%, 0, 0); }
+  }
+
+  @keyframes prada-category-in-left-{{ section.id }} {
+    from { transform: translate3d(-100%, 0, 0); }
     to { transform: translate3d(0, 0, 0); }
   }
 
@@ -323,9 +343,6 @@
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    #shopify-section-{{ section.id }} .prada-category-showcase__item { animation-duration: 1ms; }
-  }
 {% endstyle %}
 
 <script>
@@ -349,6 +366,7 @@
       tiles.forEach((tile) => tile.classList.remove('is-entering', 'is-leaving'));
       viewport.offsetWidth;
 
+      viewport.dataset.direction = current === 'women' && next === 'men' ? 'forward' : 'backward';
       viewport.dataset.active = next;
       tabs.forEach((item) => {
         const active = item === tab;
@@ -376,7 +394,7 @@
           tile.classList.remove('is-entering');
           tile.classList.add('is-active');
         });
-      }, 720);
+      }, 440);
     }));
   })();
 </script>
