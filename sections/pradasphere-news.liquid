@@ -94,14 +94,47 @@
       next.disabled = activeIndex === slides.length - 1;
     };
 
+    let animationFrame;
+
+    const ease = (progress) => {
+      let time = progress;
+      for (let iteration = 0; iteration < 5; iteration += 1) {
+        const inverse = 1 - time;
+        const x = (3 * inverse * inverse * time * .25) + (3 * inverse * time * time * .25) + (time * time * time);
+        const slope = (3 * inverse * inverse * .25) + (3 * time * time * .75);
+        if (Math.abs(slope) < .0001) break;
+        time -= (x - progress) / slope;
+        time = Math.max(0, Math.min(1, time));
+      }
+      const inverse = 1 - time;
+      return (3 * inverse * inverse * time * .1) + (3 * inverse * time * time) + (time * time * time);
+    };
+
+    const animateTo = (left) => {
+      cancelAnimationFrame(animationFrame);
+      const start = track.scrollLeft;
+      const distance = left - start;
+      const duration = 600;
+      const startedAt = performance.now();
+
+      const step = (now) => {
+        const progress = Math.min(1, (now - startedAt) / duration);
+        track.scrollLeft = start + (distance * ease(progress));
+        if (progress < 1) animationFrame = requestAnimationFrame(step);
+      };
+
+      animationFrame = requestAnimationFrame(step);
+    };
+
     const move = (direction) => {
       const activeIndex = getActiveIndex();
       const targetIndex = Math.max(0, Math.min(slides.length - 1, activeIndex + direction));
-      track.scrollTo({ left: slideTarget(slides[targetIndex]), behavior: 'smooth' });
+      animateTo(slideTarget(slides[targetIndex]));
     };
 
     previous.addEventListener('click', () => move(-1));
     next.addEventListener('click', () => move(1));
+    track.addEventListener('pointerdown', () => cancelAnimationFrame(animationFrame), { passive: true });
     track.addEventListener('scroll', updateButtons, { passive: true });
     window.addEventListener('resize', updateButtons, { passive: true });
     updateButtons();
