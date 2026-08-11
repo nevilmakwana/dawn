@@ -104,9 +104,9 @@
           {%- liquid
             assign normal_product_total = 0
             for candidate_product in collection.products
-              assign candidate_featured = candidate_product.metafields.custom.featured_tile.value
-              if candidate_featured == blank
-                assign candidate_featured = candidate_product.metafields.custom.custom_featured_tile.value
+              assign candidate_featured = false
+              if candidate_product.metafields.custom.featured_tile.value == true or candidate_product.metafields.custom.custom_featured_tile.value == true
+                assign candidate_featured = true
               endif
               unless candidate_featured
                 assign normal_product_total = normal_product_total | plus: 1
@@ -116,9 +116,9 @@
           -%}
           {%- for product in collection.products -%}
             {%- liquid
-              assign featured_tile_enabled = product.metafields.custom.featured_tile.value
-              if featured_tile_enabled == blank
-                assign featured_tile_enabled = product.metafields.custom.custom_featured_tile.value
+              assign featured_tile_enabled = false
+              if product.metafields.custom.featured_tile.value == true or product.metafields.custom.custom_featured_tile.value == true
+                assign featured_tile_enabled = true
               endif
             -%}
             {%- unless featured_tile_enabled -%}
@@ -220,9 +220,9 @@
             -%}
             {%- for featured_product in collection.products -%}
               {%- liquid
-                assign candidate_featured = featured_product.metafields.custom.featured_tile.value
-                if candidate_featured == blank
-                  assign candidate_featured = featured_product.metafields.custom.custom_featured_tile.value
+                assign candidate_featured = false
+                if featured_product.metafields.custom.featured_tile.value == true or featured_product.metafields.custom.custom_featured_tile.value == true
+                  assign candidate_featured = true
                 endif
                 assign candidate_position = featured_product.metafields.custom.featured_tile_position.value
                 if candidate_position == blank
