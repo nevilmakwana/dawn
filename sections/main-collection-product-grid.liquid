@@ -222,48 +222,6 @@
             {%- liquid
               assign rendered_normal_count = rendered_normal_count | plus: 1
             -%}
-            {%- for block in section.blocks -%}
-              {%- if block.type == 'editorial_tile' and block.settings.image != blank -%}
-                {%- assign preset_positions = block.settings.positions | split: ',' -%}
-                {%- for preset_position in preset_positions -%}
-                  {%- assign preset_position_number = preset_position | strip | plus: 0 -%}
-                  {%- if preset_position_number == rendered_normal_count -%}
-                    <li
-                      class="prada-collection__item prada-collection__item--featured prada-collection__item--featured-{{ block.settings.size }}"
-                      {{ block.shopify_attributes }}
-                    >
-                      <article class="prada-featured-tile">
-                        <a
-                          class="prada-featured-tile__link"
-                          href="{{ block.settings.link | default: collection.url }}"
-                          aria-label="{{ block.settings.alt_text | default: collection.title | escape }}"
-                        >
-                          <picture>
-                            {%- if block.settings.mobile_image != blank -%}
-                              <source
-                                media="(max-width: 749px)"
-                                srcset="{{ block.settings.mobile_image | image_url: width: 750 }} 750w, {{ block.settings.mobile_image | image_url: width: 1100 }} 1100w"
-                              >
-                            {%- endif -%}
-                            <img
-                              class="prada-featured-tile__image"
-                              src="{{ block.settings.image | image_url: width: 1600 }}"
-                              srcset="{{ block.settings.image | image_url: width: 750 }} 750w, {{ block.settings.image | image_url: width: 1100 }} 1100w, {{ block.settings.image | image_url: width: 1600 }} 1600w, {{ block.settings.image | image_url: width: 2200 }} 2200w"
-                              sizes="(max-width: 749px) 100vw, 50vw"
-                              alt="{{ block.settings.alt_text | default: collection.title | escape }}"
-                              loading="lazy"
-                              decoding="async"
-                              width="{{ block.settings.image.width }}"
-                              height="{{ block.settings.image.height }}"
-                            >
-                          </picture>
-                        </a>
-                      </article>
-                    </li>
-                  {%- endif -%}
-                {%- endfor -%}
-              {%- endif -%}
-            {%- endfor -%}
             {%- for featured_product in collection.products -%}
               {%- liquid
                 assign candidate_featured = false
@@ -375,53 +333,6 @@
       "default": true,
       "label": "Enable sorting"
     }
-  ],
-  "blocks": [
-    {
-      "type": "editorial_tile",
-      "name": "Editorial image preset",
-      "settings": [
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Desktop image"
-        },
-        {
-          "type": "image_picker",
-          "id": "mobile_image",
-          "label": "Mobile image (optional)"
-        },
-        {
-          "type": "text",
-          "id": "positions",
-          "label": "Positions",
-          "default": "5,9",
-          "info": "Comma-separated product positions. Example: 5,9 shows this image after products 5 and 9."
-        },
-        {
-          "type": "select",
-          "id": "size",
-          "label": "Desktop size",
-          "default": "wide",
-          "options": [
-            { "value": "normal", "label": "One quarter" },
-            { "value": "wide", "label": "Half width" },
-            { "value": "full", "label": "Full width" }
-          ]
-        },
-        {
-          "type": "url",
-          "id": "link",
-          "label": "Image link (optional)"
-        },
-        {
-          "type": "text",
-          "id": "alt_text",
-          "label": "Image alt text"
-        }
-      ]
-    }
-  ],
-  "max_blocks": 8
+  ]
 }
 {% endschema %}
