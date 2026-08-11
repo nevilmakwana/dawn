@@ -170,14 +170,21 @@
   {%- if section.settings.mobile_center_zoom -%}
     @media screen and (max-width: 749px) {
       #Banner-{{ section.id }} {
-        min-height: clamp(42rem, 78vh, 62rem) !important;
-        height: clamp(42rem, 78vh, 62rem) !important;
+        min-height: {% if section.settings.full_screen_height %}100vh{% else %}clamp(42rem, 78vh, 62rem){% endif %} !important;
+        height: {% if section.settings.full_screen_height %}100vh{% else %}clamp(42rem, 78vh, 62rem){% endif %} !important;
       }
 
-      @supports (height: 78svh) {
+      @supports (height: 100svh) {
         #Banner-{{ section.id }} {
-          min-height: clamp(42rem, 78svh, 62rem) !important;
-          height: clamp(42rem, 78svh, 62rem) !important;
+          min-height: {% if section.settings.full_screen_height %}100svh{% else %}clamp(42rem, 78svh, 62rem){% endif %} !important;
+          height: {% if section.settings.full_screen_height %}100svh{% else %}clamp(42rem, 78svh, 62rem){% endif %} !important;
+        }
+      }
+
+      @supports (height: 100dvh) {
+        #Banner-{{ section.id }} {
+          min-height: {% if section.settings.full_screen_height %}100dvh{% else %}clamp(42rem, 78dvh, 62rem){% endif %} !important;
+          height: {% if section.settings.full_screen_height %}100dvh{% else %}clamp(42rem, 78dvh, 62rem){% endif %} !important;
         }
       }
 
@@ -193,6 +200,12 @@
       #Banner-{{ section.id }} .banner__content {
         min-height: 100% !important;
         height: 100% !important;
+      }
+
+      #Banner-{{ section.id }} .banner__content {
+        align-items: flex-end !important;
+        justify-content: center !important;
+        padding: 0 2rem max(5rem, env(safe-area-inset-bottom)) !important;
       }
 
       #Banner-{{ section.id }} .banner__media {

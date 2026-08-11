@@ -151,7 +151,7 @@
         "image": "shopify://shop_images/imgi_21_menu_DT.jpg",
         "image_overlay_opacity": 0,
         "image_height": "adapt",
-        "full_screen_height": false,
+        "full_screen_height": true,
         "show_full_media": false,
         "mobile_center_zoom": true,
         "prada_link_button": true,
