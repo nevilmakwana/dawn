@@ -423,14 +423,14 @@
                       </quantity-popover>
 
                       <div class="prada-shopping-bag-page__mobile-actions">
-                        <button
-                          type="button"
+                        <a
+                          href="{{ item.url }}"
                           class="prada-shopping-bag-page__action"
                           data-prada-cart-edit
                           data-prada-cart-edit-data="PradaCartEditData-{{ item.index | plus: 1 }}"
                         >
                           Edit
-                        </button>
+                        </a>
                         <cart-remove-button
                           class="prada-shopping-bag-page__remove"
                           data-index="{{ item.index | plus: 1 }}"
