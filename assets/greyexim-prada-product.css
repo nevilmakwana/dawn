@@ -18,7 +18,7 @@ body:has(main[data-template='product']) .section-header .prada-header { backgrou
 .prada-product__wishlist svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; }
 .prada-product__wishlist[aria-pressed='true'] svg { fill: currentColor; }
 .prada-product__wishlist--mobile { display: none; }
-.prada-product__dots { position: fixed; z-index: 3; left: 24px; bottom: 24px; display: flex; flex-direction: column; gap: 8px; clip-path: inset(var(--prada-dots-header-clip, 0px) 0 0 0); }
+.prada-product__dots { position: fixed; z-index: 3; left: 24px; bottom: 24px; display: flex; flex-direction: column; gap: 8px; }
 .prada-product__dots.is-gallery-ended { position: absolute; bottom: 24px; }
 .prada-product__dots a { display: grid; place-items: center; width: 12px; height: 12px; }
 .prada-product__dots span { display: block; width: 5px; height: 5px; border: 1px solid #111; border-radius: 50%; background: transparent; }
@@ -97,7 +97,7 @@ html.prada-drawer-open, html.prada-drawer-open body { overflow: hidden; }
   .prada-product__gallery > .prada-product__wishlist,
   .prada-product__gallery > .prada-product__wishlist.is-on-last-media { position: absolute; top: 14px; right: 14px; display: grid; width: 40px; height: 40px; margin: 0; padding: 8px; color: #000; }
   .prada-product__gallery > .prada-product__wishlist svg { width: 24px; height: 24px; }
-  .prada-product__dots { position: absolute; left: 14px; bottom: 50%; flex-direction: column; clip-path: none; transform: translateY(50%); }
+  .prada-product__dots { position: absolute; left: 14px; bottom: 50%; flex-direction: column; transform: translateY(50%); }
   .prada-product__scroll-hint { position: absolute; z-index: 4; right: 0; bottom: 0; left: 0; display: block; padding: 15px 20px; background: rgba(20, 20, 20, .55); color: #fff; font-size: 14px; line-height: 1.2; font-weight: 600; text-align: center; opacity: 0; pointer-events: none; transform: translate3d(0, 100%, 0); transition: opacity .58s cubic-bezier(.22, 1, .36, 1), transform .68s cubic-bezier(.22, 1, .36, 1); will-change: opacity, transform; }
   .prada-product__scroll-hint.is-visible { opacity: 1; transform: translateY(0); }
   .prada-product.mobile-gallery-onboarding .prada-product__scroll-hint { animation: prada-mobile-scroll-hint 3.2s cubic-bezier(.22, 1, .36, 1) both; }
