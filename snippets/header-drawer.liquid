@@ -5,6 +5,13 @@
   {% render 'header-drawer' %}
 {% endcomment %}
 
+{%- liquid
+  assign is_wishlist_view = false
+  if template.suffix == 'wishlist'
+    assign is_wishlist_view = true
+  endif
+-%}
+
 <header-drawer data-breakpoint="{% if section.settings.menu_type_desktop == 'drawer' %}desktop{% else %}tablet{% endif %}">
   <details id="Details-menu-drawer-container" class="menu-drawer-container">
     <summary
@@ -133,7 +140,7 @@
                     <details id="Details-menu-drawer-menu-item-{{ forloop.index }}">
                       <summary
                         id="HeaderDrawer-{{ link.handle }}"
-                        class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.child_active %} menu-drawer__menu-item--active{% endif %}"
+                        class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.child_active and is_wishlist_view == false %} menu-drawer__menu-item--active{% endif %}"
                       >
                         {{ link.title | escape }}
                         <span class="svg-wrapper">
@@ -162,8 +169,8 @@
                                   <a
                                     id="HeaderDrawer-{{ link.handle }}-{{ childlink.handle }}"
                                     href="{{ childlink.url }}"
-                                    class="menu-drawer__menu-item link link--text list-menu__item focus-inset{% if childlink.current %} menu-drawer__menu-item--active{% endif %}"
-                                    {% if childlink.current %}
+                                    class="menu-drawer__menu-item link link--text list-menu__item focus-inset{% if childlink.current and is_wishlist_view == false %} menu-drawer__menu-item--active{% endif %}"
+                                    {% if childlink.current and is_wishlist_view == false %}
                                       aria-current="page"
                                     {% endif %}
                                   >
@@ -206,8 +213,8 @@
                                             <a
                                               id="HeaderDrawer-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
                                               href="{{ grandchildlink.url }}"
-                                              class="menu-drawer__menu-item link link--text list-menu__item focus-inset{% if grandchildlink.current %} menu-drawer__menu-item--active{% endif %}"
-                                              {% if grandchildlink.current %}
+                                              class="menu-drawer__menu-item link link--text list-menu__item focus-inset{% if grandchildlink.current and is_wishlist_view == false %} menu-drawer__menu-item--active{% endif %}"
+                                              {% if grandchildlink.current and is_wishlist_view == false %}
                                                 aria-current="page"
                                               {% endif %}
                                             >
@@ -229,8 +236,8 @@
                     <a
                       id="HeaderDrawer-{{ link.handle }}"
                       href="{{ link.url }}"
-                      class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.current %} menu-drawer__menu-item--active{% endif %}"
-                      {% if link.current %}
+                      class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.current and is_wishlist_view == false %} menu-drawer__menu-item--active{% endif %}"
+                      {% if link.current and is_wishlist_view == false %}
                         aria-current="page"
                       {% endif %}
                     >
