@@ -168,6 +168,24 @@
   {%- endif -%}
 
   {%- if section.settings.mobile_center_zoom -%}
+    #Banner-{{ section.id }} .banner__heading {
+      font-size: 32px !important;
+      line-height: 1.25 !important;
+      font-weight: 400 !important;
+    }
+
+    #Banner-{{ section.id }} .banner__text,
+    #Banner-{{ section.id }} .banner__text p {
+      font-size: 14px !important;
+      line-height: 18px !important;
+      font-weight: 400 !important;
+    }
+
+    #Banner-{{ section.id }} .banner__buttons .button {
+      font-size: 14px !important;
+      line-height: 18px !important;
+    }
+
     @media screen and (max-width: 749px) {
       #shopify-section-{{ section.id }} {
         min-height: 0 !important;
@@ -208,6 +226,22 @@
         width: auto !important;
         max-width: none !important;
         margin: 0 !important;
+      }
+
+      #Banner-{{ section.id }} .banner__heading {
+        font-size: 20px !important;
+        line-height: 1.25 !important;
+      }
+
+      #Banner-{{ section.id }} .banner__text,
+      #Banner-{{ section.id }} .banner__text p {
+        font-size: 14px !important;
+        line-height: 20px !important;
+      }
+
+      #Banner-{{ section.id }} .banner__buttons .button {
+        font-size: 14px !important;
+        line-height: 18px !important;
       }
 
       #Banner-{{ section.id }} .banner__media {
