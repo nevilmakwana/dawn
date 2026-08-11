@@ -170,21 +170,21 @@
   {%- if section.settings.mobile_center_zoom -%}
     @media screen and (max-width: 749px) {
       #Banner-{{ section.id }} {
-        min-height: {% if section.settings.full_screen_height %}100vh{% else %}clamp(42rem, 78vh, 62rem){% endif %} !important;
-        height: {% if section.settings.full_screen_height %}100vh{% else %}clamp(42rem, 78vh, 62rem){% endif %} !important;
+        min-height: calc(100vh - 72px) !important;
+        height: calc(100vh - 72px) !important;
       }
 
       @supports (height: 100svh) {
         #Banner-{{ section.id }} {
-          min-height: {% if section.settings.full_screen_height %}100svh{% else %}clamp(42rem, 78svh, 62rem){% endif %} !important;
-          height: {% if section.settings.full_screen_height %}100svh{% else %}clamp(42rem, 78svh, 62rem){% endif %} !important;
+          min-height: calc(100svh - 72px) !important;
+          height: calc(100svh - 72px) !important;
         }
       }
 
       @supports (height: 100dvh) {
         #Banner-{{ section.id }} {
-          min-height: {% if section.settings.full_screen_height %}100dvh{% else %}clamp(42rem, 78dvh, 62rem){% endif %} !important;
-          height: {% if section.settings.full_screen_height %}100dvh{% else %}clamp(42rem, 78dvh, 62rem){% endif %} !important;
+          min-height: calc(100dvh - 72px) !important;
+          height: calc(100dvh - 72px) !important;
         }
       }
 
@@ -203,9 +203,19 @@
       }
 
       #Banner-{{ section.id }} .banner__content {
-        align-items: flex-end !important;
-        justify-content: center !important;
-        padding: 0 2rem max(5rem, env(safe-area-inset-bottom)) !important;
+        position: absolute !important;
+        inset: 0 !important;
+        padding: 0 2rem !important;
+      }
+
+      #Banner-{{ section.id }} .banner__box {
+        position: absolute !important;
+        right: 2rem !important;
+        bottom: max(4rem, env(safe-area-inset-bottom)) !important;
+        left: 2rem !important;
+        width: auto !important;
+        max-width: none !important;
+        margin: 0 !important;
       }
 
       #Banner-{{ section.id }} .banner__media {
