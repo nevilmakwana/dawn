@@ -1,4 +1,7 @@
 .section-prada-product { margin: 0; padding-top: var(--header-height, 72px); }
+body:has(main[data-template='product']) .section-header,
+body:has(main[data-template='product']) .section-header .header-wrapper,
+body:has(main[data-template='product']) .section-header .prada-header { background: #fff !important; }
 .prada-product { --prada-border: #d8d8d8; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; color: #080808; background: #fff; }
 .prada-product__gallery { position: relative; min-width: 0; background: #f1f1f1; }
 .prada-product__media-list { margin: 0; padding: 0; }
