@@ -9,6 +9,7 @@
   const themeColorMeta = document.querySelector('meta[name="theme-color"]');
   let memoryItems = [];
   let notificationTimer;
+  let themeColorRestoreTimer;
 
   const setThemeColor = (color) => {
     if (themeColorMeta) themeColorMeta.setAttribute('content', color);
@@ -146,12 +147,13 @@
     if (viewLink) viewLink.href = getWishlistUrl();
 
     window.clearTimeout(notificationTimer);
+    window.clearTimeout(themeColorRestoreTimer);
     setThemeColor('#2838e8');
     window.requestAnimationFrame(() => notification.classList.add('is-visible'));
 
     notificationTimer = window.setTimeout(() => {
       notification.classList.remove('is-visible');
-      setThemeColor('#ffffff');
+      themeColorRestoreTimer = window.setTimeout(() => setThemeColor('#ffffff'), 240);
     }, 5000);
   };
 
