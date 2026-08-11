@@ -167,7 +167,20 @@
     }
   {%- endif -%}
 
-  {%- if section.settings.full_screen_height and section.settings.mobile_center_zoom == false -%}
+  {%- if section.settings.full_screen_height and section.settings.mobile_center_zoom != true -%}
+    #Banner-{{ section.id }} .banner__content {
+      align-items: flex-end !important;
+      justify-content: center !important;
+      padding: 5rem 5rem 4rem !important;
+    }
+
+    #Banner-{{ section.id }} .banner__box {
+      width: 100% !important;
+      max-width: 72rem !important;
+      padding: 0 !important;
+      margin: 0 auto !important;
+    }
+
     #Banner-{{ section.id }} .banner__heading {
       font-size: 32px !important;
       line-height: 1.25 !important;
