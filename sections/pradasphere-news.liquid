@@ -76,10 +76,11 @@
     const next = section?.querySelector('[data-pradasphere-next]');
     if (!track || slides.length < 2 || !previous || !next) return;
 
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const duration = 600;
     let activeIndex = 0;
     let isAnimating = false;
+    let currentPosition = 0;
+    let trackMotion = null;
     let pointerId = null;
     let pointerStart = 0;
     let dragStart = 0;
@@ -99,10 +100,35 @@
     };
 
     const render = (position, animate = true) => {
-      track.style.transition = animate && !reducedMotion.matches
-        ? `transform ${duration}ms ease`
-        : 'none';
+      if (trackMotion) {
+        trackMotion.cancel();
+        trackMotion = null;
+      }
+
+      const startPosition = currentPosition;
+      currentPosition = position;
+      track.style.transition = 'none';
       track.style.transform = `translate3d(${position}px, 0, 0)`;
+
+      if (!animate || startPosition === position) {
+        isAnimating = false;
+        return;
+      }
+
+      isAnimating = true;
+      const motion = track.animate(
+        [
+          { transform: `translate3d(${startPosition}px, 0, 0)` },
+          { transform: `translate3d(${position}px, 0, 0)` }
+        ],
+        { duration, easing: 'ease', fill: 'none' }
+      );
+      trackMotion = motion;
+      motion.addEventListener('finish', () => {
+        if (trackMotion !== motion) return;
+        trackMotion = null;
+        isAnimating = false;
+      });
     };
 
     const goTo = (index, animate = true) => {
@@ -110,7 +136,6 @@
       if (isAnimating && animate) return;
       activeIndex = targetIndex;
       updateState();
-      isAnimating = animate && !reducedMotion.matches;
       render(indexPosition(), animate);
     };
 
@@ -127,10 +152,6 @@
 
     previous.addEventListener('click', () => goTo(activeIndex - 1));
     next.addEventListener('click', () => goTo(activeIndex + 1));
-
-    track.addEventListener('transitionend', (event) => {
-      if (event.target === track && event.propertyName === 'transform') isAnimating = false;
-    });
 
     track.addEventListener('pointerdown', (event) => {
       if (isAnimating || event.button !== 0) return;

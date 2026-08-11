@@ -32,7 +32,6 @@
   touch-action: pan-y;
   user-select: none;
   will-change: transform;
-  transition: transform 600ms ease;
 }
 
 .pradasphere-news__slide {
@@ -181,8 +180,4 @@
   .pradasphere-news__arrow { display: none; }
   .pradasphere-news__discover { display: none; }
   .pradasphere-news__media:hover::after { background: transparent; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pradasphere-news__track { transition-duration: 0ms !important; }
 }
