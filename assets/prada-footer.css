@@ -434,15 +434,32 @@
     border-right: 1.5px solid #000;
     border-bottom: 1.5px solid #000;
     transform: rotate(45deg);
-    transition: transform 320ms cubic-bezier(.22, 1, .36, 1);
+    transition: transform 340ms cubic-bezier(.4, 0, .2, 1);
   }
 
-  .prada-footer__group[open] .prada-footer__chevron { transform: rotate(225deg); }
+  .prada-footer__group[open] .prada-footer__chevron { transform: rotate(45deg); }
+  .prada-footer__group.is-expanded .prada-footer__chevron { transform: rotate(225deg); }
 
   .prada-footer__group-content {
-    padding: 0 0 30px;
+    max-height: 0;
+    padding: 0;
     overflow: hidden;
-    will-change: height;
+    visibility: hidden;
+    transition:
+      max-height 340ms cubic-bezier(.4, 0, .2, 1),
+      padding-bottom 340ms cubic-bezier(.4, 0, .2, 1),
+      visibility 0s linear 340ms;
+    will-change: max-height;
+  }
+
+  .prada-footer__group.is-expanded .prada-footer__group-content {
+    max-height: var(--prada-footer-content-height, 240px);
+    padding-bottom: 30px;
+    visibility: visible;
+    transition:
+      max-height 340ms cubic-bezier(.4, 0, .2, 1),
+      padding-bottom 340ms cubic-bezier(.4, 0, .2, 1),
+      visibility 0s linear 0s;
   }
 
   .prada-footer__group-content ul {
