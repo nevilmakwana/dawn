@@ -452,7 +452,7 @@
                           data-product-url="{{ item.url | escape }}"
                           data-product-image="{% if item.image %}{{ item.image | image_url: width: 720 | escape }}{% endif %}"
                           data-product-image-alt="{{ item.image.alt | default: item.product.title | escape }}"
-                          data-product-price="{{ item.final_price | money | escape }}"
+                          data-product-price="{{ item.final_price | money | strip_html | escape }}"
                           data-product-variant-id="{{ item.variant.id }}"
                           data-product-available="{{ item.variant.available }}"
                           aria-label="Move {{ item.product.title | escape }} to wishlist"
@@ -469,7 +469,7 @@
                           "title": {{ item.product.title | json }},
                           "url": {{ item.url | json }},
                           "description": {{ item.product.description | json }},
-                          "price": {{ item.final_price | money | json }},
+                          "price": {{ item.final_price | money | strip_html | json }},
                           "image": {% if item.image %}{{ item.image | image_url: width: 1200 | json }}{% else %}null{% endif %},
                           "properties": {{ item.properties | json }},
                           "sellingPlan": {% if item.selling_plan_allocation %}{{ item.selling_plan_allocation.selling_plan.id | json }}{% else %}null{% endif %},
@@ -490,7 +490,7 @@
                               {
                                 "id": {{ variant.id | json }},
                                 "available": {{ variant.available | json }},
-                                "price": {{ variant.price | money | json }},
+                                "price": {{ variant.price | money | strip_html | json }},
                                 "options": [{{ variant.option1 | json }}, {{ variant.option2 | json }}, {{ variant.option3 | json }}],
                                 "image": {% if variant.image %}{{ variant.image | image_url: width: 1200 | json }}{% else %}null{% endif %}
                               }{% unless forloop.last %},{% endunless %}

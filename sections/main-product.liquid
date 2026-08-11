@@ -32,7 +32,7 @@
       data-product-url="{{ product.url | escape }}?variant={{ current_variant.id }}"
       data-product-image="{% if wishlist_media %}{{ wishlist_media.preview_image | image_url: width: 720 | escape }}{% endif %}"
       data-product-image-alt="{{ wishlist_media.alt | default: product.title | escape }}"
-      data-product-price="{{ current_variant.price | money | escape }}"
+      data-product-price="{{ current_variant.price | money | strip_html | escape }}"
       data-product-variant-id="{{ current_variant.id }}"
       data-product-available="{{ current_variant.available }}"
       aria-label="Add {{ product.title | escape }} to wishlist"
@@ -98,7 +98,7 @@
           data-product-url="{{ product.url | escape }}?variant={{ current_variant.id }}"
           data-product-image="{% if wishlist_media %}{{ wishlist_media.preview_image | image_url: width: 720 | escape }}{% endif %}"
           data-product-image-alt="{{ wishlist_media.alt | default: product.title | escape }}"
-          data-product-price="{{ current_variant.price | money | escape }}"
+          data-product-price="{{ current_variant.price | money | strip_html | escape }}"
           data-product-variant-id="{{ current_variant.id }}"
           data-product-available="{{ current_variant.available }}"
           aria-label="Add {{ product.title | escape }} to wishlist"
@@ -355,7 +355,7 @@
 
     const formatMoney = (cents) => {
       const amount = (cents / 100).toFixed(2);
-      return moneyFormat.replace(/\{\{\s*amount(?:_with_comma_separator)?\s*\}\}/, amount);
+      return moneyFormat.replace(/\{\{\s*amount(?:_with_comma_separator)?\s*\}\}/, amount).replace(/<[^>]*>/g, '');
     };
 
     const primaryImage = root.querySelector('.prada-product__media--image .prada-product__gallery-image');

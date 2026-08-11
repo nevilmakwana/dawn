@@ -11,6 +11,12 @@
   let notificationTimer;
   let themeColorRestoreTimer;
 
+  const normalisePrice = (value) => {
+    const parser = document.createElement('textarea');
+    parser.innerHTML = String(value || '');
+    return parser.value.replace(/<[^>]*>/g, '').replace(/^\s*(?:Rs\.?|INR)\s*/i, '₹ ').trim();
+  };
+
   const setThemeColor = (color) => {
     if (themeColorMeta) themeColorMeta.setAttribute('content', color);
   };
@@ -24,7 +30,7 @@
       url: String(item.url),
       image: item.image ? String(item.image) : '',
       imageAlt: item.imageAlt ? String(item.imageAlt) : String(item.title),
-      price: item.price ? String(item.price) : '',
+      price: normalisePrice(item.price),
       variantId: item.variantId ? String(item.variantId) : '',
       available: item.available !== false && item.available !== 'false',
     };

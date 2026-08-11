@@ -81,6 +81,12 @@
       "'": '&#039;',
     })[character]);
 
+  const normalisePrice = (value) => {
+    const parser = document.createElement('textarea');
+    parser.innerHTML = String(value || '');
+    return parser.value.replace(/<[^>]*>/g, '').replace(/^\s*(?:Rs\.?|INR)\s*/i, '₹ ').trim();
+  };
+
   const createCartEditor = (data, trigger) => {
     const existingModal = document.querySelector('[data-prada-cart-editor-modal]');
     existingModal?.remove();
@@ -113,7 +119,7 @@
           <div class="prada-cart-edit-modal__scroll">
             <div class="prada-cart-edit-modal__product-heading">
               <h2>${escapeHtml(data.title)}</h2>
-              <p class="prada-cart-edit-modal__price">${currentVariant?.price || data.price || ''}</p>
+              <p class="prada-cart-edit-modal__price">${escapeHtml(normalisePrice(currentVariant?.price || data.price))}</p>
             </div>
             <div class="prada-cart-edit-modal__options"></div>
             <p class="prada-cart-edit-modal__status" role="status"></p>
@@ -174,7 +180,7 @@
 
     const renderOptions = () => {
       const selectedVariant = getSelectedVariant();
-      price.textContent = selectedVariant?.price || data.price || '';
+      price.textContent = normalisePrice(selectedVariant?.price || data.price);
       confirmButton.disabled = !selectedVariant || !selectedVariant.available;
       status.textContent = selectedVariant?.available === false ? 'This option is currently unavailable.' : '';
       optionsContainer.innerHTML = '';

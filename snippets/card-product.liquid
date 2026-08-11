@@ -578,7 +578,7 @@
         data-product-url="{{ card_product.url | escape }}"
         data-product-image="{% if card_product.featured_media %}{{ card_product.featured_media | image_url: width: 720 | escape }}{% endif %}"
         data-product-image-alt="{{ card_product.featured_media.alt | default: card_product.title | escape }}"
-        data-product-price="{{ card_product.price | money | escape }}"
+        data-product-price="{{ card_product.price | money | strip_html | escape }}"
         data-product-variant-id="{{ card_product.selected_or_first_available_variant.id }}"
         data-product-available="{{ card_product.available }}"
         aria-label="Add {{ card_product.title | escape }} to wishlist"

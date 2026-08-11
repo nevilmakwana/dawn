@@ -201,7 +201,7 @@
                     data-product-url="{{ product.url | escape }}"
                     data-product-image="{% if product.featured_media %}{{ product.featured_media | image_url: width: 720 | escape }}{% endif %}"
                     data-product-image-alt="{{ product.featured_media.alt | default: product.title | escape }}"
-                    data-product-price="{{ product.price | money | escape }}"
+                    data-product-price="{{ product.price | money | strip_html | escape }}"
                     data-product-variant-id="{{ product.selected_or_first_available_variant.id }}"
                     data-product-available="{{ product.available }}"
                     aria-label="Add {{ product.title | escape }} to wishlist"

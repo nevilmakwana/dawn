@@ -5,8 +5,11 @@
       <path d="M12 20.15 5.3 13.8A5.05 5.05 0 0 1 12 6.25a5.05 5.05 0 0 1 6.7 7.55L12 20.15Z"></path>
     </svg>`;
 
-  const formatWishlistPrice = (value) =>
-    String(value || '').replace(/^\s*(?:Rs\.?|INR)\s*/i, '₹');
+  const formatWishlistPrice = (value) => {
+    const parser = document.createElement('textarea');
+    parser.innerHTML = String(value || '');
+    return parser.value.replace(/<[^>]*>/g, '').replace(/^\s*(?:Rs\.?|INR)\s*/i, '₹ ').trim();
+  };
 
   const createRemoveButton = (item) => {
     const button = document.createElement('button');
