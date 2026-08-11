@@ -105,7 +105,9 @@
             assign normal_product_total = 0
             for candidate_product in collection.products
               assign candidate_featured = false
-              if candidate_product.metafields.custom.featured_tile.value == true or candidate_product.metafields.custom.custom_featured_tile.value == true
+              assign candidate_featured_primary = candidate_product.metafields.custom.featured_tile.value | append: '' | strip | downcase
+              assign candidate_featured_legacy = candidate_product.metafields.custom.custom_featured_tile.value | append: '' | strip | downcase
+              if candidate_featured_primary == 'true' or candidate_featured_legacy == 'true'
                 assign candidate_featured = true
               endif
               unless candidate_featured
@@ -117,7 +119,9 @@
           {%- for product in collection.products -%}
             {%- liquid
               assign featured_tile_enabled = false
-              if product.metafields.custom.featured_tile.value == true or product.metafields.custom.custom_featured_tile.value == true
+              assign featured_tile_primary = product.metafields.custom.featured_tile.value | append: '' | strip | downcase
+              assign featured_tile_legacy = product.metafields.custom.custom_featured_tile.value | append: '' | strip | downcase
+              if featured_tile_primary == 'true' or featured_tile_legacy == 'true'
                 assign featured_tile_enabled = true
               endif
             -%}
@@ -221,7 +225,9 @@
             {%- for featured_product in collection.products -%}
               {%- liquid
                 assign candidate_featured = false
-                if featured_product.metafields.custom.featured_tile.value == true or featured_product.metafields.custom.custom_featured_tile.value == true
+                assign candidate_featured_primary = featured_product.metafields.custom.featured_tile.value | append: '' | strip | downcase
+                assign candidate_featured_legacy = featured_product.metafields.custom.custom_featured_tile.value | append: '' | strip | downcase
+                if candidate_featured_primary == 'true' or candidate_featured_legacy == 'true'
                   assign candidate_featured = true
                 endif
                 assign candidate_position = featured_product.metafields.custom.featured_tile_position.value
