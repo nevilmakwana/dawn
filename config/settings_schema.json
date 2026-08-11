@@ -1363,6 +1363,18 @@
       },
       {
         "type": "text",
+        "id": "social_bluesky_link",
+        "label": "Bluesky",
+        "placeholder": "https://bsky.app/profile/your-handle"
+      },
+      {
+        "type": "text",
+        "id": "social_linkedin_link",
+        "label": "LinkedIn",
+        "placeholder": "https://www.linkedin.com/company/your-company"
+      },
+      {
+        "type": "text",
         "id": "social_tumblr_link",
         "label": "t:settings_schema.social-media.settings.social_tumblr_link.label",
         "placeholder": "t:settings_schema.social-media.settings.social_tumblr_link.info"
