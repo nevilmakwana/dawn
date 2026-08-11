@@ -118,9 +118,14 @@
 
   .prada-faq__accordions summary {
     min-height: 72px;
-    padding: 20px 52px 20px 20px;
+    padding: 20px;
     font-size: 14px;
     line-height: 1.3;
+  }
+
+  .prada-faq__accordions summary > span:first-child {
+    min-width: 0;
+    padding-right: 20px;
   }
 
   .prada-faq__accordions .prada-faq__chevron {
