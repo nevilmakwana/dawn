@@ -313,6 +313,7 @@
 
     const gallery = root.querySelector('.prada-product__gallery');
     const desktopWishlist = gallery?.querySelector(':scope > .prada-product__wishlist');
+    const desktopDots = gallery?.querySelector('.prada-product__dots');
     const lastMedia = gallery?.querySelector('.prada-product__media:last-child');
     let wishlistFrame;
 
@@ -321,6 +322,7 @@
       wishlistFrame = window.requestAnimationFrame(() => {
         if (!gallery || !desktopWishlist || !lastMedia || !window.matchMedia('(min-width: 990px)').matches) {
           desktopWishlist?.classList.remove('is-on-last-media');
+          desktopDots?.classList.remove('is-gallery-ended');
           return;
         }
 
@@ -335,6 +337,7 @@
           'is-on-last-media',
           lastMediaRect.top + releaseDepth <= headerHeight + 24
         );
+        desktopDots?.classList.toggle('is-gallery-ended', gallery.getBoundingClientRect().bottom <= window.innerHeight);
       });
     };
 

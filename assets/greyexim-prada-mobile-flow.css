@@ -96,7 +96,8 @@
     height: 52px;
     padding: 0;
     border: 0;
-    background: rgba(255, 255, 255, .72);
+    background: transparent;
+    box-shadow: none;
     color: #111;
     font-size: 34px;
     line-height: 1;

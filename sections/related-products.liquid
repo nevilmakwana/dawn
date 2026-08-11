@@ -37,37 +37,27 @@
         data-prada-related-list
       >
         {% assign skip_card_product_styles = false %}
-        {% for recommendation in recommendations.products %}
-          <li class="grid__item">
-            {% render 'card-product',
-              card_product: recommendation,
-              media_aspect_ratio: section.settings.image_ratio,
-              image_shape: section.settings.image_shape,
-              show_secondary_image: section.settings.show_secondary_image,
-              show_vendor: section.settings.show_vendor,
-              show_rating: section.settings.show_rating,
-              skip_styles: skip_card_product_styles,
-              product_view_context: 'recommendation'
-            %}
-            {%- for option in recommendation.options_with_values -%}
-              {%- assign related_option_name = option.name | downcase -%}
-              {%- if related_option_name contains 'color' or related_option_name contains 'colour' -%}
-                <div class="prada-related-colors" aria-label="Available {{ option.name | escape }}">
-                  {%- for value in option.values limit: 3 -%}
-                    {%- assign related_swatch_color = value.swatch.color | default: '#e7e7e7' -%}
-                    <span
-                      class="prada-related-colors__swatch"
-                      style="--prada-related-color: {{ related_swatch_color }};"
-                      title="{{ value | escape }}"
-                    ></span>
-                  {%- endfor -%}
-                </div>
-                {%- break -%}
-              {%- endif -%}
-            {%- endfor -%}
-          </li>
+        {% assign rendered_related_count = 0 %}
+        {% assign rendered_related_handles = '|' %}
+        {% for recommendation in recommendations.products limit: 4 %}
+          {% render 'prada-related-product', related_product: recommendation, section: section, skip_card_product_styles: skip_card_product_styles %}
+          {%- assign rendered_related_count = rendered_related_count | plus: 1 -%}
+          {%- assign rendered_related_handles = rendered_related_handles | append: recommendation.handle | append: '|' -%}
           {%- assign skip_card_product_styles = true -%}
         {% endfor %}
+        {% if rendered_related_count < 4 %}
+          {% for fallback_product in collections.all.products %}
+            {%- assign fallback_token = '|' | append: fallback_product.handle | append: '|' -%}
+            {% if rendered_related_count < 4 and fallback_product.id != product.id %}
+              {% unless rendered_related_handles contains fallback_token %}
+                {% render 'prada-related-product', related_product: fallback_product, section: section, skip_card_product_styles: skip_card_product_styles %}
+                {%- assign rendered_related_count = rendered_related_count | plus: 1 -%}
+                {%- assign rendered_related_handles = rendered_related_handles | append: fallback_product.handle | append: '|' -%}
+                {%- assign skip_card_product_styles = true -%}
+              {% endunless %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
       </ul>
       <div class="prada-related-arrows" aria-label="Recommended products carousel controls">
         <button type="button" data-prada-related-arrow="previous" aria-label="Previous recommended products">
@@ -77,7 +67,7 @@
           <span aria-hidden="true">&#8250;</span>
         </button>
       </div>
-      {%- assign related_page_count = recommendations.products_count | plus: 1 | divided_by: 2 -%}
+      {%- assign related_page_count = rendered_related_count | plus: 1 | divided_by: 2 -%}
       {%- if related_page_count > 1 -%}
         <nav class="prada-related-pagination" aria-label="Recommended product pages" data-prada-related-pagination>
           {%- for page_number in (1..related_page_count) -%}
@@ -111,6 +101,10 @@
       list.dataset.pradaPaginationReady = 'true';
 
       let frame;
+      const updateArrowVisibility = () => {
+        const hasOverflow = list.scrollWidth > list.clientWidth + 2;
+        arrows.forEach((arrow) => { arrow.hidden = !hasOverflow; });
+      };
       const setActivePage = () => {
         frame = undefined;
         const page = Math.max(0, Math.min(dots.length - 1, Math.round(list.scrollLeft / Math.max(1, list.clientWidth))));
@@ -132,6 +126,8 @@
         const direction = arrow.dataset.pradaRelatedArrow === 'previous' ? -1 : 1;
         list.scrollBy({ left: direction * list.clientWidth, behavior: 'smooth' });
       }));
+      window.addEventListener('resize', updateArrowVisibility, { passive: true });
+      updateArrowVisibility();
       setActivePage();
       return true;
     };

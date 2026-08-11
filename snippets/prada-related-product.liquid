@@ -1,0 +1,28 @@
+<li class="grid__item">
+  {% render 'card-product',
+    card_product: related_product,
+    media_aspect_ratio: section.settings.image_ratio,
+    image_shape: section.settings.image_shape,
+    show_secondary_image: section.settings.show_secondary_image,
+    show_vendor: section.settings.show_vendor,
+    show_rating: section.settings.show_rating,
+    skip_styles: skip_card_product_styles,
+    product_view_context: 'recommendation'
+  %}
+  {%- for option in related_product.options_with_values -%}
+    {%- assign related_option_name = option.name | downcase -%}
+    {%- if related_option_name contains 'color' or related_option_name contains 'colour' -%}
+      <div class="prada-related-colors" aria-label="Available {{ option.name | escape }}">
+        {%- for value in option.values limit: 3 -%}
+          {%- assign related_swatch_color = value.swatch.color | default: '#e7e7e7' -%}
+          <span
+            class="prada-related-colors__swatch"
+            style="--prada-related-color: {{ related_swatch_color }};"
+            title="{{ value | escape }}"
+          ></span>
+        {%- endfor -%}
+      </div>
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+</li>
