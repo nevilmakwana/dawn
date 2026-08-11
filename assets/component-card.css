@@ -405,6 +405,10 @@
     text-decoration: underline;
     text-underline-offset: 0.3rem;
   }
+
+  .product-card-wrapper.underline-links-hover:hover .card__heading a {
+    text-decoration: none;
+  }
 }
 
 .card--standard.card--media .card__inner .card__information,
