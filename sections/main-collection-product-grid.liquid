@@ -104,13 +104,22 @@
           {%- for product in collection.products -%}
             {%- liquid
               assign featured_tile_enabled = product.metafields.custom.featured_tile.value
+              if featured_tile_enabled == blank
+                assign featured_tile_enabled = product.metafields.custom.custom_featured_tile.value
+              endif
               assign featured_tile_size = product.metafields.custom.featured_tile_size.value | default: 'wide' | downcase
+              if product.metafields.custom.featured_tile_size.value == blank and product.metafields.custom.custom_featured_tile_size.value != blank
+                assign featured_tile_size = product.metafields.custom.custom_featured_tile_size.value | downcase
+              endif
               unless featured_tile_size == 'normal' or featured_tile_size == 'wide' or featured_tile_size == 'large' or featured_tile_size == 'full'
                 assign featured_tile_size = 'wide'
               endunless
               assign product_grid_order = forloop.index | times: 10
               if featured_tile_enabled
                 assign featured_tile_position = product.metafields.custom.featured_tile_position.value | default: forloop.index
+                if product.metafields.custom.featured_tile_position.value == blank and product.metafields.custom.custom_featured_tile_position.value != blank
+                  assign featured_tile_position = product.metafields.custom.custom_featured_tile_position.value
+                endif
                 assign featured_tile_position = featured_tile_position | at_least: 1 | at_most: collection.products.size
                 assign product_grid_order = featured_tile_position | times: 10 | minus: 5
               endif

@@ -2,6 +2,12 @@
   assign editorial_image = product.metafields.custom.featured_tile_image.value
   assign editorial_mobile_image = product.metafields.custom.featured_tile_mobile_image.value
   if editorial_image == blank
+    assign editorial_image = product.metafields.custom.custom_featured_tile_image.value
+  endif
+  if editorial_mobile_image == blank
+    assign editorial_mobile_image = product.metafields.custom.custom_featured_tile_mobile_image.value
+  endif
+  if editorial_image == blank
     assign editorial_image = product.featured_media.preview_image
   endif
 -%}
