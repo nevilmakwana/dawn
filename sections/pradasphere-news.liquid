@@ -76,16 +76,20 @@
     const next = section?.querySelector('[data-pradasphere-next]');
     if (!track || slides.length < 2 || !previous || !next) return;
 
-    const slideTarget = (slide) => slide.offsetLeft - ((track.clientWidth - slide.offsetWidth) / 2);
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const duration = 500;
+    let activeIndex = 0;
+    let isAnimating = false;
+    let pointerId = null;
+    let pointerStart = 0;
+    let dragStart = 0;
+    let didDrag = false;
 
-    const getActiveIndex = () => slides.reduce((closestIndex, slide, index) => {
-      return Math.abs(slideTarget(slide) - track.scrollLeft) < Math.abs(slideTarget(slides[closestIndex]) - track.scrollLeft)
-        ? index
-        : closestIndex;
-    }, 0);
+    const clampIndex = (index) => Math.max(0, Math.min(slides.length - 1, index));
+    const stepWidth = () => slides[0]?.getBoundingClientRect().width || 0;
+    const indexPosition = (index = activeIndex) => -(index * stepWidth());
 
-    const updateButtons = () => {
-      const activeIndex = getActiveIndex();
+    const updateState = () => {
       slides.forEach((slide, index) => {
         slide.classList.toggle('is-active', index === activeIndex);
         slide.setAttribute('aria-current', index === activeIndex ? 'true' : 'false');
@@ -94,50 +98,75 @@
       next.disabled = activeIndex === slides.length - 1;
     };
 
-    let animationFrame;
-
-    const ease = (progress) => {
-      let time = progress;
-      for (let iteration = 0; iteration < 5; iteration += 1) {
-        const inverse = 1 - time;
-        const x = (3 * inverse * inverse * time * .25) + (3 * inverse * time * time * .25) + (time * time * time);
-        const slope = (3 * inverse * inverse * .25) + (3 * time * time * .75);
-        if (Math.abs(slope) < .0001) break;
-        time -= (x - progress) / slope;
-        time = Math.max(0, Math.min(1, time));
-      }
-      const inverse = 1 - time;
-      return (3 * inverse * inverse * time * .1) + (3 * inverse * time * time) + (time * time * time);
+    const render = (position, animate = true) => {
+      track.style.transition = animate && !reducedMotion.matches
+        ? `transform ${duration}ms linear`
+        : 'none';
+      track.style.transform = `translate3d(${position}px, 0, 0)`;
     };
 
-    const animateTo = (left) => {
-      cancelAnimationFrame(animationFrame);
-      const start = track.scrollLeft;
-      const distance = left - start;
-      const duration = 600;
-      const startedAt = performance.now();
-
-      const step = (now) => {
-        const progress = Math.min(1, (now - startedAt) / duration);
-        track.scrollLeft = start + (distance * ease(progress));
-        if (progress < 1) animationFrame = requestAnimationFrame(step);
-      };
-
-      animationFrame = requestAnimationFrame(step);
+    const goTo = (index, animate = true) => {
+      const targetIndex = clampIndex(index);
+      if (isAnimating && animate) return;
+      activeIndex = targetIndex;
+      updateState();
+      isAnimating = animate && !reducedMotion.matches;
+      render(indexPosition(), animate);
     };
 
-    const move = (direction) => {
-      const activeIndex = getActiveIndex();
-      const targetIndex = Math.max(0, Math.min(slides.length - 1, activeIndex + direction));
-      animateTo(slideTarget(slides[targetIndex]));
+    const finishDrag = (event, cancelled = false) => {
+      if (pointerId === null || event.pointerId !== pointerId) return;
+      const distance = event.clientX - pointerStart;
+      const threshold = Math.min(80, stepWidth() * .15);
+      const direction = !cancelled && Math.abs(distance) >= threshold ? (distance < 0 ? 1 : -1) : 0;
+
+      if (track.hasPointerCapture(pointerId)) track.releasePointerCapture(pointerId);
+      pointerId = null;
+      goTo(activeIndex + direction);
     };
 
-    previous.addEventListener('click', () => move(-1));
-    next.addEventListener('click', () => move(1));
-    track.addEventListener('pointerdown', () => cancelAnimationFrame(animationFrame), { passive: true });
-    track.addEventListener('scroll', updateButtons, { passive: true });
-    window.addEventListener('resize', updateButtons, { passive: true });
-    updateButtons();
+    previous.addEventListener('click', () => goTo(activeIndex - 1));
+    next.addEventListener('click', () => goTo(activeIndex + 1));
+
+    track.addEventListener('transitionend', (event) => {
+      if (event.target === track && event.propertyName === 'transform') isAnimating = false;
+    });
+
+    track.addEventListener('pointerdown', (event) => {
+      if (isAnimating || event.button !== 0) return;
+      pointerId = event.pointerId;
+      pointerStart = event.clientX;
+      dragStart = indexPosition();
+      didDrag = false;
+      track.setPointerCapture(pointerId);
+      track.style.transition = 'none';
+    });
+
+    track.addEventListener('pointermove', (event) => {
+      if (pointerId === null || event.pointerId !== pointerId) return;
+      const distance = event.clientX - pointerStart;
+      didDrag = didDrag || Math.abs(distance) > 5;
+      const minimum = indexPosition(slides.length - 1);
+      render(Math.max(minimum, Math.min(0, dragStart + distance)), false);
+    });
+
+    track.addEventListener('pointerup', (event) => finishDrag(event));
+    track.addEventListener('pointercancel', (event) => finishDrag(event, true));
+    track.addEventListener('click', (event) => {
+      if (!didDrag) return;
+      event.preventDefault();
+      event.stopPropagation();
+      didDrag = false;
+    }, true);
+
+    track.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') goTo(activeIndex - 1);
+      if (event.key === 'ArrowRight') goTo(activeIndex + 1);
+    });
+
+    window.addEventListener('resize', () => render(indexPosition(), false), { passive: true });
+    updateState();
+    render(indexPosition(), false);
   })();
 </script>
 

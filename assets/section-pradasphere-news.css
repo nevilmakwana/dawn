@@ -17,7 +17,10 @@
   text-align: center;
 }
 
-.pradasphere-news__carousel { position: relative; }
+.pradasphere-news__carousel {
+  position: relative;
+  overflow: hidden;
+}
 
 .pradasphere-news__track {
   display: flex;
@@ -25,20 +28,17 @@
   gap: 0;
   margin: 0;
   padding: 0 22.1vw;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-behavior: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
+  width: max-content;
+  touch-action: pan-y;
+  user-select: none;
+  will-change: transform;
+  transition: transform 500ms linear;
 }
-
-.pradasphere-news__track::-webkit-scrollbar { display: none; }
 
 .pradasphere-news__slide {
   flex: 0 0 55.8vw;
   width: 55.8vw;
   margin: 0;
-  scroll-snap-align: center;
 }
 
 .pradasphere-news__media {
@@ -50,11 +50,7 @@
   overflow: hidden;
   background: #222;
   color: #fff;
-  transform: scale(.9);
-  transition: transform .3s ease;
 }
-
-.pradasphere-news__slide.is-active .pradasphere-news__media { transform: scale(1); }
 
 .pradasphere-news__media::after {
   position: absolute;
@@ -72,10 +68,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform .6s cubic-bezier(.22, 1, .36, 1);
 }
-
-.pradasphere-news__media:hover img { transform: scale(1.015); }
 
 .pradasphere-news__discover {
   position: absolute;
@@ -215,6 +208,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pradasphere-news__track { scroll-behavior: auto; }
-  .pradasphere-news__media img { transition: none; }
+  .pradasphere-news__track { transition-duration: 0ms !important; }
 }
