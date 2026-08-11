@@ -17,7 +17,9 @@
 .prada-faq__topic-list a { display: grid; grid-template-columns: 28px 1fr 16px; align-items: center; min-height: 56px; padding: 0 20px; border-bottom: 1px solid #d8d8d8; color: #111; font-size: 11px; text-decoration: none; }
 .prada-faq__topic-list a:last-child { border-bottom: 0; }
 .prada-faq__topic-list strong { font-weight: 600; }
-.prada-faq__topic-list b { font-size: 20px; font-weight: 400; text-align: right; }
+.prada-faq__topic-list span { display: flex; align-items: center; }
+.prada-faq__topic-list svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.prada-faq__topic-list b { width: 8px; height: 8px; border-top: 2px solid currentColor; border-right: 2px solid currentColor; transform: rotate(45deg); justify-self: end; }
 .prada-faq__back { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 28px; padding: 0; border: 0; background: transparent; color: #111; font-size: 11px; cursor: pointer; }
 .prada-faq__back span { font-size: 20px; }
 .prada-faq__accordions { border: 1px solid #111; }
@@ -44,6 +46,62 @@
   .prada-faq__topic-list a { min-height: 68px; }
   .prada-faq__accordions summary { min-height: 64px; padding: 18px; }
   .prada-faq__answer { padding: 0 18px 24px; }
+}
+
+@media screen and (max-width: 749px) {
+  .prada-faq__sidebar {
+    display: none;
+  }
+
+  .prada-faq__content,
+  .prada-faq__detail-content {
+    width: 100%;
+    padding: 26px 20px 48px;
+  }
+
+  .prada-faq__content h1,
+  .prada-faq__topics h2,
+  .prada-faq__topic-panel > h2 {
+    margin-bottom: 25px;
+    font-size: 20px;
+    line-height: 1.2;
+  }
+
+  .prada-faq__suggested {
+    gap: 9px;
+  }
+
+  .prada-faq__suggested a {
+    min-height: 49px;
+    padding: 13px 16px;
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
+  .prada-faq__topics {
+    margin: 78px -20px 0;
+  }
+
+  .prada-faq__topics h2 {
+    padding: 0 20px;
+  }
+
+  .prada-faq__topic-list {
+    border-right: 0;
+    border-left: 0;
+  }
+
+  .prada-faq__topic-list a {
+    grid-template-columns: 34px minmax(0, 1fr) 16px;
+    min-height: 72px;
+    padding: 0 22px;
+    font-size: 14px;
+  }
+
+  .prada-faq__topic-list svg {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 .prada-faq,

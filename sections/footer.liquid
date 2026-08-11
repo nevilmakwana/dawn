@@ -85,7 +85,7 @@
       <div class="prada-footer__group-content">
         <ul>
           <li><a href="/pages/contact#send-us-email">{{ section.settings.contact_email | default: shop.email | escape }}</a></li>
-          <li><a href="/pages/contact?view=faq">FAQs</a></li>
+          <li><a href="/pages/contact?view=faq">FAQ</a></li>
         </ul>
       </div>
     </details>
@@ -592,7 +592,7 @@
           <ul>
             <li><a href="/pages/contact">Contact Grey Exim</a></li>
             {%- if shop.email != blank -%}<li><a href="mailto:{{ shop.email | escape }}">{{ shop.email | escape }}</a></li>{%- endif -%}
-            <li><a href="/pages/contact?view=faq">FAQs</a></li>
+            <li><a href="/pages/contact?view=faq">FAQ</a></li>
           </ul>
         </div>
       </details>
