@@ -169,23 +169,15 @@
 
   {%- if section.settings.mobile_center_zoom -%}
     @media screen and (max-width: 749px) {
+      #shopify-section-{{ section.id }} {
+        min-height: 0 !important;
+        height: auto !important;
+      }
+
       #Banner-{{ section.id }} {
-        min-height: calc(100vh - 72px) !important;
-        height: calc(100vh - 72px) !important;
-      }
-
-      @supports (height: 100svh) {
-        #Banner-{{ section.id }} {
-          min-height: calc(100svh - 72px) !important;
-          height: calc(100svh - 72px) !important;
-        }
-      }
-
-      @supports (height: 100dvh) {
-        #Banner-{{ section.id }} {
-          min-height: calc(100dvh - 72px) !important;
-          height: calc(100dvh - 72px) !important;
-        }
+        aspect-ratio: 1079 / 2048 !important;
+        min-height: 0 !important;
+        height: auto !important;
       }
 
       #Banner-{{ section.id }}::before,
