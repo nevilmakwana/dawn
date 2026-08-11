@@ -1170,18 +1170,20 @@
       width: 100vw !important;
       height: calc(100dvh - var(--header-height, 56px)) !important;
       max-width: none !important;
-      transform: translateX(-105%) !important;
+      transform: none !important;
+      opacity: 0 !important;
       background: #ffffff !important;
       border-right: 0 !important;
       box-shadow: none !important;
       filter: none !important;
       overflow: hidden !important;
       z-index: 1001 !important;
-      transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), visibility 300ms ease !important;
+      transition: opacity 260ms ease, visibility 260ms ease !important;
     }
 
     .js .prada-header details[open].menu-opening > .menu-drawer {
-      transform: translateX(0) !important;
+      transform: none !important;
+      opacity: 1 !important;
       visibility: visible !important;
     }
 
@@ -1246,7 +1248,67 @@
     .prada-header .menu-drawer__utility-links {
       background: #ffffff !important;
       border-top: 1px solid rgba(0, 0, 0, 0.08);
-      padding: 16px 30px !important;
+      display: grid !important;
+      gap: 18px !important;
+      padding: 24px 30px 30px !important;
+    }
+
+    .prada-header .menu-drawer__utility-row {
+      display: flex !important;
+      align-items: center !important;
+      gap: 16px !important;
+      min-height: 28px;
+      padding: 0 !important;
+      color: #111111 !important;
+      font-size: 15px !important;
+      line-height: 1.3 !important;
+      text-decoration: none !important;
+    }
+
+    .prada-header .menu-drawer__utility-row > .svg-wrapper {
+      width: 22px !important;
+      height: 22px !important;
+      flex: 0 0 22px;
+    }
+
+    .prada-header .menu-drawer__utility-row svg {
+      width: 22px !important;
+      height: 22px !important;
+      fill: none !important;
+      stroke: currentColor !important;
+      stroke-width: 1.8 !important;
+    }
+
+    .prada-header .menu-drawer__localization {
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      padding: 0 !important;
+    }
+
+    .prada-header .menu-drawer__localization localization-form,
+    .prada-header .menu-drawer__localization .localization-form,
+    .prada-header .menu-drawer__localization .localization-form > div {
+      display: inline-flex !important;
+      margin: 0 !important;
+    }
+
+    .prada-header .menu-drawer__localization .localization-form__select {
+      min-height: auto !important;
+      padding: 0 16px 0 0 !important;
+      border: 0 !important;
+      background: transparent !important;
+      color: #111111 !important;
+      font-size: 15px !important;
+      line-height: 1.3 !important;
+    }
+
+    .prada-header .menu-drawer__localization .localization-form__select .icon-caret {
+      right: 0 !important;
+    }
+
+    .prada-header .menu-drawer__localization-separator {
+      color: #777777;
     }
 
     .prada-header .header__search details {
