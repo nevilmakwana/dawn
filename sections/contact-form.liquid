@@ -206,18 +206,46 @@
         <label class="form__label field__label" for="ContactForm-body">
           Additional info*
         </label>
-        <span class="prada-contact-page__counter">200 characters max</span>
+        <span class="prada-contact-page__counter" data-prada-contact-counter>200 characters left</span>
       </div>
-      <p class="prada-contact-page__privacy">By submitting this form, you confirm that the information provided will be used to respond to and manage your request.</p>
+      <div class="prada-contact-page__legal">
+        <p>This form is protected via Google reCaptcha invisible technology</p>
+        <p>
+          By submitting this form, you confirm that you have read and understood the
+          <a href="{{ shop.privacy_policy.url | default: '/policies/privacy-policy' }}">Privacy Statement</a>
+          and acknowledge that your personal information will be used to respond to, and manage your request.
+        </p>
+      </div>
       <div class="contact__button">
-        <button type="submit" class="button">
-          {{ 'templates.contact.form.send' | t }}
-        </button>
+        <button type="submit" class="button" data-prada-contact-submit>Submit</button>
       </div>
     {%- endform -%}
   </div>
   </div>
 </div>
+
+<script>
+  (() => {
+    const form = document.getElementById('ContactForm');
+    if (!form || form.dataset.pradaContactReady === 'true') return;
+    form.dataset.pradaContactReady = 'true';
+
+    const message = form.querySelector('#ContactForm-body');
+    const counter = form.querySelector('[data-prada-contact-counter]');
+    const submit = form.querySelector('[data-prada-contact-submit]');
+
+    const syncFormState = () => {
+      if (message && counter) {
+        counter.textContent = `${Math.max(0, message.maxLength - message.value.length)} characters left`;
+      }
+      if (submit) submit.disabled = !form.checkValidity();
+    };
+
+    form.addEventListener('input', syncFormState);
+    form.addEventListener('change', syncFormState);
+    syncFormState();
+  })();
+</script>
 
 {% schema %}
 {
