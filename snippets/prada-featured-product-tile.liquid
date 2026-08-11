@@ -1,0 +1,41 @@
+{%- liquid
+  assign editorial_image = product.metafields.custom.featured_tile_image.value
+  assign editorial_mobile_image = product.metafields.custom.featured_tile_mobile_image.value
+  if editorial_image == blank
+    assign editorial_image = product.featured_media.preview_image
+  endif
+-%}
+
+<article class="prada-featured-tile">
+  <a class="prada-featured-tile__link" href="{{ product.url }}" aria-label="View {{ product.title | escape }}">
+    {%- if editorial_image != blank -%}
+      <picture>
+        {%- if editorial_mobile_image != blank -%}
+          <source
+            media="(max-width: 749px)"
+            srcset="{{ editorial_mobile_image | image_url: width: 750 }} 750w, {{ editorial_mobile_image | image_url: width: 1100 }} 1100w"
+          >
+        {%- endif -%}
+        <img
+          class="prada-featured-tile__image"
+          src="{{ editorial_image | image_url: width: 1600 }}"
+          srcset="
+            {{ editorial_image | image_url: width: 750 }} 750w,
+            {{ editorial_image | image_url: width: 1100 }} 1100w,
+            {{ editorial_image | image_url: width: 1600 }} 1600w,
+            {{ editorial_image | image_url: width: 2200 }} 2200w
+          "
+          sizes="(max-width: 749px) 100vw, 50vw"
+          alt="{{ editorial_image.alt | default: product.title | escape }}"
+          loading="lazy"
+          decoding="async"
+          width="{{ editorial_image.width }}"
+          height="{{ editorial_image.height }}"
+        >
+      </picture>
+    {%- else -%}
+      {{ 'product-apparel-2' | placeholder_svg_tag: 'prada-featured-tile__placeholder' }}
+    {%- endif -%}
+    <span class="visually-hidden">{{ product.title | escape }}</span>
+  </a>
+</article>

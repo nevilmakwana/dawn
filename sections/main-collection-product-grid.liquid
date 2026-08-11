@@ -102,12 +102,31 @@
       {%- else -%}
         <ul class="prada-collection__grid" id="product-grid" data-id="{{ section.id }}" role="list">
           {%- for product in collection.products -%}
+            {%- liquid
+              assign featured_tile_enabled = product.metafields.custom.featured_tile.value
+              assign featured_tile_size = product.metafields.custom.featured_tile_size.value | default: 'wide' | downcase
+              unless featured_tile_size == 'normal' or featured_tile_size == 'wide' or featured_tile_size == 'large' or featured_tile_size == 'full'
+                assign featured_tile_size = 'wide'
+              endunless
+              assign product_grid_order = forloop.index | times: 10
+              if featured_tile_enabled
+                assign featured_tile_position = product.metafields.custom.featured_tile_position.value | default: forloop.index
+                assign featured_tile_position = featured_tile_position | at_least: 1 | at_most: collection.products.size
+                assign product_grid_order = featured_tile_position | times: 10 | minus: 5
+              endif
+            -%}
             {%- assign secondary_media = product.media[1] -%}
             {%- assign has_secondary_image = false -%}
             {%- if secondary_media and secondary_media.media_type == 'image' -%}
               {%- assign has_secondary_image = true -%}
             {%- endif -%}
-            <li class="prada-collection__item">
+            <li
+              class="prada-collection__item{% if featured_tile_enabled %} prada-collection__item--featured prada-collection__item--featured-{{ featured_tile_size }}{% endif %}"
+              style="--prada-grid-order: {{ product_grid_order }};"
+            >
+              {%- if featured_tile_enabled -%}
+                {% render 'prada-featured-product-tile', product: product %}
+              {%- else -%}
               <product-component view-event-payload="{{ product | standard_event_data: 'view', context: 'collection' | escape }}">
                 <article class="prada-product-tile">
                   <div class="prada-product-tile__media">
@@ -194,6 +213,7 @@
                   </div>
                 </article>
               </product-component>
+              {%- endif -%}
             </li>
           {%- endfor -%}
         </ul>
