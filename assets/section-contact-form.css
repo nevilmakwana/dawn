@@ -433,8 +433,11 @@
   }
 
   #send-us-email .text-area {
+    height: 140px;
     min-height: 140px;
+    max-height: 140px;
     padding: 18px 16px 38px;
     font-size: 16px;
+    resize: none;
   }
 }
