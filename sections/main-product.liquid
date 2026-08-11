@@ -323,6 +323,7 @@
         if (!gallery || !desktopWishlist || !lastMedia || !window.matchMedia('(min-width: 990px)').matches) {
           desktopWishlist?.classList.remove('is-on-last-media');
           desktopDots?.classList.remove('is-gallery-ended');
+          desktopDots?.style.removeProperty('--prada-dots-header-clip');
           return;
         }
 
@@ -338,6 +339,11 @@
           lastMediaRect.top + releaseDepth <= headerHeight + 24
         );
         desktopDots?.classList.toggle('is-gallery-ended', gallery.getBoundingClientRect().bottom <= window.innerHeight);
+        if (desktopDots) {
+          const dotsRect = desktopDots.getBoundingClientRect();
+          const clippedHeight = Math.max(0, Math.min(dotsRect.height, headerHeight - dotsRect.top));
+          desktopDots.style.setProperty('--prada-dots-header-clip', `${clippedHeight}px`);
+        }
       });
     };
 
