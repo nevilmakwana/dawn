@@ -51,7 +51,6 @@ body:has(main[data-template='product']) .section-header.shopify-section-group-he
 .prada-product__submit { display: block; width: 100%; min-height: 52px; margin-top: 18px; padding: 14px 20px; border: 1px solid #111; border-radius: 0; background: #111; color: #fff; font-size: 12px; line-height: 1.2; font-weight: 700; letter-spacing: .035em; text-transform: uppercase; cursor: pointer; }
 .prada-product__submit:disabled { border-color: #b9b9b9; background: #b9b9b9; cursor: not-allowed; }
 .prada-product__drawer-trigger { display: block; width: max-content; margin-top: 8px; padding: 7px 0; border: 0; background: transparent; color: inherit; font: inherit; font-size: 13px; line-height: 1.35; font-weight: 500; letter-spacing: .005em; text-align: left; cursor: pointer; }
-.prada-product__store-link { display: block; width: max-content; margin-top: 12px; padding: 7px 0; color: inherit; font-size: 13px; line-height: 1.35; text-underline-offset: 4px; }
 .prada-product__drawer-shell { position: fixed; z-index: 1000; inset: 0; visibility: hidden; pointer-events: none; transition: visibility 0s linear .45s; }
 .prada-product__drawer-shell.is-open { visibility: visible; pointer-events: auto; transition-delay: 0s; }
 .prada-product__drawer-backdrop { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: rgba(0, 0, 0, .68); opacity: 0; cursor: default; transition: opacity .45s cubic-bezier(.22, 1, .36, 1); }
@@ -112,7 +111,6 @@ html.prada-drawer-open, html.prada-drawer-open body { overflow: hidden; }
   .prada-product__form { margin-top: 34px; padding-top: 28px; border-top: 1px solid var(--prada-border); }
   .prada-product__option--color { margin-bottom: 28px; }
   .prada-product__submit { min-height: 58px; margin-top: 20px; font-size: 14px; }
-  .prada-product__store-link,
   .prada-product__drawer-trigger { margin-top: 28px; padding: 0; font-size: 15px; line-height: 1.35; text-decoration: underline; text-underline-offset: 4px; }
   .prada-product__drawer-trigger + .prada-product__drawer-trigger { margin-top: 30px; }
   .prada-product__heading-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
