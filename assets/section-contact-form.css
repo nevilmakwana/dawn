@@ -376,40 +376,21 @@
   #send-us-email select.field__input {
     appearance: none;
     -webkit-appearance: none;
-    background: #fff;
+    background-color: #fff;
+    background-image:
+      linear-gradient(#777, #777),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%23111' stroke-width='2.2'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 56px center, right 22px center;
+    background-size: 1px 40px, 14px 9px;
   }
 
   #send-us-email .field:has(> select.field__input)::before {
-    position: absolute;
-    z-index: 2;
-    top: 13px;
-    right: 56px;
-    bottom: 13px;
-    display: block;
-    width: 1px;
-    height: auto;
-    background: #777;
-    box-shadow: none;
-    content: '';
-    pointer-events: none;
+    content: none;
   }
 
   #send-us-email .field:has(> select.field__input)::after {
-    position: absolute;
-    z-index: 3;
-    top: 50%;
-    right: 23px;
-    display: block;
-    width: 10px;
-    height: 10px;
-    border: 0;
-    border-right: 2px solid #111;
-    border-bottom: 2px solid #111;
-    background: transparent;
-    box-shadow: none;
-    content: '';
-    pointer-events: none;
-    transform: translateY(-70%) rotate(45deg);
+    content: none;
   }
 
   #send-us-email .field__input:focus,
