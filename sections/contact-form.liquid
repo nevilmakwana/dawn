@@ -41,7 +41,7 @@
         assign contact_form_class = 'isolate scroll-trigger animate--slide-in'
       endif
     -%}
-    {%- form 'contact', id: 'ContactForm', class: contact_form_class -%}
+    {%- form 'contact', id: 'ContactForm', class: contact_form_class, data-prada-validity-form: '' -%}
       {%- if form.posted_successfully? -%}
         <h2 class="form-status form-status-list form__message" tabindex="-1" autofocus>
           {{- 'icon-success.svg' | inline_asset_content -}}
@@ -210,7 +210,7 @@
       </div>
       <p class="prada-contact-page__privacy">By submitting this form, you confirm that the information provided will be used to respond to and manage your request.</p>
       <div class="contact__button">
-        <button type="submit" class="button">
+        <button type="submit" class="button" data-prada-validity-submit disabled>
           {{ 'templates.contact.form.send' | t }}
         </button>
       </div>
@@ -218,6 +218,8 @@
   </div>
   </div>
 </div>
+
+<script src="{{ 'prada-form-validity.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
 {

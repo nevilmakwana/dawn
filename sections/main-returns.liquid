@@ -21,7 +21,7 @@
         {%- endif -%}
       </div>
 
-      {%- form 'contact', id: 'ReturnOrderForm', class: 'prada-track-order__form' -%}
+      {%- form 'contact', id: 'ReturnOrderForm', class: 'prada-track-order__form', data-prada-validity-form: '' -%}
         <input type="hidden" name="contact[Request type]" value="Order return request">
         <input type="hidden" name="contact[body]" value="A customer has requested help returning an order.">
         {%- if form.posted_successfully? -%}
@@ -40,7 +40,7 @@
             <input type="text" name="contact[Order number]" autocomplete="off" required>
           </label>
         </div>
-        <button type="submit">Continue</button>
+        <button type="submit" data-prada-validity-submit disabled>Continue</button>
       {%- endform -%}
 
       <div class="prada-track-order__questions">
@@ -57,6 +57,8 @@
     </div>
   </div>
 </section>
+
+<script src="{{ 'prada-form-validity.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
 {

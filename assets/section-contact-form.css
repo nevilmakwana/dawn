@@ -255,10 +255,14 @@
   width: 136px;
   min-height: 34px;
   font-size: 9.6px;
-  background: #bdbdbd;
+  background: #111;
 }
 
-#send-us-email .contact__button .button:hover { background: #111; }
+#send-us-email .contact__button .button:disabled {
+  background: #bdbdbd;
+  cursor: not-allowed;
+  opacity: 1;
+}
 
 @media screen and (max-width: 989px) {
   #send-us-email .prada-contact-page {
