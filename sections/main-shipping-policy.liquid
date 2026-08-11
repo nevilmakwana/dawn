@@ -15,7 +15,7 @@
     <a class="prada-shipping-policy__back" href="/pages/contact?view=faq">FAQs</a>
     <h1 id="ShippingPolicyTitle" class="prada-shipping-policy__heading">Shipments</h1>
 
-    <div class="prada-shipping-policy__accordion">
+    <div class="prada-shipping-policy__accordion" data-prada-exclusive-accordion>
       <details class="prada-shipping-policy__item">
         <summary>How long will it take to receive my order?</summary>
         <div class="prada-shipping-policy__answer">
@@ -52,19 +52,7 @@
   </section>
 </div>
 
-<script>
-  (() => {
-    const accordion = document.currentScript.previousElementSibling?.querySelector('.prada-shipping-policy__accordion');
-    if (!accordion) return;
-    accordion.addEventListener('toggle', (event) => {
-      const opened = event.target;
-      if (!(opened instanceof HTMLDetailsElement) || !opened.open) return;
-      accordion.querySelectorAll('details[open]').forEach((item) => {
-        if (item !== opened) item.open = false;
-      });
-    }, true);
-  })();
-</script>
+<script src="{{ 'prada-exclusive-accordion.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
 {

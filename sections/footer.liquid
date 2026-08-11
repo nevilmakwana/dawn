@@ -250,6 +250,11 @@
           event.preventDefault();
           const willExpand = !group.classList.contains('is-expanded');
           if (willExpand) {
+            groups.forEach((sibling) => {
+              if (sibling === group) return;
+              sibling.classList.remove('is-expanded');
+              sibling.querySelector('summary')?.setAttribute('aria-expanded', 'false');
+            });
             group.style.setProperty('--prada-footer-content-height', `${content.scrollHeight + 30}px`);
           }
           group.classList.toggle('is-expanded', willExpand);
@@ -667,6 +672,9 @@
                 details._pradaFooterAnimation = null;
               };
             } else {
+              footer.querySelectorAll('.prada-mobile-footer__accordion[open]').forEach((sibling) => {
+                if (sibling !== details) sibling.querySelector('summary')?.click();
+              });
               details.open = true;
               const endHeight = content.getBoundingClientRect().height;
               details._pradaFooterAnimation = content.animate(

@@ -49,7 +49,7 @@
           {%- endcase -%}
           <div class="prada-faq__topic-panel" data-faq-panel="{{ topic_key }}" hidden>
             <h2>{{ topic_title }}</h2>
-            <div class="prada-faq__accordions">
+            <div class="prada-faq__accordions" data-prada-exclusive-accordion>
               {%- for block in section.blocks -%}
                 {%- if block.settings.topic == topic_key -%}
                   <details id="faq-{{ block.id }}" {{ block.shopify_attributes }}>
@@ -124,6 +124,8 @@
     applyHash();
   })();
 </script>
+
+<script src="{{ 'prada-exclusive-accordion.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
 {
