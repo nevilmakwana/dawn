@@ -191,6 +191,10 @@
   .pradasphere-news__arrow--next { right: 2px; }
 }
 
+@media screen and (max-width: 749px) {
+  .pradasphere-news__arrow { display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pradasphere-news__track { scroll-behavior: auto; }
   .pradasphere-news__media img { transition: none; }

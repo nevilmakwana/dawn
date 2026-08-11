@@ -76,18 +76,22 @@
     const next = section?.querySelector('[data-pradasphere-next]');
     if (!track || slides.length < 2 || !previous || !next) return;
 
+    const slideTarget = (slide) => slide.offsetLeft - ((track.clientWidth - slide.offsetWidth) / 2);
+
+    const getActiveIndex = () => slides.reduce((closestIndex, slide, index) => {
+      return Math.abs(slideTarget(slide) - track.scrollLeft) < Math.abs(slideTarget(slides[closestIndex]) - track.scrollLeft)
+        ? index
+        : closestIndex;
+    }, 0);
+
     const updateButtons = () => {
-      const tolerance = 4;
-      previous.disabled = track.scrollLeft <= tolerance;
-      next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - tolerance;
+      const activeIndex = getActiveIndex();
+      previous.disabled = activeIndex === 0;
+      next.disabled = activeIndex === slides.length - 1;
     };
 
     const move = (direction) => {
-      const slideTarget = (slide) => slide.offsetLeft - ((track.clientWidth - slide.offsetWidth) / 2);
-      const active = slides.reduce((closest, slide) => {
-        return Math.abs(slideTarget(slide) - track.scrollLeft) < Math.abs(slideTarget(closest) - track.scrollLeft) ? slide : closest;
-      }, slides[0]);
-      const activeIndex = slides.indexOf(active);
+      const activeIndex = getActiveIndex();
       const targetIndex = Math.max(0, Math.min(slides.length - 1, activeIndex + direction));
       track.scrollTo({ left: slideTarget(slides[targetIndex]), behavior: 'smooth' });
     };
