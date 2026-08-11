@@ -246,6 +246,7 @@
               <a
                 href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
                 class="menu-drawer__utility-row link focus-inset"
+                data-prada-utility-link
                 rel="nofollow"
               >
                 <span class="svg-wrapper">{{- 'prada-account.svg' | inline_asset_content -}}</span>
@@ -253,61 +254,34 @@
               </a>
             {%- endif -%}
 
-            <a href="{{ routes.cart_url }}" class="menu-drawer__utility-row link focus-inset">
+            <a href="{{ routes.cart_url }}" class="menu-drawer__utility-row link focus-inset" data-prada-utility-link>
               <span class="svg-wrapper">{{- 'prada-cart.svg' | inline_asset_content -}}</span>
               <span>Shopping bag</span>
             </a>
 
-            <a href="{{ routes.all_products_collection_url }}?view=wishlist" class="menu-drawer__utility-row link focus-inset">
+            <a href="{{ routes.all_products_collection_url }}?view=wishlist" class="menu-drawer__utility-row link focus-inset" data-prada-utility-link>
               <span class="svg-wrapper">{{- 'prada-wishlist.svg' | inline_asset_content -}}</span>
               <span>Wishlist</span>
             </a>
 
-            <a href="/pages/contact" class="menu-drawer__utility-row link focus-inset">
+            <a href="/pages/contact" class="menu-drawer__utility-row link focus-inset" data-prada-utility-link>
               <span class="svg-wrapper">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.5 9 8.2 6.9 9.8c1.5 3.1 4 5.6 7.1 7.1l1.7-2.1 4.8 2.4-.7 3.2c-.2.8-.9 1.3-1.7 1.3C9.4 21.7 2.3 14.6 2.3 5.9c0-.8.5-1.5 1.3-1.7l3-.7Z"/></svg>
               </span>
               <span>Contact us</span>
             </a>
 
-            <div class="menu-drawer__utility-row menu-drawer__localization-row">
+            <button
+              type="button"
+              class="menu-drawer__utility-row menu-drawer__localization-row"
+              data-prada-localization-open
+              aria-haspopup="dialog"
+            >
               <span class="svg-wrapper menu-drawer__globe-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.2 3.6 8.5S14.4 18.2 12 20.5M12 3.5C9.6 5.8 8.4 8.7 8.4 12s1.2 6.2 3.6 8.5"/></svg>
               </span>
-              <div class="menu-drawer__localization header-localization">
-                {%- if localization.available_countries and localization.available_countries.size > 1 -%}
-                  <localization-form>
-                    {%- form 'localization', id: 'HeaderCountryMobileForm', class: 'localization-form' -%}
-                      <div>
-                        <h2 class="visually-hidden" id="HeaderCountryMobileLabel">
-                          {{ 'localization.country_label' | t }}
-                        </h2>
-                        {%- render 'country-localization', localPosition: 'HeaderCountryMobile' -%}
-                      </div>
-                    {%- endform -%}
-                  </localization-form>
-                {%- else -%}
-                  <span>{{ localization.country.name | escape }}</span>
-                {%- endif -%}
-
-                <span class="menu-drawer__localization-separator" aria-hidden="true">/</span>
-
-                {%- if localization.available_languages and localization.available_languages.size > 1 -%}
-                  <localization-form>
-                    {%- form 'localization', id: 'HeaderLanguageMobileForm', class: 'localization-form' -%}
-                      <div>
-                        <h2 class="visually-hidden" id="HeaderLanguageMobileLabel">
-                          {{ 'localization.language_label' | t }}
-                        </h2>
-                        {%- render 'language-localization', localPosition: 'HeaderLanguageMobile' -%}
-                      </div>
-                    {%- endform -%}
-                  </localization-form>
-                {%- else -%}
-                  <span>{{ localization.language.endonym_name | capitalize | escape }}</span>
-                {%- endif -%}
-              </div>
-            </div>
+              <span>{{ localization.country.name | escape }} / {{ localization.language.endonym_name | capitalize | escape }}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -356,7 +330,19 @@
     document.addEventListener('click', function (event) {
       const closeButton = event.target.closest('[data-prada-drawer-close]');
       const searchButton = event.target.closest('[data-prada-drawer-search]');
-      const actionButton = closeButton || searchButton;
+      const localizationButton = event.target.closest('[data-prada-localization-open]');
+      const utilityLink = event.target.closest('[data-prada-utility-link]');
+      const actionButton = closeButton || searchButton || localizationButton;
+
+      if (utilityLink) {
+        const drawer = utilityLink.closest('header-drawer');
+        const details = drawer && drawer.querySelector(':scope > details');
+        const header = drawer && drawer.closest('.section-header');
+
+        details?.classList.remove('menu-opening');
+        header?.classList.remove('menu-open');
+        document.body.classList.remove('overflow-hidden-tablet', 'overflow-hidden-mobile');
+      }
 
       if (!actionButton) return;
 
