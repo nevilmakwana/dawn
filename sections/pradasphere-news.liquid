@@ -77,7 +77,7 @@
     if (!track || slides.length < 2 || !previous || !next) return;
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const duration = 500;
+    const duration = 600;
     let activeIndex = 0;
     let isAnimating = false;
     let pointerId = null;
@@ -100,7 +100,7 @@
 
     const render = (position, animate = true) => {
       track.style.transition = animate && !reducedMotion.matches
-        ? `transform ${duration}ms linear`
+        ? `transform ${duration}ms ease`
         : 'none';
       track.style.transform = `translate3d(${position}px, 0, 0)`;
     };
