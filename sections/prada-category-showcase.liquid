@@ -12,7 +12,7 @@
           type="button"
           role="tab"
           aria-selected="{% if section.settings.active_tab == 'women' %}true{% else %}false{% endif %}"
-          aria-controls="PradaCategoryWomen-{{ section.id }}"
+          aria-controls="PradaCategoryGrid-{{ section.id }}"
           data-prada-category-tab="women"
           class="prada-category-showcase__tab{% if section.settings.active_tab == 'women' %} is-active{% endif %}"
         >
@@ -25,7 +25,7 @@
           type="button"
           role="tab"
           aria-selected="{% if section.settings.active_tab == 'men' %}true{% else %}false{% endif %}"
-          aria-controls="PradaCategoryMen-{{ section.id }}"
+          aria-controls="PradaCategoryGrid-{{ section.id }}"
           data-prada-category-tab="men"
           class="prada-category-showcase__tab{% if section.settings.active_tab == 'men' %} is-active{% endif %}"
         >
@@ -35,74 +35,67 @@
     </div>
   </div>
 
-  <div class="prada-category-showcase__viewport" data-prada-category-viewport data-active="{{ section.settings.active_tab }}">
-    <div id="PradaCategoryWomen-{{ section.id }}" class="prada-category-showcase__grid prada-category-showcase__panel" role="tabpanel" data-prada-category-panel="women"{% unless section.settings.active_tab == 'women' %} aria-hidden="true" inert{% endunless %}>
-      {%- for block in section.blocks -%}
+  <div id="PradaCategoryGrid-{{ section.id }}" class="prada-category-showcase__viewport prada-category-showcase__grid" role="tabpanel" data-prada-category-viewport data-active="{{ section.settings.active_tab }}">
+    {%- for block in section.blocks -%}
+      <div class="prada-category-showcase__slot" style="--tile-index: {{ forloop.index0 }};">
         {%- liquid
           assign fallback_product = collections.all.products[forloop.index0]
-          assign tile_title = block.settings.women_title | default: fallback_product.title | default: block.settings.title
-          assign tile_image = block.settings.women_image
-          assign tile_url = blank
+          assign women_title = block.settings.women_title | default: fallback_product.title | default: block.settings.title
+          assign women_image = block.settings.women_image
+          assign women_url = blank
 
-          if tile_image == blank and block.settings.women_product != blank
-            assign tile_image = block.settings.women_product.featured_media.preview_image
+          if women_image == blank and block.settings.women_product != blank
+            assign women_image = block.settings.women_product.featured_media.preview_image
           endif
-          if tile_image == blank and block.settings.women_collection != blank
-            assign tile_image = block.settings.women_collection.image | default: block.settings.women_collection.products.first.featured_media.preview_image
+          if women_image == blank and block.settings.women_collection != blank
+            assign women_image = block.settings.women_collection.image | default: block.settings.women_collection.products.first.featured_media.preview_image
           endif
-          if tile_image == blank and fallback_product != blank
-            assign tile_image = fallback_product.featured_media.preview_image
+          if women_image == blank and fallback_product != blank
+            assign women_image = fallback_product.featured_media.preview_image
           endif
 
           if block.settings.women_collection != blank
-            assign tile_url = block.settings.women_collection.url
+            assign women_url = block.settings.women_collection.url
           elsif block.settings.women_link != blank
-            assign tile_url = block.settings.women_link
+            assign women_url = block.settings.women_link
           elsif block.settings.women_product != blank
-            assign tile_url = block.settings.women_product.url
+            assign women_url = block.settings.women_product.url
           elsif fallback_product != blank
-            assign tile_url = fallback_product.url
+            assign women_url = fallback_product.url
           else
-            assign tile_url = section.settings.women_link | default: routes.all_products_collection_url
+            assign women_url = section.settings.women_link | default: routes.all_products_collection_url
           endif
-        -%}
-        {%- render 'prada-category-tile', tile_image: tile_image, tile_url: tile_url, tile_title: tile_title -%}
-      {%- endfor -%}
-    </div>
 
-    <div id="PradaCategoryMen-{{ section.id }}" class="prada-category-showcase__grid prada-category-showcase__panel" role="tabpanel" data-prada-category-panel="men"{% unless section.settings.active_tab == 'men' %} aria-hidden="true" inert{% endunless %}>
-      {%- for block in section.blocks -%}
-        {%- liquid
-          assign fallback_product = collections.all.products[forloop.index0]
-          assign tile_title = block.settings.title | default: fallback_product.title
-          assign tile_image = block.settings.image
-          assign tile_url = blank
+          assign men_title = block.settings.title | default: fallback_product.title
+          assign men_image = block.settings.image
+          assign men_url = blank
 
-          if tile_image == blank and block.settings.product != blank
-            assign tile_image = block.settings.product.featured_media.preview_image
+          if men_image == blank and block.settings.product != blank
+            assign men_image = block.settings.product.featured_media.preview_image
           endif
-          if tile_image == blank and block.settings.collection != blank
-            assign tile_image = block.settings.collection.image | default: block.settings.collection.products.first.featured_media.preview_image
+          if men_image == blank and block.settings.collection != blank
+            assign men_image = block.settings.collection.image | default: block.settings.collection.products.first.featured_media.preview_image
           endif
-          if tile_image == blank and fallback_product != blank
-            assign tile_image = fallback_product.featured_media.preview_image
+          if men_image == blank and fallback_product != blank
+            assign men_image = fallback_product.featured_media.preview_image
           endif
 
           if block.settings.collection != blank
-            assign tile_url = block.settings.collection.url
+            assign men_url = block.settings.collection.url
           elsif block.settings.link != blank
-            assign tile_url = block.settings.link
+            assign men_url = block.settings.link
           elsif block.settings.product != blank
-            assign tile_url = block.settings.product.url
+            assign men_url = block.settings.product.url
           elsif fallback_product != blank
-            assign tile_url = fallback_product.url
+            assign men_url = fallback_product.url
           else
-            assign tile_url = section.settings.men_link | default: routes.all_products_collection_url
+            assign men_url = section.settings.men_link | default: routes.all_products_collection_url
           endif
         -%}
-        {%- render 'prada-category-tile', tile_image: tile_image, tile_url: tile_url, tile_title: tile_title, block: block -%}
-      {%- endfor -%}
-    </div>
+        {%- render 'prada-category-tile', tile_image: women_image, tile_url: women_url, tile_title: women_title, tile_gender: 'women', active_tab: section.settings.active_tab -%}
+        {%- render 'prada-category-tile', tile_image: men_image, tile_url: men_url, tile_title: men_title, tile_gender: 'men', active_tab: section.settings.active_tab, block: block -%}
+      </div>
+    {%- endfor -%}
   </div>
 </section>
 
@@ -168,57 +161,57 @@
   }
 
   #shopify-section-{{ section.id }} .prada-category-showcase__viewport {
-    position: relative;
-    display: grid;
     overflow: hidden;
     background: #ffffff;
   }
 
   #shopify-section-{{ section.id }} .prada-category-showcase__grid {
-    grid-area: 1 / 1;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     background: #ffffff;
   }
 
-  #shopify-section-{{ section.id }} .prada-category-showcase__panel {
-    width: 100%;
-    transition: transform 560ms cubic-bezier(0.22, 1, 0.36, 1), opacity 360ms ease;
-    will-change: transform;
-  }
-
-  #shopify-section-{{ section.id }} [data-active='women'] [data-prada-category-panel='women'],
-  #shopify-section-{{ section.id }} [data-active='men'] [data-prada-category-panel='men'] {
-    z-index: 2;
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-    pointer-events: auto;
-  }
-
-  #shopify-section-{{ section.id }} [data-active='men'] [data-prada-category-panel='women'] {
-    z-index: 1;
-    opacity: 0;
-    transform: translate3d(-100%, 0, 0);
-    pointer-events: none;
-  }
-
-  #shopify-section-{{ section.id }} [data-active='women'] [data-prada-category-panel='men'] {
-    z-index: 1;
-    opacity: 0;
-    transform: translate3d(100%, 0, 0);
-    pointer-events: none;
+  #shopify-section-{{ section.id }} .prada-category-showcase__slot {
+    display: grid;
+    min-width: 0;
+    overflow: hidden;
+    background: #ffffff;
   }
 
   #shopify-section-{{ section.id }} .prada-category-showcase__item {
+    grid-area: 1 / 1;
     display: grid;
-    grid-template-rows: minmax(420px, {{ section.settings.tile_height }}px) 74px;
+    grid-template-rows: auto 74px;
     min-width: 0;
     color: #000000;
     text-decoration: none;
     background: #ffffff;
+    transition: transform 760ms cubic-bezier(0.76, 0, 0.24, 1);
+    transition-delay: calc(var(--tile-index) * 18ms);
+    will-change: transform;
+  }
+
+  #shopify-section-{{ section.id }} [data-active='women'] .prada-category-showcase__item--women,
+  #shopify-section-{{ section.id }} [data-active='men'] .prada-category-showcase__item--men {
+    z-index: 2;
+    transform: translate3d(0, 0, 0);
+    pointer-events: auto;
+  }
+
+  #shopify-section-{{ section.id }} [data-active='men'] .prada-category-showcase__item--women {
+    z-index: 1;
+    transform: translate3d(-100%, 0, 0);
+    pointer-events: none;
+  }
+
+  #shopify-section-{{ section.id }} [data-active='women'] .prada-category-showcase__item--men {
+    z-index: 1;
+    transform: translate3d(100%, 0, 0);
+    pointer-events: none;
   }
 
   #shopify-section-{{ section.id }} .prada-category-showcase__media {
+    aspect-ratio: 4 / 5;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -228,7 +221,7 @@
     overflow: hidden;
   }
 
-  #shopify-section-{{ section.id }} .prada-category-showcase__item:last-child .prada-category-showcase__media {
+  #shopify-section-{{ section.id }} .prada-category-showcase__slot:last-child .prada-category-showcase__media {
     border-right: 0;
   }
 
@@ -282,7 +275,7 @@
     }
 
     #shopify-section-{{ section.id }} .prada-category-showcase__item {
-      grid-template-rows: minmax(260px, 52vw) 58px;
+      grid-template-rows: auto 58px;
     }
 
     #shopify-section-{{ section.id }} .prada-category-showcase__media {
@@ -311,9 +304,7 @@
       margin-top: 22px;
     }
 
-    #shopify-section-{{ section.id }} .prada-category-showcase__item {
-      grid-template-rows: minmax(238px, 61vw) 56px;
-    }
+    #shopify-section-{{ section.id }} .prada-category-showcase__item { grid-template-rows: auto 56px; }
 
     #shopify-section-{{ section.id }} .prada-category-showcase__label {
       min-height: 56px;
@@ -322,7 +313,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    #shopify-section-{{ section.id }} .prada-category-showcase__panel {
+    #shopify-section-{{ section.id }} .prada-category-showcase__item {
       transition: none;
     }
   }
@@ -335,7 +326,7 @@
     root.dataset.tabsReady = 'true';
     const viewport = root.querySelector('[data-prada-category-viewport]');
     const tabs = [...root.querySelectorAll('[data-prada-category-tab]')];
-    const panels = [...root.querySelectorAll('[data-prada-category-panel]')];
+    const tiles = [...root.querySelectorAll('[data-prada-category-tile]')];
 
     tabs.forEach((tab) => tab.addEventListener('click', () => {
       const next = tab.dataset.pradaCategoryTab;
@@ -346,10 +337,12 @@
         item.classList.toggle('is-active', active);
         item.setAttribute('aria-selected', String(active));
       });
-      panels.forEach((panel) => {
-        const active = panel.dataset.pradaCategoryPanel === next;
-        panel.setAttribute('aria-hidden', String(!active));
-        panel.toggleAttribute('inert', !active);
+      tiles.forEach((tile) => {
+        const active = tile.dataset.pradaCategoryTile === next;
+        tile.setAttribute('aria-hidden', String(!active));
+        tile.toggleAttribute('inert', !active);
+        if (active) tile.removeAttribute('tabindex');
+        else tile.setAttribute('tabindex', '-1');
       });
     }));
   })();

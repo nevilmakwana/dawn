@@ -1,4 +1,10 @@
-<a class="prada-category-showcase__item" href="{{ tile_url }}"{% if block != blank %} {{ block.shopify_attributes }}{% endif %}>
+<a
+  class="prada-category-showcase__item prada-category-showcase__item--{{ tile_gender }}"
+  href="{{ tile_url }}"
+  data-prada-category-tile="{{ tile_gender }}"
+  {% unless active_tab == tile_gender %}aria-hidden="true" tabindex="-1" inert{% endunless %}
+  {% if block != blank %} {{ block.shopify_attributes }}{% endif %}
+>
   <div class="prada-category-showcase__media">
     {%- if tile_image != blank -%}
       {{
