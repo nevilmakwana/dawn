@@ -5,6 +5,9 @@
       <path d="M12 20.15 5.3 13.8A5.05 5.05 0 0 1 12 6.25a5.05 5.05 0 0 1 6.7 7.55L12 20.15Z"></path>
     </svg>`;
 
+  const formatWishlistPrice = (value) =>
+    String(value || '').replace(/^\s*(?:Rs\.?|INR)\s*/i, '₹');
+
   const createRemoveButton = (item) => {
     const button = document.createElement('button');
     button.className = 'prada-wishlist-page__remove';
@@ -73,7 +76,7 @@
     const price = document.createElement('p');
     price.className = 'prada-wishlist-page__price money';
     price.dataset.currencyPrice = '';
-    price.textContent = item.price;
+    price.textContent = formatWishlistPrice(item.price);
     details.append(title, price);
 
     const form = document.createElement('form');
