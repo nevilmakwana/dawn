@@ -206,19 +206,19 @@
   }
 
   #shopify-section-{{ section.id }} [data-direction='forward'] .prada-category-showcase__item.is-leaving {
-    animation: prada-category-out-left-{{ section.id }} 280ms linear both;
+    animation: prada-category-out-left-{{ section.id }} 180ms linear both;
   }
 
   #shopify-section-{{ section.id }} [data-direction='forward'] .prada-category-showcase__item.is-entering {
-    animation: prada-category-in-right-{{ section.id }} 280ms linear both;
+    animation: prada-category-in-right-{{ section.id }} 180ms linear both;
   }
 
   #shopify-section-{{ section.id }} [data-direction='backward'] .prada-category-showcase__item.is-leaving {
-    animation: prada-category-out-right-{{ section.id }} 280ms linear both;
+    animation: prada-category-out-right-{{ section.id }} 180ms linear both;
   }
 
   #shopify-section-{{ section.id }} [data-direction='backward'] .prada-category-showcase__item.is-entering {
-    animation: prada-category-in-left-{{ section.id }} 280ms linear both;
+    animation: prada-category-in-left-{{ section.id }} 180ms linear both;
   }
 
   @keyframes prada-category-out-left-{{ section.id }} {
@@ -394,7 +394,7 @@
           tile.classList.remove('is-entering');
           tile.classList.add('is-active');
         });
-      }, 320);
+      }, 220);
     }));
   })();
 </script>
