@@ -186,9 +186,8 @@
     color: #000000;
     text-decoration: none;
     background: #ffffff;
-    transition: transform 760ms cubic-bezier(0.76, 0, 0.24, 1);
-    transition-delay: calc(var(--tile-index) * 18ms);
     will-change: transform;
+    backface-visibility: hidden;
     transform: translate3d(100%, 0, 0);
     pointer-events: none;
     z-index: 1;
@@ -205,13 +204,21 @@
     z-index: 2;
     transform: translate3d(-100%, 0, 0);
     pointer-events: none;
+    animation: prada-category-slide-out-{{ section.id }} 680ms cubic-bezier(0.76, 0, 0.24, 1) both;
   }
 
-  #shopify-section-{{ section.id }} .prada-category-showcase__item.is-preparing {
-    z-index: 1;
-    transform: translate3d(100%, 0, 0);
-    pointer-events: none;
-    transition: none;
+  #shopify-section-{{ section.id }} .prada-category-showcase__item.is-entering {
+    animation: prada-category-slide-in-{{ section.id }} 680ms cubic-bezier(0.76, 0, 0.24, 1) both;
+  }
+
+  @keyframes prada-category-slide-out-{{ section.id }} {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-100%, 0, 0); }
+  }
+
+  @keyframes prada-category-slide-in-{{ section.id }} {
+    from { transform: translate3d(100%, 0, 0); }
+    to { transform: translate3d(0, 0, 0); }
   }
 
   #shopify-section-{{ section.id }} .prada-category-showcase__media {
@@ -317,9 +324,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    #shopify-section-{{ section.id }} .prada-category-showcase__item {
-      transition: none;
-    }
+    #shopify-section-{{ section.id }} .prada-category-showcase__item { animation-duration: 1ms; }
   }
 {% endstyle %}
 
@@ -332,11 +337,6 @@
     const tabs = [...root.querySelectorAll('[data-prada-category-tab]')];
     const tiles = [...root.querySelectorAll('[data-prada-category-tile]')];
     let transitionTimer;
-    const motion = {
-      duration: 780,
-      easing: 'cubic-bezier(0.76, 0, 0.24, 1)',
-      fill: 'forwards'
-    };
 
     tabs.forEach((tab) => tab.addEventListener('click', () => {
       const next = tab.dataset.pradaCategoryTab;
@@ -346,9 +346,7 @@
       const incoming = tiles.filter((tile) => tile.dataset.pradaCategoryTile === next);
 
       clearTimeout(transitionTimer);
-      tiles.forEach((tile) => tile.getAnimations().forEach((animation) => animation.cancel()));
-      tiles.forEach((tile) => tile.classList.remove('is-entering', 'is-leaving', 'is-preparing'));
-      incoming.forEach((tile) => tile.classList.add('is-preparing'));
+      tiles.forEach((tile) => tile.classList.remove('is-entering', 'is-leaving'));
       viewport.offsetWidth;
 
       viewport.dataset.active = next;
@@ -362,27 +360,7 @@
         tile.classList.add('is-leaving');
       });
       incoming.forEach((tile) => {
-        tile.classList.remove('is-preparing');
         tile.classList.add('is-entering');
-      });
-
-      outgoing.forEach((tile, index) => {
-        tile.animate(
-          [
-            { transform: 'translate3d(0, 0, 0)' },
-            { transform: 'translate3d(-100%, 0, 0)' }
-          ],
-          { ...motion, delay: index * 22 }
-        );
-      });
-      incoming.forEach((tile, index) => {
-        tile.animate(
-          [
-            { transform: 'translate3d(100%, 0, 0)' },
-            { transform: 'translate3d(0, 0, 0)' }
-          ],
-          { ...motion, delay: index * 22 }
-        );
       });
       tiles.forEach((tile) => {
         const active = tile.dataset.pradaCategoryTile === next;
@@ -398,7 +376,7 @@
           tile.classList.remove('is-entering');
           tile.classList.add('is-active');
         });
-      }, 920);
+      }, 720);
     }));
   })();
 </script>
