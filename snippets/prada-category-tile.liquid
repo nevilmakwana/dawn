@@ -1,0 +1,18 @@
+<a class="prada-category-showcase__item" href="{{ tile_url }}"{% if block != blank %} {{ block.shopify_attributes }}{% endif %}>
+  <div class="prada-category-showcase__media">
+    {%- if tile_image != blank -%}
+      {{
+        tile_image
+        | image_url: width: 1100
+        | image_tag:
+          loading: 'lazy',
+          widths: '360, 480, 640, 800, 960, 1100',
+          sizes: '(min-width: 990px) 25vw, 50vw',
+          class: 'prada-category-showcase__image'
+      }}
+    {%- else -%}
+      {{ 'product-apparel-1' | placeholder_svg_tag: 'prada-category-showcase__placeholder placeholder-svg' }}
+    {%- endif -%}
+  </div>
+  <div class="prada-category-showcase__label">{{ tile_title | escape }}</div>
+</a>
