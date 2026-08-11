@@ -203,7 +203,10 @@
   .prada-track-order__faq-link { font-size: 13px; }
   .prada-track-order__fields input { height: 54px; }
   .prada-track-order__fields span { font-size: 11px; }
-  .prada-track-order__form button { height: 50px; }
+  .prada-track-order__form button {
+    height: 52px;
+    font-size: 16px;
+  }
   .prada-track-order__questions h2 { font-size: 20px; }
 }
 
