@@ -6,8 +6,13 @@
   const buttonSelector = '[data-prada-product-wishlist]';
   const indicatorSelector = '[data-prada-wishlist-indicator]';
   const notificationId = 'prada-wishlist-notification';
+  const themeColorMeta = document.querySelector('meta[name="theme-color"]');
   let memoryItems = [];
   let notificationTimer;
+
+  const setThemeColor = (color) => {
+    if (themeColorMeta) themeColorMeta.setAttribute('content', color);
+  };
 
   const normaliseItem = (item) => {
     if (!item?.id || !item?.title || !item?.url) return null;
@@ -141,12 +146,16 @@
     if (viewLink) viewLink.href = getWishlistUrl();
 
     window.clearTimeout(notificationTimer);
+    setThemeColor('#2838e8');
     window.requestAnimationFrame(() => notification.classList.add('is-visible'));
 
     notificationTimer = window.setTimeout(() => {
       notification.classList.remove('is-visible');
+      setThemeColor('#ffffff');
     }, 5000);
   };
+
+  window.addEventListener('pagehide', () => setThemeColor('#ffffff'));
 
   const notify = () => {
     const items = getItems();
