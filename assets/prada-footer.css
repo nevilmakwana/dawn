@@ -40,7 +40,6 @@
 .prada-footer__group--contact { grid-area: contact; }
 .prada-footer__group--services { grid-area: services; }
 .prada-footer__group--legal { grid-area: legal; }
-.prada-footer__group--company { display: none; }
 
 .prada-footer h2,
 .prada-footer summary {
@@ -410,8 +409,6 @@
     padding-bottom: 0;
     border-top: 1px solid #ddd;
   }
-
-  .prada-footer__group--company { display: block; }
 
   .prada-footer__group:last-of-type { border-bottom: 1px solid #ddd; }
 

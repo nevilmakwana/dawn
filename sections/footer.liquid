@@ -90,15 +90,6 @@
       </ul></div>
     </details>
 
-    <details class="prada-footer__group prada-footer__group--company" open>
-      <summary><span>Company</span><span class="prada-footer__chevron" aria-hidden="true"></span></summary>
-      <div class="prada-footer__group-content"><ul>
-        <li><a href="{{ routes.root_url }}">Grey Exim</a></li>
-        <li><a href="{{ routes.all_products_collection_url }}">All products</a></li>
-        <li><a href="/pages/contact">Contact us</a></li>
-      </ul></div>
-    </details>
-
     <details class="prada-footer__group prada-footer__group--legal" open>
       <summary><span>Legal terms and conditions</span><span class="prada-footer__chevron" aria-hidden="true"></span></summary>
       <div class="prada-footer__group-content"><ul>
@@ -603,17 +594,6 @@
             {%- if shop.shipping_policy != blank -%}<li><a href="{{ shop.shipping_policy.url }}">Shipping</a></li>{%- endif -%}
             {%- if shop.refund_policy != blank -%}<li><a href="{{ shop.refund_policy.url }}">Returns and refunds</a></li>{%- endif -%}
             <li><a href="{{ routes.cart_url }}">Shopping bag</a></li>
-          </ul>
-        </div>
-      </details>
-
-      <details class="prada-mobile-footer__accordion">
-        <summary><span>Company</span><span class="prada-mobile-footer__chevron" aria-hidden="true"></span></summary>
-        <div class="prada-mobile-footer__accordion-content">
-          <ul>
-            <li><a href="{{ routes.root_url }}">Grey Exim</a></li>
-            <li><a href="{{ routes.all_products_collection_url }}">All products</a></li>
-            <li><a href="/pages/contact">Contact us</a></li>
           </ul>
         </div>
       </details>
