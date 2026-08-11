@@ -1,5 +1,5 @@
 <a
-  class="prada-category-showcase__item prada-category-showcase__item--{{ tile_gender }}"
+  class="prada-category-showcase__item prada-category-showcase__item--{{ tile_gender }}{% if active_tab == tile_gender %} is-active{% endif %}"
   href="{{ tile_url }}"
   data-prada-category-tile="{{ tile_gender }}"
   {% unless active_tab == tile_gender %}aria-hidden="true" tabindex="-1" inert{% endunless %}

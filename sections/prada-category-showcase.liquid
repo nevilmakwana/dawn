@@ -189,25 +189,29 @@
     transition: transform 760ms cubic-bezier(0.76, 0, 0.24, 1);
     transition-delay: calc(var(--tile-index) * 18ms);
     will-change: transform;
+    transform: translate3d(100%, 0, 0);
+    pointer-events: none;
+    z-index: 1;
   }
 
-  #shopify-section-{{ section.id }} [data-active='women'] .prada-category-showcase__item--women,
-  #shopify-section-{{ section.id }} [data-active='men'] .prada-category-showcase__item--men {
+  #shopify-section-{{ section.id }} .prada-category-showcase__item.is-active,
+  #shopify-section-{{ section.id }} .prada-category-showcase__item.is-entering {
     z-index: 2;
     transform: translate3d(0, 0, 0);
     pointer-events: auto;
   }
 
-  #shopify-section-{{ section.id }} [data-active='men'] .prada-category-showcase__item--women {
-    z-index: 1;
+  #shopify-section-{{ section.id }} .prada-category-showcase__item.is-leaving {
+    z-index: 2;
     transform: translate3d(-100%, 0, 0);
     pointer-events: none;
   }
 
-  #shopify-section-{{ section.id }} [data-active='women'] .prada-category-showcase__item--men {
+  #shopify-section-{{ section.id }} .prada-category-showcase__item.is-preparing {
     z-index: 1;
     transform: translate3d(100%, 0, 0);
     pointer-events: none;
+    transition: none;
   }
 
   #shopify-section-{{ section.id }} .prada-category-showcase__media {
@@ -327,15 +331,33 @@
     const viewport = root.querySelector('[data-prada-category-viewport]');
     const tabs = [...root.querySelectorAll('[data-prada-category-tab]')];
     const tiles = [...root.querySelectorAll('[data-prada-category-tile]')];
+    let transitionTimer;
 
     tabs.forEach((tab) => tab.addEventListener('click', () => {
       const next = tab.dataset.pradaCategoryTab;
       if (!viewport || viewport.dataset.active === next) return;
+      const current = viewport.dataset.active;
+      const outgoing = tiles.filter((tile) => tile.dataset.pradaCategoryTile === current);
+      const incoming = tiles.filter((tile) => tile.dataset.pradaCategoryTile === next);
+
+      clearTimeout(transitionTimer);
+      tiles.forEach((tile) => tile.classList.remove('is-entering', 'is-leaving', 'is-preparing'));
+      incoming.forEach((tile) => tile.classList.add('is-preparing'));
+      viewport.offsetWidth;
+
       viewport.dataset.active = next;
       tabs.forEach((item) => {
         const active = item === tab;
         item.classList.toggle('is-active', active);
         item.setAttribute('aria-selected', String(active));
+      });
+      outgoing.forEach((tile) => {
+        tile.classList.remove('is-active');
+        tile.classList.add('is-leaving');
+      });
+      incoming.forEach((tile) => {
+        tile.classList.remove('is-preparing');
+        tile.classList.add('is-entering');
       });
       tiles.forEach((tile) => {
         const active = tile.dataset.pradaCategoryTile === next;
@@ -344,6 +366,14 @@
         if (active) tile.removeAttribute('tabindex');
         else tile.setAttribute('tabindex', '-1');
       });
+
+      transitionTimer = window.setTimeout(() => {
+        outgoing.forEach((tile) => tile.classList.remove('is-leaving'));
+        incoming.forEach((tile) => {
+          tile.classList.remove('is-entering');
+          tile.classList.add('is-active');
+        });
+      }, 900);
     }));
   })();
 </script>
