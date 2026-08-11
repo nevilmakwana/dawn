@@ -101,41 +101,33 @@
         </div>
       {%- else -%}
         <ul class="prada-collection__grid" id="product-grid" data-id="{{ section.id }}" role="list">
+          {%- liquid
+            assign normal_product_total = 0
+            for candidate_product in collection.products
+              assign candidate_featured = candidate_product.metafields.custom.featured_tile.value
+              if candidate_featured == blank
+                assign candidate_featured = candidate_product.metafields.custom.custom_featured_tile.value
+              endif
+              unless candidate_featured
+                assign normal_product_total = normal_product_total | plus: 1
+              endunless
+            endfor
+            assign rendered_normal_count = 0
+          -%}
           {%- for product in collection.products -%}
             {%- liquid
               assign featured_tile_enabled = product.metafields.custom.featured_tile.value
               if featured_tile_enabled == blank
                 assign featured_tile_enabled = product.metafields.custom.custom_featured_tile.value
               endif
-              assign featured_tile_size = product.metafields.custom.featured_tile_size.value | default: 'wide' | downcase
-              if product.metafields.custom.featured_tile_size.value == blank and product.metafields.custom.custom_featured_tile_size.value != blank
-                assign featured_tile_size = product.metafields.custom.custom_featured_tile_size.value | downcase
-              endif
-              unless featured_tile_size == 'normal' or featured_tile_size == 'wide' or featured_tile_size == 'large' or featured_tile_size == 'full'
-                assign featured_tile_size = 'wide'
-              endunless
-              assign product_grid_order = forloop.index | times: 10
-              if featured_tile_enabled
-                assign featured_tile_position = product.metafields.custom.featured_tile_position.value | default: forloop.index
-                if product.metafields.custom.featured_tile_position.value == blank and product.metafields.custom.custom_featured_tile_position.value != blank
-                  assign featured_tile_position = product.metafields.custom.custom_featured_tile_position.value
-                endif
-                assign featured_tile_position = featured_tile_position | at_least: 1 | at_most: collection.products.size
-                assign product_grid_order = featured_tile_position | times: 10 | minus: 5
-              endif
             -%}
+            {%- unless featured_tile_enabled -%}
             {%- assign secondary_media = product.media[1] -%}
             {%- assign has_secondary_image = false -%}
             {%- if secondary_media and secondary_media.media_type == 'image' -%}
               {%- assign has_secondary_image = true -%}
             {%- endif -%}
-            <li
-              class="prada-collection__item{% if featured_tile_enabled %} prada-collection__item--featured prada-collection__item--featured-{{ featured_tile_size }}{% endif %}"
-              style="--prada-grid-order: {{ product_grid_order }};"
-            >
-              {%- if featured_tile_enabled -%}
-                {% render 'prada-featured-product-tile', product: product %}
-              {%- else -%}
+            <li class="prada-collection__item">
               <product-component view-event-payload="{{ product | standard_event_data: 'view', context: 'collection' | escape }}">
                 <article class="prada-product-tile">
                   <div class="prada-product-tile__media">
@@ -222,8 +214,36 @@
                   </div>
                 </article>
               </product-component>
-              {%- endif -%}
             </li>
+            {%- liquid
+              assign rendered_normal_count = rendered_normal_count | plus: 1
+            -%}
+            {%- for featured_product in collection.products -%}
+              {%- liquid
+                assign candidate_featured = featured_product.metafields.custom.featured_tile.value
+                if candidate_featured == blank
+                  assign candidate_featured = featured_product.metafields.custom.custom_featured_tile.value
+                endif
+                assign candidate_position = featured_product.metafields.custom.featured_tile_position.value
+                if candidate_position == blank
+                  assign candidate_position = featured_product.metafields.custom.custom_featured_tile_position.value
+                endif
+                assign candidate_position = candidate_position | default: normal_product_total | at_least: 1 | at_most: normal_product_total
+                assign candidate_size = featured_product.metafields.custom.featured_tile_size.value | default: 'wide' | downcase
+                if featured_product.metafields.custom.featured_tile_size.value == blank and featured_product.metafields.custom.custom_featured_tile_size.value != blank
+                  assign candidate_size = featured_product.metafields.custom.custom_featured_tile_size.value | downcase
+                endif
+                unless candidate_size == 'normal' or candidate_size == 'wide' or candidate_size == 'large' or candidate_size == 'full'
+                  assign candidate_size = 'wide'
+                endunless
+              -%}
+              {%- if candidate_featured and candidate_position == rendered_normal_count -%}
+                <li class="prada-collection__item prada-collection__item--featured prada-collection__item--featured-{{ candidate_size }}">
+                  {% render 'prada-featured-product-tile', product: featured_product %}
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+            {%- endunless -%}
           {%- endfor -%}
         </ul>
 
