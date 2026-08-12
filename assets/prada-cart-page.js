@@ -10,6 +10,79 @@
     if (!disclosureGroup || disclosureGroup.dataset.pradaAccordionBound === 'true') return;
 
     disclosureGroup.dataset.pradaAccordionBound = 'true';
+
+    const disclosures = Array.from(
+      disclosureGroup.querySelectorAll('.prada-shopping-bag-footer__desktop-disclosure')
+    );
+    const closeTimers = new WeakMap();
+
+    const clearCloseTimer = (disclosure) => {
+      const timer = closeTimers.get(disclosure);
+      if (!timer) return;
+
+      window.clearTimeout(timer);
+      closeTimers.delete(disclosure);
+    };
+
+    const finishClose = (disclosure) => {
+      clearCloseTimer(disclosure);
+      disclosure.open = false;
+      disclosure.classList.remove('is-closing');
+    };
+
+    const closeDisclosure = (disclosure) => {
+      if (!disclosure.open && !disclosure.classList.contains('is-open')) return;
+
+      clearCloseTimer(disclosure);
+      disclosure.classList.remove('is-open');
+      disclosure.classList.add('is-closing');
+      disclosure.querySelector('summary')?.setAttribute('aria-expanded', 'false');
+
+      if (motionMediaQuery.matches) {
+        finishClose(disclosure);
+        return;
+      }
+
+      closeTimers.set(disclosure, window.setTimeout(() => finishClose(disclosure), 440));
+    };
+
+    const openDisclosure = (disclosure) => {
+      clearCloseTimer(disclosure);
+      disclosure.open = true;
+      disclosure.classList.remove('is-closing');
+      disclosure.querySelector('summary')?.setAttribute('aria-expanded', 'true');
+
+      if (motionMediaQuery.matches) {
+        disclosure.classList.add('is-open');
+        return;
+      }
+
+      disclosure.classList.remove('is-open');
+      disclosure.getBoundingClientRect();
+      window.requestAnimationFrame(() => disclosure.classList.add('is-open'));
+    };
+
+    disclosures.forEach((disclosure) => {
+      const summary = disclosure.querySelector('summary');
+      if (!summary) return;
+
+      disclosure.classList.toggle('is-open', disclosure.open);
+      summary.setAttribute('aria-expanded', disclosure.open ? 'true' : 'false');
+
+      summary.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        if (disclosure.classList.contains('is-open')) {
+          closeDisclosure(disclosure);
+          return;
+        }
+
+        disclosures.forEach((otherDisclosure) => {
+          if (otherDisclosure !== disclosure) closeDisclosure(otherDisclosure);
+        });
+        openDisclosure(disclosure);
+      });
+    });
   };
 
   bindDesktopAccordion();
