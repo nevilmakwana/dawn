@@ -714,38 +714,48 @@
   }
 
   .prada-cart-edit-modal__description {
-    max-height: 0;
+    display: grid;
+    grid-template-rows: 0fr;
     margin: 0;
-    padding: 0;
     overflow: hidden;
     border-top: 1px solid transparent;
     color: #111111;
     font-family: var(--font-body-family);
     font-size: 14px;
     line-height: 1.45;
-    opacity: 0;
-    transform: translateY(-4px);
     transition:
-      max-height 360ms cubic-bezier(0.22, 1, 0.36, 1),
-      margin 360ms cubic-bezier(0.22, 1, 0.36, 1),
-      padding 360ms cubic-bezier(0.22, 1, 0.36, 1),
-      border-color 220ms ease,
-      opacity 220ms ease,
-      transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: max-height, opacity, transform;
+      grid-template-rows 420ms cubic-bezier(0.22, 1, 0.36, 1),
+      margin 420ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 240ms ease;
+    will-change: grid-template-rows;
+  }
+
+  .prada-cart-edit-modal__description-inner {
+    min-height: 0;
+    overflow: hidden;
+    padding: 0;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      padding 420ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 240ms ease,
+      transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .prada-cart-edit-modal__description.is-open {
-    max-height: none;
+    grid-template-rows: 1fr;
     margin: 12px 0 4px;
-    padding: 18px 0 4px;
     border-top-color: #dedede;
+  }
+
+  .prada-cart-edit-modal__description.is-open .prada-cart-edit-modal__description-inner {
+    padding: 18px 0 4px;
     opacity: 1;
     transform: translateY(0);
   }
 
-  .prada-cart-edit-modal__description > :first-child { margin-top: 0; }
-  .prada-cart-edit-modal__description > :last-child { margin-bottom: 0; }
+  .prada-cart-edit-modal__description-inner > :first-child { margin-top: 0; }
+  .prada-cart-edit-modal__description-inner > :last-child { margin-bottom: 0; }
 
   .prada-cart-edit-modal__status {
     min-height: 0;
@@ -803,7 +813,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .prada-cart-edit-modal__description {
+    .prada-cart-edit-modal__description,
+    .prada-cart-edit-modal__description-inner {
       transition: none;
     }
   }
@@ -1653,29 +1664,48 @@
   }
 
   .prada-cart-edit-modal__description {
+    display: grid;
+    grid-template-rows: 0fr;
     overflow: hidden;
-    margin-top: 22px;
-    padding: 20px 0 4px;
-    border-top: 1px solid #dedede;
+    margin-top: 0;
+    border-top: 1px solid transparent;
     color: #111111;
     font-family: var(--font-body-family);
     font-size: 14px;
     font-weight: 400;
     line-height: 1.45;
-    opacity: 1;
     transition:
-      max-height 360ms cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 220ms ease,
-      transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+      grid-template-rows 420ms cubic-bezier(0.22, 1, 0.36, 1),
+      margin 420ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 240ms ease;
   }
 
-  .prada-cart-edit-modal__description:not(.is-open) {
+  .prada-cart-edit-modal__description-inner {
+    min-height: 0;
+    overflow: hidden;
+    padding: 0;
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(-6px);
+    transition:
+      padding 420ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 240ms ease,
+      transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .prada-cart-edit-modal__description > :first-child { margin-top: 0; }
-  .prada-cart-edit-modal__description > :last-child { margin-bottom: 0; }
+  .prada-cart-edit-modal__description.is-open {
+    grid-template-rows: 1fr;
+    margin-top: 22px;
+    border-top-color: #dedede;
+  }
+
+  .prada-cart-edit-modal__description.is-open .prada-cart-edit-modal__description-inner {
+    padding: 20px 0 4px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .prada-cart-edit-modal__description-inner > :first-child { margin-top: 0; }
+  .prada-cart-edit-modal__description-inner > :last-child { margin-bottom: 0; }
   .prada-cart-edit-modal__description p { margin: 0 0 14px; }
   .prada-cart-edit-modal__description ul,
   .prada-cart-edit-modal__description ol {

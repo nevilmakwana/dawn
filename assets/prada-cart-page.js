@@ -125,8 +125,10 @@
             </div>
             <div class="prada-cart-edit-modal__options"></div>
             <p class="prada-cart-edit-modal__status" role="status"></p>
+            <div class="prada-cart-edit-modal__description" hidden>
+              <div class="prada-cart-edit-modal__description-inner"></div>
+            </div>
             <button class="prada-cart-edit-modal__details" type="button" aria-expanded="false">Show details</button>
-            <div class="prada-cart-edit-modal__description" hidden></div>
           </div>
           <div class="prada-cart-edit-modal__actions">
             <button class="prada-cart-edit-modal__cancel" type="button">Cancel</button>
@@ -149,6 +151,7 @@
     const confirmButton = modal.querySelector('.prada-cart-edit-modal__confirm');
     const detailsButton = modal.querySelector('.prada-cart-edit-modal__details');
     const description = modal.querySelector('.prada-cart-edit-modal__description');
+    const descriptionInner = modal.querySelector('.prada-cart-edit-modal__description-inner');
     let gallerySignature = '';
     let galleryScrollFrame = null;
     let handleEscape;
@@ -429,9 +432,12 @@
     });
 
     let detailsAnimationToken = 0;
+    let detailsCloseTimer = null;
     const setDetailsOpen = (shouldOpen) => {
       detailsAnimationToken += 1;
       const animationToken = detailsAnimationToken;
+
+      window.clearTimeout(detailsCloseTimer);
 
       detailsButton.setAttribute('aria-expanded', String(shouldOpen));
       detailsButton.textContent = shouldOpen ? 'Hide details' : 'Show details';
@@ -439,34 +445,29 @@
       if (motionMediaQuery.matches) {
         description.hidden = !shouldOpen;
         description.classList.toggle('is-open', shouldOpen);
-        description.style.removeProperty('max-height');
         return;
       }
 
       if (shouldOpen) {
         description.hidden = false;
-        description.classList.remove('is-open');
-        description.style.maxHeight = '0px';
         description.getBoundingClientRect();
         description.classList.add('is-open');
-        description.style.maxHeight = `${description.scrollHeight}px`;
-        window.setTimeout(() => {
-          if (detailsAnimationToken !== animationToken || detailsButton.getAttribute('aria-expanded') !== 'true') return;
-          description.style.maxHeight = 'none';
-          description.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-        }, 380);
         return;
       }
 
-      description.style.maxHeight = `${description.scrollHeight}px`;
-      description.getBoundingClientRect();
       description.classList.remove('is-open');
-      description.style.maxHeight = '0px';
-      window.setTimeout(() => {
+
+      const finishClose = (event) => {
+        if (event && (event.target !== description || event.propertyName !== 'grid-template-rows')) return;
+        window.clearTimeout(detailsCloseTimer);
+        detailsCloseTimer = null;
+        description.removeEventListener('transitionend', finishClose);
         if (detailsAnimationToken !== animationToken || detailsButton.getAttribute('aria-expanded') !== 'false') return;
         description.hidden = true;
-        description.style.removeProperty('max-height');
-      }, 380);
+      };
+
+      description.addEventListener('transitionend', finishClose);
+      detailsCloseTimer = window.setTimeout(() => finishClose(), 500);
     };
 
     detailsButton.addEventListener('click', () => {
@@ -477,7 +478,7 @@
         return;
       }
 
-      description.innerHTML = data.description || '<p>Product details are not available for this item.</p>';
+      descriptionInner.innerHTML = data.description || '<p>Product details are not available for this item.</p>';
       setDetailsOpen(true);
     });
 
