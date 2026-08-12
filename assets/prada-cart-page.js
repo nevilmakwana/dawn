@@ -356,7 +356,7 @@
 
   document.addEventListener('click', (event) => {
     const editButton = event.target.closest('[data-prada-cart-edit]');
-    if (!editButton || !desktopMediaQuery.matches) return;
+    if (!editButton) return;
 
     event.preventDefault();
     const data = parseEditorData(editButton);
