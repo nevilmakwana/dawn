@@ -582,7 +582,7 @@
   .prada-cart-edit-modal__stepper {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 14px;
   }
 
   .prada-cart-edit-modal__color-value {
@@ -605,7 +605,7 @@
 
   .prada-cart-edit-modal__stepper button {
     display: grid;
-    width: 34px;
+    width: 36px;
     height: 44px;
     place-items: center;
     padding: 0;
@@ -613,8 +613,6 @@
     background: transparent;
     color: #111111;
     font: inherit;
-    font-size: 29px;
-    line-height: 1;
   }
 
   .prada-cart-edit-modal__stepper button:disabled {
@@ -623,11 +621,35 @@
 
   .prada-cart-edit-modal__stepper output {
     display: grid;
-    min-width: 22px;
+    min-width: 24px;
     height: 44px;
     place-items: center;
-    font-size: 17px;
+    font-size: 18px;
     line-height: 1;
+  }
+
+  .prada-cart-edit-modal__stepper-icon {
+    display: block;
+    position: relative;
+    width: 18px;
+    height: 18px;
+    color: currentColor;
+  }
+
+  .prada-cart-edit-modal__stepper-icon::before,
+  .prada-cart-edit-modal__stepper-icon--plus::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 18px;
+    height: 1.5px;
+    background: currentColor;
+    content: '';
+    transform: translate(-50%, -50%);
+  }
+
+  .prada-cart-edit-modal__stepper-icon--plus::after {
+    transform: translate(-50%, -50%) rotate(90deg);
   }
 
   .prada-cart-edit-modal__details {
@@ -645,13 +667,34 @@
   }
 
   .prada-cart-edit-modal__description {
-    margin: 12px 0 4px;
-    padding: 18px 0 4px;
-    border-top: 1px solid #dedede;
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border-top: 1px solid transparent;
     color: #111111;
     font-family: var(--font-body-family);
     font-size: 14px;
     line-height: 1.45;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+      max-height 360ms cubic-bezier(0.22, 1, 0.36, 1),
+      margin 360ms cubic-bezier(0.22, 1, 0.36, 1),
+      padding 360ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 220ms ease,
+      opacity 220ms ease,
+      transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: max-height, opacity, transform;
+  }
+
+  .prada-cart-edit-modal__description.is-open {
+    max-height: none;
+    margin: 12px 0 4px;
+    padding: 18px 0 4px;
+    border-top-color: #dedede;
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .prada-cart-edit-modal__description > :first-child { margin-top: 0; }
@@ -710,6 +753,12 @@
   .prada-cart-edit-modal__confirm:disabled {
     border-color: #bdbdbd;
     background: #bdbdbd;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .prada-cart-edit-modal__description {
+      transition: none;
+    }
   }
 }
 
@@ -1477,6 +1526,30 @@
     font-size: 20px;
   }
 
+  .prada-cart-edit-modal__stepper-icon {
+    display: block;
+    position: relative;
+    width: 16px;
+    height: 16px;
+    color: currentColor;
+  }
+
+  .prada-cart-edit-modal__stepper-icon::before,
+  .prada-cart-edit-modal__stepper-icon--plus::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 1.5px;
+    background: currentColor;
+    content: '';
+    transform: translate(-50%, -50%);
+  }
+
+  .prada-cart-edit-modal__stepper-icon--plus::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
   .prada-cart-edit-modal__stepper output {
     min-width: 16px;
     text-align: center;
@@ -1498,6 +1571,7 @@
   }
 
   .prada-cart-edit-modal__description {
+    overflow: hidden;
     margin-top: 22px;
     padding: 20px 0 4px;
     border-top: 1px solid #dedede;
@@ -1506,6 +1580,16 @@
     font-size: 14px;
     font-weight: 400;
     line-height: 1.45;
+    opacity: 1;
+    transition:
+      max-height 360ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 220ms ease,
+      transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .prada-cart-edit-modal__description:not(.is-open) {
+    opacity: 0;
+    transform: translateY(-4px);
   }
 
   .prada-cart-edit-modal__description > :first-child { margin-top: 0; }
@@ -1564,5 +1648,11 @@
     border-color: #bdbdbd;
     background: #bdbdbd;
     cursor: not-allowed;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .prada-cart-edit-modal__description {
+      transition: none;
+    }
   }
 }

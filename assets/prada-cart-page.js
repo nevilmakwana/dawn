@@ -270,9 +270,9 @@
       quantityRow.innerHTML = `
         <span>Quantity:</span>
         <div class="prada-cart-edit-modal__stepper">
-          <button type="button" data-prada-editor-quantity="decrease" aria-label="Decrease quantity" ${selectedQuantity <= 1 ? 'disabled' : ''}>-</button>
+          <button type="button" data-prada-editor-quantity="decrease" aria-label="Decrease quantity" ${selectedQuantity <= 1 ? 'disabled' : ''}><span class="prada-cart-edit-modal__stepper-icon prada-cart-edit-modal__stepper-icon--minus" aria-hidden="true"></span></button>
           <output>${selectedQuantity}</output>
-          <button type="button" data-prada-editor-quantity="increase" aria-label="Increase quantity">+</button>
+          <button type="button" data-prada-editor-quantity="increase" aria-label="Increase quantity"><span class="prada-cart-edit-modal__stepper-icon prada-cart-edit-modal__stepper-icon--plus" aria-hidden="true"></span></button>
         </div>`;
       optionsContainer.append(quantityRow);
       renderGallery();
@@ -407,21 +407,57 @@
       }
     });
 
+    let detailsAnimationToken = 0;
+    const setDetailsOpen = (shouldOpen) => {
+      detailsAnimationToken += 1;
+      const animationToken = detailsAnimationToken;
+
+      detailsButton.setAttribute('aria-expanded', String(shouldOpen));
+      detailsButton.textContent = shouldOpen ? 'Hide details' : 'Show details';
+
+      if (motionMediaQuery.matches) {
+        description.hidden = !shouldOpen;
+        description.classList.toggle('is-open', shouldOpen);
+        description.style.removeProperty('max-height');
+        return;
+      }
+
+      if (shouldOpen) {
+        description.hidden = false;
+        description.classList.remove('is-open');
+        description.style.maxHeight = '0px';
+        description.getBoundingClientRect();
+        description.classList.add('is-open');
+        description.style.maxHeight = `${description.scrollHeight}px`;
+        window.setTimeout(() => {
+          if (detailsAnimationToken !== animationToken || detailsButton.getAttribute('aria-expanded') !== 'true') return;
+          description.style.maxHeight = 'none';
+          description.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }, 380);
+        return;
+      }
+
+      description.style.maxHeight = `${description.scrollHeight}px`;
+      description.getBoundingClientRect();
+      description.classList.remove('is-open');
+      description.style.maxHeight = '0px';
+      window.setTimeout(() => {
+        if (detailsAnimationToken !== animationToken || detailsButton.getAttribute('aria-expanded') !== 'false') return;
+        description.hidden = true;
+        description.style.removeProperty('max-height');
+      }, 380);
+    };
+
     detailsButton.addEventListener('click', () => {
       const isOpen = detailsButton.getAttribute('aria-expanded') === 'true';
 
       if (isOpen) {
-        description.hidden = true;
-        detailsButton.setAttribute('aria-expanded', 'false');
-        detailsButton.textContent = 'Show details';
+        setDetailsOpen(false);
         return;
       }
 
       description.innerHTML = data.description || '<p>Product details are not available for this item.</p>';
-      description.hidden = false;
-      detailsButton.setAttribute('aria-expanded', 'true');
-      detailsButton.textContent = 'Hide details';
-      window.requestAnimationFrame(() => description.scrollIntoView({ block: 'nearest', behavior: motionMediaQuery.matches ? 'auto' : 'smooth' }));
+      setDetailsOpen(true);
     });
 
     handleEscape = (event) => {
