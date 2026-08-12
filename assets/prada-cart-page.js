@@ -4,89 +4,135 @@
 
   const desktopMediaQuery = window.matchMedia('(min-width: 990px)');
   const motionMediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const desktopAccordionAnimations = new WeakMap();
+
+  const stopDesktopAccordionAnimation = (disclosure) => {
+    const animation = desktopAccordionAnimations.get(disclosure);
+    if (!animation) return;
+
+    desktopAccordionAnimations.delete(disclosure);
+    animation.cancel();
+  };
+
+  const finishDesktopAccordionClose = (disclosure, content) => {
+    desktopAccordionAnimations.delete(disclosure);
+    disclosure.open = false;
+    disclosure.classList.remove('is-closing');
+    content.style.height = '';
+    content.style.opacity = '';
+  };
+
+  const closeDesktopDisclosure = (disclosure) => {
+    const content = disclosure.querySelector('.prada-shopping-bag-footer__desktop-disclosure-content');
+    if (!content || (!disclosure.open && !disclosure.classList.contains('is-open'))) return;
+
+    const startHeight = content.getBoundingClientRect().height;
+    const startOpacity = Number.parseFloat(window.getComputedStyle(content).opacity) || 1;
+    stopDesktopAccordionAnimation(disclosure);
+
+    disclosure.open = true;
+    disclosure.classList.remove('is-open');
+    disclosure.classList.add('is-closing');
+    disclosure.querySelector('summary')?.setAttribute('aria-expanded', 'false');
+    content.style.height = `${startHeight}px`;
+    content.style.opacity = `${startOpacity}`;
+
+    const animation = content.animate(
+      [
+        { height: `${startHeight}px`, opacity: startOpacity },
+        { height: '0px', opacity: 0 },
+      ],
+      {
+        duration: motionMediaQuery.matches ? 180 : 420,
+        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+        fill: 'forwards',
+      }
+    );
+
+    desktopAccordionAnimations.set(disclosure, animation);
+    animation.addEventListener('finish', () => {
+      if (desktopAccordionAnimations.get(disclosure) !== animation) return;
+      finishDesktopAccordionClose(disclosure, content);
+    });
+  };
+
+  const openDesktopDisclosure = (disclosure) => {
+    const content = disclosure.querySelector('.prada-shopping-bag-footer__desktop-disclosure-content');
+    if (!content) return;
+
+    const startHeight = disclosure.open ? content.getBoundingClientRect().height : 0;
+    const startOpacity = disclosure.open
+      ? Number.parseFloat(window.getComputedStyle(content).opacity) || 0
+      : 0;
+    stopDesktopAccordionAnimation(disclosure);
+
+    disclosure.open = true;
+    disclosure.classList.remove('is-closing');
+    disclosure.classList.add('is-open');
+    disclosure.querySelector('summary')?.setAttribute('aria-expanded', 'true');
+    content.style.height = `${startHeight}px`;
+    content.style.opacity = `${startOpacity}`;
+
+    const targetHeight = content.scrollHeight;
+    const animation = content.animate(
+      [
+        { height: `${startHeight}px`, opacity: startOpacity },
+        { height: `${targetHeight}px`, opacity: 1 },
+      ],
+      {
+        duration: motionMediaQuery.matches ? 180 : 420,
+        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+        fill: 'forwards',
+      }
+    );
+
+    desktopAccordionAnimations.set(disclosure, animation);
+    animation.addEventListener('finish', () => {
+      if (desktopAccordionAnimations.get(disclosure) !== animation) return;
+
+      desktopAccordionAnimations.delete(disclosure);
+      content.style.height = 'auto';
+      content.style.opacity = '1';
+    });
+  };
 
   const bindDesktopAccordion = (root = document) => {
-    const disclosureGroup = root.querySelector('.prada-shopping-bag-footer__desktop-info');
-    if (!disclosureGroup || disclosureGroup.dataset.pradaAccordionBound === 'true') return;
+    root.querySelectorAll('.prada-shopping-bag-footer__desktop-info').forEach((disclosureGroup) => {
+      disclosureGroup.querySelectorAll('.prada-shopping-bag-footer__desktop-disclosure').forEach((disclosure) => {
+        const summary = disclosure.querySelector('summary');
+        const content = disclosure.querySelector('.prada-shopping-bag-footer__desktop-disclosure-content');
+        if (!summary || !content) return;
 
-    disclosureGroup.dataset.pradaAccordionBound = 'true';
-
-    const disclosures = Array.from(
-      disclosureGroup.querySelectorAll('.prada-shopping-bag-footer__desktop-disclosure')
-    );
-    const closeTimers = new WeakMap();
-
-    const clearCloseTimer = (disclosure) => {
-      const timer = closeTimers.get(disclosure);
-      if (!timer) return;
-
-      window.clearTimeout(timer);
-      closeTimers.delete(disclosure);
-    };
-
-    const finishClose = (disclosure) => {
-      clearCloseTimer(disclosure);
-      disclosure.open = false;
-      disclosure.classList.remove('is-closing');
-    };
-
-    const closeDisclosure = (disclosure) => {
-      if (!disclosure.open && !disclosure.classList.contains('is-open')) return;
-
-      clearCloseTimer(disclosure);
-      disclosure.classList.remove('is-open');
-      disclosure.classList.add('is-closing');
-      disclosure.querySelector('summary')?.setAttribute('aria-expanded', 'false');
-
-      if (motionMediaQuery.matches) {
-        finishClose(disclosure);
-        return;
-      }
-
-      closeTimers.set(disclosure, window.setTimeout(() => finishClose(disclosure), 440));
-    };
-
-    const openDisclosure = (disclosure) => {
-      clearCloseTimer(disclosure);
-      disclosure.open = true;
-      disclosure.classList.remove('is-closing');
-      disclosure.querySelector('summary')?.setAttribute('aria-expanded', 'true');
-
-      if (motionMediaQuery.matches) {
-        disclosure.classList.add('is-open');
-        return;
-      }
-
-      disclosure.classList.remove('is-open');
-      disclosure.getBoundingClientRect();
-      window.requestAnimationFrame(() => disclosure.classList.add('is-open'));
-    };
-
-    disclosures.forEach((disclosure) => {
-      const summary = disclosure.querySelector('summary');
-      if (!summary) return;
-
-      disclosure.classList.toggle('is-open', disclosure.open);
-      summary.setAttribute('aria-expanded', disclosure.open ? 'true' : 'false');
-
-      summary.addEventListener('click', (event) => {
-        event.preventDefault();
-
-        if (disclosure.classList.contains('is-open')) {
-          closeDisclosure(disclosure);
-          return;
-        }
-
-        disclosures.forEach((otherDisclosure) => {
-          if (otherDisclosure !== disclosure) closeDisclosure(otherDisclosure);
-        });
-        openDisclosure(disclosure);
+        disclosure.classList.toggle('is-open', disclosure.open);
+        summary.setAttribute('aria-expanded', disclosure.open ? 'true' : 'false');
+        content.style.height = disclosure.open ? 'auto' : '';
+        content.style.opacity = disclosure.open ? '1' : '';
       });
     });
   };
 
   bindDesktopAccordion();
   document.addEventListener('shopify:section:load', (event) => bindDesktopAccordion(event.target));
+
+  document.addEventListener('click', (event) => {
+    const summary = event.target.closest('.prada-shopping-bag-footer__desktop-disclosure > summary');
+    if (!summary) return;
+
+    event.preventDefault();
+    const disclosure = summary.parentElement;
+    const disclosureGroup = disclosure.closest('.prada-shopping-bag-footer__desktop-info');
+    if (!disclosureGroup) return;
+
+    if (disclosure.classList.contains('is-open')) {
+      closeDesktopDisclosure(disclosure);
+      return;
+    }
+
+    disclosureGroup.querySelectorAll('.prada-shopping-bag-footer__desktop-disclosure').forEach((otherDisclosure) => {
+      if (otherDisclosure !== disclosure) closeDesktopDisclosure(otherDisclosure);
+    });
+    openDesktopDisclosure(disclosure);
+  });
 
   document.addEventListener('click', (event) => {
     const moveButton = event.target.closest('[data-prada-cart-move-to-wishlist]');
