@@ -152,6 +152,7 @@
     const detailsButton = modal.querySelector('.prada-cart-edit-modal__details');
     const description = modal.querySelector('.prada-cart-edit-modal__description');
     const descriptionInner = modal.querySelector('.prada-cart-edit-modal__description-inner');
+    const actions = modal.querySelector('.prada-cart-edit-modal__actions');
     let gallerySignature = '';
     let galleryScrollFrame = null;
     let handleEscape;
@@ -303,6 +304,7 @@
     };
 
     const close = () => {
+      stopDetailsRevealScroll();
       modal.classList.add('is-closing');
       window.setTimeout(() => {
         modal.remove();
@@ -433,6 +435,48 @@
 
     let detailsAnimationToken = 0;
     let detailsCloseTimer = null;
+    let detailsScrollFrame = null;
+
+    const stopDetailsRevealScroll = () => {
+      if (!detailsScrollFrame) return;
+      window.cancelAnimationFrame(detailsScrollFrame);
+      detailsScrollFrame = null;
+    };
+
+    const startDetailsRevealScroll = () => {
+      stopDetailsRevealScroll();
+      if (desktopMediaQuery.matches) return;
+
+      const startedAt = performance.now();
+      const revealDuration = motionMediaQuery.matches ? 0 : 460;
+
+      const keepRevealVisible = (now) => {
+        if (detailsButton.getAttribute('aria-expanded') !== 'true') {
+          detailsScrollFrame = null;
+          return;
+        }
+
+        const actionsTop = actions.getBoundingClientRect().top;
+        const detailsBottom = detailsButton.getBoundingClientRect().bottom;
+        const overflow = detailsBottom - (actionsTop - 18);
+
+        if (overflow > 0.5) {
+          modal.scrollTop += motionMediaQuery.matches ? overflow : Math.max(1, overflow * 0.28);
+        }
+
+        if (now - startedAt < revealDuration) {
+          detailsScrollFrame = window.requestAnimationFrame(keepRevealVisible);
+          return;
+        }
+
+        const remainingOverflow = detailsButton.getBoundingClientRect().bottom - (actions.getBoundingClientRect().top - 18);
+        if (remainingOverflow > 0) modal.scrollTop += remainingOverflow;
+        detailsScrollFrame = null;
+      };
+
+      detailsScrollFrame = window.requestAnimationFrame(keepRevealVisible);
+    };
+
     const setDetailsOpen = (shouldOpen) => {
       detailsAnimationToken += 1;
       const animationToken = detailsAnimationToken;
@@ -445,6 +489,7 @@
       if (motionMediaQuery.matches) {
         description.hidden = !shouldOpen;
         description.classList.toggle('is-open', shouldOpen);
+        if (shouldOpen) startDetailsRevealScroll();
         return;
       }
 
@@ -452,9 +497,11 @@
         description.hidden = false;
         description.getBoundingClientRect();
         description.classList.add('is-open');
+        startDetailsRevealScroll();
         return;
       }
 
+      stopDetailsRevealScroll();
       description.classList.remove('is-open');
 
       const finishClose = (event) => {
