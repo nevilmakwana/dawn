@@ -40,6 +40,10 @@
 
   assign image_sizes = '(min-width: 1600px) ' | append: section.settings.image_column_width | append: 'vw, (min-width: 750px) ' | append: section.settings.image_column_width | append: 'vw, 100vw'
   assign image_style = 'object-position: ' | append: section.settings.image_alignment | append: ';'
+  assign heading_tag = 'h2'
+  if use_article
+    assign heading_tag = 'h1'
+  endif
 %}
 
 {% style %}
@@ -340,7 +344,7 @@
           {% endif %}
 
           {% if story_heading != blank %}
-            <h1 id="GreyEditorialHeading-{{ section.id }}" class="ge-story__heading">{{ story_heading | escape }}</h1>
+            <{{ heading_tag }} id="GreyEditorialHeading-{{ section.id }}" class="ge-story__heading">{{ story_heading | escape }}</{{ heading_tag }}>
           {% endif %}
 
           {% if story_intro != blank %}
