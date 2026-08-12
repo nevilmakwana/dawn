@@ -352,7 +352,11 @@
       tabindex="-1"
       data-template="{{ template.name }}"
     >
-      {{ content_for_layout }}
+      {%- if request.path contains '/policies/privacy-policy' -%}
+        {% section 'grey-exim-privacy-policy' %}
+      {%- else -%}
+        {{ content_for_layout }}
+      {%- endif -%}
     </main>
 
     {% sections 'footer-group' %}
