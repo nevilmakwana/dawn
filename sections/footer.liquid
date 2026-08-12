@@ -111,7 +111,7 @@
     </details>
 
     <div class="prada-footer__bottom">
-      <p>&copy; {{ shop.name | escape }} 2007 - {{ 'now' | date: '%Y' }}</p>
+      <p>Grey Exim &copy; 2026</p>
       <button type="button" class="prada-footer__shipping" data-prada-localization-open aria-haspopup="dialog" aria-controls="PradaLocalizationDrawer-{{ section.id }}">
         <svg class="prada-footer__globe" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.2 3.6 8.5S14.4 18.2 12 20.5M12 3.5C9.6 5.8 8.4 8.7 8.4 12s1.2 6.2 3.6 8.5"/></svg>
         <span data-prada-shipping-label>Shipping to: {{ localization.country.name | escape }} — {{ localization.country.currency.iso_code }} / {{ localization.language.endonym_name | escape }}</span>
@@ -631,7 +631,7 @@
         <button type="button" class="prada-mobile-footer__localization" data-prada-shipping-label data-prada-localization-open aria-haspopup="dialog" aria-controls="PradaLocalizationDrawer-{{ section.id }}">Shipping to: {{ localization.country.name | escape }} — {{ localization.country.currency.iso_code }} / {{ localization.language.endonym_name | escape }}</button>
       </div>
       <div class="prada-mobile-footer__utility prada-mobile-footer__copyright">
-        <span>&copy; {{ shop.name | escape }} {{ 'now' | date: '%Y' }}</span>
+        <span>Grey Exim &copy; 2026</span>
       </div>
       <div class="prada-mobile-footer__legal">
         {%- if shop.privacy_policy != blank -%}<a href="{{ shop.privacy_policy.url }}">Privacy policy</a>{%- endif -%}
