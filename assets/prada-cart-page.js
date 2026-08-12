@@ -95,7 +95,9 @@
     const productOptions = data.options || [];
     const currentVariant = variants.find((variant) => Number(variant.id) === Number(data.variantId)) || variants[0];
     const selectedOptions = currentVariant ? [...currentVariant.options] : [];
-    let selectedQuantity = Math.max(1, Number(data.quantity) || 1);
+    const initialQuantity = Math.max(1, Number(data.quantity) || 1);
+    const initialVariantId = Number(currentVariant?.id || data.variantId);
+    let selectedQuantity = initialQuantity;
     let activeImageIndex = 0;
     const images = (data.images || []).filter((image) => image?.src);
 
@@ -112,6 +114,7 @@
         <div class="prada-cart-edit-modal__gallery">
           <button class="prada-cart-edit-modal__gallery-arrow prada-cart-edit-modal__gallery-arrow--previous" type="button" aria-label="Previous image"><span></span></button>
           <img class="prada-cart-edit-modal__image" alt="">
+          <img class="prada-cart-edit-modal__image-preview" alt="" aria-hidden="true">
           <button class="prada-cart-edit-modal__gallery-arrow prada-cart-edit-modal__gallery-arrow--next" type="button" aria-label="Next image"><span></span></button>
           <div class="prada-cart-edit-modal__dots" aria-hidden="true"></div>
         </div>
@@ -138,6 +141,7 @@
 
     const dialog = modal.querySelector('.prada-cart-edit-modal__dialog');
     const image = modal.querySelector('.prada-cart-edit-modal__image');
+    const previewImage = modal.querySelector('.prada-cart-edit-modal__image-preview');
     const dots = modal.querySelector('.prada-cart-edit-modal__dots');
     const previousButton = modal.querySelector('.prada-cart-edit-modal__gallery-arrow--previous');
     const nextButton = modal.querySelector('.prada-cart-edit-modal__gallery-arrow--next');
@@ -172,6 +176,9 @@
 
       image.src = activeImage.src;
       image.alt = activeImage.alt || data.title;
+      const nextImage = galleryImages[(activeImageIndex + 1) % galleryImages.length];
+      previewImage.hidden = galleryImages.length < 2;
+      if (nextImage) previewImage.src = nextImage.src;
       previousButton.hidden = nextButton.hidden = galleryImages.length < 2;
       dots.innerHTML = galleryImages.length > 1
         ? galleryImages.map((_, index) => `<span class="${index === activeImageIndex ? 'is-active' : ''}"></span>`).join('')
@@ -181,11 +188,21 @@
     const renderOptions = () => {
       const selectedVariant = getSelectedVariant();
       price.textContent = normalisePrice(selectedVariant?.price || data.price);
-      confirmButton.disabled = !selectedVariant || !selectedVariant.available;
+      const hasChanges = Boolean(
+        selectedVariant &&
+        (Number(selectedVariant.id) !== initialVariantId || selectedQuantity !== initialQuantity)
+      );
+      confirmButton.disabled = !selectedVariant || !selectedVariant.available || !hasChanges;
       status.textContent = selectedVariant?.available === false ? 'This option is currently unavailable.' : '';
       optionsContainer.innerHTML = '';
 
       productOptions.forEach((option, optionIndex) => {
+        const isDefaultTitle =
+          String(option.name || '').trim().toLowerCase() === 'title' &&
+          option.values.length === 1 &&
+          String(option.values[0] || '').trim().toLowerCase() === 'default title';
+        if (isDefaultTitle) return;
+
         const normalizedName = String(option.name || '').toLowerCase();
         const row = document.createElement('div');
         row.className = 'prada-cart-edit-modal__option-row';
@@ -214,7 +231,7 @@
       quantityRow.innerHTML = `
         <span>Quantity:</span>
         <div class="prada-cart-edit-modal__stepper">
-          <button type="button" data-prada-editor-quantity="decrease" aria-label="Decrease quantity">-</button>
+          <button type="button" data-prada-editor-quantity="decrease" aria-label="Decrease quantity" ${selectedQuantity <= 1 ? 'disabled' : ''}>-</button>
           <output>${selectedQuantity}</output>
           <button type="button" data-prada-editor-quantity="increase" aria-label="Increase quantity">+</button>
         </div>`;
@@ -274,6 +291,23 @@
       activeImageIndex = 0;
       renderOptions();
     });
+
+    let touchStartX = null;
+    const gallery = modal.querySelector('.prada-cart-edit-modal__gallery');
+    gallery.addEventListener('touchstart', (event) => {
+      touchStartX = event.touches[0]?.clientX ?? null;
+    }, { passive: true });
+    gallery.addEventListener('touchend', (event) => {
+      if (touchStartX === null) return;
+      const delta = (event.changedTouches[0]?.clientX ?? touchStartX) - touchStartX;
+      touchStartX = null;
+      if (Math.abs(delta) < 40) return;
+      const galleryImages = getGalleryImages();
+      activeImageIndex = delta < 0
+        ? (activeImageIndex + 1) % galleryImages.length
+        : (activeImageIndex - 1 + galleryImages.length) % galleryImages.length;
+      renderGallery();
+    }, { passive: true });
 
     confirmButton.addEventListener('click', async () => {
       const selectedVariant = getSelectedVariant();
