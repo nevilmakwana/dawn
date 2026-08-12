@@ -354,6 +354,8 @@
     >
       {%- if request.path contains '/policies/privacy-policy' -%}
         {% section 'grey-exim-privacy-policy' %}
+      {%- elsif request.path contains '/policies/cookie-policy' -%}
+        {% section 'grey-exim-cookie-policy' %}
       {%- else -%}
         {{ content_for_layout }}
       {%- endif -%}
