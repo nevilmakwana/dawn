@@ -32,60 +32,15 @@
         <p class="prada-collection__count">{{ collection.products_count }} products</p>
 
         <form class="prada-collection__controls" action="{{ collection.url }}" method="get">
-          {%- if section.settings.enable_filtering and collection.filters != empty -%}
-            <details class="prada-collection__filter-menu">
-              <summary>Filters</summary>
-              <div class="prada-collection__filter-panel">
-                {%- for filter in collection.filters -%}
-                  {%- case filter.type -%}
-                    {%- when 'boolean', 'list' -%}
-                      <fieldset class="prada-collection__filter-group">
-                        <legend>{{ filter.label | escape }}</legend>
-                        {%- for value in filter.values limit: 12 -%}
-                          <label class="prada-collection__filter-option{% if value.count == 0 and value.active == false %} is-disabled{% endif %}">
-                            <input
-                              type="checkbox"
-                              name="{{ value.param_name }}"
-                              value="{{ value.value }}"
-                              {% if value.active %}checked{% endif %}
-                              {% if value.count == 0 and value.active == false %}disabled{% endif %}
-                            >
-                            <span>{{ value.label | escape }}</span>
-                            <small>{{ value.count }}</small>
-                          </label>
-                        {%- endfor -%}
-                      </fieldset>
-                    {%- when 'price_range' -%}
-                      <fieldset class="prada-collection__filter-group">
-                        <legend>{{ filter.label | escape }}</legend>
-                        <div class="prada-collection__price-fields">
-                          <label>
-                            <span>Min</span>
-                            <input name="{{ filter.min_value.param_name }}" type="number" value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}" min="0">
-                          </label>
-                          <label>
-                            <span>Max</span>
-                            <input name="{{ filter.max_value.param_name }}" type="number" value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}" min="0">
-                          </label>
-                        </div>
-                      </fieldset>
-                  {%- endcase -%}
-                {%- endfor -%}
-                <button class="prada-collection__apply-filter" type="submit">Apply filters</button>
-              </div>
-            </details>
-            <span class="prada-collection__control-divider" aria-hidden="true">&middot;</span>
-          {%- endif -%}
-
           {%- if section.settings.enable_sorting -%}
+            {%- assign current_sort = collection.sort_by | default: collection.default_sort_by -%}
             <label class="prada-collection__sort">
               <span>Sort by:</span>
               <select name="sort_by" aria-label="Sort products" onchange="this.form.submit()">
-                {%- for option in collection.sort_options -%}
-                  <option value="{{ option.value | escape }}" {% if option.value == collection.sort_by %}selected="selected"{% endif %}>
-                    {{ option.name | escape }}
-                  </option>
-                {%- endfor -%}
+                <option value="manual" {% if current_sort == 'manual' or current_sort == 'relevance' %}selected="selected"{% endif %}>Most relevant</option>
+                <option value="best-selling" {% if current_sort == 'best-selling' %}selected="selected"{% endif %}>Best selling</option>
+                <option value="price-ascending" {% if current_sort == 'price-ascending' %}selected="selected"{% endif %}>Price, low to high</option>
+                <option value="price-descending" {% if current_sort == 'price-descending' %}selected="selected"{% endif %}>Price, high to low</option>
               </select>
             </label>
           {%- endif -%}
