@@ -236,16 +236,32 @@
 
         if (normalizedName.includes('color') || normalizedName.includes('colour')) {
           hasColorOption = true;
-          row.innerHTML = `<span class="prada-cart-edit-modal__option-label">${escapeHtml(option.name)}:</span><div class="prada-cart-edit-modal__color-values"></div>`;
+          row.classList.add('prada-cart-edit-modal__option-row--color');
+          row.innerHTML = `
+            <div class="prada-cart-edit-modal__color-heading">
+              <span class="prada-cart-edit-modal__option-label">${escapeHtml(option.name)}:</span>
+              <span>${escapeHtml(selectedOptions[optionIndex] || option.values[0] || '')}</span>
+            </div>
+            <div class="prada-cart-edit-modal__color-values"></div>`;
           const values = row.querySelector('.prada-cart-edit-modal__color-values');
           option.values.forEach((value) => {
+            const matchingVariant = variants.find((variant) =>
+              variant.options[optionIndex] === value &&
+              productOptions.every((_, index) =>
+                index === optionIndex || !selectedOptions[index] || variant.options[index] === selectedOptions[index]
+              )
+            ) || variants.find((variant) => variant.options[optionIndex] === value);
+            const thumbnailSrc = matchingVariant?.image || images[0]?.src || data.image || '';
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'prada-cart-edit-modal__color-value';
             button.dataset.optionIndex = optionIndex;
             button.dataset.optionValue = value;
+            button.setAttribute('aria-label', `${option.name}: ${value}`);
             button.setAttribute('aria-pressed', String(selectedOptions[optionIndex] === value));
-            button.innerHTML = `<span class="prada-cart-edit-modal__swatch" style="background:${colorSwatch(value)}"></span>${escapeHtml(value)}`;
+            button.innerHTML = thumbnailSrc
+              ? `<img class="prada-cart-edit-modal__color-thumbnail" src="${escapeHtml(thumbnailSrc)}" alt="">`
+              : `<span class="prada-cart-edit-modal__swatch" style="background:${colorSwatch(value)}"></span>`;
             values.append(button);
           });
         } else {
@@ -256,12 +272,17 @@
 
       if (!hasColorOption) {
         const colorRow = document.createElement('div');
-        colorRow.className = 'prada-cart-edit-modal__option-row';
+        colorRow.className = 'prada-cart-edit-modal__option-row prada-cart-edit-modal__option-row--color';
         colorRow.innerHTML = `
-          <span class="prada-cart-edit-modal__option-label">Color:</span>
-          <span class="prada-cart-edit-modal__color-value" aria-label="Color as shown">
-            <span class="prada-cart-edit-modal__swatch"></span>As shown
-          </span>`;
+          <div class="prada-cart-edit-modal__color-heading">
+            <span class="prada-cart-edit-modal__option-label">Color:</span>
+            <span>As shown</span>
+          </div>
+          <div class="prada-cart-edit-modal__color-values">
+            <span class="prada-cart-edit-modal__color-value" aria-label="Color as shown">
+              ${images[0]?.src || data.image ? `<img class="prada-cart-edit-modal__color-thumbnail" src="${escapeHtml(images[0]?.src || data.image)}" alt="${escapeHtml(data.title)}">` : '<span class="prada-cart-edit-modal__swatch"></span>'}
+            </span>
+          </div>`;
         optionsContainer.append(colorRow);
       }
 
