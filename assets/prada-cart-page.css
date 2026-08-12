@@ -392,6 +392,7 @@
     z-index: 10000;
     inset: 0;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     background: #ffffff;
     opacity: 1;
     overscroll-behavior: contain;
@@ -412,6 +413,7 @@
     flex-direction: column;
     width: 100%;
     min-height: 100%;
+    padding-bottom: calc(180px + env(safe-area-inset-bottom));
     background: #ffffff;
     outline: 0;
   }
@@ -443,32 +445,49 @@
   .prada-cart-edit-modal__close span::after { transform: rotate(-45deg); }
 
   .prada-cart-edit-modal__gallery {
-    display: grid;
     position: relative;
-    grid-template-columns: minmax(0, 77%) minmax(0, 23%);
-    align-items: stretch;
-    column-gap: 2px;
     width: 100%;
     height: 96vw;
     min-height: 0;
     max-height: 520px;
     background: #f3f3f3;
+    overflow: hidden;
+  }
+
+  .prada-cart-edit-modal__gallery-track {
+    display: flex;
+    gap: 2px;
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    touch-action: pan-x pan-y;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .prada-cart-edit-modal__gallery-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .prada-cart-edit-modal__gallery-track::after {
+    flex: 0 0 calc(23% - 2px);
+    content: '';
   }
 
   .prada-cart-edit-modal__image {
     display: block;
-    width: 100%;
+    flex: 0 0 77%;
+    width: 77%;
     height: 100%;
     object-fit: contain;
-  }
-
-  .prada-cart-edit-modal__image-preview {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
     background: #f3f3f3;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    user-select: none;
   }
 
   .prada-cart-edit-modal__gallery-arrow {
@@ -480,13 +499,14 @@
     position: absolute;
     bottom: 20px;
     left: 50%;
-    gap: 18px;
+    z-index: 2;
+    gap: 12px;
     transform: translateX(-50%);
   }
 
   .prada-cart-edit-modal__dots span {
-    width: 10px;
-    height: 10px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: #c6c6c6;
   }
@@ -518,7 +538,7 @@
   }
 
   .prada-cart-edit-modal__product-heading h2 {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
     line-height: 1.35;
   }
@@ -538,7 +558,7 @@
     border-bottom: 1px solid #dedede;
     color: #111111;
     font-family: var(--font-body-family);
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 400;
   }
 
@@ -562,7 +582,7 @@
   .prada-cart-edit-modal__stepper {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 20px;
   }
 
   .prada-cart-edit-modal__color-value {
@@ -584,23 +604,69 @@
   }
 
   .prada-cart-edit-modal__stepper button {
-    width: 30px;
-    height: 40px;
+    display: grid;
+    width: 34px;
+    height: 44px;
+    place-items: center;
     padding: 0;
     border: 0;
     background: transparent;
     color: #111111;
     font: inherit;
-    font-size: 25px;
+    font-size: 29px;
+    line-height: 1;
   }
 
   .prada-cart-edit-modal__stepper button:disabled {
     color: #a8a8a8;
   }
 
-  .prada-cart-edit-modal__details,
-  .prada-cart-edit-modal__description,
+  .prada-cart-edit-modal__stepper output {
+    display: grid;
+    min-width: 22px;
+    height: 44px;
+    place-items: center;
+    font-size: 17px;
+    line-height: 1;
+  }
+
+  .prada-cart-edit-modal__details {
+    display: inline-block;
+    margin: 24px 0 10px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #111111;
+    font-family: var(--font-body-family);
+    font-size: 15px;
+    font-weight: 400;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .prada-cart-edit-modal__description {
+    margin: 12px 0 4px;
+    padding: 18px 0 4px;
+    border-top: 1px solid #dedede;
+    color: #111111;
+    font-family: var(--font-body-family);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .prada-cart-edit-modal__description > :first-child { margin-top: 0; }
+  .prada-cart-edit-modal__description > :last-child { margin-bottom: 0; }
+
   .prada-cart-edit-modal__status {
+    min-height: 0;
+    margin: 14px 0 0;
+    color: #9d1d1d;
+    font-family: var(--font-body-family);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .prada-cart-edit-modal__status:empty {
     display: none;
   }
 
@@ -608,9 +674,15 @@
     display: flex;
     flex-direction: column-reverse;
     gap: 20px;
+    position: fixed;
+    z-index: 5;
+    right: 0;
+    bottom: 0;
+    left: 0;
     margin-top: 0;
     padding: 16px 16px calc(28px + env(safe-area-inset-bottom));
     border-top: 1px solid #dedede;
+    background: #ffffff;
   }
 
   .prada-cart-edit-modal__actions button {
@@ -1210,22 +1282,33 @@
   .prada-cart-edit-modal__close span::after { transform: rotate(-45deg); }
 
   .prada-cart-edit-modal__gallery {
-    display: grid;
     position: relative;
-    place-items: center;
     min-width: 0;
+    overflow: hidden;
     background: #f5f5f5;
+  }
+
+  .prada-cart-edit-modal__gallery-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+  }
+
+  .prada-cart-edit-modal__gallery-track::after {
+    display: none;
   }
 
   .prada-cart-edit-modal__image {
     display: block;
+    flex: 0 0 100%;
     width: 100%;
     height: 100%;
     object-fit: contain;
-  }
-
-  .prada-cart-edit-modal__image-preview {
-    display: none;
+    scroll-snap-align: start;
+    user-select: none;
   }
 
   .prada-cart-edit-modal__gallery-arrow {

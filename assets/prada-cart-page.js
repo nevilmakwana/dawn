@@ -113,8 +113,7 @@
         <button class="prada-cart-edit-modal__close" type="button" aria-label="Close product editor"><span></span></button>
         <div class="prada-cart-edit-modal__gallery">
           <button class="prada-cart-edit-modal__gallery-arrow prada-cart-edit-modal__gallery-arrow--previous" type="button" aria-label="Previous image"><span></span></button>
-          <img class="prada-cart-edit-modal__image" alt="">
-          <img class="prada-cart-edit-modal__image-preview" alt="" aria-hidden="true">
+          <div class="prada-cart-edit-modal__gallery-track" data-prada-cart-editor-gallery></div>
           <button class="prada-cart-edit-modal__gallery-arrow prada-cart-edit-modal__gallery-arrow--next" type="button" aria-label="Next image"><span></span></button>
           <div class="prada-cart-edit-modal__dots" aria-hidden="true"></div>
         </div>
@@ -140,8 +139,7 @@
     document.documentElement.classList.add('prada-cart-edit-modal-open');
 
     const dialog = modal.querySelector('.prada-cart-edit-modal__dialog');
-    const image = modal.querySelector('.prada-cart-edit-modal__image');
-    const previewImage = modal.querySelector('.prada-cart-edit-modal__image-preview');
+    const galleryTrack = modal.querySelector('[data-prada-cart-editor-gallery]');
     const dots = modal.querySelector('.prada-cart-edit-modal__dots');
     const previousButton = modal.querySelector('.prada-cart-edit-modal__gallery-arrow--previous');
     const nextButton = modal.querySelector('.prada-cart-edit-modal__gallery-arrow--next');
@@ -151,6 +149,8 @@
     const confirmButton = modal.querySelector('.prada-cart-edit-modal__confirm');
     const detailsButton = modal.querySelector('.prada-cart-edit-modal__details');
     const description = modal.querySelector('.prada-cart-edit-modal__description');
+    let gallerySignature = '';
+    let galleryScrollFrame = null;
     let handleEscape;
 
     const getSelectedVariant = () =>
@@ -169,20 +169,46 @@
       ];
     };
 
-    const renderGallery = () => {
-      const galleryImages = getGalleryImages();
-      if (activeImageIndex >= galleryImages.length) activeImageIndex = 0;
-      const activeImage = galleryImages[activeImageIndex] || { src: '', alt: data.title };
-
-      image.src = activeImage.src;
-      image.alt = activeImage.alt || data.title;
-      const nextImage = galleryImages[(activeImageIndex + 1) % galleryImages.length];
-      previewImage.hidden = galleryImages.length < 2;
-      if (nextImage) previewImage.src = nextImage.src;
-      previousButton.hidden = nextButton.hidden = galleryImages.length < 2;
+    const updateGalleryDots = (galleryImages) => {
       dots.innerHTML = galleryImages.length > 1
         ? galleryImages.map((_, index) => `<span class="${index === activeImageIndex ? 'is-active' : ''}"></span>`).join('')
         : '';
+    };
+
+    const scrollGalleryToActiveImage = (behavior = 'smooth') => {
+      const slide = galleryTrack.children[activeImageIndex];
+      if (!slide) return;
+      galleryTrack.scrollTo({
+        left: slide.offsetLeft,
+        behavior: motionMediaQuery.matches ? 'auto' : behavior,
+      });
+    };
+
+    const renderGallery = ({ scroll = true } = {}) => {
+      const galleryImages = getGalleryImages();
+      if (activeImageIndex >= galleryImages.length) activeImageIndex = 0;
+      const nextSignature = galleryImages.map((galleryImage) => galleryImage.src).join('|');
+      const galleryWasRebuilt = gallerySignature !== nextSignature;
+
+      if (galleryWasRebuilt) {
+        gallerySignature = nextSignature;
+        galleryTrack.replaceChildren(...galleryImages.map((galleryImage) => {
+          const image = document.createElement('img');
+          image.className = 'prada-cart-edit-modal__image';
+          image.src = galleryImage.src;
+          image.alt = galleryImage.alt || data.title;
+          image.loading = 'eager';
+          image.draggable = false;
+          return image;
+        }));
+      }
+
+      previousButton.hidden = nextButton.hidden = galleryImages.length < 2;
+      updateGalleryDots(galleryImages);
+
+      if (scroll) {
+        window.requestAnimationFrame(() => scrollGalleryToActiveImage(galleryWasRebuilt ? 'auto' : 'smooth'));
+      }
     };
 
     const renderOptions = () => {
@@ -195,6 +221,7 @@
       confirmButton.disabled = !selectedVariant || !selectedVariant.available || !hasChanges;
       status.textContent = selectedVariant?.available === false ? 'This option is currently unavailable.' : '';
       optionsContainer.innerHTML = '';
+      let hasColorOption = false;
 
       productOptions.forEach((option, optionIndex) => {
         const isDefaultTitle =
@@ -208,6 +235,7 @@
         row.className = 'prada-cart-edit-modal__option-row';
 
         if (normalizedName.includes('color') || normalizedName.includes('colour')) {
+          hasColorOption = true;
           row.innerHTML = `<span class="prada-cart-edit-modal__option-label">${escapeHtml(option.name)}:</span><div class="prada-cart-edit-modal__color-values"></div>`;
           const values = row.querySelector('.prada-cart-edit-modal__color-values');
           option.values.forEach((value) => {
@@ -225,6 +253,17 @@
         }
         optionsContainer.append(row);
       });
+
+      if (!hasColorOption) {
+        const colorRow = document.createElement('div');
+        colorRow.className = 'prada-cart-edit-modal__option-row';
+        colorRow.innerHTML = `
+          <span class="prada-cart-edit-modal__option-label">Color:</span>
+          <span class="prada-cart-edit-modal__color-value" aria-label="Color as shown">
+            <span class="prada-cart-edit-modal__swatch"></span>As shown
+          </span>`;
+        optionsContainer.append(colorRow);
+      }
 
       const quantityRow = document.createElement('div');
       quantityRow.className = 'prada-cart-edit-modal__quantity-row';
@@ -273,14 +312,16 @@
       if (event.target.closest('.prada-cart-edit-modal__gallery-arrow--previous')) {
         const galleryImages = getGalleryImages();
         activeImageIndex = (activeImageIndex - 1 + galleryImages.length) % galleryImages.length;
-        renderGallery();
+        updateGalleryDots(galleryImages);
+        scrollGalleryToActiveImage();
         return;
       }
 
       if (event.target.closest('.prada-cart-edit-modal__gallery-arrow--next')) {
         const galleryImages = getGalleryImages();
         activeImageIndex = (activeImageIndex + 1) % galleryImages.length;
-        renderGallery();
+        updateGalleryDots(galleryImages);
+        scrollGalleryToActiveImage();
       }
     });
 
@@ -292,21 +333,27 @@
       renderOptions();
     });
 
-    let touchStartX = null;
-    const gallery = modal.querySelector('.prada-cart-edit-modal__gallery');
-    gallery.addEventListener('touchstart', (event) => {
-      touchStartX = event.touches[0]?.clientX ?? null;
+    galleryTrack.addEventListener('scroll', () => {
+      if (galleryScrollFrame) window.cancelAnimationFrame(galleryScrollFrame);
+      galleryScrollFrame = window.requestAnimationFrame(() => {
+        galleryScrollFrame = null;
+        const slides = [...galleryTrack.children];
+        if (!slides.length) return;
+
+        const nearestIndex = slides.reduce((nearest, slide, index) =>
+          Math.abs(slide.offsetLeft - galleryTrack.scrollLeft) <
+          Math.abs(slides[nearest].offsetLeft - galleryTrack.scrollLeft)
+            ? index
+            : nearest, 0);
+        if (nearestIndex === activeImageIndex) return;
+        activeImageIndex = nearestIndex;
+        updateGalleryDots(getGalleryImages());
+      });
     }, { passive: true });
-    gallery.addEventListener('touchend', (event) => {
-      if (touchStartX === null) return;
-      const delta = (event.changedTouches[0]?.clientX ?? touchStartX) - touchStartX;
-      touchStartX = null;
-      if (Math.abs(delta) < 40) return;
+
+    galleryTrack.addEventListener('scrollend', () => {
       const galleryImages = getGalleryImages();
-      activeImageIndex = delta < 0
-        ? (activeImageIndex + 1) % galleryImages.length
-        : (activeImageIndex - 1 + galleryImages.length) % galleryImages.length;
-      renderGallery();
+      updateGalleryDots(galleryImages);
     }, { passive: true });
 
     confirmButton.addEventListener('click', async () => {
