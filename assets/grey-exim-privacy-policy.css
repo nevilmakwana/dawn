@@ -51,6 +51,27 @@
   color: var(--grey-policy-muted);
 }
 
+/* Keep the privacy title and update label on one deterministic left origin. */
+.section-grey-exim-privacy-policy .grey-policy__hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+}
+
+.section-grey-exim-privacy-policy .grey-policy__hero h1,
+.section-grey-exim-privacy-policy .grey-policy__updated {
+  box-sizing: border-box;
+  width: 100%;
+  margin-inline: 0;
+  padding-inline: 0;
+  text-indent: 0;
+}
+
+/* Align the update label with the visible edge of the large “P” glyph. */
+.section-grey-exim-privacy-policy .grey-policy__updated {
+  padding-inline-start: 0.3rem;
+}
+
 .grey-policy__shell {
   width: min(100%, 144rem);
   margin: 0 auto;
@@ -196,6 +217,22 @@
   font-size: 1.2rem;
   line-height: 1;
   letter-spacing: .08em;
+}
+
+/* Privacy section markers use the same scale and baseline as their headings. */
+.section-grey-exim-privacy-policy .grey-policy__section h2 {
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: start;
+}
+
+.section-grey-exim-privacy-policy .grey-policy__section h2 span {
+  padding-top: 0;
+  color: #000;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  font-variant-numeric: tabular-nums;
 }
 
 .grey-policy__section h3 {
