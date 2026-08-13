@@ -22,6 +22,11 @@
   text-indent: 0;
 }
 
+/* Optically align the update label with the visible edge of the large "C". */
+.grey-cookie-policy .grey-policy__updated {
+  padding-left: .3rem;
+}
+
 /* Policy navigation and section markers stay prominent and legible. */
 .grey-cookie-policy .grey-policy__toc a {
   grid-template-columns: 3.2rem minmax(0, 1fr);
