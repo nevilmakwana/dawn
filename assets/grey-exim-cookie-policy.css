@@ -8,6 +8,20 @@
   --cookie-muted: #666;
 }
 
+.grey-cookie-policy .grey-policy__hero-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.grey-cookie-policy .grey-policy__hero h1,
+.grey-cookie-policy .grey-policy__updated {
+  width: 100%;
+  margin-left: 0;
+  padding-left: 0;
+  text-indent: 0;
+}
+
 /* Policy navigation and section markers stay prominent and legible. */
 .grey-cookie-policy .grey-policy__toc a {
   grid-template-columns: 3.2rem minmax(0, 1fr);
