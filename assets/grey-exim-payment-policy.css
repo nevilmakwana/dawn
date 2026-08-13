@@ -1,0 +1,75 @@
+.section-grey-exim-payment-policy {
+  background: #fff;
+}
+
+.grey-payment-policy__source:empty {
+  min-height: 18rem;
+}
+
+.grey-payment-policy__empty {
+  margin: 0;
+  padding: 3rem;
+  border: 1px solid var(--grey-policy-border);
+  background: var(--grey-policy-surface);
+  font-size: 1.6rem;
+  line-height: 1.6;
+}
+
+.grey-payment-policy__source > .grey-policy__intro:empty,
+.grey-payment-policy [data-payment-policy-aside][hidden] {
+  display: none;
+}
+
+.grey-payment-policy__source table {
+  width: 100%;
+  min-width: 72rem;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.grey-payment-policy__source th,
+.grey-payment-policy__source td {
+  padding: 1.6rem;
+  border-right: 1px solid #dedede;
+  border-bottom: 1px solid #dedede;
+  vertical-align: top;
+  text-align: left;
+  font-size: 1.3rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.grey-payment-policy__source th {
+  background: #111;
+  color: #fff;
+  font-weight: 600;
+}
+
+.grey-payment-policy__source th:last-child,
+.grey-payment-policy__source td:last-child {
+  border-right: 0;
+}
+
+.grey-payment-policy__source tr:last-child td {
+  border-bottom: 0;
+}
+
+.grey-payment-policy__source tbody tr:nth-child(even) {
+  background: #f7f7f5;
+}
+
+.grey-payment-policy__table-wrap {
+  width: 100%;
+  margin: 3rem 0;
+  border: 1px solid #bdbdbd;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media screen and (max-width: 749px) {
+  .grey-payment-policy__empty {
+    padding: 2.2rem;
+    font-size: 1.5rem;
+  }
+}

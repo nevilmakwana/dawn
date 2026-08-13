@@ -2165,11 +2165,12 @@
       const headerWrapper = this.querySelector('.header-wrapper') || document.querySelector('.header-wrapper');
       if (!headerWrapper) return;
 
-      // Cookie Policy contains documentation examples with "banner" in their
+      // Policy documentation can contain examples with "banner" in their
       // class names. They are not hero banners and must not make the header
       // transparent.
-      const isCookiePolicy = new URLSearchParams(window.location.search).get('view') === 'cookie-policy';
-      if (isCookiePolicy) {
+      const policyView = new URLSearchParams(window.location.search).get('view');
+      const isDocumentationPolicy = ['cookie-policy', 'payment-policy'].includes(policyView);
+      if (isDocumentationPolicy) {
         headerWrapper.classList.remove('has-hero-banner', 'scrolled-past-hero');
         return;
       }
