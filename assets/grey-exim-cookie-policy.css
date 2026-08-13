@@ -36,17 +36,17 @@
 }
 
 .grey-cookie-policy .grey-policy__section h2 {
-  grid-template-columns: 4.8rem minmax(0, 1fr);
-  align-items: baseline;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: start;
 }
 
 .grey-cookie-policy .grey-policy__section h2 span {
   padding-top: 0;
   color: #000;
-  font-size: 2.4rem;
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
   font-variant-numeric: tabular-nums;
 }
 
