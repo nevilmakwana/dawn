@@ -143,6 +143,31 @@
   text-underline-offset: .3rem;
 }
 
+@media screen and (min-width: 990px) {
+  /* Keep the TOC heading fixed while the longer Privacy Policy index scrolls. */
+  .section-grey-exim-privacy-policy .grey-policy__toc nav {
+    max-height: min(48rem, calc(100dvh - 20rem));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    padding-inline-end: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: #111 #e4e4e4;
+  }
+
+  .section-grey-exim-privacy-policy .grey-policy__toc nav::-webkit-scrollbar {
+    width: .4rem;
+  }
+
+  .section-grey-exim-privacy-policy .grey-policy__toc nav::-webkit-scrollbar-track {
+    background: #e4e4e4;
+  }
+
+  .section-grey-exim-privacy-policy .grey-policy__toc nav::-webkit-scrollbar-thumb {
+    background: #111;
+  }
+}
+
 .grey-policy__content {
   width: 100%;
   max-width: 88rem;
