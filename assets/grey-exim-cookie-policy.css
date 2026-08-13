@@ -9,22 +9,18 @@
 }
 
 .grey-cookie-policy .grey-policy__hero-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
 }
 
 .grey-cookie-policy .grey-policy__hero h1,
 .grey-cookie-policy .grey-policy__updated {
+  box-sizing: border-box;
   width: 100%;
-  margin-left: 0;
-  padding-left: 0;
+  margin-inline: 0;
+  padding-inline: 0;
   text-indent: 0;
-}
-
-/* Optically align the update label with the visible edge of the large "C". */
-.grey-cookie-policy .grey-policy__updated {
-  padding-left: .3rem;
 }
 
 /* Policy navigation and section markers stay prominent and legible. */
