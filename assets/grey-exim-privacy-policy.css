@@ -198,6 +198,12 @@
   letter-spacing: -.025em;
 }
 
+/* Shopify policy content already includes section dividers. Avoid a second line
+   from the enhanced refund-policy heading styles. */
+.section-grey-exim-refund-policy .grey-policy--editorial .grey-policy__content h2 {
+  border-top: 0;
+}
+
 .grey-policy--editorial .grey-policy__content h2:first-child {
   margin-top: 0;
 }
