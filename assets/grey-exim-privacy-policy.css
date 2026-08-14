@@ -204,6 +204,10 @@
   border-top: 0;
 }
 
+.section-grey-exim-shopify-policy .grey-policy--editorial .grey-policy__content h2 {
+  border-top: 0;
+}
+
 .grey-policy--editorial .grey-policy__content h2:first-child {
   margin-top: 0;
 }

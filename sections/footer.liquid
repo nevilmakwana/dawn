@@ -54,6 +54,20 @@
     endif
 
     assign greyexim_refund_url = routes.root_url | append: 'policies/return-and-refund-policy'
+    assign greyexim_terms_url = routes.root_url | append: 'policies/terms-of-service'
+    if shop.terms_of_service != blank
+      assign greyexim_terms_url = shop.terms_of_service.url
+    endif
+
+    assign greyexim_cookie_url = routes.root_url | append: 'policies/legal-notice'
+    assign greyexim_payment_url = routes.root_url | append: 'policies/contact-information'
+    for policy in shop.policies
+      if policy.url contains '/policies/legal-notice'
+        assign greyexim_cookie_url = policy.url
+      elsif policy.url contains '/policies/contact-information'
+        assign greyexim_payment_url = policy.url
+      endif
+    endfor
   -%}
 
   <div id="GreyeximFooter" class="prada-footer">
@@ -104,11 +118,11 @@
     <details class="prada-footer__group prada-footer__group--legal" open>
       <summary><span>LEGAL &amp; POLICIES</span><span class="prada-footer__chevron" aria-hidden="true"></span></summary>
       <div class="prada-footer__group-content"><ul>
-        <li><a href="{{ routes.root_url }}pages/contact?view=terms-and-conditions">Terms &amp; Conditions</a></li>
+        <li><a href="{{ greyexim_terms_url }}">Terms &amp; Conditions</a></li>
         <li><a href="{{ greyexim_privacy_url }}">Privacy Policy</a></li>
-        <li><a href="{{ routes.root_url }}pages/contact?view=cookie-policy">Cookie Policy</a></li>
+        <li><a href="{{ greyexim_cookie_url }}">Cookie Policy</a></li>
         <li><button type="button" class="prada-footer__cookie-settings" data-cookie-settings>Cookie Settings</button></li>
-        <li><a href="{{ routes.root_url }}pages/contact?view=payment-policy">Payment Policy</a></li>
+        <li><a href="{{ greyexim_payment_url }}">Payment Policy</a></li>
         <li><a href="{{ greyexim_refund_url }}">Return &amp; Refund Policy</a></li>
         <li><a href="{{ routes.root_url }}sitemap.xml">Sitemap</a></li>
       </ul></div>

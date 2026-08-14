@@ -363,9 +363,11 @@
       data-template="{{ template.name }}"
     >
       {%- if request.path contains '/policies/privacy-policy' -%}
-        {% section 'grey-exim-privacy-policy' %}
+        {% section 'grey-exim-shopify-policy' %}
       {%- elsif request.path contains '/policies/refund-policy' -%}
         {% section 'grey-exim-refund-policy' %}
+      {%- elsif request.path contains '/policies/terms-of-service' or request.path contains '/policies/legal-notice' or request.path contains '/policies/contact-information' -%}
+        {% section 'grey-exim-shopify-policy' %}
       {%- else -%}
         {{ content_for_layout }}
       {%- endif -%}

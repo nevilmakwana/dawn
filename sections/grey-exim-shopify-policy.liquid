@@ -1,0 +1,102 @@
+{{ 'grey-exim-privacy-policy.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign policy_source = blank
+  assign policy_heading = 'Policy'
+  assign policy_label = 'Store policy'
+
+  if request.path contains '/policies/privacy-policy'
+    assign policy_source = shop.privacy_policy
+    assign policy_heading = 'Privacy Policy'
+    assign policy_label = 'Privacy and personal data'
+  elsif request.path contains '/policies/terms-of-service'
+    assign policy_source = shop.terms_of_service
+    assign policy_heading = 'Terms & Conditions'
+    assign policy_label = 'Terms governing use and purchases'
+  else
+    for store_policy in shop.policies
+      if request.path contains '/policies/legal-notice' and store_policy.url contains '/policies/legal-notice'
+        assign policy_source = store_policy
+        assign policy_heading = 'Cookie Policy'
+        assign policy_label = 'Cookies and similar technologies'
+      elsif request.path contains '/policies/contact-information' and store_policy.url contains '/policies/contact-information'
+        assign policy_source = store_policy
+        assign policy_heading = 'Payment Policy'
+        assign policy_label = 'Payments, charges and security'
+      endif
+    endfor
+  endif
+-%}
+
+<article id="GreyShopifyPolicy-{{ section.id }}" class="grey-policy grey-policy--editorial" aria-labelledby="GreyShopifyPolicyTitle-{{ section.id }}">
+  <header class="grey-policy__hero">
+    <div class="grey-policy__hero-inner">
+      <h1 id="GreyShopifyPolicyTitle-{{ section.id }}">{{ policy_heading | escape }}</h1>
+      <p class="grey-policy__updated">{{ policy_label | escape }}</p>
+    </div>
+  </header>
+
+  <div class="grey-policy__shell">
+    <aside class="grey-policy__aside" data-shopify-policy-navigation hidden>
+      <details class="grey-policy__toc" open>
+        <summary>On this page</summary>
+        <nav aria-label="{{ policy_heading | escape }} sections">
+          <ol data-shopify-policy-navigation-list></ol>
+        </nav>
+      </details>
+    </aside>
+
+    <div class="grey-policy__content rte" data-shopify-policy-content>
+      {%- if policy_source != blank and policy_source.body != blank -%}
+        {{ policy_source.body }}
+      {%- else -%}
+        <div class="grey-policy__intro">
+          <p>Add this policy's content in Shopify Admin under <strong>Settings &rarr; Policies</strong>. Once saved, it will appear here automatically.</p>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</article>
+
+<script>
+  (() => {
+    const root = document.getElementById('GreyShopifyPolicy-{{ section.id }}');
+    if (!root) return;
+
+    document.title = `{{ policy_heading | escape }} – {{ shop.name | escape }}`;
+    const content = root.querySelector('[data-shopify-policy-content]');
+    const navigation = root.querySelector('[data-shopify-policy-navigation]');
+    const list = root.querySelector('[data-shopify-policy-navigation-list]');
+    const headings = content ? [...content.querySelectorAll('h2')] : [];
+    if (!navigation || !list || headings.length < 2) return;
+
+    const usedIds = new Set();
+    headings.forEach((heading, index) => {
+      const baseId = heading.textContent.trim().toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '') || `section-${index + 1}`;
+      let id = baseId;
+      let suffix = 2;
+      while (usedIds.has(id) || document.getElementById(id)) id = `${baseId}-${suffix++}`;
+      usedIds.add(id);
+      heading.id = id;
+
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = `#${id}`;
+      link.textContent = heading.textContent.trim();
+      item.appendChild(link);
+      list.appendChild(item);
+    });
+    navigation.hidden = false;
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Shopify policy content",
+  "tag": "section",
+  "class": "section-grey-exim-privacy-policy section-grey-exim-shopify-policy",
+  "settings": []
+}
+{% endschema %}
