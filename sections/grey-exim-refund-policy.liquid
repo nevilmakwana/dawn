@@ -65,9 +65,26 @@
     const content = section.querySelector('[data-policy-content]');
     const navigation = section.querySelector('[data-policy-navigation]');
     const list = section.querySelector('[data-policy-navigation-list]');
-    const headings = content ? [...content.querySelectorAll('h2')] : [];
     const contactHeading = section.querySelector('[data-refund-contact] h2');
     const contactNumber = section.querySelector('[data-refund-contact-number]');
+
+    if (content && contactHeading) {
+      const duplicateContactHeading = [...content.querySelectorAll('h2')].find((heading) => {
+        if (heading === contactHeading) return false;
+        return heading.textContent.trim().replace(/^\d+[.)\s:-]*/, '').toLowerCase() === 'contact us';
+      });
+
+      if (duplicateContactHeading) {
+        let node = duplicateContactHeading;
+        while (node && !node.matches('[data-refund-contact]')) {
+          const nextNode = node.nextElementSibling;
+          node.remove();
+          node = nextNode;
+        }
+      }
+    }
+
+    const headings = content ? [...content.querySelectorAll('h2')] : [];
     if (contactHeading && contactNumber) {
       const contactIndex = headings.indexOf(contactHeading);
       contactNumber.textContent = String(contactIndex + 1).padStart(2, '0');
