@@ -1,0 +1,181 @@
+{{ 'grey-exim-privacy-policy.css' | asset_url | stylesheet_tag }}
+{{ 'grey-exim-cookie-policy.css' | asset_url | stylesheet_tag }}
+{{ 'grey-exim-terms-policy.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign terms_policy_title = section.settings.title | default: 'Terms and Conditions'
+  assign terms_policy_updated = section.settings.last_updated | default: 'Last updated: 14 August 2026'
+  assign terms_policy_toc_label = section.settings.toc_label | default: 'On this page'
+-%}
+
+<article
+  id="GreyTermsPolicy-{{ section.id }}"
+  class="grey-policy grey-cookie-policy grey-terms-policy"
+  data-terms-policy
+  aria-labelledby="GreyTermsPolicyTitle-{{ section.id }}"
+>
+  <header class="grey-policy__hero">
+    <div class="grey-policy__hero-inner">
+      <h1 id="GreyTermsPolicyTitle-{{ section.id }}">{{ terms_policy_title | escape }}</h1>
+      {%- if terms_policy_updated != blank -%}
+        <p class="grey-policy__updated">{{ terms_policy_updated | escape }}</p>
+      {%- endif -%}
+    </div>
+  </header>
+
+  <div class="grey-policy__shell">
+    <aside class="grey-policy__aside" data-terms-policy-aside>
+      <details class="grey-policy__toc" open>
+        <summary>{{ terms_policy_toc_label | escape }}</summary>
+        <nav aria-label="{{ terms_policy_title | escape }} sections" data-terms-policy-toc>
+          <ol></ol>
+        </nav>
+      </details>
+    </aside>
+
+    <div class="grey-policy__content rte">
+      <div class="grey-terms-policy__source" data-terms-policy-source>
+        {%- if section.settings.policy_content != blank -%}
+          {{ section.settings.policy_content }}
+        {%- elsif request.design_mode -%}
+          <p class="grey-terms-policy__empty">
+            Paste your complete Terms and Conditions in this section's <strong>Policy content</strong> setting. Format every main section title as Heading 2 to create the numbered navigation automatically.
+          </p>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</article>
+
+<script>
+  (() => {
+    const rootId = 'GreyTermsPolicy-{{ section.id }}';
+
+    const slugify = (value) => value
+      .toLowerCase()
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    const initialiseTermsPolicy = () => {
+      const root = document.getElementById(rootId);
+      if (!root || root.dataset.termsPolicyReady === 'true') return;
+
+      const source = root.querySelector('[data-terms-policy-source]');
+      const toc = root.querySelector('[data-terms-policy-toc] ol');
+      const aside = root.querySelector('[data-terms-policy-aside]');
+      if (!source || !toc || !aside) return;
+
+      const sourceNodes = Array.from(source.childNodes).filter((node) => (
+        node.nodeType !== Node.TEXT_NODE || node.textContent.trim() !== ''
+      ));
+
+      const fragment = document.createDocumentFragment();
+      let currentContainer = document.createElement('div');
+      currentContainer.className = 'grey-policy__intro';
+      let sectionIndex = 0;
+      const usedIds = new Set();
+
+      const appendCurrentContainer = () => {
+        if (currentContainer.childNodes.length) fragment.appendChild(currentContainer);
+      };
+
+      sourceNodes.forEach((node) => {
+        const isSectionHeading = node.nodeType === Node.ELEMENT_NODE && node.tagName === 'H2';
+
+        if (isSectionHeading) {
+          appendCurrentContainer();
+          sectionIndex += 1;
+
+          const headingText = node.textContent.trim();
+          const sectionElement = document.createElement('section');
+          let sectionId = `terms-${slugify(headingText) || `section-${sectionIndex}`}`;
+          let suffix = 2;
+          while (usedIds.has(sectionId)) {
+            sectionId = `terms-${slugify(headingText) || `section-${sectionIndex}`}-${suffix}`;
+            suffix += 1;
+          }
+          usedIds.add(sectionId);
+
+          sectionElement.id = sectionId;
+          sectionElement.className = 'grey-policy__section';
+
+          const marker = document.createElement('span');
+          marker.setAttribute('aria-hidden', 'true');
+          marker.textContent = String(sectionIndex).padStart(2, '0');
+          node.prepend(marker, document.createTextNode(' '));
+          sectionElement.appendChild(node);
+
+          const item = document.createElement('li');
+          const link = document.createElement('a');
+          link.href = `#${sectionId}`;
+          link.textContent = headingText;
+          item.appendChild(link);
+          toc.appendChild(item);
+
+          currentContainer = sectionElement;
+          return;
+        }
+
+        currentContainer.appendChild(node);
+      });
+
+      appendCurrentContainer();
+      source.replaceChildren(fragment);
+
+      source.querySelectorAll('table').forEach((table) => {
+        if (table.parentElement?.classList.contains('grey-terms-policy__table-wrap')) return;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'grey-terms-policy__table-wrap';
+        wrapper.setAttribute('role', 'region');
+        wrapper.setAttribute('aria-label', 'Terms and conditions table');
+        wrapper.tabIndex = 0;
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+      });
+
+      aside.hidden = sectionIndex === 0;
+      root.dataset.termsPolicyReady = 'true';
+    };
+
+    initialiseTermsPolicy();
+    document.addEventListener('shopify:section:load', (event) => {
+      if (event.detail?.sectionId === '{{ section.id }}') initialiseTermsPolicy();
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Grey Exim terms policy",
+  "tag": "section",
+  "class": "section-grey-exim-terms-policy",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Policy title",
+      "default": "Terms and Conditions"
+    },
+    {
+      "type": "text",
+      "id": "last_updated",
+      "label": "Last updated text",
+      "default": "Last updated: 14 August 2026"
+    },
+    {
+      "type": "text",
+      "id": "toc_label",
+      "label": "Navigation heading",
+      "default": "On this page"
+    },
+    {
+      "type": "richtext",
+      "id": "policy_content",
+      "label": "Policy content",
+      "info": "Paste the complete Terms and Conditions here. Format every main section title as Heading 2; section numbers and On this page links are created automatically."
+    }
+  ]
+}
+{% endschema %}

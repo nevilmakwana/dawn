@@ -2169,7 +2169,7 @@
       // class names. They are not hero banners and must not make the header
       // transparent.
       const policyView = new URLSearchParams(window.location.search).get('view');
-      const isDocumentationPolicy = ['cookie-policy', 'payment-policy'].includes(policyView);
+      const isDocumentationPolicy = ['cookie-policy', 'payment-policy', 'terms-and-conditions'].includes(policyView);
       if (isDocumentationPolicy) {
         headerWrapper.classList.remove('has-hero-banner', 'scrolled-past-hero');
         return;

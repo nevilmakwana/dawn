@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "main": {
+      "type": "grey-exim-terms-policy",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
