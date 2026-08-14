@@ -68,7 +68,7 @@
         {%- if form.errors -%}<small class="prada-footer__message">{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</small>{%- endif -%}
         {%- if form.posted_successfully? -%}<small class="prada-footer__message">Thank you for subscribing.</small>{%- endif -%}
       {%- endform -%}
-      <p class="prada-footer__privacy">By clicking on “Subscribe”, you confirm that you have read and understood our <a href="{{ greyexim_privacy_url }}">Privacy Statement</a> and that you want to receive the newsletter and other marketing communications as set out therein.</p>
+      <p class="prada-footer__privacy">By clicking on “Subscribe”, you confirm that you have read and understood our <a href="{{ greyexim_privacy_url }}">Privacy Policy</a> and that you want to receive the newsletter and other marketing communications as set out therein.</p>
       {%- if section.settings.show_social -%}
         <ul class="prada-footer__social" role="list" aria-label="Social media">
           <li><a href="{{ settings.social_instagram_link | default: '#' }}" aria-label="Instagram">{{ 'icon-instagram.svg' | inline_asset_content }}</a></li>
@@ -102,13 +102,13 @@
     </details>
 
     <details class="prada-footer__group prada-footer__group--legal" open>
-      <summary><span>Legal terms and conditions</span><span class="prada-footer__chevron" aria-hidden="true"></span></summary>
+      <summary><span>LEGAL &amp; POLICIES</span><span class="prada-footer__chevron" aria-hidden="true"></span></summary>
       <div class="prada-footer__group-content"><ul>
-        <li><a href="{{ greyexim_privacy_url }}">Privacy Statement</a></li>
+        <li><a href="{{ routes.root_url }}pages/contact?view=terms-and-conditions">Terms &amp; Conditions</a></li>
+        <li><a href="{{ greyexim_privacy_url }}">Privacy Policy</a></li>
         <li><a href="{{ routes.root_url }}pages/contact?view=cookie-policy">Cookie Policy</a></li>
+        <li><button type="button" class="prada-footer__cookie-settings" data-cookie-settings>Cookie Settings</button></li>
         <li><a href="{{ routes.root_url }}pages/contact?view=payment-policy">Payment Policy</a></li>
-        <li><a href="{{ routes.root_url }}pages/contact?view=terms-and-conditions">Terms and Conditions</a></li>
-        <li><button type="button" class="prada-footer__cookie-settings" data-cookie-settings>Cookie settings</button></li>
         <li><a href="{{ greyexim_refund_url }}">Return &amp; Refund Policy</a></li>
         <li><a href="{{ routes.root_url }}sitemap.xml">Sitemap</a></li>
       </ul></div>
@@ -584,9 +584,9 @@
         <p class="prada-mobile-footer__privacy">
           By clicking on &ldquo;Subscribe&rdquo;, you confirm that you have read and understood our
           {%- if shop.privacy_policy != blank -%}
-            <a href="{{ shop.privacy_policy.url }}"> Privacy Statement</a>
+            <a href="{{ shop.privacy_policy.url }}"> Privacy Policy</a>
           {%- else -%}
-            <a href="{{ routes.root_url }}policies/privacy-policy"> Privacy Statement</a>
+            <a href="{{ routes.root_url }}policies/privacy-policy"> Privacy Policy</a>
           {%- endif -%}
           and that you want to receive marketing communications.
         </p>
@@ -618,7 +618,7 @@
       </details>
 
       <details class="prada-mobile-footer__accordion">
-        <summary><span>Legal terms and conditions</span><span class="prada-mobile-footer__chevron" aria-hidden="true"></span></summary>
+        <summary><span>LEGAL &amp; POLICIES</span><span class="prada-mobile-footer__chevron" aria-hidden="true"></span></summary>
         <div class="prada-mobile-footer__accordion-content">
           <ul>
             {%- for policy in shop.policies -%}
