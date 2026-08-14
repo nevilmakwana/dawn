@@ -244,6 +244,16 @@
   letter-spacing: -.025em;
 }
 
+/* Policy introductions use the same readable body typography as the
+   paragraphs that follow them across every policy template. */
+.grey-policy .grey-policy__intro p:first-child,
+.grey-policy--editorial .grey-policy__content > p:first-child {
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.75;
+  letter-spacing: normal;
+}
+
 .grey-policy__content p,
 .grey-policy__content li,
 .grey-policy__content address {
@@ -421,6 +431,12 @@
     line-height: 1.68;
   }
 
+  .grey-policy .grey-policy__intro p:first-child,
+  .grey-policy--editorial .grey-policy__content > p:first-child {
+    font-size: 1.5rem;
+    line-height: 1.68;
+  }
+
   .grey-policy__columns {
     columns: 1;
   }
@@ -468,8 +484,9 @@
     font-size: 4.2rem;
   }
 
-  .grey-policy__intro p:first-child {
-    font-size: 2.4rem;
+  .grey-policy .grey-policy__intro p:first-child,
+  .grey-policy--editorial .grey-policy__content > p:first-child {
+    font-size: 1.5rem;
   }
 
   .grey-policy__section h2 {
