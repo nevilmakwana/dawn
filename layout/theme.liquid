@@ -362,6 +362,8 @@
     >
       {%- if request.path contains '/policies/privacy-policy' -%}
         {% section 'grey-exim-privacy-policy' %}
+      {%- elsif request.path contains '/policies/refund-policy' -%}
+        {% section 'grey-exim-refund-policy' %}
       {%- else -%}
         {{ content_for_layout }}
       {%- endif -%}

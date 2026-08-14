@@ -1,0 +1,76 @@
+{{ 'grey-exim-privacy-policy.css' | asset_url | stylesheet_tag }}
+
+<article class="grey-policy grey-policy--editorial" aria-labelledby="GreyRefundPolicyTitle">
+  <header class="grey-policy__hero">
+    <div class="grey-policy__hero-inner">
+      <h1 id="GreyRefundPolicyTitle">{{ shop.refund_policy.title | default: 'Return & Refund Policy' | escape }}</h1>
+      <p class="grey-policy__updated">Returns, exchanges and refunds</p>
+    </div>
+  </header>
+
+  <div class="grey-policy__shell">
+    <aside class="grey-policy__aside" data-policy-navigation hidden>
+      <details class="grey-policy__toc" open>
+        <summary>On this page</summary>
+        <nav aria-label="Return and refund policy sections">
+          <ol data-policy-navigation-list></ol>
+        </nav>
+      </details>
+    </aside>
+
+    <div class="grey-policy__content rte" data-policy-content>
+      {%- if shop.refund_policy.body != blank -%}
+        {{ shop.refund_policy.body }}
+      {%- else -%}
+        <div class="grey-policy__intro">
+          <p>Return and refund policy information will be available here shortly.</p>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</article>
+
+<script>
+  (() => {
+    const section = document.currentScript?.previousElementSibling;
+    if (!section) return;
+
+    const content = section.querySelector('[data-policy-content]');
+    const navigation = section.querySelector('[data-policy-navigation]');
+    const list = section.querySelector('[data-policy-navigation-list]');
+    const headings = content ? [...content.querySelectorAll('h2')] : [];
+    if (!navigation || !list || headings.length < 2) return;
+
+    const usedIds = new Set();
+    headings.forEach((heading, index) => {
+      const baseId = heading.textContent
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '') || `section-${index + 1}`;
+      let id = baseId;
+      let suffix = 2;
+      while (usedIds.has(id) || document.getElementById(id)) id = `${baseId}-${suffix++}`;
+      usedIds.add(id);
+      heading.id = id;
+
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = `#${id}`;
+      link.textContent = heading.textContent.trim();
+      item.appendChild(link);
+      list.appendChild(item);
+    });
+
+    navigation.hidden = false;
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Return & refund policy",
+  "tag": "section",
+  "class": "section-grey-exim-privacy-policy section-grey-exim-refund-policy",
+  "settings": []
+}
+{% endschema %}
