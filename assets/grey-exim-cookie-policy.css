@@ -45,7 +45,8 @@
   align-items: start;
 }
 
-.grey-cookie-policy .grey-policy__section h2 span {
+.section-grey-exim-cookie-policy .grey-cookie-policy .grey-policy__section h2 span,
+.section-grey-exim-payment-policy .grey-payment-policy .grey-policy__section h2 span {
   padding-top: 0;
   color: #000;
   font-size: inherit;

@@ -43,6 +43,22 @@
           </p>
         {%- endif -%}
       </div>
+
+      <section id="payment-contact" class="grey-policy__section grey-policy__section--contact" data-payment-contact>
+        <h2><span data-payment-contact-number aria-hidden="true">01</span> Contact Us</h2>
+        <p>For questions, complaints or concerns regarding payments, payment failures, duplicate transactions, COD, applicable charges or your order, please contact:</p>
+        <div class="grey-policy__contact-card">
+          <address>
+            <strong>Grey Exim</strong><br>
+            Shop 105, Building B, Sicilia<br>
+            Mota Varachha, Near Bhakti Nandan Circle<br>
+            Surat &ndash; 394101<br>
+            Gujarat, India
+          </address>
+          <p><strong>Email</strong><br><a href="{{ routes.root_url }}pages/contact#send-us-email">care@greyexim.com</a></p>
+          <p><strong>Website</strong><br><a href="https://www.greyexim.com">www.greyexim.com</a></p>
+        </div>
+      </section>
     </div>
   </div>
 </article>
@@ -67,9 +83,15 @@
       const aside = root.querySelector('[data-payment-policy-aside]');
       if (!source || !toc || !aside) return;
 
-      const sourceNodes = Array.from(source.childNodes).filter((node) => (
+      let sourceNodes = Array.from(source.childNodes).filter((node) => (
         node.nodeType !== Node.TEXT_NODE || node.textContent.trim() !== ''
       ));
+      const oldContactIndex = sourceNodes.findIndex((node) => (
+        node.nodeType === Node.ELEMENT_NODE &&
+        node.tagName === 'H2' &&
+        node.textContent.trim().replace(/^\d+[.)\s:-]*/, '').toLowerCase() === 'contact us'
+      ));
+      if (oldContactIndex >= 0) sourceNodes = sourceNodes.slice(0, oldContactIndex);
 
       const fragment = document.createDocumentFragment();
       let currentContainer = document.createElement('div');
@@ -123,6 +145,20 @@
 
       appendCurrentContainer();
       source.replaceChildren(fragment);
+
+      const contactSection = root.querySelector('[data-payment-contact]');
+      const contactNumber = contactSection?.querySelector('[data-payment-contact-number]');
+      if (contactSection && contactNumber) {
+        sectionIndex += 1;
+        contactNumber.textContent = String(sectionIndex).padStart(2, '0');
+
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = '#payment-contact';
+        link.textContent = 'Contact Us';
+        item.appendChild(link);
+        toc.appendChild(item);
+      }
 
       source.querySelectorAll('table').forEach((table) => {
         if (table.parentElement?.classList.contains('grey-payment-policy__table-wrap')) return;

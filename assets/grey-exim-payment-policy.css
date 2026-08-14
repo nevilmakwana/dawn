@@ -67,9 +67,51 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.grey-payment-policy .grey-policy__contact-card {
+  grid-template-columns: minmax(22rem, 1.5fr) repeat(2, minmax(14rem, 1fr));
+}
+
+.grey-payment-policy .grey-policy__contact-card > * {
+  min-width: 0;
+}
+
+.grey-payment-policy .grey-policy__contact-card a {
+  overflow-wrap: anywhere;
+}
+
+@media screen and (min-width: 990px) {
+  .section-grey-exim-payment-policy [data-payment-policy-toc] {
+    max-height: min(48rem, calc(100dvh - 20rem));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    padding-inline-end: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: #111 #e4e4e4;
+  }
+
+  .section-grey-exim-payment-policy [data-payment-policy-toc]::-webkit-scrollbar {
+    width: .4rem;
+  }
+
+  .section-grey-exim-payment-policy [data-payment-policy-toc]::-webkit-scrollbar-track {
+    background: #e4e4e4;
+  }
+
+  .section-grey-exim-payment-policy [data-payment-policy-toc]::-webkit-scrollbar-thumb {
+    background: #111;
+  }
+}
+
 @media screen and (max-width: 749px) {
   .grey-payment-policy__empty {
     padding: 2.2rem;
     font-size: 1.5rem;
+  }
+}
+
+@media screen and (max-width: 989px) {
+  .grey-payment-policy .grey-policy__contact-card {
+    grid-template-columns: 1fr;
   }
 }
