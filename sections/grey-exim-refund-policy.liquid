@@ -1,10 +1,15 @@
 {{ 'grey-exim-privacy-policy.css' | asset_url | stylesheet_tag }}
 
+{%- liquid
+  assign refund_policy_updated = section.settings.last_updated | default: 'Last updated: 14 August 2026'
+  assign refund_contact_email = section.settings.contact_email | default: 'care@greyexim.com'
+-%}
+
 <article class="grey-policy grey-policy--editorial" aria-labelledby="GreyRefundPolicyTitle">
   <header class="grey-policy__hero">
     <div class="grey-policy__hero-inner">
       <h1 id="GreyRefundPolicyTitle">{{ shop.refund_policy.title | default: 'Return & Refund Policy' | escape }}</h1>
-      <p class="grey-policy__updated">Returns, exchanges and refunds</p>
+      <p class="grey-policy__updated">{{ refund_policy_updated | escape }}</p>
     </div>
   </header>
 
@@ -26,6 +31,22 @@
           <p>Return and refund policy information will be available here shortly.</p>
         </div>
       {%- endif -%}
+
+      <section id="refund-contact" class="grey-policy__section grey-policy__section--contact" data-refund-contact>
+        <h2><span data-refund-contact-number aria-hidden="true">01</span> Contact Us</h2>
+        <p>For questions, complaints or concerns regarding returns or refunds, your order or our Website, please contact:</p>
+        <div class="grey-policy__contact-card">
+          <address>
+            <strong>Grey Exim</strong><br>
+            Shop 105, Building B, Sicilia<br>
+            Mota Varachha, Near Bhakti Nandan Circle<br>
+            Surat &ndash; 394101<br>
+            Gujarat, India
+          </address>
+          <p><strong>Email</strong><br><a href="mailto:{{ refund_contact_email | escape }}">{{ refund_contact_email | escape }}</a></p>
+          <p><strong>Website</strong><br><a href="https://www.greyexim.com">www.greyexim.com</a></p>
+        </div>
+      </section>
     </div>
   </div>
 </article>
@@ -39,6 +60,12 @@
     const navigation = section.querySelector('[data-policy-navigation]');
     const list = section.querySelector('[data-policy-navigation-list]');
     const headings = content ? [...content.querySelectorAll('h2')] : [];
+    const contactHeading = section.querySelector('[data-refund-contact] h2');
+    const contactNumber = section.querySelector('[data-refund-contact-number]');
+    if (contactHeading && contactNumber) {
+      const contactIndex = headings.indexOf(contactHeading);
+      contactNumber.textContent = String(contactIndex + 1).padStart(2, '0');
+    }
     if (!navigation || !list || headings.length < 2) return;
 
     const usedIds = new Set();
@@ -57,7 +84,9 @@
       const item = document.createElement('li');
       const link = document.createElement('a');
       link.href = `#${id}`;
-      link.textContent = heading.textContent.trim();
+      const headingLabel = heading.cloneNode(true);
+      headingLabel.querySelector('[data-refund-contact-number]')?.remove();
+      link.textContent = headingLabel.textContent.trim();
       item.appendChild(link);
       list.appendChild(item);
     });
@@ -71,6 +100,19 @@
   "name": "Return & refund policy",
   "tag": "section",
   "class": "section-grey-exim-privacy-policy section-grey-exim-refund-policy",
-  "settings": []
+  "settings": [
+    {
+      "type": "text",
+      "id": "last_updated",
+      "label": "Last updated text",
+      "default": "Last updated: 14 August 2026"
+    },
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "Contact email",
+      "default": "care@greyexim.com"
+    }
+  ]
 }
 {% endschema %}
