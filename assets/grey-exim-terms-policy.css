@@ -71,8 +71,16 @@
   grid-template-columns: minmax(22rem, 1.5fr) repeat(2, minmax(14rem, 1fr));
 }
 
-.grey-terms-policy .grey-policy__contact-card > div {
+.grey-terms-policy .grey-policy__contact-card > * {
   min-width: 0;
+}
+
+.grey-terms-policy .grey-policy__contact-card address {
+  font-style: normal;
+}
+
+.grey-terms-policy .grey-policy__contact-card a {
+  overflow-wrap: anywhere;
 }
 
 @media screen and (min-width: 990px) {
@@ -110,4 +118,19 @@
   .grey-terms-policy .grey-policy__contact-card {
     grid-template-columns: 1fr;
   }
+}
+
+.section-grey-exim-terms-policy .grey-policy__section h2 {
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: start;
+}
+
+.section-grey-exim-terms-policy .grey-policy__section h2 > span {
+  padding-top: 0;
+  color: #000;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  font-variant-numeric: tabular-nums;
 }

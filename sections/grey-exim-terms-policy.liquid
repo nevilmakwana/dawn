@@ -84,46 +84,136 @@
         .replace(/:$/, '');
 
       const enhanceContactSection = (contactSection) => {
-        if (!contactSection) return;
+        if (!contactSection || contactSection.querySelector('.grey-policy__contact-card')) return;
 
-        const blocks = Array.from(contactSection.children).slice(1);
-        const labelFor = (block) => normaliseLabel(
-          block.querySelector('strong')?.textContent || block.textContent || ''
+        const heading = contactSection.querySelector(':scope > h2');
+        const blocks = Array.from(contactSection.children).filter((child) => child !== heading);
+        if (!blocks.length) return;
+
+        const textFromBlock = (block) => {
+          const clone = block.cloneNode(true);
+
+          clone.querySelectorAll('strong, b').forEach((strong) => {
+            const label = normaliseLabel(strong.textContent || '');
+            if (['grey exim', 'email', 'website'].includes(label)) {
+              strong.before(document.createTextNode('\n'));
+              strong.after(document.createTextNode('\n'));
+            }
+          });
+
+          const parts = [];
+          const visit = (node, isRoot = false) => {
+            if (node.nodeType === Node.TEXT_NODE) {
+              parts.push(node.textContent || '');
+              return;
+            }
+            if (node.nodeType !== Node.ELEMENT_NODE) return;
+            if (node.tagName === 'BR') {
+              parts.push('\n');
+              return;
+            }
+
+            const isBlock = !isRoot && ['P', 'DIV', 'LI', 'ADDRESS'].includes(node.tagName);
+            if (isBlock) parts.push('\n');
+            Array.from(node.childNodes).forEach((child) => visit(child));
+            if (isBlock) parts.push('\n');
+          };
+
+          visit(clone, true);
+          return parts.join('');
+        };
+
+        const flattenedText = blocks
+          .map(textFromBlock)
+          .join('\n')
+          .replace(/\u00a0/g, ' ')
+          .replace(/[ \t]+\n/g, '\n')
+          .replace(/\n[ \t]+/g, '\n')
+          .replace(/\n{2,}/g, '\n')
+          .trim();
+
+        const findMarker = (pattern, startAt = 0) => {
+          const match = flattenedText.slice(startAt).match(pattern);
+          if (!match) return null;
+          return {
+            index: startAt + match.index,
+            end: startAt + match.index + match[0].length,
+          };
+        };
+
+        const addressMarker = findMarker(/(?:^|\n)\s*Grey Exim\s*/i);
+        const emailMarker = addressMarker && findMarker(/(?:^|\n)\s*Email\s*:?\s*/i, addressMarker.end);
+        const websiteMarker = emailMarker && findMarker(/(?:^|\n)\s*Website\s*:?\s*/i, emailMarker.end);
+        if (!addressMarker || !emailMarker || !websiteMarker) return;
+
+        const introText = flattenedText.slice(0, addressMarker.index).trim();
+        const addressLines = flattenedText
+          .slice(addressMarker.end, emailMarker.index)
+          .split(/\n+/)
+          .map((line) => line.trim())
+          .filter(Boolean);
+
+        const emailAnchor = contactSection.querySelector('a[href^="mailto:"]');
+        const emailSlice = flattenedText.slice(emailMarker.end, websiteMarker.index);
+        const emailValue = (
+          emailAnchor?.getAttribute('href')?.replace(/^mailto:/i, '') ||
+          emailAnchor?.textContent ||
+          emailSlice.match(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/i)?.[0] ||
+          ''
+        ).trim();
+
+        const websiteAnchor = Array.from(contactSection.querySelectorAll('a[href]')).find((anchor) => (
+          !anchor.getAttribute('href')?.toLowerCase().startsWith('mailto:') &&
+          /greyexim\.com/i.test(`${anchor.textContent} ${anchor.getAttribute('href')}`)
+        ));
+        const websiteSlice = flattenedText.slice(websiteMarker.end);
+        const websiteValue = (
+          websiteAnchor?.textContent ||
+          websiteSlice.match(/(?:https?:\/\/)?(?:www\.)?greyexim\.com(?:\/[^\s]*)?/i)?.[0] ||
+          'www.greyexim.com'
+        ).trim().replace(/[.,;]+$/, '');
+        const websiteHref = websiteAnchor?.getAttribute('href') || (
+          /^https?:\/\//i.test(websiteValue) ? websiteValue : `https://${websiteValue}`
         );
-        const textFor = (block) => normaliseLabel(block.textContent || '');
 
-        const addressIndex = blocks.findIndex((block) => (
-          labelFor(block) === 'grey exim' || textFor(block).startsWith('grey exim')
-        ));
-        const emailIndex = blocks.findIndex((block) => (
-          block.querySelector('a[href^="mailto:"]') ||
-          labelFor(block) === 'email' ||
-          textFor(block).startsWith('email:')
-        ));
-        const websiteIndex = blocks.findIndex((block) => (
-          labelFor(block) === 'website' ||
-          textFor(block).startsWith('website:')
-        ));
+        if (!addressLines.length || !emailValue) return;
 
-        if (
-          addressIndex < 0 ||
-          emailIndex <= addressIndex ||
-          websiteIndex <= emailIndex
-        ) return;
+        blocks.forEach((block) => block.remove());
+
+        if (introText) {
+          const intro = document.createElement('p');
+          intro.textContent = introText.replace(/\n+/g, ' ');
+          contactSection.appendChild(intro);
+        }
 
         const card = document.createElement('div');
         card.className = 'grey-policy__contact-card';
 
-        [
-          blocks.slice(addressIndex, emailIndex),
-          blocks.slice(emailIndex, websiteIndex),
-          blocks.slice(websiteIndex),
-        ].forEach((group) => {
-          const column = document.createElement('div');
-          group.forEach((block) => column.appendChild(block));
-          card.appendChild(column);
+        const address = document.createElement('address');
+        const addressName = document.createElement('strong');
+        addressName.textContent = 'Grey Exim';
+        address.append(addressName);
+        addressLines.forEach((line) => {
+          address.append(document.createElement('br'), document.createTextNode(line));
         });
 
+        const email = document.createElement('p');
+        const emailLabel = document.createElement('strong');
+        emailLabel.textContent = 'Email';
+        const emailLink = document.createElement('a');
+        emailLink.href = `mailto:${emailValue}`;
+        emailLink.textContent = emailValue;
+        email.append(emailLabel, document.createElement('br'), emailLink);
+
+        const website = document.createElement('p');
+        const websiteLabel = document.createElement('strong');
+        websiteLabel.textContent = 'Website';
+        const websiteLink = document.createElement('a');
+        websiteLink.href = websiteHref;
+        websiteLink.textContent = websiteValue.replace(/^https?:\/\//i, '');
+        website.append(websiteLabel, document.createElement('br'), websiteLink);
+
+        card.append(address, email, website);
         contactSection.appendChild(card);
       };
 
@@ -150,7 +240,8 @@
 
           sectionElement.id = sectionId;
           sectionElement.className = 'grey-policy__section';
-          if (normaliseLabel(headingText) === 'contact us') {
+          const headingLabel = normaliseLabel(headingText).replace(/^\d+[.)\s:-]+/, '');
+          if (headingLabel === 'contact us') {
             sectionElement.classList.add('grey-policy__section--contact');
             sectionElement.dataset.termsContact = '';
           }
