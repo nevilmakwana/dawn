@@ -1803,3 +1803,20 @@
 .prada-cart-edit-modal :is(input, textarea, [contenteditable='true']) {
   caret-color: auto;
 }
+
+/* Author display rules must never override the details panel's native hidden state. */
+.prada-cart-edit-modal__description[hidden] {
+  display: none;
+}
+
+.prada-cart-edit-modal__description {
+  transition:
+    margin 440ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 240ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prada-cart-edit-modal__description {
+    transition: none;
+  }
+}
