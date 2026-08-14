@@ -555,6 +555,7 @@
     let detailsAnimationToken = 0;
     let detailsCloseTimer = null;
     let detailsScrollFrame = null;
+    let detailsPanelAnimation = null;
 
     const stopDetailsRevealScroll = () => {
       if (!detailsScrollFrame) return;
@@ -605,6 +606,9 @@
       detailsButton.setAttribute('aria-expanded', String(shouldOpen));
       detailsButton.textContent = shouldOpen ? 'Hide details' : 'Show details';
 
+      detailsPanelAnimation?.cancel();
+      detailsPanelAnimation = null;
+
       if (motionMediaQuery.matches) {
         description.hidden = !shouldOpen;
         description.classList.toggle('is-open', shouldOpen);
@@ -614,26 +618,44 @@
 
       if (shouldOpen) {
         description.hidden = false;
-        description.getBoundingClientRect();
         description.classList.add('is-open');
+        const targetHeight = descriptionInner.scrollHeight;
+        detailsPanelAnimation = description.animate(
+          [
+            { height: '0px', opacity: 0, transform: 'translateY(-8px)' },
+            { height: `${targetHeight}px`, opacity: 1, transform: 'translateY(0)' },
+          ],
+          { duration: 460, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+        );
+        detailsPanelAnimation.addEventListener('finish', () => {
+          if (detailsAnimationToken !== animationToken) return;
+          detailsPanelAnimation = null;
+        });
         startDetailsRevealScroll();
         return;
       }
 
       stopDetailsRevealScroll();
-      description.classList.remove('is-open');
+      const startHeight = description.getBoundingClientRect().height;
+      detailsPanelAnimation = description.animate(
+        [
+          { height: `${startHeight}px`, opacity: 1, transform: 'translateY(0)' },
+          { height: '0px', opacity: 0, transform: 'translateY(-8px)' },
+        ],
+        { duration: 400, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' }
+      );
 
-      const finishClose = (event) => {
-        if (event && (event.target !== description || event.propertyName !== 'grid-template-rows')) return;
-        window.clearTimeout(detailsCloseTimer);
-        detailsCloseTimer = null;
-        description.removeEventListener('transitionend', finishClose);
+      const finishClose = () => {
         if (detailsAnimationToken !== animationToken || detailsButton.getAttribute('aria-expanded') !== 'false') return;
+        detailsPanelAnimation = null;
+        description.classList.remove('is-open');
         description.hidden = true;
       };
 
-      description.addEventListener('transitionend', finishClose);
-      detailsCloseTimer = window.setTimeout(() => finishClose(), 500);
+      detailsPanelAnimation.addEventListener('finish', finishClose);
+      detailsCloseTimer = window.setTimeout(() => {
+        detailsPanelAnimation?.finish();
+      }, 460);
     };
 
     detailsButton.addEventListener('click', () => {

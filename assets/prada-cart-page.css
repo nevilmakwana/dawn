@@ -653,13 +653,22 @@
   .prada-cart-edit-modal__stepper button {
     display: grid;
     width: 28px;
-    height: 34px;
+    height: 28px;
     place-items: center;
     padding: 0;
-    border: 0;
-    background: transparent;
+    border: 1px solid #d2d2d2;
+    border-radius: 50%;
+    background: #ffffff;
     color: #111111;
     font: inherit;
+    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+  }
+
+  .prada-cart-edit-modal__stepper button:not(:disabled):hover,
+  .prada-cart-edit-modal__stepper button:not(:disabled):focus-visible {
+    border-color: #111111;
+    background: #111111;
+    color: #ffffff;
   }
 
   .prada-cart-edit-modal__stepper button:disabled {
@@ -1327,7 +1336,20 @@
     align-items: center;
     justify-content: center;
     min-width: 34px;
-    height: 24px;
+    min-height: 24px;
+    height: auto;
+  }
+
+  .prada-shopping-bag-footer__payment-list span {
+    display: inline-flex;
+    min-height: 28px;
+    align-items: center;
+    padding: 5px 9px;
+    border: 1px solid #d8d8d8;
+    background: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
   }
 
   .prada-shopping-bag-footer__payment-list svg {
@@ -1623,15 +1645,32 @@
   }
 
   .prada-cart-edit-modal__stepper button {
-    width: 18px;
-    height: 24px;
+    display: grid;
+    width: 26px;
+    height: 26px;
+    place-items: center;
     padding: 0;
-    border: 0;
-    background: transparent;
-    color: #555555;
+    border: 1px solid #d2d2d2;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #111111;
     cursor: pointer;
     font: inherit;
     font-size: 16px;
+    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+  }
+
+  .prada-cart-edit-modal__stepper button:not(:disabled):hover,
+  .prada-cart-edit-modal__stepper button:not(:disabled):focus-visible {
+    border-color: #111111;
+    background: #111111;
+    color: #ffffff;
+  }
+
+  .prada-cart-edit-modal__stepper button:disabled {
+    border-color: #e5e5e5;
+    color: #aaaaaa;
+    cursor: not-allowed;
   }
 
   .prada-cart-edit-modal__stepper-icon {

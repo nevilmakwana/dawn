@@ -71,15 +71,11 @@
               <summary>Secure payments</summary>
               <div class="prada-shopping-bag-footer__desktop-disclosure-content">
                 <div class="prada-shopping-bag-footer__desktop-disclosure-content-inner">
-                  <p>Your payment details are protected with secure encryption.</p>
-                  {%- if shop.enabled_payment_types.size > 0 -%}
-                    <ul class="prada-shopping-bag-footer__payment-list" role="list">
-                      {%- for type in shop.enabled_payment_types -%}
-                        <li>{{ type | payment_type_svg_tag: class: 'icon icon--full-color' }}</li>
-                      {%- endfor -%}
-                    </ul>
-                  {%- endif -%}
-                  <p>Available payment methods are shown at checkout.</p>
+                  <p>Online payments are processed securely through Paytm Payment Gateway. Eligible online methods and Cash on Delivery availability are shown at checkout.</p>
+                  <ul class="prada-shopping-bag-footer__payment-list" role="list" aria-label="Available payment options">
+                    <li><span>Paytm Payment Gateway</span></li>
+                    <li><span>Cash on Delivery</span></li>
+                  </ul>
                 </div>
               </div>
             </details>
@@ -88,16 +84,16 @@
               <summary>Need help? Contact us</summary>
               <div class="prada-shopping-bag-footer__desktop-disclosure-content">
                 <div class="prada-shopping-bag-footer__desktop-disclosure-content-inner">
-                  <p><a href="{{ routes.contact_url }}">Contact our customer care team</a> for assistance with your order.</p>
+                  <p><a href="{{ routes.root_url }}pages/contact#send-us-email">Contact our customer care team</a> for payment, delivery, return or order assistance.</p>
                 </div>
               </div>
             </details>
 
             <details class="prada-shopping-bag-footer__desktop-disclosure">
-              <summary>Free shipping and returns</summary>
+              <summary>Shipping and approved returns</summary>
               <div class="prada-shopping-bag-footer__desktop-disclosure-content">
                 <div class="prada-shopping-bag-footer__desktop-disclosure-content-inner">
-                  <p>Shipping and return details are available at checkout.</p>
+                  <p>Shipping charges and delivery details are shown at checkout. Eligible return or exchange requests must be raised within 48 hours of delivery; approved returns qualify for free pickup, subject to our <a href="{{ routes.root_url }}policies/return-and-refund-policy">Return &amp; Refund Policy</a>.</p>
                 </div>
               </div>
             </details>
