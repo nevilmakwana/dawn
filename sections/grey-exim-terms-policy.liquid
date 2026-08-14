@@ -77,6 +77,56 @@
       let sectionIndex = 0;
       const usedIds = new Set();
 
+      const normaliseLabel = (value) => value
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .replace(/:$/, '');
+
+      const enhanceContactSection = (contactSection) => {
+        if (!contactSection) return;
+
+        const blocks = Array.from(contactSection.children).slice(1);
+        const labelFor = (block) => normaliseLabel(
+          block.querySelector('strong')?.textContent || block.textContent || ''
+        );
+        const textFor = (block) => normaliseLabel(block.textContent || '');
+
+        const addressIndex = blocks.findIndex((block) => (
+          labelFor(block) === 'grey exim' || textFor(block).startsWith('grey exim')
+        ));
+        const emailIndex = blocks.findIndex((block) => (
+          block.querySelector('a[href^="mailto:"]') ||
+          labelFor(block) === 'email' ||
+          textFor(block).startsWith('email:')
+        ));
+        const websiteIndex = blocks.findIndex((block) => (
+          labelFor(block) === 'website' ||
+          textFor(block).startsWith('website:')
+        ));
+
+        if (
+          addressIndex < 0 ||
+          emailIndex <= addressIndex ||
+          websiteIndex <= emailIndex
+        ) return;
+
+        const card = document.createElement('div');
+        card.className = 'grey-policy__contact-card';
+
+        [
+          blocks.slice(addressIndex, emailIndex),
+          blocks.slice(emailIndex, websiteIndex),
+          blocks.slice(websiteIndex),
+        ].forEach((group) => {
+          const column = document.createElement('div');
+          group.forEach((block) => column.appendChild(block));
+          card.appendChild(column);
+        });
+
+        contactSection.appendChild(card);
+      };
+
       const appendCurrentContainer = () => {
         if (currentContainer.childNodes.length) fragment.appendChild(currentContainer);
       };
@@ -100,6 +150,10 @@
 
           sectionElement.id = sectionId;
           sectionElement.className = 'grey-policy__section';
+          if (normaliseLabel(headingText) === 'contact us') {
+            sectionElement.classList.add('grey-policy__section--contact');
+            sectionElement.dataset.termsContact = '';
+          }
 
           const marker = document.createElement('span');
           marker.setAttribute('aria-hidden', 'true');
@@ -123,6 +177,7 @@
 
       appendCurrentContainer();
       source.replaceChildren(fragment);
+      enhanceContactSection(source.querySelector('[data-terms-contact]'));
 
       source.querySelectorAll('table').forEach((table) => {
         if (table.parentElement?.classList.contains('grey-terms-policy__table-wrap')) return;

@@ -67,9 +67,47 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.grey-terms-policy .grey-policy__contact-card {
+  grid-template-columns: minmax(22rem, 1.5fr) repeat(2, minmax(14rem, 1fr));
+}
+
+.grey-terms-policy .grey-policy__contact-card > div {
+  min-width: 0;
+}
+
+@media screen and (min-width: 990px) {
+  .section-grey-exim-terms-policy .grey-policy__toc nav {
+    max-height: min(48rem, calc(100dvh - 20rem));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    padding-inline-end: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: #111 #e4e4e4;
+  }
+
+  .section-grey-exim-terms-policy .grey-policy__toc nav::-webkit-scrollbar {
+    width: .4rem;
+  }
+
+  .section-grey-exim-terms-policy .grey-policy__toc nav::-webkit-scrollbar-track {
+    background: #e4e4e4;
+  }
+
+  .section-grey-exim-terms-policy .grey-policy__toc nav::-webkit-scrollbar-thumb {
+    background: #111;
+  }
+}
+
 @media screen and (max-width: 749px) {
   .grey-terms-policy__empty {
     padding: 2.2rem;
     font-size: 1.5rem;
+  }
+}
+
+@media screen and (max-width: 989px) {
+  .grey-terms-policy .grey-policy__contact-card {
+    grid-template-columns: 1fr;
   }
 }
