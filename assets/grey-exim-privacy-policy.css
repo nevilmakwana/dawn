@@ -206,6 +206,17 @@
 
 .section-grey-exim-shopify-policy .grey-policy--editorial .grey-policy__content h2 {
   border-top: 0;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: start;
+  gap: 1.6rem;
+}
+
+.section-grey-exim-shopify-policy .grey-policy--editorial .grey-policy__content h2 > [data-shopify-policy-number] {
+  color: #000;
+  font: inherit;
+  letter-spacing: inherit;
+  font-variant-numeric: tabular-nums;
 }
 
 .grey-policy--editorial .grey-policy__content h2:first-child {

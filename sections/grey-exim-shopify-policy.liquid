@@ -4,11 +4,13 @@
   assign policy_source = blank
   assign policy_heading = 'Policy'
   assign policy_label = 'Store policy'
+  assign policy_kind = 'general'
 
   if request.path contains '/policies/privacy-policy'
     assign policy_source = shop.privacy_policy
     assign policy_heading = 'Privacy Policy'
     assign policy_label = 'Privacy and personal data'
+    assign policy_kind = 'privacy'
   elsif request.path contains '/policies/terms-of-service'
     assign policy_source = shop.terms_of_service
     assign policy_heading = 'Terms & Conditions'
@@ -28,7 +30,7 @@
   endif
 -%}
 
-<article id="GreyShopifyPolicy-{{ section.id }}" class="grey-policy grey-policy--editorial" aria-labelledby="GreyShopifyPolicyTitle-{{ section.id }}">
+<article id="GreyShopifyPolicy-{{ section.id }}" class="grey-policy grey-policy--editorial" data-policy-kind="{{ policy_kind }}" aria-labelledby="GreyShopifyPolicyTitle-{{ section.id }}">
   <header class="grey-policy__hero">
     <div class="grey-policy__hero-inner">
       <h1 id="GreyShopifyPolicyTitle-{{ section.id }}">{{ policy_heading | escape }}</h1>
@@ -54,6 +56,24 @@
           <p>Add this policy's content in Shopify Admin under <strong>Settings &rarr; Policies</strong>. Once saved, it will appear here automatically.</p>
         </div>
       {%- endif -%}
+
+      {%- if policy_kind == 'privacy' -%}
+        <section id="privacy-contact" class="grey-policy__section grey-policy__section--contact" data-shopify-policy-contact>
+          <h2>Contact Us</h2>
+          <p>For questions, complaints or concerns regarding this Privacy Policy or your personal data, please contact:</p>
+          <div class="grey-policy__contact-card">
+            <address>
+              <strong>Grey Exim</strong><br>
+              Shop 105, Building B, Sicilia<br>
+              Mota Varachha, Near Bhakti Nandan Circle<br>
+              Surat &ndash; 394101<br>
+              Gujarat, India
+            </address>
+            <p><strong>Email</strong><br><a href="{{ routes.root_url }}pages/contact#send-us-email">care@greyexim.com</a></p>
+            <p><strong>Website</strong><br><a href="https://www.greyexim.com">www.greyexim.com</a></p>
+          </div>
+        </section>
+      {%- endif -%}
     </div>
   </div>
 </article>
@@ -67,12 +87,44 @@
     const content = root.querySelector('[data-shopify-policy-content]');
     const navigation = root.querySelector('[data-shopify-policy-navigation]');
     const list = root.querySelector('[data-shopify-policy-navigation-list]');
+    const contactSection = root.querySelector('[data-shopify-policy-contact]');
+    const contactHeading = contactSection?.querySelector('h2');
+
+    if (content && contactSection) {
+      const duplicateContactHeading = [...content.querySelectorAll('h2')].find((heading) => {
+        if (heading === contactHeading) return false;
+        return heading.textContent.trim().replace(/^\d+[.)\s:-]*/, '').toLowerCase() === 'contact us';
+      });
+
+      if (duplicateContactHeading) {
+        let node = duplicateContactHeading;
+        while (node && node !== contactSection) {
+          const nextNode = node.nextElementSibling;
+          node.remove();
+          node = nextNode;
+        }
+      }
+    }
+
     const headings = content ? [...content.querySelectorAll('h2')] : [];
+    headings.forEach((heading, index) => {
+      const cleanLabel = heading.textContent.trim().replace(/^\d+[.)\s:-]*/, '');
+      heading.textContent = cleanLabel;
+      const marker = document.createElement('span');
+      marker.setAttribute('aria-hidden', 'true');
+      marker.dataset.shopifyPolicyNumber = '';
+      marker.textContent = String(index + 1).padStart(2, '0');
+      heading.prepend(marker, document.createTextNode(' '));
+    });
+
     if (!navigation || !list || headings.length < 2) return;
 
     const usedIds = new Set();
     headings.forEach((heading, index) => {
-      const baseId = heading.textContent.trim().toLowerCase()
+      const headingLabel = heading.cloneNode(true);
+      headingLabel.querySelector('[data-shopify-policy-number]')?.remove();
+      const cleanHeadingLabel = headingLabel.textContent.trim();
+      const baseId = cleanHeadingLabel.toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '') || `section-${index + 1}`;
       let id = baseId;
@@ -84,7 +136,7 @@
       const item = document.createElement('li');
       const link = document.createElement('a');
       link.href = `#${id}`;
-      link.textContent = heading.textContent.trim();
+      link.textContent = cleanHeadingLabel;
       item.appendChild(link);
       list.appendChild(item);
     });
