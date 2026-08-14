@@ -1,5 +1,9 @@
 {{ 'section-image-banner.css' | asset_url | stylesheet_tag }}
 
+{%- if section.settings.mobile_center_zoom and section.settings.mobile_auto_subject_focus -%}
+  <script src="{{ 'image-banner-subject-focus.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
 {%- liquid
   assign desktop_banner_aspect_ratio = section.settings.image.aspect_ratio
   if section.settings.video != blank
@@ -14,6 +18,19 @@
   assign use_full_media_adapt = false
   if section.settings.show_full_media and section.settings.image_2 == blank
     assign use_full_media_adapt = true
+  endif
+
+  assign mobile_subject_focus_position = 'center center'
+  if section.settings.mobile_auto_subject_focus
+    if section.settings.mobile_video != blank and section.settings.mobile_video.preview_image.presentation.focal_point != blank
+      assign mobile_subject_focus_position = section.settings.mobile_video.preview_image.presentation.focal_point
+    elsif section.settings.video != blank and section.settings.video.preview_image.presentation.focal_point != blank
+      assign mobile_subject_focus_position = section.settings.video.preview_image.presentation.focal_point
+    elsif section.settings.image.presentation.focal_point != blank
+      assign mobile_subject_focus_position = section.settings.image.presentation.focal_point
+    elsif section.settings.image_2.presentation.focal_point != blank
+      assign mobile_subject_focus_position = section.settings.image_2.presentation.focal_point
+    endif
   endif
 -%}
 
@@ -247,6 +264,7 @@
         aspect-ratio: 1079 / 2048 !important;
         min-height: 0 !important;
         height: auto !important;
+        --mobile-banner-subject-position: {{ mobile_subject_focus_position }};
       }
 
       #Banner-{{ section.id }}::before,
@@ -307,7 +325,8 @@
         width: 100% !important;
         height: 100% !important;
         object-fit: cover !important;
-        object-position: center center !important;
+        object-position: var(--mobile-banner-subject-position, center center) !important;
+        transition: object-position 300ms ease;
       }
     }
   {%- endif -%}
@@ -337,7 +356,7 @@
 
 <div
   id="Banner-{{ section.id }}"
-  class="banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if section.settings.video == blank and section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank and section.settings.mobile_video == blank %} banner--stacked{% endif %}{% if mobile_banner_aspect_ratio != blank and section.settings.image_height == 'adapt' or mobile_banner_aspect_ratio != blank and use_full_media_adapt %} banner--adapt{% endif %}{% if section.settings.show_full_media %} banner--show-full-media{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
+  class="banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if section.settings.video == blank and section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank and section.settings.mobile_video == blank %} banner--stacked{% endif %}{% if mobile_banner_aspect_ratio != blank and section.settings.image_height == 'adapt' or mobile_banner_aspect_ratio != blank and use_full_media_adapt %} banner--adapt{% endif %}{% if section.settings.show_full_media %} banner--show-full-media{% endif %}{% if section.settings.mobile_center_zoom %} banner--mobile-center-zoom{% endif %}{% if section.settings.mobile_center_zoom and section.settings.mobile_auto_subject_focus %} banner--mobile-auto-subject-focus{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
 >
   {%- if section.settings.video != blank -%}
     <div class="banner__media media{% if section.settings.mobile_video != blank %} small-hide{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
@@ -570,6 +589,13 @@
       "default": false,
       "label": "Enable mobile center zoom",
       "info": "On mobile, crops the image from the center so the banner feels more zoomed in."
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_auto_subject_focus",
+      "default": true,
+      "label": "Auto-center model on mobile",
+      "info": "When mobile center zoom is enabled, uses the media focal point and supported browser face detection to keep the model centered."
     },
     {
       "type": "checkbox",
