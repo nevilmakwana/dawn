@@ -1,6 +1,6 @@
 {{ 'section-faq.css' | asset_url | stylesheet_tag }}
 
-{%- assign topic_keys = 'online,account,returns,shipments' | split: ',' -%}
+{%- assign topic_keys = 'online,account,returns,shipments,payments,privacy' | split: ',' -%}
 
 <section class="prada-faq" data-prada-faq>
   <aside class="prada-faq__sidebar" aria-label="Client service navigation">
@@ -32,6 +32,8 @@
             <a href="#topic-account" data-faq-topic-link="account"><span aria-hidden="true">{{- 'prada-account.svg' | inline_asset_content -}}</span><strong>Personal account</strong><b aria-hidden="true"></b></a>
             <a href="#topic-returns" data-faq-topic-link="returns"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 7h14v12H5zM7 3h10l2 4H5l2-4Z"/><path d="m13 12-3 3 3 3M10 15h6"/></svg></span><strong>Returns</strong><b aria-hidden="true"></b></a>
             <a href="#topic-shipments" data-faq-topic-link="shipments"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 7h11v10H3zM14 10h4l3 3v4h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg></span><strong>Shipments</strong><b aria-hidden="true"></b></a>
+            <a href="#topic-payments" data-faq-topic-link="payments"><span aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/></svg></span><strong>Payments</strong><b aria-hidden="true"></b></a>
+            <a href="#topic-privacy" data-faq-topic-link="privacy"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.6 2.9 8.1 7 10 4.1-1.9 7-5.4 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg></span><strong>Privacy &amp; cookies</strong><b aria-hidden="true"></b></a>
           </div>
         </div>
       </div>
@@ -46,6 +48,8 @@
             {%- when 'account' -%}{%- assign topic_title = 'Personal Account' -%}
             {%- when 'returns' -%}{%- assign topic_title = 'Returns' -%}
             {%- when 'shipments' -%}{%- assign topic_title = 'Shipments' -%}
+            {%- when 'payments' -%}{%- assign topic_title = 'Payments' -%}
+            {%- when 'privacy' -%}{%- assign topic_title = 'Privacy & Cookies' -%}
           {%- endcase -%}
           <div class="prada-faq__topic-panel" data-faq-panel="{{ topic_key }}" hidden>
             <h2>{{ topic_title }}</h2>
@@ -158,6 +162,8 @@
             { "value": "account", "label": "Personal account" },
             { "value": "returns", "label": "Returns" },
             { "value": "shipments", "label": "Shipments" }
+            ,{ "value": "payments", "label": "Payments" }
+            ,{ "value": "privacy", "label": "Privacy & cookies" }
           ]
         },
         { "type": "text", "id": "question", "label": "Question", "default": "How can I place an online order?" },
