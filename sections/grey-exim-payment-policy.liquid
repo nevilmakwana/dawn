@@ -8,6 +8,19 @@
   assign payment_policy_toc_label = section.settings.toc_label | default: 'On this page'
 -%}
 
+<style>
+  #GreyPaymentPolicy-{{ section.id }} .grey-policy__section > h2 > span {
+    padding-top: 0 !important;
+    color: currentColor !important;
+    font-family: inherit !important;
+    font-size: 1em !important;
+    font-style: inherit !important;
+    font-weight: inherit !important;
+    line-height: inherit !important;
+    letter-spacing: inherit !important;
+  }
+</style>
+
 <article
   id="GreyPaymentPolicy-{{ section.id }}"
   class="grey-policy grey-cookie-policy grey-payment-policy"

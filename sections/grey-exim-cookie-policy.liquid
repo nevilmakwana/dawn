@@ -1,7 +1,20 @@
 {{ 'grey-exim-privacy-policy.css' | asset_url | stylesheet_tag }}
 {{ 'grey-exim-cookie-policy.css' | asset_url | stylesheet_tag }}
 
-<article class="grey-policy grey-cookie-policy" aria-labelledby="GreyCookiePolicyTitle">
+<style>
+  #GreyCookiePolicy .grey-policy__section > h2 > span {
+    padding-top: 0 !important;
+    color: currentColor !important;
+    font-family: inherit !important;
+    font-size: 1em !important;
+    font-style: inherit !important;
+    font-weight: inherit !important;
+    line-height: inherit !important;
+    letter-spacing: inherit !important;
+  }
+</style>
+
+<article id="GreyCookiePolicy" class="grey-policy grey-cookie-policy" aria-labelledby="GreyCookiePolicyTitle">
   <header class="grey-policy__hero">
     <div class="grey-policy__hero-inner">
       <h1 id="GreyCookiePolicyTitle">Cookie Policy</h1>
