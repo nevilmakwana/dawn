@@ -375,6 +375,34 @@
 
     {% sections 'footer-group' %}
 
+    <script>
+      (() => {
+        const contactFormUrl = '{{ routes.root_url }}pages/contact#send-us-email';
+        const redirectCareEmailLinks = (root = document) => {
+          root.querySelectorAll?.('a').forEach((link) => {
+            const href = (link.getAttribute('href') || '').toLowerCase();
+            const label = (link.textContent || '').trim().toLowerCase();
+            if (href.startsWith('mailto:care@greyexim.com') || label === 'care@greyexim.com') {
+              link.setAttribute('href', contactFormUrl);
+            }
+          });
+        };
+
+        redirectCareEmailLinks();
+        document.addEventListener('shopify:section:load', (event) => redirectCareEmailLinks(event.target));
+        document.addEventListener('click', (event) => {
+          const link = event.target.closest?.('a');
+          if (!link) return;
+          const href = (link.getAttribute('href') || '').toLowerCase();
+          const label = (link.textContent || '').trim().toLowerCase();
+          if (href.startsWith('mailto:care@greyexim.com') || label === 'care@greyexim.com') {
+            event.preventDefault();
+            window.location.assign(contactFormUrl);
+          }
+        });
+      })();
+    </script>
+
     <ul hidden>
       <li id="a11y-refresh-page-message">{{ 'accessibility.refresh_page' | t }}</li>
       <li id="a11y-new-window-message">{{ 'accessibility.link_messages.new_window' | t }}</li>
