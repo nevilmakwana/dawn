@@ -11,6 +11,10 @@
       <script>
         if (/\/policies\/cookie-policy\/?$/.test(window.location.pathname)) {
           window.location.replace('{{ routes.root_url }}pages/contact?view=cookie-policy');
+        } else if (/\/policies\/legal-notice\/?$/.test(window.location.pathname)) {
+          window.location.replace('{{ routes.root_url }}pages/contact?view=cookie-policy');
+        } else if (/\/policies\/contact-information\/?$/.test(window.location.pathname)) {
+          window.location.replace('{{ routes.root_url }}pages/contact?view=payment-policy');
         } else if (/\/policies\/return-and-refund-policy\/?$/.test(window.location.pathname)) {
           window.location.replace('{{ routes.root_url }}policies/refund-policy');
         }
@@ -366,7 +370,7 @@
         {% section 'grey-exim-shopify-policy' %}
       {%- elsif request.path contains '/policies/refund-policy' -%}
         {% section 'grey-exim-refund-policy' %}
-      {%- elsif request.path contains '/policies/terms-of-service' or request.path contains '/policies/legal-notice' or request.path contains '/policies/contact-information' -%}
+      {%- elsif request.path contains '/policies/terms-of-service' -%}
         {% section 'grey-exim-shopify-policy' %}
       {%- else -%}
         {{ content_for_layout }}

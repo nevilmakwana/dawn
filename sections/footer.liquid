@@ -59,15 +59,8 @@
       assign greyexim_terms_url = shop.terms_of_service.url
     endif
 
-    assign greyexim_cookie_url = routes.root_url | append: 'policies/legal-notice'
-    assign greyexim_payment_url = routes.root_url | append: 'policies/contact-information'
-    for policy in shop.policies
-      if policy.url contains '/policies/legal-notice'
-        assign greyexim_cookie_url = policy.url
-      elsif policy.url contains '/policies/contact-information'
-        assign greyexim_payment_url = policy.url
-      endif
-    endfor
+    assign greyexim_cookie_url = routes.root_url | append: 'pages/contact?view=cookie-policy'
+    assign greyexim_payment_url = routes.root_url | append: 'pages/contact?view=payment-policy'
   -%}
 
   <div id="GreyeximFooter" class="prada-footer">
