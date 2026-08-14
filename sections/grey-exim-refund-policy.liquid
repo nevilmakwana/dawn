@@ -8,7 +8,7 @@
 <article class="grey-policy grey-policy--editorial" aria-labelledby="GreyRefundPolicyTitle">
   <header class="grey-policy__hero">
     <div class="grey-policy__hero-inner">
-      <h1 id="GreyRefundPolicyTitle">{{ shop.refund_policy.title | default: 'Return & Refund Policy' | escape }}</h1>
+      <h1 id="GreyRefundPolicyTitle">Return and Refund Policy</h1>
       <p class="grey-policy__updated">{{ refund_policy_updated | escape }}</p>
     </div>
   </header>
@@ -55,6 +55,12 @@
   (() => {
     const section = document.currentScript?.previousElementSibling;
     if (!section) return;
+
+    const publicPath = '{{ routes.root_url }}policies/return-and-refund-policy';
+    if (window.location.pathname !== publicPath) {
+      window.history.replaceState(window.history.state, '', `${publicPath}${window.location.search}${window.location.hash}`);
+    }
+    document.title = `Return and Refund Policy – {{ shop.name | escape }}`;
 
     const content = section.querySelector('[data-policy-content]');
     const navigation = section.querySelector('[data-policy-navigation]');

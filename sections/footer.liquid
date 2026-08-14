@@ -53,10 +53,7 @@
       assign greyexim_privacy_url = shop.privacy_policy.url
     endif
 
-    assign greyexim_refund_url = routes.root_url | append: 'policies/refund-policy'
-    if shop.refund_policy != blank
-      assign greyexim_refund_url = shop.refund_policy.url
-    endif
+    assign greyexim_refund_url = routes.root_url | append: 'policies/return-and-refund-policy'
   -%}
 
   <div id="GreyeximFooter" class="prada-footer">

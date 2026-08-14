@@ -11,6 +11,8 @@
       <script>
         if (/\/policies\/cookie-policy\/?$/.test(window.location.pathname)) {
           window.location.replace('{{ routes.root_url }}pages/contact?view=cookie-policy');
+        } else if (/\/policies\/return-and-refund-policy\/?$/.test(window.location.pathname)) {
+          window.location.replace('{{ routes.root_url }}policies/refund-policy');
         }
       </script>
     {%- endif -%}
