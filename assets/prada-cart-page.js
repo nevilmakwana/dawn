@@ -244,10 +244,10 @@
             </div>
             <div class="prada-cart-edit-modal__options"></div>
             <p class="prada-cart-edit-modal__status" role="status"></p>
+            <button class="prada-cart-edit-modal__details" type="button" aria-expanded="false">Show details</button>
             <div class="prada-cart-edit-modal__description" hidden>
               <div class="prada-cart-edit-modal__description-inner"></div>
             </div>
-            <button class="prada-cart-edit-modal__details" type="button" aria-expanded="false">Show details</button>
           </div>
           <div class="prada-cart-edit-modal__actions">
             <button class="prada-cart-edit-modal__cancel" type="button">Cancel</button>
@@ -618,8 +618,12 @@
 
       if (shouldOpen) {
         description.hidden = false;
+        description.style.height = '0px';
+        description.style.opacity = '0';
+        description.style.transform = 'translateY(-8px)';
+        description.getBoundingClientRect();
         description.classList.add('is-open');
-        const targetHeight = descriptionInner.scrollHeight;
+        const targetHeight = description.scrollHeight;
         detailsPanelAnimation = description.animate(
           [
             { height: '0px', opacity: 0, transform: 'translateY(-8px)' },
@@ -629,6 +633,9 @@
         );
         detailsPanelAnimation.addEventListener('finish', () => {
           if (detailsAnimationToken !== animationToken) return;
+          description.style.height = 'auto';
+          description.style.opacity = '1';
+          description.style.transform = 'none';
           detailsPanelAnimation = null;
         });
         startDetailsRevealScroll();
@@ -636,7 +643,10 @@
       }
 
       stopDetailsRevealScroll();
-      const startHeight = description.getBoundingClientRect().height;
+      const startHeight = description.scrollHeight;
+      description.style.height = `${startHeight}px`;
+      description.style.opacity = '1';
+      description.style.transform = 'none';
       detailsPanelAnimation = description.animate(
         [
           { height: `${startHeight}px`, opacity: 1, transform: 'translateY(0)' },
@@ -650,6 +660,9 @@
         detailsPanelAnimation = null;
         description.classList.remove('is-open');
         description.hidden = true;
+        description.style.height = '';
+        description.style.opacity = '';
+        description.style.transform = '';
       };
 
       detailsPanelAnimation.addEventListener('finish', finishClose);

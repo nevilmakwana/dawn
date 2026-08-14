@@ -658,7 +658,7 @@
     padding: 0;
     border: 0;
     border-radius: 0;
-    background: #f3f3f3;
+    background: transparent;
     color: #111111;
     font: inherit;
     transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
@@ -666,8 +666,8 @@
 
   .prada-cart-edit-modal__stepper button:not(:disabled):hover,
   .prada-cart-edit-modal__stepper button:not(:disabled):focus-visible {
-    background: #111111;
-    color: #ffffff;
+    background: transparent;
+    color: #666666;
   }
 
   .prada-cart-edit-modal__stepper button:disabled {
@@ -723,8 +723,7 @@
   }
 
   .prada-cart-edit-modal__description {
-    display: grid;
-    grid-template-rows: 0fr;
+    display: block;
     margin: 0;
     overflow: hidden;
     border-top: 1px solid transparent;
@@ -732,35 +731,20 @@
     font-family: var(--font-body-family);
     font-size: 14px;
     line-height: 1.45;
-    transition:
-      grid-template-rows 420ms cubic-bezier(0.22, 1, 0.36, 1),
-      margin 420ms cubic-bezier(0.22, 1, 0.36, 1),
-      border-color 240ms ease;
-    will-change: grid-template-rows;
+    will-change: height, opacity, transform;
   }
 
   .prada-cart-edit-modal__description-inner {
-    min-height: 0;
-    overflow: hidden;
     padding: 0;
-    opacity: 0;
-    transform: translateY(-6px);
-    transition:
-      padding 420ms cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 240ms ease,
-      transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .prada-cart-edit-modal__description.is-open {
-    grid-template-rows: 1fr;
     margin: 12px 0 4px;
     border-top-color: #dedede;
   }
 
   .prada-cart-edit-modal__description.is-open .prada-cart-edit-modal__description-inner {
     padding: 18px 0 4px;
-    opacity: 1;
-    transform: translateY(0);
   }
 
   .prada-cart-edit-modal__description-inner > :first-child { margin-top: 0; }
@@ -1652,7 +1636,7 @@
     padding: 0;
     border: 0;
     border-radius: 0;
-    background: #f3f3f3;
+    background: transparent;
     color: #111111;
     cursor: pointer;
     font: inherit;
@@ -1662,12 +1646,12 @@
 
   .prada-cart-edit-modal__stepper button:not(:disabled):hover,
   .prada-cart-edit-modal__stepper button:not(:disabled):focus-visible {
-    background: #111111;
-    color: #ffffff;
+    background: transparent;
+    color: #666666;
   }
 
   .prada-cart-edit-modal__stepper button:disabled {
-    background: #f7f7f7;
+    background: transparent;
     color: #aaaaaa;
     cursor: not-allowed;
   }
@@ -1720,8 +1704,7 @@
   }
 
   .prada-cart-edit-modal__description {
-    display: grid;
-    grid-template-rows: 0fr;
+    display: block;
     overflow: hidden;
     margin-top: 0;
     border-top: 1px solid transparent;
@@ -1730,35 +1713,20 @@
     font-size: 14px;
     font-weight: 400;
     line-height: 1.45;
-    transition:
-      grid-template-rows 440ms cubic-bezier(0.22, 1, 0.36, 1),
-      margin 440ms cubic-bezier(0.22, 1, 0.36, 1),
-      border-color 260ms ease;
-    will-change: grid-template-rows;
+    will-change: height, opacity, transform;
   }
 
   .prada-cart-edit-modal__description-inner {
-    min-height: 0;
-    overflow: hidden;
     padding: 0;
-    opacity: 0;
-    transform: translateY(-6px);
-    transition:
-      padding 440ms cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 280ms ease,
-      transform 440ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .prada-cart-edit-modal__description.is-open {
-    grid-template-rows: 1fr;
     margin-top: 22px;
     border-top-color: #dedede;
   }
 
   .prada-cart-edit-modal__description.is-open .prada-cart-edit-modal__description-inner {
     padding: 20px 0 4px;
-    opacity: 1;
-    transform: translateY(0);
   }
 
   .prada-cart-edit-modal__description-inner > :first-child { margin-top: 0; }
