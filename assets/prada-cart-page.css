@@ -652,8 +652,8 @@
 
   .prada-cart-edit-modal__stepper button {
     display: grid;
-    width: 32px;
-    height: 40px;
+    width: 28px;
+    height: 34px;
     place-items: center;
     padding: 0;
     border: 0;
@@ -668,18 +668,18 @@
 
   .prada-cart-edit-modal__stepper output {
     display: grid;
-    min-width: 20px;
-    height: 40px;
+    min-width: 18px;
+    height: 34px;
     place-items: center;
-    font-size: 15px;
+    font-size: 13px;
     line-height: 1;
   }
 
   .prada-cart-edit-modal__stepper-icon {
     display: block;
     position: relative;
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     color: currentColor;
   }
 
@@ -688,8 +688,8 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 14px;
-    height: 1.25px;
+    width: 12px;
+    height: 1px;
     background: currentColor;
     content: '';
     transform: translate(-50%, -50%);
@@ -1618,27 +1618,27 @@
   .prada-cart-edit-modal__stepper {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 18px;
     font-weight: 400;
   }
 
   .prada-cart-edit-modal__stepper button {
-    width: 20px;
-    height: 28px;
+    width: 18px;
+    height: 24px;
     padding: 0;
     border: 0;
     background: transparent;
     color: #555555;
     cursor: pointer;
     font: inherit;
-    font-size: 20px;
+    font-size: 16px;
   }
 
   .prada-cart-edit-modal__stepper-icon {
     display: block;
     position: relative;
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
     color: currentColor;
   }
 
@@ -1647,8 +1647,8 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 16px;
-    height: 1.5px;
+    width: 12px;
+    height: 1px;
     background: currentColor;
     content: '';
     transform: translate(-50%, -50%);
@@ -1659,7 +1659,9 @@
   }
 
   .prada-cart-edit-modal__stepper output {
-    min-width: 16px;
+    min-width: 14px;
+    font-size: 13px;
+    line-height: 1;
     text-align: center;
   }
 
@@ -1690,9 +1692,10 @@
     font-weight: 400;
     line-height: 1.45;
     transition:
-      grid-template-rows 420ms cubic-bezier(0.22, 1, 0.36, 1),
-      margin 420ms cubic-bezier(0.22, 1, 0.36, 1),
-      border-color 240ms ease;
+      grid-template-rows 440ms cubic-bezier(0.22, 1, 0.36, 1),
+      margin 440ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 260ms ease;
+    will-change: grid-template-rows;
   }
 
   .prada-cart-edit-modal__description-inner {
@@ -1702,9 +1705,9 @@
     opacity: 0;
     transform: translateY(-6px);
     transition:
-      padding 420ms cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 240ms ease,
-      transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+      padding 440ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 280ms ease,
+      transform 440ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .prada-cart-edit-modal__description.is-open {
