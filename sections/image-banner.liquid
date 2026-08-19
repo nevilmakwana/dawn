@@ -5,6 +5,42 @@
 {%- endif -%}
 
 {%- liquid
+  assign desktop_webm_setting = section.settings.webm_video_file | strip
+  assign desktop_webm_url = ''
+  if desktop_webm_setting != blank
+    if desktop_webm_setting contains 'shopify://'
+      assign desktop_webm_filename = desktop_webm_setting | split: '/' | last
+      assign desktop_webm_url = desktop_webm_filename | file_url
+    elsif desktop_webm_setting contains '://'
+      assign desktop_webm_url = desktop_webm_setting
+    else
+      assign desktop_webm_url = desktop_webm_setting | file_url
+    endif
+  endif
+
+  assign mobile_webm_setting = section.settings.mobile_webm_video_file | strip
+  assign mobile_webm_url = ''
+  if mobile_webm_setting != blank
+    if mobile_webm_setting contains 'shopify://'
+      assign mobile_webm_filename = mobile_webm_setting | split: '/' | last
+      assign mobile_webm_url = mobile_webm_filename | file_url
+    elsif mobile_webm_setting contains '://'
+      assign mobile_webm_url = mobile_webm_setting
+    else
+      assign mobile_webm_url = mobile_webm_setting | file_url
+    endif
+  endif
+
+  assign has_desktop_video = false
+  if section.settings.video != blank or desktop_webm_url != blank
+    assign has_desktop_video = true
+  endif
+
+  assign has_mobile_video = false
+  if section.settings.mobile_video != blank or mobile_webm_url != blank
+    assign has_mobile_video = true
+  endif
+
   assign desktop_banner_aspect_ratio = section.settings.image.aspect_ratio
   if section.settings.video != blank
     assign desktop_banner_aspect_ratio = section.settings.video.aspect_ratio
@@ -356,24 +392,40 @@
 
 <div
   id="Banner-{{ section.id }}"
-  class="banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if section.settings.video == blank and section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank and section.settings.mobile_video == blank %} banner--stacked{% endif %}{% if mobile_banner_aspect_ratio != blank and section.settings.image_height == 'adapt' or mobile_banner_aspect_ratio != blank and use_full_media_adapt %} banner--adapt{% endif %}{% if section.settings.show_full_media %} banner--show-full-media{% endif %}{% if section.settings.mobile_center_zoom %} banner--mobile-center-zoom{% endif %}{% if section.settings.mobile_center_zoom and section.settings.mobile_auto_subject_focus %} banner--mobile-auto-subject-focus{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
+  class="banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if has_desktop_video == false and section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank and has_mobile_video == false %} banner--stacked{% endif %}{% if mobile_banner_aspect_ratio != blank and section.settings.image_height == 'adapt' or mobile_banner_aspect_ratio != blank and use_full_media_adapt %} banner--adapt{% endif %}{% if section.settings.show_full_media %} banner--show-full-media{% endif %}{% if section.settings.mobile_center_zoom %} banner--mobile-center-zoom{% endif %}{% if section.settings.mobile_center_zoom and section.settings.mobile_auto_subject_focus %} banner--mobile-auto-subject-focus{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
 >
-  {%- if section.settings.video != blank -%}
-    <div class="banner__media media{% if section.settings.mobile_video != blank %} small-hide{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
-      {{
-        section.settings.video
-        | video_tag:
-          image_size: '3840x',
-          autoplay: true,
-          loop: true,
-          muted: true,
-          playsinline: true,
-          controls: false,
-          class: 'banner__media-video'
-      }}
+  {%- if has_desktop_video -%}
+    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+      {%- assign desktop_video_webm_sources = section.settings.video.sources | where: 'format', 'webm' -%}
+      <video
+        class="banner__media-video"
+        autoplay
+        loop
+        muted
+        playsinline
+        preload="{% if section.index == 1 %}auto{% else %}metadata{% endif %}"
+        {% if section.settings.video.preview_image != blank %}
+          poster="{{ section.settings.video.preview_image | image_url: width: 3840 }}"
+        {% endif %}
+      >
+        {%- if desktop_webm_url != blank -%}
+          <source src="{{ desktop_webm_url }}" type="video/webm">
+        {%- else -%}
+          {%- for source in desktop_video_webm_sources -%}
+            <source src="{{ source.url }}" type="{{ source.mime_type | default: 'video/webm' }}">
+          {%- endfor -%}
+        {%- endif -%}
+        {%- if section.settings.video.preview_image != blank -%}
+          {{
+            section.settings.video.preview_image
+            | image_url: width: 3840
+            | image_tag: class: 'banner__media-video-poster', loading: 'lazy'
+          }}
+        {%- endif -%}
+      </video>
     </div>
   {%- elsif section.settings.image != blank -%}
-    <div class="banner__media media{% if section.settings.mobile_video != blank %} small-hide{% endif %}{% if section.settings.image == blank and section.settings.image_2 == blank %} placeholder{% endif %}{% if section.settings.image_2 != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image == blank and section.settings.image_2 == blank %} placeholder{% endif %}{% if section.settings.image_2 != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
       {%- liquid
         assign image_height = section.settings.image.width | divided_by: section.settings.image.aspect_ratio
         if section.settings.image_2 != blank
@@ -400,12 +452,12 @@
       }}
     </div>
   {%- elsif section.settings.image_2 == blank -%}
-    <div class="banner__media media{% if section.settings.mobile_video != blank %} small-hide{% endif %}{% if section.settings.image == blank and section.settings.image_2 == blank %} placeholder{% endif %}{% if section.settings.image_2 != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image == blank and section.settings.image_2 == blank %} placeholder{% endif %}{% if section.settings.image_2 != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
       {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
     </div>
   {%- endif -%}
-  {%- if section.settings.video == blank and section.settings.image_2 != blank -%}
-    <div class="banner__media media{% if section.settings.mobile_video != blank %} small-hide{% endif %}{% if section.settings.image != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+  {%- if has_desktop_video == false and section.settings.image_2 != blank -%}
+    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
       {%- liquid
         assign image_height_2 = section.settings.image_2.width | divided_by: section.settings.image_2.aspect_ratio
         if section.settings.image != blank
@@ -432,19 +484,35 @@
       }}
     </div>
   {%- endif -%}
-  {%- if section.settings.mobile_video != blank -%}
+  {%- if has_mobile_video -%}
     <div class="banner__media media medium-hide large-up-hide{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
-      {{
-        section.settings.mobile_video
-        | video_tag:
-          image_size: '1500x',
-          autoplay: true,
-          loop: true,
-          muted: true,
-          playsinline: true,
-          controls: false,
-          class: 'banner__media-video'
-      }}
+      {%- assign mobile_video_webm_sources = section.settings.mobile_video.sources | where: 'format', 'webm' -%}
+      <video
+        class="banner__media-video"
+        autoplay
+        loop
+        muted
+        playsinline
+        preload="metadata"
+        {% if section.settings.mobile_video.preview_image != blank %}
+          poster="{{ section.settings.mobile_video.preview_image | image_url: width: 1500 }}"
+        {% endif %}
+      >
+        {%- if mobile_webm_url != blank -%}
+          <source src="{{ mobile_webm_url }}" type="video/webm">
+        {%- else -%}
+          {%- for source in mobile_video_webm_sources -%}
+            <source src="{{ source.url }}" type="{{ source.mime_type | default: 'video/webm' }}">
+          {%- endfor -%}
+        {%- endif -%}
+        {%- if section.settings.mobile_video.preview_image != blank -%}
+          {{
+            section.settings.mobile_video.preview_image
+            | image_url: width: 1500
+            | image_tag: class: 'banner__media-video-poster', loading: 'lazy'
+          }}
+        {%- endif -%}
+      </video>
     </div>
   {%- endif -%}
   <div class="banner__content banner__content--{{ section.settings.desktop_content_position }} page-width{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
@@ -525,6 +593,12 @@
       "id": "video",
       "label": "Video",
       "info": "If selected, this video replaces the banner image."
+    },
+    {
+      "type": "text",
+      "id": "webm_video_file",
+      "label": "WebM file name or URL",
+      "info": "Optional. Upload a .webm file in Shopify Files, then paste the file name, Shopify file URL, or full CDN URL here to force direct WebM playback."
     },
     {
       "type": "paragraph",
@@ -717,6 +791,12 @@
       "id": "mobile_video",
       "label": "Mobile video",
       "info": "If selected, this video replaces the desktop banner media on mobile."
+    },
+    {
+      "type": "text",
+      "id": "mobile_webm_video_file",
+      "label": "Mobile WebM file name or URL",
+      "info": "Optional. Upload a mobile .webm file in Shopify Files, then paste the file name, Shopify file URL, or full CDN URL here to force direct WebM playback on mobile."
     },
     {
       "type": "checkbox",
