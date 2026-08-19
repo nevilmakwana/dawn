@@ -5,7 +5,7 @@
 {%- endif -%}
 
 {%- liquid
-  assign desktop_webm_setting = section.settings.webm_video_file | strip
+  assign desktop_webm_setting = section.settings.webm_filename | default: section.settings.webm_video_file | strip
   assign desktop_webm_url = ''
   if desktop_webm_setting != blank
     if desktop_webm_setting contains 'shopify://'
@@ -18,7 +18,7 @@
     endif
   endif
 
-  assign mobile_webm_setting = section.settings.mobile_webm_video_file | strip
+  assign mobile_webm_setting = section.settings.mobile_webm_filename | default: section.settings.mobile_webm_video_file | strip
   assign mobile_webm_url = ''
   if mobile_webm_setting != blank
     if mobile_webm_setting contains 'shopify://'
@@ -596,7 +596,7 @@
     },
     {
       "type": "text",
-      "id": "webm_video_file",
+      "id": "webm_filename",
       "label": "WebM file name or URL",
       "info": "Optional. Upload a .webm file in Shopify Files, then paste the file name, Shopify file URL, or full CDN URL here to force direct WebM playback."
     },
@@ -794,7 +794,7 @@
     },
     {
       "type": "text",
-      "id": "mobile_webm_video_file",
+      "id": "mobile_webm_filename",
       "label": "Mobile WebM file name or URL",
       "info": "Optional. Upload a mobile .webm file in Shopify Files, then paste the file name, Shopify file URL, or full CDN URL here to force direct WebM playback on mobile."
     },

@@ -36,8 +36,8 @@
         "button"
       ],
       "settings": {
-        "video": "shopify://files/videos/loop_m_DT.webm",
-        "webm_video_file": "loop_m_DT.webm",
+        "video": "shopify://files/videos/hero-video.webm",
+        "webm_filename": "hero-video.webm",
         "image_overlay_opacity": 0,
         "image_height": "large",
         "full_screen_height": true,
