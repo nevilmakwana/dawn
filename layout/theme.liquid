@@ -379,6 +379,8 @@
 
     {% sections 'footer-group' %}
 
+    {{ 'greyexim-typography.css' | asset_url | stylesheet_tag }}
+
     <script>
       (() => {
         const contactFormUrl = '{{ routes.root_url }}pages/contact#send-us-email';

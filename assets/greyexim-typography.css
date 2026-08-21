@@ -1,0 +1,842 @@
+/* Grey Exim typography system: restrained editorial hierarchy using Archivo. */
+:root {
+  --font-body-weight: 400;
+  --font-body-weight-bold: 400;
+  --font-heading-weight: 400;
+
+  --ge-font-family: Archivo, var(--font-body-family), Arial, sans-serif;
+  --ge-weight-regular: 400;
+  --ge-weight-active: 500;
+
+  --ge-type-nav: 12px;
+  --ge-type-meta: 11px;
+  --ge-type-mega-category: 14px;
+  --ge-type-mega-label: 10px;
+  --ge-type-mega-link: 12px;
+  --ge-type-eyebrow: 11px;
+  --ge-type-hero-title: 32px;
+  --ge-type-hero-body: 14px;
+  --ge-type-section-title: 28px;
+  --ge-type-tile-title: 18px;
+  --ge-type-collection-title: 16px;
+  --ge-type-body: 14px;
+  --ge-type-news-heading: 24px;
+  --ge-type-news-title: 15px;
+  --ge-type-product-card-title: 13px;
+  --ge-type-product-card-secondary: 11px;
+  --ge-type-badge: 10px;
+  --ge-type-plp-editorial: 20px;
+  --ge-type-pdp-title: 20px;
+  --ge-type-pdp-price: 14px;
+  --ge-type-pdp-label: 12px;
+  --ge-type-pdp-value: 13px;
+  --ge-type-pdp-section: 16px;
+  --ge-type-pdp-copy: 13px;
+  --ge-type-editorial-h1: 32px;
+  --ge-type-editorial-h2: 22px;
+  --ge-type-service-h1: 28px;
+  --ge-type-service-h2: 20px;
+  --ge-type-faq-question: 16px;
+  --ge-type-form-label: 12px;
+  --ge-type-form-value: 13px;
+  --ge-type-legal-label: 15px;
+  --ge-type-legal-heading: 14px;
+  --ge-type-legal-body: 13px;
+  --ge-type-footer-heading: 11px;
+  --ge-type-footer-link: 12px;
+  --ge-type-copyright: 10px;
+  --ge-type-drawer-title: 18px;
+}
+
+@media screen and (max-width: 749px) {
+  :root {
+    --ge-type-mega-category: 15px;
+    --ge-type-mega-link: 13px;
+    --ge-type-eyebrow: 10px;
+    --ge-type-hero-title: 24px;
+    --ge-type-hero-body: 13px;
+    --ge-type-section-title: 22px;
+    --ge-type-tile-title: 16px;
+    --ge-type-collection-title: 15px;
+    --ge-type-body: 13px;
+    --ge-type-news-heading: 20px;
+    --ge-type-news-title: 14px;
+    --ge-type-product-card-title: 12px;
+    --ge-type-plp-editorial: 18px;
+    --ge-type-pdp-title: 18px;
+    --ge-type-pdp-price: 13px;
+    --ge-type-pdp-section: 15px;
+    --ge-type-editorial-h1: 24px;
+    --ge-type-editorial-h2: 20px;
+    --ge-type-service-h1: 22px;
+    --ge-type-service-h2: 18px;
+    --ge-type-faq-question: 15px;
+    --ge-type-legal-label: 14px;
+    --ge-type-drawer-title: 17px;
+  }
+}
+
+body,
+button,
+input,
+textarea,
+select,
+.button,
+.shopify-challenge__button,
+.customer button {
+  font-family: var(--ge-font-family) !important;
+  font-weight: var(--ge-weight-regular);
+  letter-spacing: 0;
+}
+
+body {
+  font-size: var(--ge-type-body);
+  line-height: 1.45;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h0,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6,
+.title {
+  font-family: var(--ge-font-family) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  letter-spacing: 0;
+}
+
+h1,
+.h1,
+.title--primary {
+  font-size: var(--ge-type-editorial-h1);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+h2,
+.h2,
+.title {
+  font-size: var(--ge-type-section-title);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+h3,
+.h3 {
+  font-size: var(--ge-type-tile-title);
+  line-height: 1.15;
+}
+
+.text-body,
+.rte,
+.rte p,
+.rte li,
+.subtitle,
+.subtitle--small,
+.subtitle--medium {
+  font-size: var(--ge-type-body);
+  font-weight: var(--ge-weight-regular);
+  line-height: 1.45;
+  letter-spacing: 0;
+}
+
+.caption,
+.caption-large,
+.caption-with-letter-spacing,
+.caption-with-letter-spacing--medium,
+.caption-with-letter-spacing--large {
+  font-size: var(--ge-type-meta);
+  font-weight: var(--ge-weight-regular);
+  line-height: 1.2;
+}
+
+.caption-with-letter-spacing,
+.caption-with-letter-spacing--medium,
+.caption-with-letter-spacing--large {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.button,
+.shopify-challenge__button,
+.customer button,
+.shopify-payment-button__button,
+.shopify-payment-button__button--unbranded {
+  font-size: 12px;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+
+.link,
+.customer a,
+.underlined-link,
+.link-with-icon {
+  font-size: var(--ge-type-footer-link);
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+/* Announcement, header, navigation, and menu drawers */
+.announcement-bar__message,
+.announcement-bar__link,
+.utility-bar,
+.utility-bar a,
+.localization-form,
+.localization-form__select,
+.header__menu-item,
+.list-menu__item,
+.list-menu__item--link,
+.prada-header-btn,
+.prada-header-btn__label,
+.prada-header .prada-menu-text,
+.prada-header .prada-search-text,
+.prada-header .header__icon,
+.prada-header .cart-count-bubble {
+  font-family: var(--ge-font-family) !important;
+  font-size: var(--ge-type-nav) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0 !important;
+}
+
+.announcement-bar__message,
+.utility-bar {
+  font-size: var(--ge-type-meta) !important;
+  line-height: 1.25 !important;
+}
+
+.prada-cart-badge,
+.cart-count-bubble {
+  font-size: 10px !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.15 !important;
+}
+
+.mega-menu__link,
+.header__submenu .header__menu-item,
+.menu-drawer__menu-item,
+.menu-drawer__close-button,
+.menu-drawer__account,
+.prada-desktop-menu__submenu-link,
+.prada-desktop-menu__view-all,
+.prada-desktop-menu__grandchild-list a,
+.prada-desktop-menu__utility a,
+.prada-desktop-menu__utility button {
+  font-family: var(--ge-font-family) !important;
+  font-size: var(--ge-type-mega-link) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0 !important;
+}
+
+.mega-menu__link--level-2,
+.prada-desktop-menu__primary-link,
+.prada-desktop-menu__toolbar-button {
+  font-size: var(--ge-type-mega-category) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+}
+
+.prada-desktop-menu__primary-control:checked + .prada-desktop-menu__primary-link,
+.prada-desktop-menu__submenu-control:checked + .prada-desktop-menu__submenu-link {
+  font-weight: var(--ge-weight-active) !important;
+}
+
+/* Hero and homepage editorial sections */
+.banner__heading,
+.slideshow__text .banner__heading,
+.image-with-text__heading {
+  font-size: var(--ge-type-hero-title) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.banner__text,
+.banner__text p,
+.image-with-text__text,
+.image-with-text__text p {
+  font-size: var(--ge-type-hero-body) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0 !important;
+}
+
+.banner .caption-with-letter-spacing,
+.slideshow .caption-with-letter-spacing,
+.image-with-text .caption-with-letter-spacing {
+  font-size: var(--ge-type-eyebrow) !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase;
+}
+
+.banner__buttons .button,
+.slideshow__text .button,
+.image-with-text__content .button {
+  font-size: 12px !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0 !important;
+}
+
+.title-wrapper .title,
+.collection-list-title,
+.featured-collection .title,
+.multicolumn .title,
+.rich-text__heading {
+  font-size: var(--ge-type-section-title) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.multicolumn-card__info h3,
+.collage-card__heading,
+.article-card .card__heading,
+.collection-card-wrapper .card__heading {
+  font-size: var(--ge-type-tile-title) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.15 !important;
+  letter-spacing: 0 !important;
+}
+
+.prada-category-showcase__heading {
+  font-size: var(--ge-type-section-title) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.prada-category-showcase__text,
+.prada-category-showcase__text p {
+  font-size: var(--ge-type-body) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.45 !important;
+}
+
+.prada-category-showcase__tab {
+  font-size: 12px !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0 !important;
+}
+
+.prada-category-showcase__tab.is-active {
+  font-weight: var(--ge-weight-active) !important;
+}
+
+.prada-category-showcase__label {
+  font-size: var(--ge-type-tile-title) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.15 !important;
+  letter-spacing: 0 !important;
+}
+
+/* Collection and product listing pages */
+.collection-hero__title,
+.prada-collection__title {
+  font-size: var(--ge-type-collection-title) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0 !important;
+}
+
+.prada-collection__tab,
+.prada-collection__count,
+.prada-collection__controls,
+.prada-collection__sort,
+.facets__heading,
+.facets__summary,
+.facet-filters__label,
+.facet-filters__sort,
+.product-count__text,
+.mobile-facets__open,
+.mobile-facets__heading,
+.mobile-facets__count,
+.mobile-facets__summary,
+.mobile-facets__label,
+.mobile-facets__sort,
+.active-facets__button-wrapper *,
+span.active-facets__button-inner {
+  font-size: 12px !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+}
+
+.prada-collection__tab.is-active,
+.facets__label.active,
+.facets-layout-grid--image .facets__label.active {
+  font-weight: var(--ge-weight-active) !important;
+}
+
+.card__heading,
+.card__heading a,
+.product-card-wrapper .card__heading,
+.prada-product-tile__title,
+.quick-add-modal .product__title > h1 {
+  font-size: var(--ge-type-product-card-title) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0 !important;
+}
+
+.card-information,
+.card-information > *,
+.card-information .price,
+.card-information .caption,
+.price,
+.price-item,
+.unit-price,
+.prada-product-tile__price,
+.card__caption {
+  font-size: var(--ge-type-product-card-secondary) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0 !important;
+}
+
+.badge,
+.card__badge,
+.product__badge,
+.prada-product__status {
+  font-size: var(--ge-type-badge) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.15 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase;
+}
+
+.prada-featured-tile__heading,
+.product-grid .card--text .card__heading {
+  font-size: var(--ge-type-plp-editorial) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.15 !important;
+}
+
+/* Product detail pages */
+.product__title h1,
+.product__title .h1,
+.prada-product__heading-row h1 {
+  font-size: var(--ge-type-pdp-title) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.005em !important;
+}
+
+.product .price,
+.product__tax,
+.prada-product__price {
+  font-size: var(--ge-type-pdp-price) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+}
+
+.product-form__input .form__label,
+.product__info-container .form__label,
+.prada-product__option > span:first-child,
+.prada-product__size-chart-trigger,
+.prada-product__color-heading,
+.variant-picker__option-info,
+.product-form__input legend {
+  font-size: var(--ge-type-pdp-label) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+}
+
+.product-form__input input[type='radio'] + label,
+.product-form__input select,
+.prada-product__option,
+.prada-product__option-trigger,
+.prada-product__drawer-trigger,
+.prada-product__choice {
+  font-size: var(--ge-type-pdp-value) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+}
+
+.prada-product__choice.is-selected,
+.prada-product__swatch.is-selected,
+.prada-product__swatch[aria-pressed='true'] {
+  font-weight: var(--ge-weight-active) !important;
+}
+
+.product__accordion .accordion__title,
+.product__accordion summary,
+.prada-product__drawer-header h2,
+.prada-product__metafield-section h3,
+.prada-product__drawer-accordion summary {
+  font-size: var(--ge-type-pdp-section) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+}
+
+.product__description,
+.product__description p,
+.product__description li,
+.prada-product__drawer-pane,
+.prada-product__drawer-pane p,
+.prada-product__drawer-pane li {
+  font-size: var(--ge-type-pdp-copy) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0 !important;
+}
+
+.prada-product__submit,
+.product-form__submit,
+.shopify-payment-button__button {
+  font-size: 12px !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.01em !important;
+}
+
+/* Editorial, blog, news, and story pages */
+.ge-story__eyebrow,
+.article-card__excerpt + .caption-with-letter-spacing,
+.pradasphere-news__category {
+  font-size: 10px !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase;
+}
+
+.ge-story__heading,
+.article-template__title {
+  font-size: var(--ge-type-editorial-h1) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.ge-story__intro,
+.ge-story__intro p,
+.ge-story__body,
+.ge-story__body p,
+.ge-story__body li,
+.article-template__content,
+.article-template__content p,
+.article-template__content li {
+  font-size: var(--ge-type-body) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.45 !important;
+  letter-spacing: 0 !important;
+}
+
+.ge-story__date,
+.article-template__social-sharing + header .caption-with-letter-spacing {
+  font-size: 10px !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0 !important;
+}
+
+.ge-story__cta {
+  font-size: 12px !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0 !important;
+}
+
+.blog__title,
+.main-blog .title--primary,
+.pradasphere-news__heading {
+  font-size: var(--ge-type-news-heading) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.15 !important;
+  letter-spacing: 0 !important;
+}
+
+.pradasphere-news__content h3,
+.article-card .card__heading {
+  font-size: var(--ge-type-news-title) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+}
+
+.pradasphere-news__discover {
+  font-size: 12px !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.2 !important;
+}
+
+/* Service, FAQ, contact, forms, account, search */
+#send-us-email .contact__page-title,
+.main-page-title,
+.customer > h1,
+.customer__title,
+.template-search__header h1,
+.search__heading {
+  font-size: var(--ge-type-service-h1) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.15 !important;
+  letter-spacing: 0 !important;
+}
+
+#send-us-email .contact > .title,
+.prada-track-order__content h1,
+.prada-track-order__questions h2,
+.customer h2,
+.account h2,
+.order h2 {
+  font-size: var(--ge-type-service-h2) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0 !important;
+}
+
+.prada-faq__content h1,
+.prada-faq__topics h2,
+.prada-faq__topic-panel > h2 {
+  font-size: var(--ge-type-service-h1) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.15 !important;
+}
+
+.prada-faq__topic-list a,
+.prada-faq__topic-list strong,
+.prada-faq__accordions summary {
+  font-size: var(--ge-type-faq-question) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.35 !important;
+  letter-spacing: 0 !important;
+}
+
+.prada-faq__answer,
+.prada-faq__answer p,
+.prada-faq__suggested a,
+.prada-track-order__fields span,
+.prada-track-order__faq-link,
+.prada-track-order__body {
+  font-size: var(--ge-type-pdp-copy) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.5 !important;
+}
+
+.field__label,
+.form__label,
+#send-us-email .field__label,
+#send-us-email .prada-contact-select__label,
+.customer label,
+label[for='AddressCountryNew'],
+label[for='AddressProvinceNew'] {
+  font-size: var(--ge-type-form-label) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0 !important;
+}
+
+.field__input,
+.select__select,
+.customer .field input,
+.customer select,
+#send-us-email .field__input,
+#send-us-email select.field__input,
+#send-us-email .text-area,
+#send-us-email .prada-contact-phone__code,
+.search__input,
+.predictive-search__input {
+  font-size: var(--ge-type-form-value) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.35 !important;
+  letter-spacing: 0 !important;
+}
+
+/* Legal and policy pages */
+.grey-policy__eyebrow,
+.grey-policy__updated,
+.grey-policy__toc summary,
+.grey-cookie-policy__appendix-label,
+.grey-cookie-policy__priority {
+  font-size: var(--ge-type-legal-label) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase;
+}
+
+.grey-policy__hero h1 {
+  font-size: var(--ge-type-editorial-h1) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.grey-policy__section h2,
+.grey-policy--editorial .grey-policy__content h2,
+.grey-policy__section h3,
+.grey-policy--editorial .grey-policy__content h3,
+.grey-cookie-policy__choice-grid strong,
+.grey-cookie-policy__banner-example > strong,
+.grey-cookie-policy__preference-list strong,
+.grey-cookie-policy__flow strong {
+  font-size: var(--ge-type-legal-heading) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0 !important;
+}
+
+.grey-policy__content p,
+.grey-policy__content li,
+.grey-policy__content address,
+.grey-policy__toc a,
+.grey-policy__toc a::before,
+.grey-terms-policy__source th,
+.grey-terms-policy__source td,
+.grey-payment-policy__source th,
+.grey-payment-policy__source td,
+.grey-cookie-policy__table th,
+.grey-cookie-policy__table td,
+.grey-cookie-policy__choice-grid span,
+.grey-cookie-policy__preference-list span,
+.grey-cookie-policy__flow span,
+.grey-cookie-policy__sources li {
+  font-size: var(--ge-type-legal-body) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.55 !important;
+  letter-spacing: 0 !important;
+}
+
+/* Cart drawer, cart page, modal, footer, and newsletter */
+.drawer__heading,
+.cart__empty-text,
+.cart__login-title,
+.cart-items th,
+.cart-item__name,
+.cart-item__title,
+.prada-cart-drawer .drawer__heading,
+.prada-cart-drawer__empty-message,
+.prada-contact-drawer__title,
+.prada-localization-drawer__content h2 {
+  font-size: var(--ge-type-drawer-title) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0 !important;
+}
+
+.cart-item__details,
+.cart-item__details *,
+.cart-item__price-wrapper,
+.cart-item__discounted-prices,
+.cart-item__error,
+.cart__warnings,
+.cart__login-paragraph,
+.prada-cart-drawer__option,
+.prada-cart-drawer__quantity,
+.prada-cart-drawer__price,
+.prada-cart-drawer__remove,
+.prada-cart-drawer__empty-login,
+.prada-contact-drawer__note,
+.prada-contact-drawer__action,
+.prada-localization-drawer__note {
+  font-size: var(--ge-type-pdp-copy) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.45 !important;
+  letter-spacing: 0 !important;
+}
+
+.totals__total,
+.totals__total-value {
+  font-size: var(--ge-type-pdp-price) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.25 !important;
+}
+
+.cart__checkout-button,
+.prada-cart-drawer__view-cart,
+.prada-localization-drawer__confirm {
+  font-size: 12px !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.01em !important;
+}
+
+.footer,
+.greyexim-footer,
+.prada-footer,
+.prada-localization-drawer__panel {
+  font-family: var(--ge-font-family) !important;
+}
+
+.footer-block__heading,
+.greyexim-footer__group h2,
+.prada-footer h2,
+.prada-footer summary {
+  font-size: var(--ge-type-footer-heading) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+}
+
+.footer-block__details-content .list-menu__item--link,
+.footer a,
+.greyexim-footer__group a,
+.greyexim-footer__legal,
+.prada-footer a,
+.prada-footer__cookie-settings,
+.prada-footer__shipping {
+  font-size: var(--ge-type-footer-link) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0 !important;
+}
+
+.newsletter-form__field-wrapper .field__input,
+.newsletter-form__button,
+.prada-footer__field input,
+.newsletter__subheading,
+.newsletter__subheading p {
+  font-size: var(--ge-type-form-value) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0 !important;
+}
+
+.copyright__content,
+.copyright__content a,
+.greyexim-footer__copyright,
+.greyexim-footer__language,
+.prada-footer__bottom p,
+.prada-footer__privacy {
+  font-size: var(--ge-type-copyright) !important;
+  font-weight: var(--ge-weight-regular) !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0 !important;
+}
+
+@media screen and (max-width: 749px) {
+  body {
+    font-size: var(--ge-type-body);
+  }
+
+  .prada-category-showcase__label {
+    font-size: var(--ge-type-tile-title) !important;
+  }
+
+  #send-us-email .contact__button .button {
+    font-size: 12px !important;
+  }
+
+  .prada-footer summary {
+    min-height: 64px;
+  }
+}
