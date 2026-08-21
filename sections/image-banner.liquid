@@ -424,18 +424,32 @@
           if (!video || !source) return;
 
           const mobileQuery = window.matchMedia('(max-width: 749px)');
-          const setResponsiveWebmSource = () => {
-            const nextSrc = mobileQuery.matches ? source.dataset.mobileSrc : source.dataset.desktopSrc;
-            if (!nextSrc || source.dataset.currentSrc === nextSrc) return;
-
-            source.dataset.currentSrc = nextSrc;
-            source.src = nextSrc;
-            video.load();
+          const playResponsiveWebmVideo = () => {
+            video.defaultMuted = true;
+            video.muted = true;
+            video.playsInline = true;
+            video.setAttribute('muted', '');
+            video.setAttribute('playsinline', '');
 
             const playRequest = video.play();
             if (playRequest && typeof playRequest.catch === 'function') {
               playRequest.catch(() => {});
             }
+          };
+
+          const setResponsiveWebmSource = () => {
+            const nextSrc = mobileQuery.matches ? source.dataset.mobileSrc : source.dataset.desktopSrc;
+            if (!nextSrc) return;
+
+            if (source.dataset.currentSrc !== nextSrc) {
+              source.dataset.currentSrc = nextSrc;
+              source.src = nextSrc;
+              video.load();
+            }
+
+            playResponsiveWebmVideo();
+            video.addEventListener('loadeddata', playResponsiveWebmVideo, { once: true });
+            video.addEventListener('canplay', playResponsiveWebmVideo, { once: true });
           };
 
           setResponsiveWebmSource();
