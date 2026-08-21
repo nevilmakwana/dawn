@@ -71,6 +71,10 @@
   endif
 -%}
 
+{%- if has_responsive_webm_video -%}
+  <script src="{{ 'image-banner-responsive-video.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
 {%- if mobile_banner_aspect_ratio != blank and section.settings.image_height == 'adapt' or mobile_banner_aspect_ratio != blank and use_full_media_adapt -%}
   {%- style -%}
     @media screen and (max-width: 749px) {
@@ -400,66 +404,21 @@
       <video
         id="Banner-{{ section.id }}-responsive-webm"
         class="banner__media-video"
+        data-responsive-webm
+        data-mobile-src="{{ mobile_webm_url | escape }}"
+        data-desktop-src="{{ desktop_webm_url | escape }}"
+        {% if section.settings.mobile_video.preview_image != blank %}
+          data-mobile-poster="{{ section.settings.mobile_video.preview_image | image_url: width: 1500 }}"
+        {% endif %}
+        {% if section.settings.video.preview_image != blank %}
+          data-desktop-poster="{{ section.settings.video.preview_image | image_url: width: 3840 }}"
+        {% endif %}
         autoplay
         loop
         muted
         playsinline
-        preload="metadata"
-        {% if section.settings.video.preview_image != blank %}
-          poster="{{ section.settings.video.preview_image | image_url: width: 3840 }}"
-        {% elsif section.settings.mobile_video.preview_image != blank %}
-          poster="{{ section.settings.mobile_video.preview_image | image_url: width: 1500 }}"
-        {% endif %}
-      >
-        <source
-          type="video/webm"
-          data-mobile-src="{{ mobile_webm_url | escape }}"
-          data-desktop-src="{{ desktop_webm_url | escape }}"
-        >
-      </video>
-      <script>
-        (() => {
-          const video = document.getElementById('Banner-{{ section.id }}-responsive-webm');
-          const source = video && video.querySelector('source[type="video/webm"]');
-          if (!video || !source) return;
-
-          const mobileQuery = window.matchMedia('(max-width: 749px)');
-          const playResponsiveWebmVideo = () => {
-            video.defaultMuted = true;
-            video.muted = true;
-            video.playsInline = true;
-            video.setAttribute('muted', '');
-            video.setAttribute('playsinline', '');
-
-            const playRequest = video.play();
-            if (playRequest && typeof playRequest.catch === 'function') {
-              playRequest.catch(() => {});
-            }
-          };
-
-          const setResponsiveWebmSource = () => {
-            const nextSrc = mobileQuery.matches ? source.dataset.mobileSrc : source.dataset.desktopSrc;
-            if (!nextSrc) return;
-
-            if (source.dataset.currentSrc !== nextSrc) {
-              source.dataset.currentSrc = nextSrc;
-              source.src = nextSrc;
-              video.load();
-            }
-
-            playResponsiveWebmVideo();
-            video.addEventListener('loadeddata', playResponsiveWebmVideo, { once: true });
-            video.addEventListener('canplay', playResponsiveWebmVideo, { once: true });
-          };
-
-          setResponsiveWebmSource();
-          if (mobileQuery.addEventListener) {
-            mobileQuery.addEventListener('change', setResponsiveWebmSource);
-          } else if (mobileQuery.addListener) {
-            mobileQuery.addListener(setResponsiveWebmSource);
-          }
-        })();
-      </script>
+        preload="{% if section.index == 1 %}auto{% else %}metadata{% endif %}"
+      ></video>
     </div>
   {%- elsif has_desktop_video -%}
     <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
