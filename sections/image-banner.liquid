@@ -37,6 +37,11 @@
     assign has_mobile_video = true
   endif
 
+  assign has_responsive_webm_video = false
+  if desktop_webm_url != blank and mobile_webm_url != blank
+    assign has_responsive_webm_video = true
+  endif
+
   assign desktop_banner_aspect_ratio = section.settings.image.aspect_ratio
   if section.settings.video != blank
     assign desktop_banner_aspect_ratio = section.settings.video.aspect_ratio
@@ -390,7 +395,26 @@
   id="Banner-{{ section.id }}"
   class="banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if has_desktop_video == false and section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank and has_mobile_video == false %} banner--stacked{% endif %}{% if mobile_banner_aspect_ratio != blank and section.settings.image_height == 'adapt' or mobile_banner_aspect_ratio != blank and use_full_media_adapt %} banner--adapt{% endif %}{% if section.settings.show_full_media %} banner--show-full-media{% endif %}{% if section.settings.mobile_center_zoom %} banner--mobile-center-zoom{% endif %}{% if section.settings.mobile_center_zoom and section.settings.mobile_auto_subject_focus %} banner--mobile-auto-subject-focus{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
 >
-  {%- if has_desktop_video -%}
+  {%- if has_responsive_webm_video -%}
+    <div class="banner__media media{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+      <video
+        class="banner__media-video"
+        autoplay
+        loop
+        muted
+        playsinline
+        preload="metadata"
+        {% if section.settings.video.preview_image != blank %}
+          poster="{{ section.settings.video.preview_image | image_url: width: 3840 }}"
+        {% elsif section.settings.mobile_video.preview_image != blank %}
+          poster="{{ section.settings.mobile_video.preview_image | image_url: width: 1500 }}"
+        {% endif %}
+      >
+        <source src="{{ mobile_webm_url }}" type="video/webm" media="(max-width: 749px)">
+        <source src="{{ desktop_webm_url }}" type="video/webm" media="(min-width: 750px)">
+      </video>
+    </div>
+  {%- elsif has_desktop_video -%}
     <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
       {%- if desktop_webm_url != blank -%}
         <video
@@ -488,7 +512,7 @@
       }}
     </div>
   {%- endif -%}
-  {%- if has_mobile_video -%}
+  {%- if has_mobile_video and has_responsive_webm_video == false -%}
     <div class="banner__media media medium-hide large-up-hide{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
       {%- if mobile_webm_url != blank -%}
         <video
