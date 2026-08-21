@@ -1820,3 +1820,82 @@
     transition: none;
   }
 }
+
+body:has(cart-items.prada-shopping-bag-page.is-empty) {
+  background: #ffffff;
+}
+
+#MainContent:has(cart-items.prada-shopping-bag-page.is-empty) {
+  display: block;
+  width: 100%;
+  max-width: none;
+  min-height: calc(100vh - var(--header-height, 56px));
+  margin: 0;
+  padding: var(--header-height, 56px) 0 0 !important;
+  background: #ffffff;
+}
+
+cart-items.prada-shopping-bag-page.is-empty {
+  display: block;
+  min-height: calc(100vh - var(--header-height, 56px));
+  background: #ffffff;
+}
+
+cart-items.prada-shopping-bag-page.is-empty .page-width {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: calc(100vh - var(--header-height, 56px));
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+cart-items.prada-shopping-bag-page.is-empty .cart__warnings {
+  display: flex !important;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: calc(100vh - var(--header-height, 56px) - 50px);
+  margin: 0;
+  padding: 64px 16px;
+  background: #ffffff;
+  text-align: center;
+}
+
+cart-items.prada-shopping-bag-page.is-empty .cart__empty-text {
+  margin: 0 0 28px;
+  color: #111111;
+  font-family: var(--font-body-family);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
+cart-items.prada-shopping-bag-page.is-empty .cart__warnings .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 205px;
+  min-height: 60px;
+  padding: 0 28px;
+  border: 1px solid #111111;
+  border-radius: 0;
+  background: #111111;
+  color: #ffffff;
+  font-family: var(--font-body-family);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+  text-decoration: none;
+}
+
+@media screen and (min-width: 750px) {
+  cart-items.prada-shopping-bag-page.is-empty .cart__warnings {
+    min-height: calc(100vh - var(--header-height, 72px));
+  }
+}
