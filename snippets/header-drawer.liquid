@@ -51,8 +51,13 @@
                       type="radio"
                       name="PradaDesktopMenu-{{ section.id }}"
                       id="PradaDesktopMenu-{{ section.id }}-{{ forloop.index }}"
+                      {% if link.child_active and is_wishlist_view == false %}checked{% endif %}
                     >
-                    <label class="prada-desktop-menu__primary-link" for="PradaDesktopMenu-{{ section.id }}-{{ forloop.index }}">
+                    <label
+                      class="prada-desktop-menu__primary-link"
+                      for="PradaDesktopMenu-{{ section.id }}-{{ forloop.index }}"
+                      aria-controls="PradaDesktopMenuPanel-{{ section.id }}-{{ forloop.index }}"
+                    >
                       <span>{{ link.title | escape }}</span>
                       <span class="prada-desktop-menu__chevron" aria-hidden="true">&rarr;</span>
                     </label>
@@ -66,12 +71,21 @@
                                 type="radio"
                                 name="PradaDesktopSubMenu-{{ section.id }}-{{ forloop.parentloop.index }}"
                                 id="PradaDesktopSubMenu-{{ section.id }}-{{ forloop.parentloop.index }}-{{ forloop.index }}"
+                                {% if childlink.child_active or childlink.current %}checked{% endif %}
                               >
-                              <label class="prada-desktop-menu__submenu-link" for="PradaDesktopSubMenu-{{ section.id }}-{{ forloop.parentloop.index }}-{{ forloop.index }}">
+                              <label
+                                class="prada-desktop-menu__submenu-link"
+                                for="PradaDesktopSubMenu-{{ section.id }}-{{ forloop.parentloop.index }}-{{ forloop.index }}"
+                                aria-controls="PradaDesktopGrandchildPanel-{{ section.id }}-{{ forloop.parentloop.index }}-{{ forloop.index }}"
+                              >
                                 <span>{{ childlink.title | escape }}</span>
                                 <span class="prada-desktop-menu__chevron" aria-hidden="true">&rarr;</span>
                               </label>
-                              <div class="prada-desktop-menu__grandchild-panel" aria-label="{{ childlink.title | escape }}">
+                              <div
+                                class="prada-desktop-menu__grandchild-panel"
+                                id="PradaDesktopGrandchildPanel-{{ section.id }}-{{ forloop.parentloop.index }}-{{ forloop.index }}"
+                                aria-label="{{ childlink.title | escape }}"
+                              >
                                 <a class="prada-desktop-menu__view-all" href="{{ childlink.url }}">View all</a>
                                 <ul class="prada-desktop-menu__grandchild-list" role="list">
                                   {%- for grandchildlink in childlink.links -%}
@@ -314,8 +328,25 @@
         if (activeSubmenuControl) level = '3';
       }
 
+      menuDrawer.querySelectorAll('.prada-desktop-menu__primary-control, .prada-desktop-menu__submenu-control').forEach(function (control) {
+        const label = menuDrawer.querySelector('label[for="' + control.id + '"]');
+        if (label) label.setAttribute('aria-expanded', control.checked ? 'true' : 'false');
+      });
+
       menuDrawer.dataset.pradaMenuLevel = level;
     }
+
+    function activatePradaDesktopMenuControl(control) {
+      if (!control || control.checked) {
+        updatePradaDesktopMenuLevel(control && control.closest('.menu-drawer'));
+        return;
+      }
+
+      control.checked = true;
+      control.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    document.querySelectorAll('.menu-drawer').forEach(updatePradaDesktopMenuLevel);
 
     document.addEventListener('change', function (event) {
       const control = event.target;
@@ -332,6 +363,26 @@
       }
 
       updatePradaDesktopMenuLevel(menuDrawer);
+    });
+
+    document.addEventListener('pointerover', function (event) {
+      if (!window.matchMedia('(min-width: 990px)').matches) return;
+
+      const label = event.target.closest('.prada-desktop-menu__primary-link[for], .prada-desktop-menu__submenu-link[for]');
+      if (!label) return;
+
+      const control = document.getElementById(label.getAttribute('for'));
+      if (control) activatePradaDesktopMenuControl(control);
+    });
+
+    document.addEventListener('focusin', function (event) {
+      if (!window.matchMedia('(min-width: 990px)').matches) return;
+
+      const label = event.target.closest('.prada-desktop-menu__primary-link[for], .prada-desktop-menu__submenu-link[for]');
+      if (!label) return;
+
+      const control = document.getElementById(label.getAttribute('for'));
+      if (control) activatePradaDesktopMenuControl(control);
     });
 
     document.addEventListener('click', function (event) {
