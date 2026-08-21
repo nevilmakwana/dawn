@@ -398,6 +398,7 @@
   {%- if has_responsive_webm_video -%}
     <div class="banner__media media{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
       <video
+        id="Banner-{{ section.id }}-responsive-webm"
         class="banner__media-video"
         autoplay
         loop
@@ -410,9 +411,41 @@
           poster="{{ section.settings.mobile_video.preview_image | image_url: width: 1500 }}"
         {% endif %}
       >
-        <source src="{{ mobile_webm_url }}" type="video/webm" media="(max-width: 749px)">
-        <source src="{{ desktop_webm_url }}" type="video/webm" media="(min-width: 750px)">
+        <source
+          type="video/webm"
+          data-mobile-src="{{ mobile_webm_url | escape }}"
+          data-desktop-src="{{ desktop_webm_url | escape }}"
+        >
       </video>
+      <script>
+        (() => {
+          const video = document.getElementById('Banner-{{ section.id }}-responsive-webm');
+          const source = video && video.querySelector('source[type="video/webm"]');
+          if (!video || !source) return;
+
+          const mobileQuery = window.matchMedia('(max-width: 749px)');
+          const setResponsiveWebmSource = () => {
+            const nextSrc = mobileQuery.matches ? source.dataset.mobileSrc : source.dataset.desktopSrc;
+            if (!nextSrc || source.dataset.currentSrc === nextSrc) return;
+
+            source.dataset.currentSrc = nextSrc;
+            source.src = nextSrc;
+            video.load();
+
+            const playRequest = video.play();
+            if (playRequest && typeof playRequest.catch === 'function') {
+              playRequest.catch(() => {});
+            }
+          };
+
+          setResponsiveWebmSource();
+          if (mobileQuery.addEventListener) {
+            mobileQuery.addEventListener('change', setResponsiveWebmSource);
+          } else if (mobileQuery.addListener) {
+            mobileQuery.addListener(setResponsiveWebmSource);
+          }
+        })();
+      </script>
     </div>
   {%- elsif has_desktop_video -%}
     <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
