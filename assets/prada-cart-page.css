@@ -2007,10 +2007,22 @@ cart-items.prada-shopping-bag-page.is-empty .cart__warnings .button {
 }
 
 .prada-shopping-bag-page .cart-item {
-  transition: opacity 180ms ease, transform 180ms ease;
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease,
+    max-height 220ms ease,
+    padding-top 220ms ease,
+    padding-bottom 220ms ease,
+    border-color 220ms ease;
+  will-change: opacity, transform, max-height;
 }
 
 .prada-shopping-bag-page .cart-item.is-removing {
+  max-height: 0 !important;
+  min-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  border-color: transparent;
   opacity: 0;
   transform: scale(0.98);
   pointer-events: none;
@@ -2019,5 +2031,6 @@ cart-items.prada-shopping-bag-page.is-empty .cart__warnings .button {
 @media (prefers-reduced-motion: reduce) {
   .prada-shopping-bag-page .cart-item {
     transition: none;
+    will-change: auto;
   }
 }

@@ -1,4 +1,22 @@
 class CartRemoveButton extends HTMLElement {
+  restoreRemovingState() {
+    const cartItem = this.closest('.cart-item');
+    if (!cartItem) return;
+
+    cartItem.classList.remove('is-removing');
+    cartItem.style.maxHeight = '';
+    cartItem.style.overflow = '';
+    this.removeAttribute('aria-disabled');
+    this.querySelectorAll('a, button').forEach((control) => {
+      control.removeAttribute('aria-disabled');
+      if (control.tagName === 'BUTTON') {
+        control.disabled = false;
+      } else {
+        control.removeAttribute('tabindex');
+      }
+    });
+  }
+
   constructor() {
     super();
 
@@ -17,7 +35,9 @@ class CartRemoveButton extends HTMLElement {
 
       if (cartItem.classList.contains('is-removing')) return;
 
-      cartItem.classList.add('is-removing');
+      cartItem.style.maxHeight = `${cartItem.offsetHeight}px`;
+      cartItem.style.overflow = 'hidden';
+      cartItem.getBoundingClientRect();
       this.setAttribute('aria-disabled', 'true');
       this.querySelectorAll('a, button').forEach((control) => {
         control.setAttribute('aria-disabled', 'true');
@@ -29,8 +49,19 @@ class CartRemoveButton extends HTMLElement {
       });
 
       const removeEvent = { currentTarget: this };
-      const removeDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180;
-      window.setTimeout(() => cartItems.updateQuantity(this.dataset.index, 0, removeEvent), removeDelay);
+      const removeDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 220;
+      const removeFromCart = () => cartItems.updateQuantity(this.dataset.index, 0, removeEvent);
+
+      window.requestAnimationFrame(() => {
+        cartItem.classList.add('is-removing');
+
+        if (removeDelay === 0) {
+          removeFromCart();
+          return;
+        }
+
+        window.setTimeout(removeFromCart, removeDelay);
+      });
     });
   }
 }
@@ -233,6 +264,9 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
           const items = document.querySelectorAll('.cart-item');
 
           if (parsedState.errors) {
+            if (quantity === 0 && event.currentTarget instanceof CartRemoveButton) {
+              event.currentTarget.restoreRemovingState();
+            }
             quantityElement.value = quantityElement.getAttribute('value');
             this.updateLiveRegions(line, parsedState.errors);
             return;
@@ -297,6 +331,9 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
         publish(PUB_SUB_EVENTS.cartUpdate, { source: 'cart-items', cartData: parsedState, variantId: variantId });
       })
       .catch((e) => {
+        if (quantity === 0 && event.currentTarget instanceof CartRemoveButton) {
+          event.currentTarget.restoreRemovingState();
+        }
         this.querySelectorAll('.loading__spinner').forEach((overlay) => overlay.classList.add('hidden'));
         const errors = document.getElementById('cart-errors') || document.getElementById('CartDrawer-CartErrors');
         if (errors) errors.textContent = window.cartStrings.error;
