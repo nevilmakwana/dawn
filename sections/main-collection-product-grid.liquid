@@ -305,31 +305,6 @@
           return (element?.textContent || '').replace(/\s+/g, ' ').trim();
         }
 
-        function comparableText(value) {
-          return (value || '')
-            .toLowerCase()
-            .replace(/&/g, ' and ')
-            .replace(/[^a-z0-9]+/g, ' ')
-            .trim();
-        }
-
-        var currentCollectionTitle = textFrom(title);
-
-        function labelMatchesCurrentCollection(label) {
-          if (!label || /^view all$/i.test(label)) return true;
-
-          var currentTitle = comparableText(currentCollectionTitle);
-          var candidateTitle = comparableText(label);
-
-          if (!currentTitle || !candidateTitle) return true;
-
-          return (
-            currentTitle === candidateTitle ||
-            currentTitle.indexOf(candidateTitle) !== -1 ||
-            candidateTitle.indexOf(currentTitle) !== -1
-          );
-        }
-
         function makeTab(label, href, active) {
           var tab = document.createElement('a');
           var labelText = document.createElement('span');
@@ -564,15 +539,13 @@
               });
 
               if (activeChildTab) {
-                if (labelMatchesCurrentCollection(activeChildTab.label)) {
-                  match = {
-                    title: childTitle,
-                    tabs: childTabs,
-                    activePath: currentPath,
-                  };
-                }
+                match = {
+                  title: childTitle,
+                  tabs: childTabs,
+                  activePath: currentPath,
+                };
               }
-            } else if (childPath === currentPath && parentTabs.length > 1 && labelMatchesCurrentCollection(childTitle)) {
+            } else if (childPath === currentPath && parentTabs.length > 1) {
               match = {
                 title: parentTitle || title.textContent,
                 tabs: parentTabs,
@@ -581,7 +554,7 @@
             }
           });
 
-          if (!match && parentViewAllPath === currentPath && parentTabs.length > 1 && labelMatchesCurrentCollection(parentTitle)) {
+          if (!match && parentViewAllPath === currentPath && parentTabs.length > 1) {
             match = {
               title: parentTitle || title.textContent,
               tabs: parentTabs,
