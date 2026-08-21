@@ -134,6 +134,7 @@
 
 .prada-footer__social .icon { width: 14px; height: 14px; }
 .prada-footer__social .icon path { fill: currentColor; stroke: none; }
+.prada-footer__social-link--bluesky .icon { width: 11px; height: 11px; }
 
 .prada-footer__group-content ul {
   display: grid;
@@ -403,6 +404,7 @@
   .prada-footer__social a { width: 18px; height: 18px; }
   .prada-footer__social svg,
   .prada-footer__social .icon { width: 17px; height: 17px; }
+  .prada-footer__social-link--bluesky .icon { width: 13px; height: 13px; }
 
   .prada-footer__group {
     padding-top: 0;
