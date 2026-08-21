@@ -8,9 +8,9 @@
   {%- paginate collection.products by section.settings.products_per_page -%}
     <header class="prada-collection__header">
       <div class="prada-collection__navigation">
-        <h1 class="prada-collection__title">{{ collection.title | escape }}</h1>
+        <h1 class="prada-collection__title" data-prada-collection-title>{{ collection.title | escape }}</h1>
 
-        <nav class="prada-collection__tabs" aria-label="{{ collection.title | escape }} categories">
+        <nav class="prada-collection__tabs" aria-label="{{ collection.title | escape }} categories" data-prada-collection-tabs>
           <a class="prada-collection__tab is-active" href="{{ collection.url }}" aria-current="page">View all</a>
           {%- if section.settings.subcategory_menu != blank -%}
             {%- for link in section.settings.subcategory_menu.links -%}
@@ -254,6 +254,133 @@
   }
 
   window.pradaCollectionCarouselSetup(document);
+
+  if (!window.pradaCollectionNavigationSetup) {
+    window.pradaCollectionNavigationSetup = function (root) {
+      root.querySelectorAll('[data-prada-collection-tabs]').forEach(function (tabs) {
+        if (tabs.dataset.pradaNavigationReady === 'true') return;
+
+        var desktopMenu = document.querySelector('.prada-desktop-menu');
+        var title = tabs.closest('.prada-collection__navigation')?.querySelector('[data-prada-collection-title]');
+        if (!desktopMenu || !title) return;
+
+        function normalizeUrl(url) {
+          try {
+            return new URL(url, window.location.origin).pathname.replace(/\/$/, '') || '/';
+          } catch (error) {
+            return '';
+          }
+        }
+
+        function textFrom(element) {
+          return (element?.textContent || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function makeTab(label, href, active) {
+          var tab = document.createElement('a');
+          tab.className = 'prada-collection__tab' + (active ? ' is-active' : '');
+          tab.href = href;
+          tab.textContent = label;
+          if (active) tab.setAttribute('aria-current', 'page');
+          return tab;
+        }
+
+        var currentPath = normalizeUrl(window.location.href);
+        var match = null;
+
+        desktopMenu.querySelectorAll('.prada-desktop-menu__item').forEach(function (parentItem) {
+          if (match) return;
+
+          var parentLabel = parentItem.querySelector('.prada-desktop-menu__primary-link span:first-child');
+          var parentTitle = textFrom(parentLabel);
+          var submenu = parentItem.querySelector(':scope > .prada-desktop-menu__submenu');
+          if (!submenu) return;
+
+          var childItems = submenu.querySelectorAll(':scope > .prada-desktop-menu__submenu-list > .prada-desktop-menu__submenu-item');
+          var parentTabs = [];
+          var parentViewAll = submenu.querySelector(':scope > .prada-desktop-menu__submenu-list > .prada-desktop-menu__submenu-view-all .prada-desktop-menu__view-all');
+
+          if (parentViewAll) {
+            parentTabs.push({ label: 'View all', href: parentViewAll.href, path: normalizeUrl(parentViewAll.href) });
+          }
+
+          childItems.forEach(function (childItem) {
+            if (match) return;
+
+            var childLabel = childItem.querySelector(':scope > .prada-desktop-menu__submenu-link[for]');
+            var childLink = childItem.querySelector(':scope > a.prada-desktop-menu__submenu-link');
+            var childTitle = textFrom(childLabel || childLink);
+            var grandchildPanel = childItem.querySelector(':scope > .prada-desktop-menu__grandchild-panel');
+            var childViewAll = grandchildPanel?.querySelector(':scope > .prada-desktop-menu__view-all');
+            var childHref = childViewAll?.href || childLink?.href || '';
+            var childPath = normalizeUrl(childHref);
+
+            if (childTitle && childHref) {
+              parentTabs.push({ label: childTitle, href: childHref, path: childPath });
+            }
+
+            if (grandchildPanel && childViewAll) {
+              var childTabs = [
+                { label: 'View all', href: childViewAll.href, path: normalizeUrl(childViewAll.href) },
+              ];
+
+              grandchildPanel.querySelectorAll(':scope > .prada-desktop-menu__grandchild-list a').forEach(function (grandchildLink) {
+                childTabs.push({
+                  label: textFrom(grandchildLink),
+                  href: grandchildLink.href,
+                  path: normalizeUrl(grandchildLink.href),
+                });
+              });
+
+              var activeChildTab = childTabs.find(function (tab) {
+                return tab.path === currentPath;
+              });
+
+              if (activeChildTab) {
+                match = {
+                  title: childTitle,
+                  tabs: childTabs,
+                  activePath: currentPath,
+                };
+              }
+            } else if (childPath === currentPath && parentTabs.length > 1) {
+              match = {
+                title: parentTitle || title.textContent,
+                tabs: parentTabs,
+                activePath: currentPath,
+              };
+            }
+          });
+
+          if (!match && parentViewAll && normalizeUrl(parentViewAll.href) === currentPath && parentTabs.length > 1) {
+            match = {
+              title: parentTitle || title.textContent,
+              tabs: parentTabs,
+              activePath: currentPath,
+            };
+          }
+        });
+
+        if (!match || !match.tabs || match.tabs.length < 2) return;
+
+        tabs.replaceChildren();
+        title.textContent = match.title;
+        tabs.setAttribute('aria-label', match.title + ' categories');
+
+        match.tabs.forEach(function (tab) {
+          tabs.appendChild(makeTab(tab.label, tab.href, tab.path === match.activePath));
+        });
+
+        tabs.dataset.pradaNavigationReady = 'true';
+      });
+    };
+
+    document.addEventListener('shopify:section:load', function (event) {
+      window.pradaCollectionNavigationSetup(event.target);
+    });
+  }
+
+  window.pradaCollectionNavigationSetup(document);
 </script>
 
 {% schema %}
