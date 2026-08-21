@@ -24,7 +24,7 @@ body:has(.prada-collection) .section-header {
 
 body:has(.prada-collection) .section-header.shopify-section-header-hidden {
   top: 0 !important;
-  transform: translate3d(0, calc(-100% - var(--prada-title-height)), 0);
+  transform: translate3d(0, -100%, 0);
 }
 
 .prada-collection * {
@@ -37,14 +37,14 @@ body:has(.prada-collection) .section-header.shopify-section-header-hidden {
   top: var(--header-height, 6.8rem);
   background: #fff;
   border-bottom: 1px solid var(--prada-line);
-  transition: top 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateZ(0);
   will-change: transform;
 }
 
 body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
   .prada-collection__header {
-  top: 0;
+  transform: translate3d(0, calc(0px - var(--header-height, 6.8rem)), 0);
 }
 
 .prada-collection__navigation {
@@ -66,11 +66,6 @@ body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
   transform: translate3d(0, 0, 0);
   transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
-}
-
-body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
-  .prada-collection__title {
-  transform: translate3d(0, -100%, 0);
 }
 
 .prada-collection__tabs {
@@ -457,9 +452,7 @@ body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
     min-height: var(--prada-title-height);
     padding: 1.4rem 2rem 0.7rem;
     background: #fff;
-    transition:
-      top 200ms cubic-bezier(0.4, 0, 0.2, 1),
-      transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .prada-collection__tabs {
@@ -469,7 +462,9 @@ body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
     min-height: var(--prada-tabs-height);
     background: #fff;
     border-bottom: 1px solid var(--prada-line);
-    transition: top 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translate3d(0, 0, 0);
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
   }
 
   .prada-collection__tab {
@@ -484,22 +479,26 @@ body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
     padding: 0 2rem;
     background: #fff;
     border-bottom: 1px solid var(--prada-line);
-    transition: top 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translate3d(0, 0, 0);
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+  }
+
+  body:has(.prada-collection) .section-header.shopify-section-header-hidden {
+    transform: translate3d(0, calc(-100% - var(--prada-title-height)), 0);
   }
 
   body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
-    .prada-collection__title {
-    top: 0;
-  }
-
+    .prada-collection__title,
   body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
-    .prada-collection__tabs {
-    top: 0;
-  }
-
+    .prada-collection__tabs,
   body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
     .prada-collection__toolbar {
-    top: var(--prada-tabs-height);
+    transform: translate3d(
+      0,
+      calc(0px - var(--header-height, 6.8rem) - var(--prada-title-height)),
+      0
+    );
   }
 }
 
