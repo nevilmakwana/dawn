@@ -59,6 +59,7 @@
                       assign parent_key = parent_title | handleize
                       assign parent_url = parent_block.settings.link | default: '#'
                       assign has_child_blocks = false
+                      assign parent_has_grandchild_blocks = false
                       assign scan_parent_children = false
                       for child_check_block in section.blocks
                         if child_check_block.id == parent_block.id
@@ -67,7 +68,19 @@
                           break
                         elsif scan_parent_children and child_check_block.type == 'drawer_child' and child_check_block.settings.title != blank
                           assign has_child_blocks = true
-                          break
+                          assign scan_child_grandchildren = false
+                          for grandchild_check_block in section.blocks
+                            if grandchild_check_block.id == child_check_block.id
+                              assign scan_child_grandchildren = true
+                            elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_parent'
+                              break
+                            elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_child'
+                              break
+                            elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_grandchild' and grandchild_check_block.settings.title != blank
+                              assign parent_has_grandchild_blocks = true
+                              break
+                            endif
+                          endfor
                         endif
                       endfor
                     -%}
@@ -93,9 +106,11 @@
                         </label>
                         <div class="prada-desktop-menu__submenu" id="PradaDesktopMenuPanel-{{ section.id }}-{{ parent_block.id }}" aria-label="{{ parent_title | escape }}">
                           <ul class="prada-desktop-menu__submenu-list" role="list">
-                            <li class="prada-desktop-menu__submenu-view-all">
-                              <a class="prada-desktop-menu__view-all" href="{{ parent_url }}">View all</a>
-                            </li>
+                            {%- unless parent_has_grandchild_blocks -%}
+                              <li class="prada-desktop-menu__submenu-view-all">
+                                <a class="prada-desktop-menu__view-all" href="{{ parent_url }}">View all</a>
+                              </li>
+                            {%- endunless -%}
                             {%- assign scan_parent_children = false -%}
                             {%- for child_block in section.blocks -%}
                               {%- liquid
@@ -193,6 +208,15 @@
                 {%- endfor -%}
               {%- else -%}
               {%- for link in section.settings.menu.links -%}
+                {%- liquid
+                  assign parent_has_grandchild_links = false
+                  for childlink_check in link.links
+                    if childlink_check.links != blank
+                      assign parent_has_grandchild_links = true
+                      break
+                    endif
+                  endfor
+                -%}
                 <div class="prada-desktop-menu__item{% if link.links != blank %} has-submenu{% endif %}" role="listitem">
                   {%- if link.links != blank -%}
                     <input
@@ -215,9 +239,11 @@
                     </label>
                     <div class="prada-desktop-menu__submenu" id="PradaDesktopMenuPanel-{{ section.id }}-{{ forloop.index }}" aria-label="{{ link.title | escape }}">
                       <ul class="prada-desktop-menu__submenu-list" role="list">
-                        <li class="prada-desktop-menu__submenu-view-all">
-                          <a class="prada-desktop-menu__view-all" href="{{ link.url }}">View all</a>
-                        </li>
+                        {%- unless parent_has_grandchild_links -%}
+                          <li class="prada-desktop-menu__submenu-view-all">
+                            <a class="prada-desktop-menu__view-all" href="{{ link.url }}">View all</a>
+                          </li>
+                        {%- endunless -%}
                         {%- for childlink in link.links -%}
                           <li class="prada-desktop-menu__submenu-item{% if childlink.links != blank %} has-grandchildren{% endif %}">
                             {%- if childlink.links != blank -%}
@@ -717,6 +743,38 @@
       const utilityLink = event.target.closest('[data-prada-utility-link]');
       const actionButton = closeButton || searchButton || localizationButton;
       const menuSummary = event.target.closest('header-drawer > details > summary');
+      const desktopLabel = event.target.closest('.prada-desktop-menu__primary-link[for], .prada-desktop-menu__submenu-link[for]');
+
+      if (desktopLabel && window.matchMedia('(min-width: 990px)').matches) {
+        const control = document.getElementById(desktopLabel.getAttribute('for'));
+
+        if (control) {
+          event.preventDefault();
+
+          const menuDrawer = control.closest('.menu-drawer');
+          const isPrimaryControl = control.matches('.prada-desktop-menu__primary-control');
+
+          if (control.checked) {
+            control.checked = false;
+
+            if (isPrimaryControl) {
+              control.closest('.prada-desktop-menu__item')?.querySelectorAll('.prada-desktop-menu__submenu-control').forEach(function (submenuControl) {
+                submenuControl.checked = false;
+              });
+            }
+          } else {
+            if (isPrimaryControl) {
+              menuDrawer?.querySelectorAll('.prada-desktop-menu__submenu-control').forEach(function (submenuControl) {
+                submenuControl.checked = false;
+              });
+            }
+
+            control.checked = true;
+          }
+
+          control.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
 
       if (menuSummary) {
         const details = menuSummary.closest('details');
