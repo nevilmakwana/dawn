@@ -45,6 +45,13 @@ window.PradaCartHeader = window.PradaCartHeader || {};
 window.PradaCartHeader.update = updatePradaCartIcon;
 window.PradaCartHeader.refresh = refreshPradaCartIcon;
 
+const isPradaCartPage = () => {
+  const cartPath = new URL(window.routes?.cart_url || '/cart', window.location.origin).pathname.replace(/\/+$/, '') || '/';
+  const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+
+  return currentPath === cartPath;
+};
+
 class CartDrawer extends HTMLElement {
   constructor() {
     super();
@@ -98,6 +105,11 @@ class CartDrawer extends HTMLElement {
       const cartLink = getCartLink(event.target);
       if (!cartLink) return;
 
+      if (isPradaCartPage() || cartLink.dataset.pradaCartDisabled === 'true' || cartLink.getAttribute('aria-disabled') === 'true') {
+        event.preventDefault();
+        return;
+      }
+
       event.preventDefault();
       cartLink.setAttribute('role', 'button');
       cartLink.setAttribute('aria-haspopup', 'dialog');
@@ -113,6 +125,13 @@ class CartDrawer extends HTMLElement {
 
     const cartLink = document.querySelector('#cart-icon-bubble.prada-header-btn--cart');
     if (cartLink) {
+      if (isPradaCartPage()) {
+        cartLink.setAttribute('aria-disabled', 'true');
+        cartLink.setAttribute('data-prada-cart-disabled', 'true');
+        cartLink.setAttribute('tabindex', '-1');
+        return;
+      }
+
       cartLink.setAttribute('role', 'button');
       cartLink.setAttribute('aria-haspopup', 'dialog');
     }
