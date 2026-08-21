@@ -59,9 +59,13 @@
                       assign parent_key = parent_title | handleize
                       assign parent_url = parent_block.settings.link | default: '#'
                       assign has_child_blocks = false
+                      assign scan_parent_children = false
                       for child_check_block in section.blocks
-                        assign child_parent_key = child_check_block.settings.parent_title | handleize
-                        if child_check_block.type == 'drawer_child' and child_check_block.settings.title != blank and child_parent_key == parent_key
+                        if child_check_block.id == parent_block.id
+                          assign scan_parent_children = true
+                        elsif scan_parent_children and child_check_block.type == 'drawer_parent'
+                          break
+                        elsif scan_parent_children and child_check_block.type == 'drawer_child' and child_check_block.settings.title != blank
                           assign has_child_blocks = true
                           break
                         endif
@@ -85,25 +89,34 @@
                         </label>
                         <div class="prada-desktop-menu__submenu" id="PradaDesktopMenuPanel-{{ section.id }}-{{ parent_block.id }}" aria-label="{{ parent_title | escape }}">
                           <ul class="prada-desktop-menu__submenu-list" role="list">
+                            {%- assign scan_parent_children = false -%}
                             {%- for child_block in section.blocks -%}
                               {%- liquid
-                                assign child_parent_key = child_block.settings.parent_title | handleize
                                 assign child_title = child_block.settings.title
                                 assign child_key = child_title | handleize
                                 assign child_url = child_block.settings.link | default: '#'
                                 assign has_grandchild_blocks = false
-                                if child_block.type == 'drawer_child' and child_title != blank and child_parent_key == parent_key
+                              -%}
+                              {%- if child_block.id == parent_block.id -%}
+                                {%- assign scan_parent_children = true -%}
+                              {%- elsif scan_parent_children and child_block.type == 'drawer_parent' -%}
+                                {%- break -%}
+                              {%- elsif scan_parent_children and child_block.type == 'drawer_child' and child_title != blank -%}
+                                {%- liquid
+                                  assign scan_child_grandchildren = false
                                   for grandchild_check_block in section.blocks
-                                    assign grandchild_parent_key = grandchild_check_block.settings.parent_title | handleize
-                                    assign grandchild_child_key = grandchild_check_block.settings.child_title | handleize
-                                    if grandchild_check_block.type == 'drawer_grandchild' and grandchild_check_block.settings.title != blank and grandchild_parent_key == parent_key and grandchild_child_key == child_key
+                                    if grandchild_check_block.id == child_block.id
+                                      assign scan_child_grandchildren = true
+                                    elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_parent'
+                                      break
+                                    elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_child'
+                                      break
+                                    elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_grandchild' and grandchild_check_block.settings.title != blank
                                       assign has_grandchild_blocks = true
                                       break
                                     endif
                                   endfor
-                                endif
-                              -%}
-                              {%- if child_block.type == 'drawer_child' and child_title != blank and child_parent_key == parent_key -%}
+                                -%}
                                 <li class="prada-desktop-menu__submenu-item{% if has_grandchild_blocks %} has-grandchildren{% endif %}" {{ child_block.shopify_attributes }}>
                                   {%- if has_grandchild_blocks -%}
                                     <input
@@ -127,14 +140,19 @@
                                     >
                                       <a class="prada-desktop-menu__view-all" href="{{ child_url }}">View all</a>
                                       <ul class="prada-desktop-menu__grandchild-list" role="list">
+                                        {%- assign scan_child_grandchildren = false -%}
                                         {%- for grandchild_block in section.blocks -%}
                                           {%- liquid
-                                            assign grandchild_parent_key = grandchild_block.settings.parent_title | handleize
-                                            assign grandchild_child_key = grandchild_block.settings.child_title | handleize
                                             assign grandchild_title = grandchild_block.settings.title
                                             assign grandchild_url = grandchild_block.settings.link | default: '#'
                                           -%}
-                                          {%- if grandchild_block.type == 'drawer_grandchild' and grandchild_title != blank and grandchild_parent_key == parent_key and grandchild_child_key == child_key -%}
+                                          {%- if grandchild_block.id == child_block.id -%}
+                                            {%- assign scan_child_grandchildren = true -%}
+                                          {%- elsif scan_child_grandchildren and grandchild_block.type == 'drawer_parent' -%}
+                                            {%- break -%}
+                                          {%- elsif scan_child_grandchildren and grandchild_block.type == 'drawer_child' -%}
+                                            {%- break -%}
+                                          {%- elsif scan_child_grandchildren and grandchild_block.type == 'drawer_grandchild' and grandchild_title != blank -%}
                                             <li {{ grandchild_block.shopify_attributes }}>
                                               <a href="{{ grandchild_url }}">
                                                 {{ grandchild_title | escape }}
@@ -277,9 +295,13 @@
                       assign parent_key = parent_title | handleize
                       assign parent_url = parent_block.settings.link | default: '#'
                       assign has_child_blocks = false
+                      assign scan_parent_children = false
                       for child_check_block in section.blocks
-                        assign child_parent_key = child_check_block.settings.parent_title | handleize
-                        if child_check_block.type == 'drawer_child' and child_check_block.settings.title != blank and child_parent_key == parent_key
+                        if child_check_block.id == parent_block.id
+                          assign scan_parent_children = true
+                        elsif scan_parent_children and child_check_block.type == 'drawer_parent'
+                          break
+                        elsif scan_parent_children and child_check_block.type == 'drawer_child' and child_check_block.settings.title != blank
                           assign has_child_blocks = true
                           break
                         endif
@@ -318,25 +340,34 @@
                                     View all
                                   </a>
                                 </li>
+                                {%- assign scan_parent_children = false -%}
                                 {%- for child_block in section.blocks -%}
                                   {%- liquid
-                                    assign child_parent_key = child_block.settings.parent_title | handleize
                                     assign child_title = child_block.settings.title
                                     assign child_key = child_title | handleize
                                     assign child_url = child_block.settings.link | default: '#'
                                     assign has_grandchild_blocks = false
-                                    if child_block.type == 'drawer_child' and child_title != blank and child_parent_key == parent_key
+                                  -%}
+                                  {%- if child_block.id == parent_block.id -%}
+                                    {%- assign scan_parent_children = true -%}
+                                  {%- elsif scan_parent_children and child_block.type == 'drawer_parent' -%}
+                                    {%- break -%}
+                                  {%- elsif scan_parent_children and child_block.type == 'drawer_child' and child_title != blank -%}
+                                    {%- liquid
+                                      assign scan_child_grandchildren = false
                                       for grandchild_check_block in section.blocks
-                                        assign grandchild_parent_key = grandchild_check_block.settings.parent_title | handleize
-                                        assign grandchild_child_key = grandchild_check_block.settings.child_title | handleize
-                                        if grandchild_check_block.type == 'drawer_grandchild' and grandchild_check_block.settings.title != blank and grandchild_parent_key == parent_key and grandchild_child_key == child_key
+                                        if grandchild_check_block.id == child_block.id
+                                          assign scan_child_grandchildren = true
+                                        elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_parent'
+                                          break
+                                        elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_child'
+                                          break
+                                        elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_grandchild' and grandchild_check_block.settings.title != blank
                                           assign has_grandchild_blocks = true
                                           break
                                         endif
                                       endfor
-                                    endif
-                                  -%}
-                                  {%- if child_block.type == 'drawer_child' and child_title != blank and child_parent_key == parent_key -%}
+                                    -%}
                                     <li {{ child_block.shopify_attributes }}>
                                       {%- if has_grandchild_blocks -%}
                                         <details id="Details-menu-drawer-{{ parent_key }}-{{ child_key }}">
@@ -375,14 +406,19 @@
                                                   View all
                                                 </a>
                                               </li>
+                                              {%- assign scan_child_grandchildren = false -%}
                                               {%- for grandchild_block in section.blocks -%}
                                                 {%- liquid
-                                                  assign grandchild_parent_key = grandchild_block.settings.parent_title | handleize
-                                                  assign grandchild_child_key = grandchild_block.settings.child_title | handleize
                                                   assign grandchild_title = grandchild_block.settings.title
                                                   assign grandchild_url = grandchild_block.settings.link | default: '#'
                                                 -%}
-                                                {%- if grandchild_block.type == 'drawer_grandchild' and grandchild_title != blank and grandchild_parent_key == parent_key and grandchild_child_key == child_key -%}
+                                                {%- if grandchild_block.id == child_block.id -%}
+                                                  {%- assign scan_child_grandchildren = true -%}
+                                                {%- elsif scan_child_grandchildren and grandchild_block.type == 'drawer_parent' -%}
+                                                  {%- break -%}
+                                                {%- elsif scan_child_grandchildren and grandchild_block.type == 'drawer_child' -%}
+                                                  {%- break -%}
+                                                {%- elsif scan_child_grandchildren and grandchild_block.type == 'drawer_grandchild' and grandchild_title != blank -%}
                                                   <li {{ grandchild_block.shopify_attributes }}>
                                                     <a
                                                       id="HeaderDrawer-{{ parent_key }}-{{ child_key }}-{{ grandchild_title | handleize }}"
