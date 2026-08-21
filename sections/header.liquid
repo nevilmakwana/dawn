@@ -2301,7 +2301,7 @@
 {
   "name": "t:sections.header.name",
   "class": "section-header",
-  "max_blocks": 3,
+  "max_blocks": 50,
   "settings": [
     {
       "type": "select",
@@ -2512,6 +2512,75 @@
   "blocks": [
     {
       "type": "@app"
+    },
+    {
+      "type": "drawer_parent",
+      "name": "Parent menu item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Label",
+          "default": "Grey Home"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    },
+    {
+      "type": "drawer_child",
+      "name": "Sub menu item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "parent_title",
+          "label": "Parent label",
+          "info": "Must exactly match a Parent menu item label, for example Grey Home."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Label",
+          "default": "Scented Candles"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    },
+    {
+      "type": "drawer_grandchild",
+      "name": "Sub-sub menu item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "parent_title",
+          "label": "Parent label",
+          "info": "Must exactly match a Parent menu item label, for example Grey Home."
+        },
+        {
+          "type": "text",
+          "id": "child_title",
+          "label": "Sub menu label",
+          "info": "Must exactly match a Sub menu item label, for example Scented Candles."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Label",
+          "default": "French Vanilla"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
     }
   ]
 }
