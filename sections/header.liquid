@@ -461,7 +461,6 @@
       z-index: 1999 !important;
       transition:
         transform 420ms cubic-bezier(0.33, 1, 0.68, 1),
-        width 360ms cubic-bezier(0.33, 1, 0.68, 1),
         visibility 420ms ease !important;
     }
 
@@ -645,19 +644,20 @@
       background: #ffffff;
       opacity: 0;
       pointer-events: none;
-      transform: translate3d(-8px, 0, 0);
       visibility: hidden;
       transition:
-        opacity 260ms cubic-bezier(0.33, 1, 0.68, 1),
-        transform 320ms cubic-bezier(0.33, 1, 0.68, 1),
-        visibility 260ms ease;
+        opacity 320ms cubic-bezier(0.33, 1, 0.68, 1),
+        visibility 0s linear 320ms;
+      will-change: opacity;
     }
 
     .prada-desktop-menu__primary-control:checked ~ .prada-desktop-menu__submenu {
       opacity: 1;
       pointer-events: auto;
-      transform: translate3d(0, 0, 0);
       visibility: visible;
+      transition:
+        opacity 320ms cubic-bezier(0.33, 1, 0.68, 1),
+        visibility 0s linear 0s;
     }
 
     .prada-desktop-menu__submenu-list,
@@ -719,19 +719,20 @@
       background: #ffffff;
       opacity: 0;
       pointer-events: none;
-      transform: translate3d(-8px, 0, 0);
       visibility: hidden;
       transition:
-        opacity 260ms cubic-bezier(0.33, 1, 0.68, 1),
-        transform 320ms cubic-bezier(0.33, 1, 0.68, 1),
-        visibility 260ms ease;
+        opacity 320ms cubic-bezier(0.33, 1, 0.68, 1),
+        visibility 0s linear 320ms;
+      will-change: opacity;
     }
 
     .prada-desktop-menu__submenu-control:checked ~ .prada-desktop-menu__grandchild-panel {
       opacity: 1;
       pointer-events: auto;
-      transform: translate3d(0, 0, 0);
       visibility: visible;
+      transition:
+        opacity 320ms cubic-bezier(0.33, 1, 0.68, 1),
+        visibility 0s linear 0s;
     }
 
     .prada-desktop-menu__view-all,
