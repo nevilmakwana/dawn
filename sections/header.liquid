@@ -1401,6 +1401,26 @@
       color: #000000 !important;
     }
 
+    .prada-header .menu-drawer__menu-item,
+    .prada-header .menu-drawer__close-button,
+    .prada-header .menu-drawer__utility-row {
+      transition: background-color 180ms ease, color 180ms ease;
+    }
+
+    .prada-header .menu-drawer__menu-item:focus:not(:focus-visible),
+    .prada-header .menu-drawer__menu-item--active:not(.is-prada-mobile-pressed),
+    .prada-header .menu-drawer__close-button:focus:not(:focus-visible),
+    .prada-header .menu-drawer__utility-row:focus:not(:focus-visible) {
+      background: transparent !important;
+    }
+
+    .prada-header .menu-drawer__menu-item.is-prada-mobile-pressed,
+    .prada-header .menu-drawer__close-button.is-prada-mobile-pressed,
+    .prada-header .menu-drawer__utility-row.is-prada-mobile-pressed {
+      background: #f6f6f6 !important;
+      color: #000000 !important;
+    }
+
     .prada-header .menu-drawer__submenu {
       position: absolute !important;
       inset: 0 !important;

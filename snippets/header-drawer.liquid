@@ -685,7 +685,9 @@
   if (!window.pradaDrawerToolbarBound) {
     window.pradaDrawerToolbarBound = true;
     const pradaDesktopMenuMedia = window.matchMedia('(min-width: 990px)');
+    const pradaMobileMenuMedia = window.matchMedia('(max-width: 989px)');
     const PRADA_DRAWER_CLOSE_DURATION = 760;
+    const PRADA_MOBILE_MENU_PRESS_DURATION = 1200;
 
     function updatePradaDesktopMenuLevel(menuDrawer) {
       if (!menuDrawer) return;
@@ -717,6 +719,19 @@
       });
 
       updatePradaDesktopMenuLevel(menuDrawer);
+    }
+
+    function flashPradaMobileMenuOption(option, { blurAfter = false } = {}) {
+      if (!option || !pradaMobileMenuMedia.matches) return;
+
+      window.clearTimeout(option.pradaMobilePressedTimer);
+      option.classList.add('is-prada-mobile-pressed');
+
+      option.pradaMobilePressedTimer = window.setTimeout(function () {
+        option.classList.remove('is-prada-mobile-pressed');
+
+        if (blurAfter && document.activeElement === option) option.blur();
+      }, PRADA_MOBILE_MENU_PRESS_DURATION);
     }
 
     function closePradaDesktopDrawer(drawer, options = {}) {
@@ -783,6 +798,28 @@
       }
 
       updatePradaDesktopMenuLevel(menuDrawer);
+    });
+
+    document.addEventListener('pointerdown', function (event) {
+      if (!pradaMobileMenuMedia.matches) return;
+
+      const target = event.target instanceof Element ? event.target : null;
+      const option = target?.closest('.menu-drawer__menu-item, .menu-drawer__close-button, .menu-drawer__utility-row');
+
+      if (!option || !option.closest('.prada-header .menu-drawer')) return;
+
+      flashPradaMobileMenuOption(option, { blurAfter: true });
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (!pradaMobileMenuMedia.matches || (event.key !== 'Enter' && event.key !== ' ')) return;
+
+      const target = event.target instanceof Element ? event.target : null;
+      const option = target?.closest('.menu-drawer__menu-item, .menu-drawer__close-button, .menu-drawer__utility-row');
+
+      if (!option || !option.closest('.prada-header .menu-drawer')) return;
+
+      flashPradaMobileMenuOption(option);
     });
 
     document.addEventListener('click', function (event) {
