@@ -280,11 +280,25 @@
         }
 
         function normalizeUrl(url) {
+          var rawUrl = (url || '').trim();
+
+          if (!rawUrl || rawUrl === '#' || rawUrl.charAt(0) === '#' || /^javascript:/i.test(rawUrl)) {
+            return '';
+          }
+
           try {
-            return new URL(url, window.location.origin).pathname.replace(/\/$/, '') || '/';
+            return new URL(rawUrl, window.location.origin).pathname.replace(/\/$/, '') || '/';
           } catch (error) {
             return '';
           }
+        }
+
+        function pathFromLink(link) {
+          return normalizeUrl(link?.getAttribute('href') || '');
+        }
+
+        function hrefFromLink(link) {
+          return pathFromLink(link) ? link.href : '';
         }
 
         function textFrom(element) {
@@ -329,18 +343,18 @@
         function updateTabIndicator(tabsElement, activeTab) {
           if (!activeTab) return;
 
-          var tabsRect = tabsElement.getBoundingClientRect();
-          var activeRect = activeTab.getBoundingClientRect();
-          var labelRect = getTabTextElement(activeTab).getBoundingClientRect();
-          var indicatorRect = labelRect.width > 0 ? labelRect : activeRect;
+          var labelText = getTabTextElement(activeTab);
+          var activeLeft = activeTab.offsetLeft || 0;
+          var labelLeft = labelText.offsetLeft || 0;
+          var labelWidth = labelText.offsetWidth || Math.round(labelText.getBoundingClientRect().width);
 
           tabsElement.style.setProperty(
             '--prada-tab-indicator-left',
-            (indicatorRect.left - tabsRect.left + tabsElement.scrollLeft) + 'px'
+            (activeLeft + labelLeft) + 'px'
           );
           tabsElement.style.setProperty(
             '--prada-tab-indicator-width',
-            Math.max(indicatorRect.width, 16) + 'px'
+            Math.max(labelWidth, 16) + 'px'
           );
         }
 
@@ -455,9 +469,10 @@
           var childItems = submenu.querySelectorAll(':scope > .prada-desktop-menu__submenu-list > .prada-desktop-menu__submenu-item');
           var parentTabs = [];
           var parentViewAll = submenu.querySelector(':scope > .prada-desktop-menu__submenu-list > .prada-desktop-menu__submenu-view-all .prada-desktop-menu__view-all');
+          var parentViewAllPath = pathFromLink(parentViewAll);
 
-          if (parentViewAll) {
-            parentTabs.push({ label: 'View all', href: parentViewAll.href, path: normalizeUrl(parentViewAll.href) });
+          if (parentViewAllPath) {
+            parentTabs.push({ label: 'View all', href: parentViewAll.href, path: parentViewAllPath });
           }
 
           childItems.forEach(function (childItem) {
@@ -468,24 +483,23 @@
             var childTitle = textFrom(childLabel || childLink);
             var grandchildPanel = childItem.querySelector(':scope > .prada-desktop-menu__grandchild-panel');
             var childViewAll = grandchildPanel?.querySelector(':scope > .prada-desktop-menu__view-all');
-            var childHref = childViewAll?.href || childLink?.href || '';
-            var childPath = normalizeUrl(childHref);
+            var childHref = hrefFromLink(childViewAll) || hrefFromLink(childLink);
+            var childPath = pathFromLink(childViewAll) || pathFromLink(childLink);
 
             if (childTitle && childHref) {
               parentTabs.push({ label: childTitle, href: childHref, path: childPath });
             }
 
-            if (grandchildPanel && childViewAll) {
+            if (grandchildPanel && childViewAll && childPath) {
               var childTabs = [
-                { label: 'View all', href: childViewAll.href, path: normalizeUrl(childViewAll.href) },
+                { label: 'View all', href: childViewAll.href, path: childPath },
               ];
 
               grandchildPanel.querySelectorAll(':scope > .prada-desktop-menu__grandchild-list a').forEach(function (grandchildLink) {
-                childTabs.push({
-                  label: textFrom(grandchildLink),
-                  href: grandchildLink.href,
-                  path: normalizeUrl(grandchildLink.href),
-                });
+                var grandchildPath = pathFromLink(grandchildLink);
+                if (!grandchildPath) return;
+
+                childTabs.push({ label: textFrom(grandchildLink), href: grandchildLink.href, path: grandchildPath });
               });
 
               var activeChildTab = childTabs.find(function (tab) {
@@ -508,7 +522,7 @@
             }
           });
 
-          if (!match && parentViewAll && normalizeUrl(parentViewAll.href) === currentPath && parentTabs.length > 1) {
+          if (!match && parentViewAllPath === currentPath && parentTabs.length > 1) {
             match = {
               title: parentTitle || title.textContent,
               tabs: parentTabs,
