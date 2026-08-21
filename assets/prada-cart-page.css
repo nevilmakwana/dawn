@@ -2005,3 +2005,19 @@ cart-items.prada-shopping-bag-page.is-empty .cart__warnings .button {
     margin-top: 30px;
   }
 }
+
+.prada-shopping-bag-page .cart-item {
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.prada-shopping-bag-page .cart-item.is-removing {
+  opacity: 0;
+  transform: scale(0.98);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prada-shopping-bag-page .cart-item {
+    transition: none;
+  }
+}

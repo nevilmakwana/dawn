@@ -5,7 +5,32 @@ class CartRemoveButton extends HTMLElement {
     this.addEventListener('click', (event) => {
       event.preventDefault();
       const cartItems = this.closest('cart-items') || this.closest('cart-drawer-items');
-      cartItems.updateQuantity(this.dataset.index, 0, event);
+      const cartItem = this.closest('.cart-item');
+      const isShoppingBagItem = cartItems?.matches('cart-items') && cartItem?.closest('.prada-shopping-bag-page');
+
+      if (!cartItems) return;
+
+      if (!isShoppingBagItem) {
+        cartItems.updateQuantity(this.dataset.index, 0, event);
+        return;
+      }
+
+      if (cartItem.classList.contains('is-removing')) return;
+
+      cartItem.classList.add('is-removing');
+      this.setAttribute('aria-disabled', 'true');
+      this.querySelectorAll('a, button').forEach((control) => {
+        control.setAttribute('aria-disabled', 'true');
+        if (control.tagName === 'BUTTON') {
+          control.disabled = true;
+        } else {
+          control.setAttribute('tabindex', '-1');
+        }
+      });
+
+      const removeEvent = { currentTarget: this };
+      const removeDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180;
+      window.setTimeout(() => cartItems.updateQuantity(this.dataset.index, 0, removeEvent), removeDelay);
     });
   }
 }
