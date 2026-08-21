@@ -684,6 +684,8 @@
 <script>
   if (!window.pradaDrawerToolbarBound) {
     window.pradaDrawerToolbarBound = true;
+    const pradaDesktopMenuMedia = window.matchMedia('(min-width: 990px)');
+    const PRADA_DRAWER_CLOSE_DURATION = 380;
 
     function updatePradaDesktopMenuLevel(menuDrawer) {
       if (!menuDrawer) return;
@@ -717,6 +719,53 @@
       updatePradaDesktopMenuLevel(menuDrawer);
     }
 
+    function closePradaDesktopDrawer(drawer, options = {}) {
+      if (!drawer || !pradaDesktopMenuMedia.matches) return false;
+
+      const details = drawer.querySelector(':scope > details');
+      if (!details || !details.open) return false;
+      if (details.classList.contains('is-prada-closing')) return true;
+
+      const summary = details.querySelector(':scope > summary');
+      const menuDrawer = details.querySelector(':scope > .menu-drawer');
+      const header = drawer.closest('.section-header');
+      const breakpoint = drawer.dataset.breakpoint || 'tablet';
+
+      details.classList.add('is-prada-closing');
+      details.classList.remove('menu-opening');
+      summary?.setAttribute('aria-expanded', 'false');
+
+      window.setTimeout(function () {
+        resetPradaDesktopMenu(menuDrawer);
+
+        details.querySelectorAll('details').forEach(function (nestedDetails) {
+          nestedDetails.removeAttribute('open');
+          nestedDetails.classList.remove('menu-opening');
+        });
+        details.querySelectorAll('.submenu-open').forEach(function (submenu) {
+          submenu.classList.remove('submenu-open');
+        });
+
+        details.removeAttribute('open');
+        details.classList.remove('is-prada-closing', 'menu-opening');
+        header?.classList.remove('menu-open');
+        document.body.classList.remove(
+          'overflow-hidden-tablet',
+          'overflow-hidden-mobile',
+          'overflow-hidden-desktop',
+          `overflow-hidden-${breakpoint}`
+        );
+
+        if (typeof removeTrapFocus === 'function') {
+          removeTrapFocus(options.focusElement || summary || false);
+        }
+
+        if (typeof options.afterClose === 'function') options.afterClose();
+      }, PRADA_DRAWER_CLOSE_DURATION);
+
+      return true;
+    }
+
     document.querySelectorAll('.menu-drawer').forEach(updatePradaDesktopMenuLevel);
 
     document.addEventListener('change', function (event) {
@@ -735,6 +784,46 @@
 
       updatePradaDesktopMenuLevel(menuDrawer);
     });
+
+    document.addEventListener('click', function (event) {
+      const closeButton = event.target.closest('[data-prada-drawer-close]');
+      const searchButton = event.target.closest('[data-prada-drawer-search]');
+      const menuSummary = event.target.closest('header-drawer > details > summary');
+
+      if (!pradaDesktopMenuMedia.matches) return;
+
+      if (menuSummary) {
+        const drawer = menuSummary.closest('header-drawer');
+        const details = menuSummary.closest('details');
+
+        if (details && details.open) {
+          event.preventDefault();
+          event.stopPropagation();
+          closePradaDesktopDrawer(drawer, { focusElement: menuSummary });
+        }
+
+        return;
+      }
+
+      if (!closeButton && !searchButton) return;
+
+      const drawer = event.target.closest('header-drawer');
+      if (!drawer) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      closePradaDesktopDrawer(drawer, {
+        focusElement: drawer.querySelector(':scope > details > summary'),
+        afterClose: searchButton
+          ? function () {
+              const header = drawer.closest('.prada-header');
+              const searchSummary = header && header.querySelector('.header__search details > summary');
+              if (searchSummary) searchSummary.click();
+            }
+          : undefined,
+      });
+    }, true);
 
     document.addEventListener('click', function (event) {
       const closeButton = event.target.closest('[data-prada-drawer-close]');
@@ -818,5 +907,22 @@
 
       document.querySelectorAll('header-drawer > details[open] .menu-drawer').forEach(resetPradaDesktopMenu);
     });
+
+    document.addEventListener('keyup', function (event) {
+      if (event.key !== 'Escape' || !pradaDesktopMenuMedia.matches) return;
+
+      const eventTarget = event.target instanceof Element ? event.target : null;
+      const drawer =
+        eventTarget?.closest('header-drawer') ||
+        document.querySelector('.prada-header header-drawer > details[open]')?.closest('header-drawer');
+
+      if (!drawer) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      closePradaDesktopDrawer(drawer, {
+        focusElement: drawer.querySelector(':scope > details > summary'),
+      });
+    }, true);
   }
 </script>
