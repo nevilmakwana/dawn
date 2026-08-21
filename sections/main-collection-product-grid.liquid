@@ -263,6 +263,7 @@
   if (!window.pradaCollectionNavigationSetup) {
     window.pradaCollectionNavigationState = window.pradaCollectionNavigationState || {
       request: null,
+      navigationId: 0,
     };
 
     window.pradaCollectionNavigationSetup = function (root) {
@@ -314,9 +315,23 @@
           var tabsRect = tabsElement.getBoundingClientRect();
           var activeRect = activeTab.getBoundingClientRect();
           var inset = 10.5;
+          var textRect = activeRect;
+          var range = document.createRange();
 
-          tabsElement.style.setProperty('--prada-tab-indicator-left', (activeRect.left - tabsRect.left + tabsElement.scrollLeft + inset) + 'px');
-          tabsElement.style.setProperty('--prada-tab-indicator-width', Math.max(activeRect.width - inset * 2, 16) + 'px');
+          range.selectNodeContents(activeTab);
+          var rangeRect = range.getBoundingClientRect();
+          range.detach();
+
+          if (rangeRect.width > 0) textRect = rangeRect;
+
+          tabsElement.style.setProperty(
+            '--prada-tab-indicator-left',
+            (textRect.left - tabsRect.left + tabsElement.scrollLeft) + 'px'
+          );
+          tabsElement.style.setProperty(
+            '--prada-tab-indicator-width',
+            Math.max(textRect.width || activeRect.width - inset * 2, 16) + 'px'
+          );
         }
 
         function refreshCollectionCarousel() {
@@ -363,6 +378,12 @@
 
           var targetUrl = new URL(tab.href, window.location.origin);
           if (targetUrl.origin !== window.location.origin || targetUrl.href === window.location.href) {
+            if (window.pradaCollectionNavigationState.request) {
+              window.pradaCollectionNavigationState.request.abort();
+              window.pradaCollectionNavigationState.request = null;
+            }
+
+            window.pradaCollectionNavigationState.navigationId += 1;
             setActiveTab(tabs, tab);
             event.preventDefault();
             return;
@@ -378,6 +399,8 @@
           }
 
           var controller = new AbortController();
+          var navigationId = window.pradaCollectionNavigationState.navigationId + 1;
+          window.pradaCollectionNavigationState.navigationId = navigationId;
           window.pradaCollectionNavigationState.request = controller;
 
           setActiveTab(tabs, tab);
@@ -388,6 +411,13 @@
               return response.text();
             })
             .then(function (html) {
+              if (
+                window.pradaCollectionNavigationState.request !== controller ||
+                window.pradaCollectionNavigationState.navigationId !== navigationId
+              ) {
+                return;
+              }
+
               var sourceDocument = new DOMParser().parseFromString(html, 'text/html');
               if (!replaceCollectionContent(sourceDocument, targetUrl)) window.location.href = targetUrl.href;
             })
