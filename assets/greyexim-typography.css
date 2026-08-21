@@ -248,6 +248,13 @@ h3,
   letter-spacing: 0 !important;
 }
 
+.prada-desktop-menu__submenu-link,
+.prada-desktop-menu__view-all,
+.prada-desktop-menu__grandchild-list a {
+  font-size: var(--ge-type-mega-category) !important;
+  line-height: 1.25 !important;
+}
+
 .prada-desktop-menu__primary-control:checked + .prada-desktop-menu__primary-link,
 .prada-desktop-menu__submenu-control:checked + .prada-desktop-menu__submenu-link {
   font-weight: var(--ge-weight-active) !important;

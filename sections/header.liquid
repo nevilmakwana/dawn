@@ -782,36 +782,46 @@
       gap: 18px;
     }
 
-    .prada-desktop-menu__primary:hover .prada-desktop-menu__primary-link,
-    .prada-desktop-menu__submenu:hover .prada-desktop-menu__submenu-link,
-    .prada-desktop-menu__submenu:hover .prada-desktop-menu__view-all,
-    .prada-desktop-menu__submenu:hover .prada-desktop-menu__grandchild-list a,
-    .prada-desktop-menu__grandchild-panel:hover .prada-desktop-menu__view-all,
-    .prada-desktop-menu__grandchild-panel:hover .prada-desktop-menu__grandchild-list a {
+    .prada-desktop-menu:has(
+        .prada-desktop-menu__primary-link:is(:hover, :focus-visible),
+        .prada-desktop-menu__submenu-link:is(:hover, :focus-visible),
+        .prada-desktop-menu__view-all:is(:hover, :focus-visible),
+        .prada-desktop-menu__grandchild-list a:is(:hover, :focus-visible)
+      )
+      .prada-desktop-menu__primary-link,
+    .prada-desktop-menu:has(
+        .prada-desktop-menu__primary-link:is(:hover, :focus-visible),
+        .prada-desktop-menu__submenu-link:is(:hover, :focus-visible),
+        .prada-desktop-menu__view-all:is(:hover, :focus-visible),
+        .prada-desktop-menu__grandchild-list a:is(:hover, :focus-visible)
+      )
+      .prada-desktop-menu__submenu-link,
+    .prada-desktop-menu:has(
+        .prada-desktop-menu__primary-link:is(:hover, :focus-visible),
+        .prada-desktop-menu__submenu-link:is(:hover, :focus-visible),
+        .prada-desktop-menu__view-all:is(:hover, :focus-visible),
+        .prada-desktop-menu__grandchild-list a:is(:hover, :focus-visible)
+      )
+      .prada-desktop-menu__view-all,
+    .prada-desktop-menu:has(
+        .prada-desktop-menu__primary-link:is(:hover, :focus-visible),
+        .prada-desktop-menu__submenu-link:is(:hover, :focus-visible),
+        .prada-desktop-menu__view-all:is(:hover, :focus-visible),
+        .prada-desktop-menu__grandchild-list a:is(:hover, :focus-visible)
+      )
+      .prada-desktop-menu__grandchild-list
+      a {
       color: #777777 !important;
     }
 
-    .prada-desktop-menu__primary:hover
-      .prada-desktop-menu__primary-control:checked
-      + .prada-desktop-menu__primary-link:not(:hover):not(:focus-visible),
-    .prada-desktop-menu__submenu:hover
-      .prada-desktop-menu__submenu-control:checked
-      + .prada-desktop-menu__submenu-link:not(:hover):not(:focus-visible) {
-      color: #777777 !important;
-    }
-
-    .prada-desktop-menu__primary:hover .prada-desktop-menu__primary-link:hover,
-    .prada-desktop-menu__primary:hover .prada-desktop-menu__primary-link:focus-visible,
-    .prada-desktop-menu__submenu:hover .prada-desktop-menu__submenu-link:hover,
-    .prada-desktop-menu__submenu:hover .prada-desktop-menu__submenu-link:focus-visible,
-    .prada-desktop-menu__submenu:hover .prada-desktop-menu__view-all:hover,
-    .prada-desktop-menu__submenu:hover .prada-desktop-menu__view-all:focus-visible,
-    .prada-desktop-menu__submenu:hover .prada-desktop-menu__grandchild-list a:hover,
-    .prada-desktop-menu__submenu:hover .prada-desktop-menu__grandchild-list a:focus-visible,
-    .prada-desktop-menu__grandchild-panel:hover .prada-desktop-menu__view-all:hover,
-    .prada-desktop-menu__grandchild-panel:hover .prada-desktop-menu__view-all:focus-visible,
-    .prada-desktop-menu__grandchild-panel:hover .prada-desktop-menu__grandchild-list a:hover,
-    .prada-desktop-menu__grandchild-panel:hover .prada-desktop-menu__grandchild-list a:focus-visible {
+    .prada-desktop-menu .prada-desktop-menu__primary-link:hover,
+    .prada-desktop-menu .prada-desktop-menu__primary-link:focus-visible,
+    .prada-desktop-menu .prada-desktop-menu__submenu-link:hover,
+    .prada-desktop-menu .prada-desktop-menu__submenu-link:focus-visible,
+    .prada-desktop-menu .prada-desktop-menu__view-all:hover,
+    .prada-desktop-menu .prada-desktop-menu__view-all:focus-visible,
+    .prada-desktop-menu .prada-desktop-menu__grandchild-list a:hover,
+    .prada-desktop-menu .prada-desktop-menu__grandchild-list a:focus-visible {
       color: #111111 !important;
     }
 
