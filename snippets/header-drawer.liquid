@@ -85,7 +85,11 @@
                           aria-controls="PradaDesktopMenuPanel-{{ section.id }}-{{ parent_block.id }}"
                         >
                           <span>{{ parent_title | escape }}</span>
-                          <span class="prada-desktop-menu__chevron" aria-hidden="true">&rarr;</span>
+                          <span class="prada-desktop-menu__chevron" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" focusable="false">
+                              <path d="M6 3.5 10.5 8 6 12.5" />
+                            </svg>
+                          </span>
                         </label>
                         <div class="prada-desktop-menu__submenu" id="PradaDesktopMenuPanel-{{ section.id }}-{{ parent_block.id }}" aria-label="{{ parent_title | escape }}">
                           <ul class="prada-desktop-menu__submenu-list" role="list">
@@ -131,7 +135,11 @@
                                       aria-controls="PradaDesktopGrandchildPanel-{{ section.id }}-{{ parent_block.id }}-{{ child_block.id }}"
                                     >
                                       <span>{{ child_title | escape }}</span>
-                                      <span class="prada-desktop-menu__chevron" aria-hidden="true">&rarr;</span>
+                                      <span class="prada-desktop-menu__chevron" aria-hidden="true">
+                                        <svg viewBox="0 0 16 16" focusable="false">
+                                          <path d="M6 3.5 10.5 8 6 12.5" />
+                                        </svg>
+                                      </span>
                                     </label>
                                     <div
                                       class="prada-desktop-menu__grandchild-panel"
@@ -197,7 +205,11 @@
                       aria-controls="PradaDesktopMenuPanel-{{ section.id }}-{{ forloop.index }}"
                     >
                       <span>{{ link.title | escape }}</span>
-                      <span class="prada-desktop-menu__chevron" aria-hidden="true">&rarr;</span>
+                      <span class="prada-desktop-menu__chevron" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" focusable="false">
+                          <path d="M6 3.5 10.5 8 6 12.5" />
+                        </svg>
+                      </span>
                     </label>
                     <div class="prada-desktop-menu__submenu" id="PradaDesktopMenuPanel-{{ section.id }}-{{ forloop.index }}" aria-label="{{ link.title | escape }}">
                       <ul class="prada-desktop-menu__submenu-list" role="list">
@@ -217,7 +229,11 @@
                                 aria-controls="PradaDesktopGrandchildPanel-{{ section.id }}-{{ forloop.parentloop.index }}-{{ forloop.index }}"
                               >
                                 <span>{{ childlink.title | escape }}</span>
-                                <span class="prada-desktop-menu__chevron" aria-hidden="true">&rarr;</span>
+                                <span class="prada-desktop-menu__chevron" aria-hidden="true">
+                                  <svg viewBox="0 0 16 16" focusable="false">
+                                    <path d="M6 3.5 10.5 8 6 12.5" />
+                                  </svg>
+                                </span>
                               </label>
                               <div
                                 class="prada-desktop-menu__grandchild-panel"
