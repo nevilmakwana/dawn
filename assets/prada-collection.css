@@ -122,6 +122,11 @@ body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
   color: var(--prada-ink);
 }
 
+.prada-collection__tab-text {
+  display: inline-block;
+  line-height: inherit;
+}
+
 .prada-collection__toolbar {
   display: flex;
   align-items: center;

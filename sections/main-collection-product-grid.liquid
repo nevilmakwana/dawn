@@ -16,7 +16,9 @@
           data-prada-collection-tabs
           data-prada-navigation-state="resolving"
         >
-          <a class="prada-collection__tab is-active" href="{{ collection.url }}" aria-current="page">View all</a>
+          <a class="prada-collection__tab is-active" href="{{ collection.url }}" aria-current="page">
+            <span class="prada-collection__tab-text">View all</span>
+          </a>
           {%- if section.settings.subcategory_menu != blank -%}
             {%- for link in section.settings.subcategory_menu.links -%}
               <a
@@ -26,7 +28,7 @@
                   aria-current="page"
                 {% endif %}
               >
-                {{- link.title | escape -}}
+                <span class="prada-collection__tab-text">{{- link.title | escape -}}</span>
               </a>
             {%- endfor -%}
           {%- endif -%}
@@ -291,11 +293,26 @@
 
         function makeTab(label, href, active) {
           var tab = document.createElement('a');
+          var labelText = document.createElement('span');
+
           tab.className = 'prada-collection__tab' + (active ? ' is-active' : '');
           tab.href = href;
-          tab.textContent = label;
+          labelText.className = 'prada-collection__tab-text';
+          labelText.textContent = label;
+          tab.appendChild(labelText);
           if (active) tab.setAttribute('aria-current', 'page');
           return tab;
+        }
+
+        function getTabTextElement(tab) {
+          var existingText = tab.querySelector('.prada-collection__tab-text');
+          if (existingText) return existingText;
+
+          var labelText = document.createElement('span');
+          labelText.className = 'prada-collection__tab-text';
+          labelText.textContent = textFrom(tab);
+          tab.replaceChildren(labelText);
+          return labelText;
         }
 
         function setActiveTab(tabsElement, activeTab) {
@@ -314,23 +331,16 @@
 
           var tabsRect = tabsElement.getBoundingClientRect();
           var activeRect = activeTab.getBoundingClientRect();
-          var inset = 10.5;
-          var textRect = activeRect;
-          var range = document.createRange();
-
-          range.selectNodeContents(activeTab);
-          var rangeRect = range.getBoundingClientRect();
-          range.detach();
-
-          if (rangeRect.width > 0) textRect = rangeRect;
+          var labelRect = getTabTextElement(activeTab).getBoundingClientRect();
+          var indicatorRect = labelRect.width > 0 ? labelRect : activeRect;
 
           tabsElement.style.setProperty(
             '--prada-tab-indicator-left',
-            (textRect.left - tabsRect.left + tabsElement.scrollLeft) + 'px'
+            (indicatorRect.left - tabsRect.left + tabsElement.scrollLeft) + 'px'
           );
           tabsElement.style.setProperty(
             '--prada-tab-indicator-width',
-            Math.max(textRect.width || activeRect.width - inset * 2, 16) + 'px'
+            Math.max(indicatorRect.width, 16) + 'px'
           );
         }
 
