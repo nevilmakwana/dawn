@@ -337,6 +337,7 @@
 
           if (!sourceGrid || !targetGrid) return false;
 
+          sourceGrid.classList.add('is-prada-entering');
           targetGrid.replaceWith(sourceGrid);
 
           if (sourceCount && targetCount) targetCount.replaceWith(sourceCount);
@@ -349,6 +350,9 @@
           document.title = sourceDocument.title || document.title;
           window.history.pushState({ pradaCollectionUrl: targetUrl.href }, '', targetUrl.href);
           refreshCollectionCarousel();
+          window.requestAnimationFrame(function () {
+            sourceGrid.classList.remove('is-prada-entering');
+          });
 
           return true;
         }
@@ -377,29 +381,24 @@
           window.pradaCollectionNavigationState.request = controller;
 
           setActiveTab(tabs, tab);
-          collectionRoot.classList.add('is-prada-loading');
 
-          window.setTimeout(function () {
-            fetch(targetUrl.href, { signal: controller.signal, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-              .then(function (response) {
-                if (!response.ok) throw new Error('Unable to load collection');
-                return response.text();
-              })
-              .then(function (html) {
-                var sourceDocument = new DOMParser().parseFromString(html, 'text/html');
-                if (!replaceCollectionContent(sourceDocument, targetUrl)) window.location.href = targetUrl.href;
-              })
-              .catch(function (error) {
-                if (error.name !== 'AbortError') window.location.href = targetUrl.href;
-              })
-              .finally(function () {
-                if (window.pradaCollectionNavigationState.request === controller) {
-                  window.pradaCollectionNavigationState.request = null;
-                }
-
-                document.querySelector('.prada-collection')?.classList.remove('is-prada-loading');
-              });
-          }, 140);
+          fetch(targetUrl.href, { signal: controller.signal, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function (response) {
+              if (!response.ok) throw new Error('Unable to load collection');
+              return response.text();
+            })
+            .then(function (html) {
+              var sourceDocument = new DOMParser().parseFromString(html, 'text/html');
+              if (!replaceCollectionContent(sourceDocument, targetUrl)) window.location.href = targetUrl.href;
+            })
+            .catch(function (error) {
+              if (error.name !== 'AbortError') window.location.href = targetUrl.href;
+            })
+            .finally(function () {
+              if (window.pradaCollectionNavigationState.request === controller) {
+                window.pradaCollectionNavigationState.request = null;
+              }
+            });
         }
 
         var currentPath = normalizeUrl(window.location.href);
