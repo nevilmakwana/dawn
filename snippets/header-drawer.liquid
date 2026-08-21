@@ -93,6 +93,9 @@
                         </label>
                         <div class="prada-desktop-menu__submenu" id="PradaDesktopMenuPanel-{{ section.id }}-{{ parent_block.id }}" aria-label="{{ parent_title | escape }}">
                           <ul class="prada-desktop-menu__submenu-list" role="list">
+                            <li class="prada-desktop-menu__submenu-view-all">
+                              <a class="prada-desktop-menu__view-all" href="{{ parent_url }}">View all</a>
+                            </li>
                             {%- assign scan_parent_children = false -%}
                             {%- for child_block in section.blocks -%}
                               {%- liquid
@@ -197,7 +200,6 @@
                       type="radio"
                       name="PradaDesktopMenu-{{ section.id }}"
                       id="PradaDesktopMenu-{{ section.id }}-{{ forloop.index }}"
-                      {% if link.child_active and is_wishlist_view == false %}checked{% endif %}
                     >
                     <label
                       class="prada-desktop-menu__primary-link"
@@ -213,6 +215,9 @@
                     </label>
                     <div class="prada-desktop-menu__submenu" id="PradaDesktopMenuPanel-{{ section.id }}-{{ forloop.index }}" aria-label="{{ link.title | escape }}">
                       <ul class="prada-desktop-menu__submenu-list" role="list">
+                        <li class="prada-desktop-menu__submenu-view-all">
+                          <a class="prada-desktop-menu__view-all" href="{{ link.url }}">View all</a>
+                        </li>
                         {%- for childlink in link.links -%}
                           <li class="prada-desktop-menu__submenu-item{% if childlink.links != blank %} has-grandchildren{% endif %}">
                             {%- if childlink.links != blank -%}
@@ -221,7 +226,6 @@
                                 type="radio"
                                 name="PradaDesktopSubMenu-{{ section.id }}-{{ forloop.parentloop.index }}"
                                 id="PradaDesktopSubMenu-{{ section.id }}-{{ forloop.parentloop.index }}-{{ forloop.index }}"
-                                {% if childlink.child_active or childlink.current %}checked{% endif %}
                               >
                               <label
                                 class="prada-desktop-menu__submenu-link"
@@ -507,6 +511,11 @@
                             {{ link.title | escape }}
                           </button>
                           <ul class="menu-drawer__menu list-menu" role="list" tabindex="-1">
+                            <li>
+                              <a class="menu-drawer__menu-item link link--text list-menu__item focus-inset" href="{{ link.url }}">
+                                View all
+                              </a>
+                            </li>
                             {%- for childlink in link.links -%}
                               <li>
                                 {%- if childlink.links == blank -%}
@@ -552,6 +561,11 @@
                                         role="list"
                                         tabindex="-1"
                                       >
+                                        <li>
+                                          <a class="menu-drawer__menu-item link link--text list-menu__item focus-inset" href="{{ childlink.url }}">
+                                            View all
+                                          </a>
+                                        </li>
                                         {%- for grandchildlink in childlink.links -%}
                                           <li>
                                             <a
@@ -667,14 +681,14 @@
       menuDrawer.dataset.pradaMenuLevel = level;
     }
 
-    function activatePradaDesktopMenuControl(control) {
-      if (!control || control.checked) {
-        updatePradaDesktopMenuLevel(control && control.closest('.menu-drawer'));
-        return;
-      }
+    function resetPradaDesktopMenu(menuDrawer) {
+      if (!menuDrawer) return;
 
-      control.checked = true;
-      control.dispatchEvent(new Event('change', { bubbles: true }));
+      menuDrawer.querySelectorAll('.prada-desktop-menu__primary-control, .prada-desktop-menu__submenu-control').forEach(function (control) {
+        control.checked = false;
+      });
+
+      updatePradaDesktopMenuLevel(menuDrawer);
     }
 
     document.querySelectorAll('.menu-drawer').forEach(updatePradaDesktopMenuLevel);
@@ -696,38 +710,28 @@
       updatePradaDesktopMenuLevel(menuDrawer);
     });
 
-    document.addEventListener('pointerover', function (event) {
-      if (!window.matchMedia('(min-width: 990px)').matches) return;
-
-      const label = event.target.closest('.prada-desktop-menu__primary-link[for], .prada-desktop-menu__submenu-link[for]');
-      if (!label) return;
-
-      const control = document.getElementById(label.getAttribute('for'));
-      if (control) activatePradaDesktopMenuControl(control);
-    });
-
-    document.addEventListener('focusin', function (event) {
-      if (!window.matchMedia('(min-width: 990px)').matches) return;
-
-      const label = event.target.closest('.prada-desktop-menu__primary-link[for], .prada-desktop-menu__submenu-link[for]');
-      if (!label) return;
-
-      const control = document.getElementById(label.getAttribute('for'));
-      if (control) activatePradaDesktopMenuControl(control);
-    });
-
     document.addEventListener('click', function (event) {
       const closeButton = event.target.closest('[data-prada-drawer-close]');
       const searchButton = event.target.closest('[data-prada-drawer-search]');
       const localizationButton = event.target.closest('[data-prada-localization-open]');
       const utilityLink = event.target.closest('[data-prada-utility-link]');
       const actionButton = closeButton || searchButton || localizationButton;
+      const menuSummary = event.target.closest('header-drawer > details > summary');
+
+      if (menuSummary) {
+        const details = menuSummary.closest('details');
+
+        if (details && details.open) {
+          resetPradaDesktopMenu(details.querySelector('.menu-drawer'));
+        }
+      }
 
       if (utilityLink) {
         const drawer = utilityLink.closest('header-drawer');
         const details = drawer && drawer.querySelector(':scope > details');
         const header = drawer && drawer.closest('.section-header');
 
+        resetPradaDesktopMenu(drawer && drawer.querySelector('.menu-drawer'));
         details?.classList.remove('menu-opening');
         header?.classList.remove('menu-open');
         document.body.classList.remove('overflow-hidden-tablet', 'overflow-hidden-mobile');
@@ -738,6 +742,8 @@
       const drawer = actionButton.closest('header-drawer');
       const drawerSummary = drawer && drawer.querySelector('details > summary');
 
+      resetPradaDesktopMenu(drawer && drawer.querySelector('.menu-drawer'));
+
       if (drawerSummary) drawerSummary.click();
 
       if (searchButton) {
@@ -747,6 +753,12 @@
           if (searchSummary) searchSummary.click();
         }, 0);
       }
+    });
+
+    document.addEventListener('keyup', function (event) {
+      if (event.key !== 'Escape') return;
+
+      document.querySelectorAll('header-drawer > details[open] .menu-drawer').forEach(resetPradaDesktopMenu);
     });
   }
 </script>
