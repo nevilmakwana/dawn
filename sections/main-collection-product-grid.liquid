@@ -305,6 +305,31 @@
           return (element?.textContent || '').replace(/\s+/g, ' ').trim();
         }
 
+        function comparableText(value) {
+          return (value || '')
+            .toLowerCase()
+            .replace(/&/g, ' and ')
+            .replace(/[^a-z0-9]+/g, ' ')
+            .trim();
+        }
+
+        var currentCollectionTitle = textFrom(title);
+
+        function labelMatchesCurrentCollection(label) {
+          if (!label || /^view all$/i.test(label)) return true;
+
+          var currentTitle = comparableText(currentCollectionTitle);
+          var candidateTitle = comparableText(label);
+
+          if (!currentTitle || !candidateTitle) return true;
+
+          return (
+            currentTitle === candidateTitle ||
+            currentTitle.indexOf(candidateTitle) !== -1 ||
+            candidateTitle.indexOf(currentTitle) !== -1
+          );
+        }
+
         function makeTab(label, href, active) {
           var tab = document.createElement('a');
           var labelText = document.createElement('span');
@@ -340,22 +365,54 @@
           updateTabIndicator(tabsElement, activeTab);
         }
 
+        var tabTextCanvasContext;
+
+        function measureTabText(labelText) {
+          if (!labelText) return 0;
+
+          var text = textFrom(labelText);
+          if (!text) return 0;
+
+          if (!tabTextCanvasContext) {
+            tabTextCanvasContext = document.createElement('canvas').getContext('2d');
+          }
+
+          var styles = window.getComputedStyle(labelText);
+          tabTextCanvasContext.font = styles.font;
+
+          return tabTextCanvasContext.measureText(text).width;
+        }
+
         function updateTabIndicator(tabsElement, activeTab) {
           if (!activeTab) return;
 
+          var tabsRect = tabsElement.getBoundingClientRect();
           var labelText = getTabTextElement(activeTab);
-          var activeLeft = activeTab.offsetLeft || 0;
-          var labelLeft = labelText.offsetLeft || 0;
-          var labelWidth = labelText.offsetWidth || Math.round(labelText.getBoundingClientRect().width);
+          var labelRect = labelText.getBoundingClientRect();
+          var measuredWidth = measureTabText(labelText);
+          var indicatorWidth = measuredWidth || labelRect.width || activeTab.getBoundingClientRect().width;
+          var indicatorLeft = labelRect.left - tabsRect.left + tabsElement.scrollLeft;
+
+          if (labelRect.width > indicatorWidth) {
+            indicatorLeft += (labelRect.width - indicatorWidth) / 2;
+          }
 
           tabsElement.style.setProperty(
             '--prada-tab-indicator-left',
-            (activeLeft + labelLeft) + 'px'
+            indicatorLeft + 'px'
           );
           tabsElement.style.setProperty(
             '--prada-tab-indicator-width',
-            Math.max(labelWidth, 16) + 'px'
+            Math.max(indicatorWidth, 16) + 'px'
           );
+        }
+
+        function queueTabIndicatorUpdate(tabsElement) {
+          window.requestAnimationFrame(function () {
+            window.requestAnimationFrame(function () {
+              updateTabIndicator(tabsElement, tabsElement.querySelector('.prada-collection__tab.is-active'));
+            });
+          });
         }
 
         function refreshCollectionCarousel() {
@@ -507,13 +564,15 @@
               });
 
               if (activeChildTab) {
-                match = {
-                  title: childTitle,
-                  tabs: childTabs,
-                  activePath: currentPath,
-                };
+                if (labelMatchesCurrentCollection(activeChildTab.label)) {
+                  match = {
+                    title: childTitle,
+                    tabs: childTabs,
+                    activePath: currentPath,
+                  };
+                }
               }
-            } else if (childPath === currentPath && parentTabs.length > 1) {
+            } else if (childPath === currentPath && parentTabs.length > 1 && labelMatchesCurrentCollection(childTitle)) {
               match = {
                 title: parentTitle || title.textContent,
                 tabs: parentTabs,
@@ -522,7 +581,7 @@
             }
           });
 
-          if (!match && parentViewAllPath === currentPath && parentTabs.length > 1) {
+          if (!match && parentViewAllPath === currentPath && parentTabs.length > 1 && labelMatchesCurrentCollection(parentTitle)) {
             match = {
               title: parentTitle || title.textContent,
               tabs: parentTabs,
@@ -535,12 +594,13 @@
           tabs.dataset.pradaNavigationState = 'ready';
           tabs.dataset.pradaNavigationReady = 'true';
           updateTabIndicator(tabs, tabs.querySelector('.prada-collection__tab.is-active'));
+          queueTabIndicatorUpdate(tabs);
           document.fonts?.ready?.then(function () {
-            updateTabIndicator(tabs, tabs.querySelector('.prada-collection__tab.is-active'));
+            queueTabIndicatorUpdate(tabs);
           });
           tabs.addEventListener('click', navigateCollection);
           window.addEventListener('resize', function () {
-            updateTabIndicator(tabs, tabs.querySelector('.prada-collection__tab.is-active'));
+            queueTabIndicatorUpdate(tabs);
           });
           return;
         }
@@ -556,15 +616,16 @@
         tabs.dataset.pradaNavigationState = 'ready';
         tabs.dataset.pradaNavigationReady = 'true';
         updateTabIndicator(tabs, tabs.querySelector('.prada-collection__tab.is-active'));
+        queueTabIndicatorUpdate(tabs);
         document.fonts?.ready?.then(function () {
-          updateTabIndicator(tabs, tabs.querySelector('.prada-collection__tab.is-active'));
+          queueTabIndicatorUpdate(tabs);
         });
         tabs.addEventListener('click', navigateCollection);
         tabs.addEventListener('scroll', function () {
           updateTabIndicator(tabs, tabs.querySelector('.prada-collection__tab.is-active'));
         }, { passive: true });
         window.addEventListener('resize', function () {
-          updateTabIndicator(tabs, tabs.querySelector('.prada-collection__tab.is-active'));
+          queueTabIndicatorUpdate(tabs);
         });
       });
     };
