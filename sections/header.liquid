@@ -2102,6 +2102,7 @@
       this.headerIsAlwaysSticky =
         this.getAttribute('data-sticky-type') === 'always' ||
         this.getAttribute('data-sticky-type') === 'reduce-logo-size';
+      this.isCollectionPage = /(^|\/)collections\//.test(window.location.pathname);
       this.headerBounds = {};
 
       this.setHeaderHeight();
@@ -2177,10 +2178,11 @@
 
     onScroll() {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const hideThreshold = this.isCollectionPage ? 200 : this.headerBounds.bottom;
 
       if (this.predictiveSearch && this.predictiveSearch.isOpen) return;
 
-      if (scrollTop > this.currentScrollTop && scrollTop > this.headerBounds.bottom) {
+      if (scrollTop > this.currentScrollTop && scrollTop > hideThreshold) {
         this.header.classList.add('scrolled-past-header');
         if (this.preventHide) return;
         requestAnimationFrame(this.hide.bind(this));
