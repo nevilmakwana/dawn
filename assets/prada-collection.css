@@ -651,13 +651,3 @@ body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
     font-size: 1.1rem;
   }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  body:has(.prada-collection) .section-header,
-  .prada-collection__header,
-  .prada-collection__title,
-  .prada-collection__tabs,
-  .prada-collection__toolbar {
-    transition: none;
-  }
-}
