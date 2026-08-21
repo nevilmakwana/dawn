@@ -6,6 +6,17 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="#ffffff">
     <link rel="canonical" href="{{ canonical_url }}">
+    <style>
+      .facet-checkbox .icon-checkmark,
+      .mobile-facets__label .icon-checkmark {
+        visibility: hidden;
+      }
+
+      .facet-checkbox > input[type='checkbox']:checked ~ .svg-wrapper > .icon-checkmark,
+      .mobile-facets__label > input[type='checkbox']:checked ~ .icon-checkmark {
+        visibility: visible;
+      }
+    </style>
 
     {%- if request.page_type == '404' -%}
       <script>
