@@ -135,11 +135,12 @@ body:has(.prada-wishlist-page) .footer {
   display: block;
   min-height: 0;
   color: #111111;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  font-size: 14px;
+  font-family: var(--font-body-family);
+  font-size: 1.35rem;
+  font-style: var(--font-body-style);
   font-weight: 700;
   letter-spacing: 0;
-  line-height: 1.3;
+  line-height: 1.35;
   text-decoration: none;
 }
 
@@ -244,6 +245,12 @@ body:has(.prada-wishlist-page) .footer {
   align-items: flex-end;
 }
 
+@media screen and (max-width: 989px) {
+  .prada-wishlist-page__title {
+    font-size: 1.1rem;
+  }
+}
+
 @media screen and (min-width: 990px) {
   .prada-wishlist-page {
     padding-top: 96px;
@@ -298,10 +305,6 @@ body:has(.prada-wishlist-page) .footer {
   .prada-wishlist-page__price {
     font-size: 13px;
     font-weight: 400;
-  }
-
-  .prada-wishlist-page__title {
-    font-size: 13px;
   }
 
   .prada-wishlist-page__add {
