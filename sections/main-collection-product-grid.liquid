@@ -4,6 +4,7 @@
   class="prada-collection"
   view-event-payload="{{ collection | standard_event_data: 'view' | escape }}"
   data-collection-id="{{ collection.id }}"
+  data-section-id="{{ section.id }}"
 >
   {%- paginate collection.products by section.settings.products_per_page -%}
     <header class="prada-collection__header">
@@ -267,6 +268,9 @@
       request: null,
       navigationId: 0,
     };
+    window.pradaCollectionNavigationState.cache = window.pradaCollectionNavigationState.cache || new Map();
+    window.pradaCollectionNavigationState.prefetchRequests =
+      window.pradaCollectionNavigationState.prefetchRequests || new Map();
 
     window.pradaCollectionNavigationSetup = function (root) {
       root.querySelectorAll('[data-prada-collection-tabs]').forEach(function (tabs) {
@@ -274,7 +278,8 @@
 
         var desktopMenu = document.querySelector('.prada-desktop-menu');
         var title = tabs.closest('.prada-collection__navigation')?.querySelector('[data-prada-collection-title]');
-        if (!desktopMenu || !title) {
+        var collectionRoot = tabs.closest('.prada-collection');
+        if (!desktopMenu || !title || !collectionRoot) {
           tabs.dataset.pradaNavigationState = 'ready';
           return;
         }
@@ -303,6 +308,119 @@
 
         function textFrom(element) {
           return (element?.textContent || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function cacheKeyFromUrl(url) {
+          var cacheUrl = new URL(url.href, window.location.origin);
+          cacheUrl.hash = '';
+          cacheUrl.searchParams.delete('section_id');
+          return cacheUrl.href;
+        }
+
+        function sectionRequestUrl(targetUrl) {
+          var requestUrl = new URL(targetUrl.href, window.location.origin);
+          var sectionId = collectionRoot.dataset.sectionId;
+
+          if (sectionId) requestUrl.searchParams.set('section_id', sectionId);
+          return requestUrl;
+        }
+
+        function fetchCollectionHtml(targetUrl, signal) {
+          var requestOptions = { headers: { 'X-Requested-With': 'XMLHttpRequest' } };
+          var cacheKey = cacheKeyFromUrl(targetUrl);
+          if (signal) requestOptions.signal = signal;
+
+          return fetch(sectionRequestUrl(targetUrl).href, requestOptions)
+            .then(function (response) {
+              if (!response.ok) throw new Error('Unable to load collection');
+              return response.text();
+            })
+            .then(function (html) {
+              if (!html || !html.includes('id="ProductGridContainer"')) {
+                throw new Error('Collection section response is incomplete');
+              }
+
+              window.pradaCollectionNavigationState.cache.set(cacheKey, html);
+              return html;
+            });
+        }
+
+        function loadCollectionHtml(targetUrl, signal) {
+          var cacheKey = cacheKeyFromUrl(targetUrl);
+          var cachedHtml = window.pradaCollectionNavigationState.cache.get(cacheKey);
+          var pendingPrefetch = window.pradaCollectionNavigationState.prefetchRequests.get(cacheKey);
+
+          if (cachedHtml) return Promise.resolve(cachedHtml);
+          if (pendingPrefetch) {
+            return pendingPrefetch.then(function (html) {
+              return html || fetchCollectionHtml(targetUrl, signal);
+            });
+          }
+
+          return fetchCollectionHtml(targetUrl, signal);
+        }
+
+        function prefetchCollection(tab) {
+          var targetUrl = new URL(tab.href, window.location.origin);
+          var cacheKey = cacheKeyFromUrl(targetUrl);
+
+          if (
+            targetUrl.origin !== window.location.origin ||
+            targetUrl.href === window.location.href ||
+            window.pradaCollectionNavigationState.cache.has(cacheKey)
+          ) {
+            return null;
+          }
+
+          var pendingRequest = window.pradaCollectionNavigationState.prefetchRequests.get(cacheKey);
+          if (pendingRequest) return pendingRequest;
+
+          var prefetchRequest = fetchCollectionHtml(targetUrl)
+            .catch(function () {
+              return '';
+            })
+            .finally(function () {
+              if (window.pradaCollectionNavigationState.prefetchRequests.get(cacheKey) === prefetchRequest) {
+                window.pradaCollectionNavigationState.prefetchRequests.delete(cacheKey);
+              }
+            });
+
+          window.pradaCollectionNavigationState.prefetchRequests.set(cacheKey, prefetchRequest);
+          return prefetchRequest;
+        }
+
+        function enableTabPrefetch() {
+          function prefetchEventTab(event) {
+            var tab = event.target.closest('.prada-collection__tab');
+            if (tab && tabs.contains(tab)) prefetchCollection(tab);
+          }
+
+          tabs.addEventListener('pointerover', prefetchEventTab, { passive: true });
+          tabs.addEventListener('focusin', prefetchEventTab);
+          tabs.addEventListener('touchstart', prefetchEventTab, { passive: true });
+
+          if (navigator.connection?.saveData) return;
+
+          var queuedTabs = Array.from(tabs.querySelectorAll('.prada-collection__tab:not(.is-active)'));
+          function prefetchNext() {
+            var nextTab = queuedTabs.shift();
+            if (!nextTab) return;
+
+            var request = prefetchCollection(nextTab);
+            if (request) request.then(function () { window.setTimeout(prefetchNext, 100); });
+            else prefetchNext();
+          }
+
+          if (window.requestIdleCallback) {
+            window.requestIdleCallback(prefetchNext, { timeout: 1200 });
+          } else {
+            window.setTimeout(prefetchNext, 600);
+          }
+        }
+
+        var currentCacheKey = cacheKeyFromUrl(new URL(window.location.href));
+        if (!window.pradaCollectionNavigationState.cache.has(currentCacheKey)) {
+          window.pradaCollectionNavigationState.cache.set(currentCacheKey, collectionRoot.outerHTML);
         }
 
         function makeTab(label, href, active) {
@@ -446,8 +564,6 @@
           if (!tab || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
 
           var targetUrl = new URL(tab.href, window.location.origin);
-          var collectionRoot = tabs.closest('.prada-collection');
-          if (!collectionRoot) return;
 
           if (targetUrl.origin !== window.location.origin || targetUrl.href === window.location.href) {
             if (window.pradaCollectionNavigationState.request) {
@@ -475,11 +591,7 @@
 
           setActiveTab(tabs, tab);
 
-          fetch(targetUrl.href, { signal: controller.signal, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-            .then(function (response) {
-              if (!response.ok) throw new Error('Unable to load collection');
-              return response.text();
-            })
+          loadCollectionHtml(targetUrl, controller.signal)
             .then(function (html) {
               if (
                 window.pradaCollectionNavigationState.request !== controller ||
@@ -586,6 +698,7 @@
             queueTabIndicatorUpdate(tabs);
           });
           tabs.addEventListener('click', navigateCollection);
+          enableTabPrefetch();
           window.addEventListener('resize', function () {
             queueTabIndicatorUpdate(tabs);
           });
@@ -608,6 +721,7 @@
           queueTabIndicatorUpdate(tabs);
         });
         tabs.addEventListener('click', navigateCollection);
+        enableTabPrefetch();
         tabs.addEventListener('scroll', function () {
           updateTabIndicator(tabs, tabs.querySelector('.prada-collection__tab.is-active'));
         }, { passive: true });
