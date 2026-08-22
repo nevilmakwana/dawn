@@ -1236,6 +1236,10 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     padding: 0;
   }
 
+  cart-drawer.prada-cart-drawer.is-empty-entering .drawer__inner-empty .drawer__close {
+    transition-delay: 360ms;
+  }
+
   cart-drawer.prada-cart-drawer.is-empty .cart-drawer__warnings {
     display: flex;
     align-items: center;

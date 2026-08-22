@@ -342,7 +342,7 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
                 cartDrawerWrapper.classList.add('is-empty-visible');
                 cartDrawerWrapper.emptyTransitionTimer = window.setTimeout(() => {
                   cartDrawerWrapper.classList.remove('is-empty-entering', 'is-empty-visible');
-                }, 520);
+                }, 680);
               });
             });
           }
