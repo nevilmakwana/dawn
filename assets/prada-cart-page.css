@@ -2008,12 +2008,12 @@ cart-items.prada-shopping-bag-page.is-empty .cart__warnings .button {
 
 .prada-shopping-bag-page .cart-item {
   transition:
-    opacity 220ms ease,
-    transform 220ms ease,
-    max-height 220ms ease,
-    padding-top 220ms ease,
-    padding-bottom 220ms ease,
-    border-color 220ms ease;
+    opacity 180ms ease,
+    transform 180ms ease,
+    max-height 180ms ease,
+    padding-top 180ms ease,
+    padding-bottom 180ms ease,
+    border-color 180ms ease;
   will-change: opacity, transform, max-height;
 }
 

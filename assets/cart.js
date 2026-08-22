@@ -25,19 +25,22 @@ class CartRemoveButton extends HTMLElement {
       const cartItems = this.closest('cart-items') || this.closest('cart-drawer-items');
       const cartItem = this.closest('.cart-item');
       const isShoppingBagItem = cartItems?.matches('cart-items') && cartItem?.closest('.prada-shopping-bag-page');
+      const isCartDrawerItem = cartItems?.matches('cart-drawer-items') && cartItem?.closest('cart-drawer');
 
       if (!cartItems) return;
 
-      if (!isShoppingBagItem) {
+      if (!isShoppingBagItem && !isCartDrawerItem) {
         cartItems.updateQuantity(this.dataset.index, 0, event);
         return;
       }
 
       if (cartItem.classList.contains('is-removing')) return;
 
-      cartItem.style.maxHeight = `${cartItem.offsetHeight}px`;
-      cartItem.style.overflow = 'hidden';
-      cartItem.getBoundingClientRect();
+      if (isShoppingBagItem) {
+        cartItem.style.maxHeight = `${cartItem.offsetHeight}px`;
+        cartItem.style.overflow = 'hidden';
+        cartItem.getBoundingClientRect();
+      }
       this.setAttribute('aria-disabled', 'true');
       this.querySelectorAll('a, button').forEach((control) => {
         control.setAttribute('aria-disabled', 'true');
@@ -49,7 +52,7 @@ class CartRemoveButton extends HTMLElement {
       });
 
       const removeEvent = { currentTarget: this };
-      const removeDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 220;
+      const removeDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180;
       const removeFromCart = () => cartItems.updateQuantity(this.dataset.index, 0, removeEvent);
 
       window.requestAnimationFrame(() => {
