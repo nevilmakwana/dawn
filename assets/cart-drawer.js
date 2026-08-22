@@ -108,6 +108,11 @@ class CartDrawer extends HTMLElement {
       'prada-cart-drawer--multiple',
       sourceDrawer.classList.contains('prada-cart-drawer--multiple'),
     );
+    const itemCount = Number.parseInt(sourceDrawer.dataset.cartItemCount || '', 10);
+    if (Number.isFinite(itemCount)) {
+      this.dataset.cartItemCount = String(itemCount);
+      updatePradaCartIcon(itemCount);
+    }
     this.bindOverlay();
   }
 
@@ -217,13 +222,22 @@ class CartDrawer extends HTMLElement {
   }
 
   renderContents(parsedState, { shouldOpen = true } = {}) {
-    if (typeof parsedState.item_count === 'number') {
-      this.classList.toggle('is-empty', parsedState.item_count === 0);
-      updatePradaCartIcon(parsedState.item_count);
-    }
     const sourceDrawer = parsedState.sections?.['cart-drawer']
       ? this.getSectionDOM(parsedState.sections['cart-drawer'], 'cart-drawer')
       : null;
+    const sectionItemCount = Number.parseInt(sourceDrawer?.dataset.cartItemCount || '', 10);
+    const itemCount =
+      typeof parsedState.item_count === 'number'
+        ? parsedState.item_count
+        : Number.isFinite(sectionItemCount)
+          ? sectionItemCount
+          : null;
+
+    if (itemCount !== null) {
+      this.dataset.cartItemCount = String(itemCount);
+      this.classList.toggle('is-empty', itemCount === 0);
+      updatePradaCartIcon(itemCount);
+    }
     if (sourceDrawer) {
       this.classList.toggle(
         'prada-cart-drawer--multiple',
@@ -241,7 +255,7 @@ class CartDrawer extends HTMLElement {
     });
 
     this.bindOverlay();
-    void refreshPradaCartIcon();
+    if (itemCount === null) void refreshPradaCartIcon();
 
     if (shouldOpen) {
       setTimeout(() => this.open());

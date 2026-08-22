@@ -17,7 +17,10 @@
   }
 </style>
 
-<cart-drawer class="drawer prada-cart-drawer{% if cart == empty %} is-empty{% endif %}{% if cart.items.size > 1 %} prada-cart-drawer--multiple{% endif %}">
+<cart-drawer
+  class="drawer prada-cart-drawer{% if cart == empty %} is-empty{% endif %}{% if cart.items.size > 1 %} prada-cart-drawer--multiple{% endif %}"
+  data-cart-item-count="{{ cart.item_count }}"
+>
   <div id="CartDrawer" class="cart-drawer">
     <div id="CartDrawer-Overlay" class="cart-drawer__overlay"></div>
     <div
