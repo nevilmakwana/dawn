@@ -396,7 +396,7 @@
           document.dispatchEvent(new Event('prada:collection:updated'));
         }
 
-        function scrollCollectionToStart(collectionRoot) {
+        function scrollCollectionToStart(collectionRoot, behavior) {
           if (!collectionRoot) return;
 
           var collectionTop = window.scrollY + collectionRoot.getBoundingClientRect().top;
@@ -404,7 +404,7 @@
 
           window.scrollTo({
             top: Math.max(0, collectionTop),
-            behavior: reduceMotion ? 'auto' : 'smooth',
+            behavior: reduceMotion ? 'auto' : behavior || 'smooth',
           });
         }
 
@@ -422,6 +422,7 @@
 
           sourceGrid.classList.add('is-prada-entering');
           targetGrid.replaceWith(sourceGrid);
+          scrollCollectionToStart(targetCollection, 'auto');
 
           if (sourceCount && targetCount) targetCount.replaceWith(sourceCount);
           if (sourceControls && targetControls) targetControls.replaceWith(sourceControls);
@@ -473,7 +474,6 @@
           window.pradaCollectionNavigationState.request = controller;
 
           setActiveTab(tabs, tab);
-          scrollCollectionToStart(collectionRoot);
 
           fetch(targetUrl.href, { signal: controller.signal, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(function (response) {
