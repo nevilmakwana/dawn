@@ -3,8 +3,11 @@ class CartRemoveButton extends HTMLElement {
     const cartItem = this.closest('.cart-item');
     if (!cartItem) return;
 
-    cartItem.classList.remove('is-removing');
+    cartItem.classList.remove('is-removing', 'is-collapsing', 'is-horizontal-removal');
     cartItem.style.maxHeight = '';
+    cartItem.style.maxWidth = '';
+    cartItem.style.width = '';
+    cartItem.style.flexBasis = '';
     cartItem.style.overflow = '';
     this.removeAttribute('aria-disabled');
     this.querySelectorAll('a, button').forEach((control) => {
@@ -36,11 +39,22 @@ class CartRemoveButton extends HTMLElement {
 
       if (cartItem.classList.contains('is-removing')) return;
 
-      if (isShoppingBagItem) {
+      const isHorizontalDrawerItem = Boolean(
+        isCartDrawerItem &&
+        window.matchMedia('(max-width: 989px)').matches &&
+        cartItem.closest('.prada-cart-drawer__items--multiple')
+      );
+
+      if (isHorizontalDrawerItem) {
+        cartItem.classList.add('is-horizontal-removal');
+        cartItem.style.width = `${cartItem.offsetWidth}px`;
+        cartItem.style.maxWidth = `${cartItem.offsetWidth}px`;
+        cartItem.style.flexBasis = `${cartItem.offsetWidth}px`;
+      } else {
         cartItem.style.maxHeight = `${cartItem.offsetHeight}px`;
-        cartItem.style.overflow = 'hidden';
-        cartItem.getBoundingClientRect();
       }
+      cartItem.style.overflow = 'hidden';
+      cartItem.getBoundingClientRect();
       this.setAttribute('aria-disabled', 'true');
       this.querySelectorAll('a, button').forEach((control) => {
         control.setAttribute('aria-disabled', 'true');
@@ -53,7 +67,10 @@ class CartRemoveButton extends HTMLElement {
 
       const removeEvent = { currentTarget: this };
       const removeDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180;
-      const removeFromCart = () => cartItems.updateQuantity(this.dataset.index, 0, removeEvent);
+      const removeFromCart = () => {
+        cartItem.classList.add('is-collapsing');
+        cartItems.updateQuantity(this.dataset.index, 0, removeEvent);
+      };
 
       window.requestAnimationFrame(() => {
         cartItem.classList.add('is-removing');

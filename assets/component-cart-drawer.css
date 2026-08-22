@@ -12,7 +12,19 @@
 }
 
 cart-drawer.prada-cart-drawer .cart-item {
-  transition: opacity 180ms ease, transform 180ms ease;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    max-height 180ms ease,
+    min-height 180ms ease,
+    padding-top 180ms ease,
+    padding-bottom 180ms ease,
+    border-color 180ms ease,
+    width 180ms ease,
+    max-width 180ms ease,
+    flex-basis 180ms ease,
+    padding-left 180ms ease,
+    padding-right 180ms ease;
   transform-origin: center;
   will-change: opacity, transform;
 }
@@ -21,6 +33,23 @@ cart-drawer.prada-cart-drawer .cart-item.is-removing {
   opacity: 0;
   transform: scale(0.98);
   pointer-events: none;
+}
+
+cart-drawer.prada-cart-drawer .cart-item.is-collapsing:not(.is-horizontal-removal) {
+  max-height: 0 !important;
+  min-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  border-color: transparent;
+}
+
+cart-drawer.prada-cart-drawer .cart-item.is-horizontal-removal.is-collapsing {
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  flex-basis: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

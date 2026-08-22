@@ -2018,14 +2018,17 @@ cart-items.prada-shopping-bag-page.is-empty .cart__warnings .button {
 }
 
 .prada-shopping-bag-page .cart-item.is-removing {
+  opacity: 0;
+  transform: scale(0.98);
+  pointer-events: none;
+}
+
+.prada-shopping-bag-page .cart-item.is-collapsing {
   max-height: 0 !important;
   min-height: 0 !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   border-color: transparent;
-  opacity: 0;
-  transform: scale(0.98);
-  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
