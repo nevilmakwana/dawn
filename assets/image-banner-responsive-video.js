@@ -22,8 +22,10 @@
 
   const updateVideo = (video) => {
     const isMobile = mobileQuery.matches;
+    const viewport = isMobile ? 'mobile' : 'desktop';
     const nextSource = isMobile ? video.dataset.mobileSrc : video.dataset.desktopSrc;
     const nextPoster = isMobile ? video.dataset.mobilePoster : video.dataset.desktopPoster;
+    const hasNativeSources = Boolean(video.querySelector('source[src]'));
 
     if (!nextSource) return;
 
@@ -31,19 +33,25 @@
       video.setAttribute('poster', nextPoster);
     }
 
-    if (video.dataset.currentSrc !== nextSource) {
+    if (!hasNativeSources && video.dataset.currentSrc !== nextSource) {
       video.dataset.currentSrc = nextSource;
       video.src = nextSource;
       video.load();
+    } else if (hasNativeSources && video.dataset.currentViewport && video.dataset.currentViewport !== viewport) {
+      video.load();
     }
+    video.dataset.currentViewport = viewport;
 
     if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
       playVideo(video);
       return;
     }
 
-    video.addEventListener('loadeddata', () => playVideo(video), { once: true });
-    video.addEventListener('canplay', () => playVideo(video), { once: true });
+    if (video.dataset.playbackBound !== 'true') {
+      video.dataset.playbackBound = 'true';
+      video.addEventListener('loadeddata', () => playVideo(video));
+      video.addEventListener('canplay', () => playVideo(video));
+    }
   };
 
   const initialize = (root = document) => {
@@ -54,10 +62,9 @@
   const api = { initialize };
   window.GreyEximResponsiveWebm = api;
 
+  initialize(document);
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => initialize(document), { once: true });
-  } else {
-    initialize(document);
   }
 
   const handleViewportChange = () => initialize(document);

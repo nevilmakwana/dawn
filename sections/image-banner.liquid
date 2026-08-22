@@ -390,17 +390,21 @@
     assign stacked_sizes = '(min-width: 750px) 50vw, 100vw'
   endif
   assign fetch_priority = 'auto'
+  assign image_loading = 'lazy'
+  assign enable_section_reveal = settings.animations_reveal_on_scroll
   if section.index == 1
     assign fetch_priority = 'high'
+    assign image_loading = 'eager'
+    assign enable_section_reveal = false
   endif
 -%}
 
 <div
   id="Banner-{{ section.id }}"
-  class="banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if has_desktop_video == false and section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank and has_mobile_video == false %} banner--stacked{% endif %}{% if mobile_banner_aspect_ratio != blank and section.settings.image_height == 'adapt' or mobile_banner_aspect_ratio != blank and use_full_media_adapt %} banner--adapt{% endif %}{% if section.settings.show_full_media %} banner--show-full-media{% endif %}{% if section.settings.mobile_center_zoom %} banner--mobile-center-zoom{% endif %}{% if section.settings.mobile_center_zoom and section.settings.mobile_auto_subject_focus %} banner--mobile-auto-subject-focus{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
+  class="banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if has_desktop_video == false and section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank and has_mobile_video == false %} banner--stacked{% endif %}{% if mobile_banner_aspect_ratio != blank and section.settings.image_height == 'adapt' or mobile_banner_aspect_ratio != blank and use_full_media_adapt %} banner--adapt{% endif %}{% if section.settings.show_full_media %} banner--show-full-media{% endif %}{% if section.settings.mobile_center_zoom %} banner--mobile-center-zoom{% endif %}{% if section.settings.mobile_center_zoom and section.settings.mobile_auto_subject_focus %} banner--mobile-auto-subject-focus{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}"
 >
   {%- if has_responsive_webm_video -%}
-    <div class="banner__media media{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+    <div class="banner__media media{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
       <video
         id="Banner-{{ section.id }}-responsive-webm"
         class="banner__media-video"
@@ -408,7 +412,7 @@
         data-mobile-src="{{ mobile_webm_url | escape }}"
         data-desktop-src="{{ desktop_webm_url | escape }}"
         {% if section.settings.mobile_video.preview_image != blank %}
-          data-mobile-poster="{{ section.settings.mobile_video.preview_image | image_url: width: 1500 }}"
+          data-mobile-poster="{{ section.settings.mobile_video.preview_image | image_url: width: 900 }}"
         {% endif %}
         {% if section.settings.video.preview_image != blank %}
           data-desktop-poster="{{ section.settings.video.preview_image | image_url: width: 3840 }}"
@@ -417,11 +421,15 @@
         loop
         muted
         playsinline
+        {% if section.index == 1 %}fetchpriority="high"{% endif %}
         preload="{% if section.index == 1 %}auto{% else %}metadata{% endif %}"
-      ></video>
+      >
+        <source src="{{ mobile_webm_url }}" type="video/webm" media="(max-width: 749px)">
+        <source src="{{ desktop_webm_url }}" type="video/webm" media="(min-width: 750px)">
+      </video>
     </div>
   {%- elsif has_desktop_video -%}
-    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
       {%- if desktop_webm_url != blank -%}
         <video
           class="banner__media-video"
@@ -459,7 +467,7 @@
       {%- endif -%}
     </div>
   {%- elsif section.settings.image != blank -%}
-    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image == blank and section.settings.image_2 == blank %} placeholder{% endif %}{% if section.settings.image_2 != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image == blank and section.settings.image_2 == blank %} placeholder{% endif %}{% if section.settings.image_2 != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
       {%- liquid
         assign image_height = section.settings.image.width | divided_by: section.settings.image.aspect_ratio
         if section.settings.image_2 != blank
@@ -482,16 +490,17 @@
           class: image_class,
           sizes: sizes,
           widths: widths,
+          loading: image_loading,
           fetchpriority: fetch_priority
       }}
     </div>
   {%- elsif section.settings.image_2 == blank -%}
-    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image == blank and section.settings.image_2 == blank %} placeholder{% endif %}{% if section.settings.image_2 != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image == blank and section.settings.image_2 == blank %} placeholder{% endif %}{% if section.settings.image_2 != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
       {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
     </div>
   {%- endif -%}
   {%- if has_desktop_video == false and section.settings.image_2 != blank -%}
-    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
       {%- liquid
         assign image_height_2 = section.settings.image_2.width | divided_by: section.settings.image_2.aspect_ratio
         if section.settings.image != blank
@@ -514,12 +523,13 @@
           class: image_class_2,
           sizes: sizes,
           widths: widths,
+          loading: image_loading,
           fetchpriority: fetch_priority
       }}
     </div>
   {%- endif -%}
   {%- if has_mobile_video and has_responsive_webm_video == false -%}
-    <div class="banner__media media medium-hide large-up-hide{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+    <div class="banner__media media medium-hide large-up-hide{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
       {%- if mobile_webm_url != blank -%}
         <video
           class="banner__media-video"
@@ -529,14 +539,14 @@
           playsinline
           preload="metadata"
           {% if section.settings.mobile_video.preview_image != blank %}
-            poster="{{ section.settings.mobile_video.preview_image | image_url: width: 1500 }}"
+            poster="{{ section.settings.mobile_video.preview_image | image_url: width: 900 }}"
           {% endif %}
         >
           <source src="{{ mobile_webm_url }}" type="video/webm">
           {%- if section.settings.mobile_video.preview_image != blank -%}
             {{
               section.settings.mobile_video.preview_image
-              | image_url: width: 1500
+              | image_url: width: 900
               | image_tag: class: 'banner__media-video-poster', loading: 'lazy'
             }}
           {%- endif -%}
@@ -545,7 +555,7 @@
         {{
           section.settings.mobile_video
           | video_tag:
-            image_size: '1500x',
+            image_size: '900x',
             autoplay: true,
             loop: true,
             muted: true,
@@ -557,7 +567,7 @@
       {%- endif -%}
     </div>
   {%- endif -%}
-  <div class="banner__content banner__content--{{ section.settings.desktop_content_position }} page-width{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+  <div class="banner__content banner__content--{{ section.settings.desktop_content_position }} page-width{% if enable_section_reveal %} scroll-trigger animate--slide-in{% endif %}">
     <div class="banner__box content-container content-container--full-width-mobile color-{{ section.settings.color_scheme }} gradient">
       {%- for block in section.blocks -%}
         {%- case block.type -%}

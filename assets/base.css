@@ -3628,3 +3628,11 @@ details-disclosure > details {
     -webkit-tap-highlight-color: transparent;
   }
 }
+
+/* Reserve later homepage sections while skipping their initial mobile render work. */
+@media screen and (max-width: 749px) {
+  #MainContent[data-template='index'] > .shopify-section:not(:first-child) {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 720px;
+  }
+}
