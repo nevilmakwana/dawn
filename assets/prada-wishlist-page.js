@@ -151,13 +151,13 @@
       addButton.disabled = true;
 
       try {
-        const cartDrawer = document.querySelector('cart-drawer');
+        const cartSurface = document.querySelector('cart-notification, cart-drawer');
         const formData = new FormData(form);
 
-        if (cartDrawer) {
+        if (cartSurface) {
           formData.append(
             'sections',
-            cartDrawer
+            cartSurface
               .getSectionsToRender()
               .map((section) => section.id)
               .join(','),
@@ -179,8 +179,8 @@
 
         await refreshCartHeaderCount(cartState);
 
-        if (cartDrawer && cartState.sections) {
-          cartDrawer.renderContents(cartState, { shouldOpen: false });
+        if (cartSurface && cartState.sections) {
+          cartSurface.renderContents(cartState, { shouldOpen: false });
           return;
         }
 
