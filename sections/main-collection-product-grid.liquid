@@ -396,6 +396,18 @@
           document.dispatchEvent(new Event('prada:collection:updated'));
         }
 
+        function scrollCollectionToStart(collectionRoot) {
+          if (!collectionRoot) return;
+
+          var collectionTop = window.scrollY + collectionRoot.getBoundingClientRect().top;
+          var reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+          window.scrollTo({
+            top: Math.max(0, collectionTop),
+            behavior: reduceMotion ? 'auto' : 'smooth',
+          });
+        }
+
         function replaceCollectionContent(sourceDocument, targetUrl) {
           var sourceCollection = sourceDocument.querySelector('.prada-collection');
           var sourceGrid = sourceDocument.querySelector('#ProductGridContainer');
@@ -433,6 +445,9 @@
           if (!tab || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
 
           var targetUrl = new URL(tab.href, window.location.origin);
+          var collectionRoot = tabs.closest('.prada-collection');
+          if (!collectionRoot) return;
+
           if (targetUrl.origin !== window.location.origin || targetUrl.href === window.location.href) {
             if (window.pradaCollectionNavigationState.request) {
               window.pradaCollectionNavigationState.request.abort();
@@ -442,13 +457,11 @@
             window.pradaCollectionNavigationState.navigationId += 1;
             setActiveTab(tabs, tab);
             event.preventDefault();
+            scrollCollectionToStart(collectionRoot);
             return;
           }
 
           event.preventDefault();
-
-          var collectionRoot = tabs.closest('.prada-collection');
-          if (!collectionRoot) return;
 
           if (window.pradaCollectionNavigationState.request) {
             window.pradaCollectionNavigationState.request.abort();
@@ -460,6 +473,7 @@
           window.pradaCollectionNavigationState.request = controller;
 
           setActiveTab(tabs, tab);
+          scrollCollectionToStart(collectionRoot);
 
           fetch(targetUrl.href, { signal: controller.signal, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(function (response) {
