@@ -59,6 +59,41 @@ cart-drawer.prada-cart-drawer .cart-item.is-horizontal-removal.is-collapsing {
   }
 }
 
+cart-drawer.prada-cart-drawer .prada-cart-drawer__empty-content {
+  transition:
+    opacity 280ms ease 90ms,
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1) 90ms;
+}
+
+cart-drawer.prada-cart-drawer .drawer__inner-empty .drawer__close {
+  transition: opacity 220ms ease 140ms;
+}
+
+cart-drawer.prada-cart-drawer.is-empty-entering .prada-cart-drawer__empty-content,
+cart-drawer.prada-cart-drawer.is-empty-entering .drawer__inner-empty .drawer__close {
+  opacity: 0;
+}
+
+cart-drawer.prada-cart-drawer.is-empty-entering .prada-cart-drawer__empty-content {
+  transform: translateY(14px);
+}
+
+cart-drawer.prada-cart-drawer.is-empty-entering.is-empty-visible .prada-cart-drawer__empty-content,
+cart-drawer.prada-cart-drawer.is-empty-entering.is-empty-visible .drawer__inner-empty .drawer__close {
+  opacity: 1;
+}
+
+cart-drawer.prada-cart-drawer.is-empty-entering.is-empty-visible .prada-cart-drawer__empty-content {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  cart-drawer.prada-cart-drawer .prada-cart-drawer__empty-content,
+  cart-drawer.prada-cart-drawer .drawer__inner-empty .drawer__close {
+    transition: none;
+  }
+}
+
 .drawer.active {
   visibility: visible;
 }
@@ -810,7 +845,9 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     background: #ffffff;
     color: #111111;
     transform: translate3d(0, 105%, 0) !important;
-    transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+    transition:
+      transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      height 360ms cubic-bezier(0.22, 1, 0.36, 1) !important;
   }
 
   cart-drawer.prada-cart-drawer:not(.is-empty).active .drawer__inner {
@@ -1185,7 +1222,9 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     background: #ffffff;
     color: #111111;
     transform: translate3d(0, 105%, 0) !important;
-    transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+    transition:
+      transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      height 360ms cubic-bezier(0.22, 1, 0.36, 1) !important;
   }
 
   cart-drawer.prada-cart-drawer.is-empty.active .drawer__inner {
@@ -1246,5 +1285,11 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     line-height: 1.35;
     text-decoration: underline;
     text-underline-offset: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  cart-drawer.prada-cart-drawer .drawer__inner {
+    transition: none !important;
   }
 }

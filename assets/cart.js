@@ -295,9 +295,18 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
           this.classList.toggle('is-empty', parsedState.item_count === 0);
           const cartDrawerWrapper = document.querySelector('cart-drawer');
           const cartFooter = document.getElementById('main-cart-footer');
+          const shouldRevealEmptyDrawer = Boolean(
+            parsedState.item_count === 0 &&
+            eventTarget === 'clear' &&
+            cartDrawerWrapper?.classList.contains('active') &&
+            !cartDrawerWrapper.classList.contains('is-empty')
+          );
 
           if (cartFooter) cartFooter.classList.toggle('is-empty', parsedState.item_count === 0);
           if (cartDrawerWrapper) {
+            window.clearTimeout(cartDrawerWrapper.emptyTransitionTimer);
+            cartDrawerWrapper.classList.remove('is-empty-entering', 'is-empty-visible');
+            if (shouldRevealEmptyDrawer) cartDrawerWrapper.classList.add('is-empty-entering');
             cartDrawerWrapper.classList.toggle('is-empty', parsedState.item_count === 0);
             cartDrawerWrapper.classList.toggle('prada-cart-drawer--multiple', parsedState.items.length > 1);
             window.PradaCartHeader?.update?.(parsedState.item_count);
@@ -324,6 +333,20 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
               section.selector
             );
           });
+
+          if (shouldRevealEmptyDrawer) {
+            window.requestAnimationFrame(() => {
+              window.requestAnimationFrame(() => {
+                if (!cartDrawerWrapper.classList.contains('is-empty')) return;
+
+                cartDrawerWrapper.classList.add('is-empty-visible');
+                cartDrawerWrapper.emptyTransitionTimer = window.setTimeout(() => {
+                  cartDrawerWrapper.classList.remove('is-empty-entering', 'is-empty-visible');
+                }, 520);
+              });
+            });
+          }
+
           const updatedValue = parsedState.items[line - 1] ? parsedState.items[line - 1].quantity : undefined;
           let message = '';
           if (items.length === parsedState.items.length && updatedValue !== parseInt(quantityElement.value)) {
