@@ -75,7 +75,8 @@ cart-drawer.prada-cart-drawer.is-empty-leaving:not(.is-empty) .drawer__footer {
   pointer-events: none;
 }
 
-cart-drawer.prada-cart-drawer .prada-cart-drawer__empty-content {
+cart-drawer.prada-cart-drawer .prada-cart-drawer__empty-message,
+cart-drawer.prada-cart-drawer .prada-cart-drawer__empty-login {
   transition:
     opacity 280ms ease 90ms,
     transform 420ms cubic-bezier(0.22, 1, 0.36, 1) 90ms;
@@ -85,26 +86,31 @@ cart-drawer.prada-cart-drawer .drawer__inner-empty .drawer__close {
   transition: opacity 220ms ease 140ms;
 }
 
-cart-drawer.prada-cart-drawer.is-empty-entering .prada-cart-drawer__empty-content,
+cart-drawer.prada-cart-drawer.is-empty-entering .prada-cart-drawer__empty-message,
+cart-drawer.prada-cart-drawer.is-empty-entering .prada-cart-drawer__empty-login,
 cart-drawer.prada-cart-drawer.is-empty-entering .drawer__inner-empty .drawer__close {
   opacity: 0;
 }
 
-cart-drawer.prada-cart-drawer.is-empty-entering .prada-cart-drawer__empty-content {
+cart-drawer.prada-cart-drawer.is-empty-entering .prada-cart-drawer__empty-message,
+cart-drawer.prada-cart-drawer.is-empty-entering .prada-cart-drawer__empty-login {
   transform: translateY(14px);
 }
 
-cart-drawer.prada-cart-drawer.is-empty-entering.is-empty-visible .prada-cart-drawer__empty-content,
+cart-drawer.prada-cart-drawer.is-empty-entering.is-empty-visible .prada-cart-drawer__empty-message,
+cart-drawer.prada-cart-drawer.is-empty-entering.is-empty-visible .prada-cart-drawer__empty-login,
 cart-drawer.prada-cart-drawer.is-empty-entering.is-empty-visible .drawer__inner-empty .drawer__close {
   opacity: 1;
 }
 
-cart-drawer.prada-cart-drawer.is-empty-entering.is-empty-visible .prada-cart-drawer__empty-content {
+cart-drawer.prada-cart-drawer.is-empty-entering.is-empty-visible .prada-cart-drawer__empty-message,
+cart-drawer.prada-cart-drawer.is-empty-entering.is-empty-visible .prada-cart-drawer__empty-login {
   transform: translateY(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  cart-drawer.prada-cart-drawer .prada-cart-drawer__empty-content,
+  cart-drawer.prada-cart-drawer .prada-cart-drawer__empty-message,
+  cart-drawer.prada-cart-drawer .prada-cart-drawer__empty-login,
   cart-drawer.prada-cart-drawer .drawer__inner-empty .drawer__close {
     transition: none;
   }
