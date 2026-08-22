@@ -206,6 +206,45 @@
     return parser.value.replace(/<[^>]*>/g, '').replace(/^\s*(?:Rs\.?|INR)\s*/i, '₹ ').trim();
   };
 
+  const getEditorCartSections = () => {
+    const cartItems = document.querySelector('cart-items');
+    if (!cartItems?.getSectionsToRender) return [];
+
+    return cartItems
+      .getSectionsToRender()
+      .filter((section) => section.id === 'main-cart-items' || section.id === 'main-cart-footer');
+  };
+
+  const renderEditorCartUpdate = (cartState, sectionsToRender, variantId) => {
+    if (!cartState.sections) throw new Error('The shopping bag could not be refreshed.');
+
+    const cartItems = document.querySelector('cart-items');
+    const cartFooter = document.getElementById('main-cart-footer');
+    const cartDrawer = document.querySelector('cart-drawer');
+
+    cartItems?.classList.toggle('is-empty', cartState.item_count === 0);
+    cartFooter?.classList.toggle('is-empty', cartState.item_count === 0);
+    cartDrawer?.classList.toggle('is-empty', cartState.item_count === 0);
+    cartDrawer?.classList.toggle('prada-cart-drawer--multiple', cartState.items.length > 1);
+
+    sectionsToRender.forEach((section) => {
+      const sectionElement = document.getElementById(section.id);
+      const sectionHtml = cartState.sections[section.section];
+      if (!sectionElement || !sectionHtml) return;
+
+      const target = sectionElement.querySelector(section.selector) || sectionElement;
+      const source = new DOMParser().parseFromString(sectionHtml, 'text/html').querySelector(section.selector);
+      if (source) target.innerHTML = source.innerHTML;
+    });
+
+    window.PradaCartHeader?.update?.(cartState.item_count);
+    document.querySelectorAll('[data-prada-shopping-bag-count]').forEach((count) => {
+      count.textContent = String(cartState.item_count);
+    });
+    bindDesktopAccordion();
+    publish(PUB_SUB_EVENTS.cartUpdate, { source: 'cart-items', cartData: cartState, variantId });
+  };
+
   const createCartEditor = (data, trigger) => {
     const existingModal = document.querySelector('[data-prada-cart-editor-modal]');
     existingModal?.remove();
@@ -422,14 +461,14 @@
       renderGallery();
     };
 
-    const close = () => {
+    const close = ({ restoreFocus = true } = {}) => {
       stopDetailsRevealScroll();
       modal.classList.add('is-closing');
       window.setTimeout(() => {
         modal.remove();
         document.documentElement.classList.remove('prada-cart-edit-modal-open');
         document.removeEventListener('keydown', handleEscape);
-        trigger.focus();
+        if (restoreFocus && trigger.isConnected) trigger.focus();
       }, motionMediaQuery.matches ? 0 : 180);
     };
 
@@ -510,6 +549,11 @@
 
       try {
         const isVariantChange = Number(selectedVariant.id) !== Number(data.variantId);
+        const sectionsToRender = getEditorCartSections();
+
+        if (!sectionsToRender.length) {
+          throw new Error('The shopping bag could not be refreshed.');
+        }
 
         if (isVariantChange) {
           const itemToAdd = {
@@ -536,7 +580,12 @@
 
         const changeResponse = await fetch(`${routes.cart_change_url}`, {
           ...fetchConfig(),
-          body: JSON.stringify({ id: data.key, quantity: isVariantChange ? 0 : selectedQuantity }),
+          body: JSON.stringify({
+            id: data.key,
+            quantity: isVariantChange ? 0 : selectedQuantity,
+            sections: sectionsToRender.map((section) => section.section),
+            sections_url: window.location.pathname,
+          }),
         });
         const changeData = await changeResponse.json();
 
@@ -544,7 +593,8 @@
           throw new Error(changeData.description || 'Unable to update the shopping bag.');
         }
 
-        window.location.reload();
+        renderEditorCartUpdate(changeData, sectionsToRender, selectedVariant.id);
+        close({ restoreFocus: false });
       } catch (error) {
         console.error(error);
         status.textContent = error.message || 'We could not update this item. Please try again.';
