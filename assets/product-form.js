@@ -8,7 +8,9 @@ if (!customElements.get('product-form')) {
         this.form = this.querySelector('form');
         this.variantIdInput.disabled = false;
         this.form.addEventListener('submit', this.onSubmitHandler.bind(this));
-        this.cart = document.querySelector('cart-notification') || document.querySelector('cart-drawer');
+        const preferredCart = this.dataset.cartTarget === 'drawer' ? 'cart-drawer' : 'cart-notification';
+        const fallbackCart = preferredCart === 'cart-drawer' ? 'cart-notification' : 'cart-drawer';
+        this.cart = document.querySelector(preferredCart) || document.querySelector(fallbackCart);
         this.submitButton = this.querySelector('[type="submit"]');
         this.submitButtonText = this.submitButton.querySelector('span');
 
@@ -85,10 +87,8 @@ if (!customElements.get('product-form')) {
                 CartPerformance.measureFromMarker('add:wait-for-subscribers', startMarker);
               });
             this.error = false;
-            const shouldOpenCart = !window.matchMedia('(max-width: 749px)').matches;
-            const refreshHeaderCartBadge = () => {
-              requestAnimationFrame(() => window.PradaCartHeader?.refresh?.());
-            };
+            const shouldOpenCart =
+              this.dataset.openCart === 'true' || !window.matchMedia('(max-width: 749px)').matches;
             const quickAddModal = this.closest('quick-add-modal');
             if (quickAddModal) {
               document.body.addEventListener(
@@ -97,7 +97,6 @@ if (!customElements.get('product-form')) {
                   setTimeout(() => {
                     CartPerformance.measure("add:paint-updated-sections", () => {
                       this.cart.renderContents(response, { shouldOpen: shouldOpenCart });
-                      refreshHeaderCartBadge();
                     });
                   });
                 },
@@ -107,7 +106,6 @@ if (!customElements.get('product-form')) {
             } else {
               CartPerformance.measure("add:paint-updated-sections", () => {
                 this.cart.renderContents(response, { shouldOpen: shouldOpenCart });
-                refreshHeaderCartBadge();
               });
             }
           })

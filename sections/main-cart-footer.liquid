@@ -35,6 +35,7 @@
           id="prada-mobile-checkout"
           class="prada-shopping-bag-footer__mobile-checkout-button"
           name="checkout"
+          data-prada-fast-checkout="{{ routes.root_url }}checkout"
           {% if cart == empty %}
             disabled
           {% endif %}
@@ -56,6 +57,7 @@
             id="checkout"
             class="prada-shopping-bag-footer__desktop-checkout"
             name="checkout"
+            data-prada-fast-checkout="{{ routes.root_url }}checkout"
             {% if cart == empty %}
               disabled
             {% endif %}

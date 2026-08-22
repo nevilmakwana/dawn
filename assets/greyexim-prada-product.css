@@ -48,7 +48,12 @@ body:has(main[data-template='product']) .section-header.shopify-section-group-he
 .prada-product__swatch > span { display: block; width: 100%; height: 100%; background: var(--swatch-color, #d8d8d8); }
 .prada-product__swatch.is-selected, .prada-product__swatch[aria-pressed='true'] { border: 2px solid #111; padding: 2px; }
 .prada-product__status { margin: 14px 0 18px; font-size: 11px; line-height: 1.3; font-weight: 700; text-transform: uppercase; }
-.prada-product__submit { display: block; width: 100%; min-height: 52px; margin-top: 18px; padding: 14px 20px; border: 1px solid #111; border-radius: 0; background: #111; color: #fff; font-size: 12px; line-height: 1.2; font-weight: 700; letter-spacing: .035em; text-transform: uppercase; cursor: pointer; }
+.prada-product__form-shell { display: block; }
+.prada-product__form-error { margin: 14px 0 0; color: #9d1d1d; font-size: 12px; line-height: 1.4; }
+.prada-product__submit { display: block; position: relative; width: 100%; min-height: 52px; margin-top: 18px; padding: 14px 20px; border: 1px solid #111; border-radius: 0; background: #111; color: #fff; font-size: 12px; line-height: 1.2; font-weight: 700; letter-spacing: .035em; text-transform: uppercase; cursor: pointer; }
+.prada-product__submit.loading { color: transparent; }
+.prada-product__submit.loading > .loading__spinner { display: flex; position: absolute; top: 50%; left: 50%; align-items: center; width: 18px; height: 18px; transform: translate(-50%, -50%); }
+.prada-product__submit .loading__spinner .path { stroke: #fff; }
 .prada-product__submit:disabled { border-color: #b9b9b9; background: #b9b9b9; cursor: not-allowed; }
 .prada-product__drawer-trigger { display: block; width: max-content; margin-top: 8px; padding: 7px 0; border: 0; background: transparent; color: inherit; font: inherit; font-size: 13px; line-height: 1.35; font-weight: 500; letter-spacing: .005em; text-align: left; cursor: pointer; }
 .prada-product__drawer-shell { position: fixed; z-index: 1000; inset: 0; visibility: hidden; pointer-events: none; transition: visibility 0s linear .45s; }

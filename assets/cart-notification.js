@@ -28,10 +28,11 @@ const updatePradaCartBadge = (itemCount) => {
 const refreshPradaCartBadge = async () => {
   try {
     const cartUrl = window.routes?.cart_url || '/cart';
-    const response = await fetch(`${cartUrl}.js`, { headers: { Accept: 'application/json' } });
-    if (!response.ok) return;
-
-    const cart = await response.json();
+    const cart = typeof CartItems !== 'undefined'
+      ? await CartItems.fetchCartData()
+      : await fetch(`${cartUrl}.js`, { headers: { Accept: 'application/json' } }).then((response) =>
+          response.ok ? response.json() : null
+        );
     if (typeof cart?.item_count === 'number') updatePradaCartBadge(cart.item_count);
   } catch (_error) {
     // A badge refresh must never interrupt a successful add-to-cart action.
@@ -151,9 +152,6 @@ class CartNotification extends HTMLElement {
       },
       {
         id: 'cart-notification-button',
-      },
-      {
-        id: 'cart-icon-bubble',
       },
     ];
   }

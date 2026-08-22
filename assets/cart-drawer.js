@@ -31,10 +31,11 @@ const updatePradaCartIcon = (itemCount) => {
 const refreshPradaCartIcon = async () => {
   try {
     const cartUrl = window.routes?.cart_url || '/cart';
-    const response = await fetch(`${cartUrl}.js`, { headers: { Accept: 'application/json' } });
-    if (!response.ok) return;
-
-    const cart = await response.json();
+    const cart = typeof CartItems !== 'undefined'
+      ? await CartItems.fetchCartData()
+      : await fetch(`${cartUrl}.js`, { headers: { Accept: 'application/json' } }).then((response) =>
+          response.ok ? response.json() : null
+        );
     if (typeof cart?.item_count === 'number') updatePradaCartIcon(cart.item_count);
   } catch (_error) {
     // A badge refresh must never interrupt a successful add-to-cart action.
@@ -44,6 +45,25 @@ const refreshPradaCartIcon = async () => {
 window.PradaCartHeader = window.PradaCartHeader || {};
 window.PradaCartHeader.update = updatePradaCartIcon;
 window.PradaCartHeader.refresh = refreshPradaCartIcon;
+
+if (!window.pradaFastCheckoutBound) {
+  window.pradaFastCheckoutBound = true;
+  document.addEventListener('click', (event) => {
+    const checkoutButton = event.target.closest('[data-prada-fast-checkout]');
+    if (!checkoutButton || checkoutButton.disabled || checkoutButton.getAttribute('aria-disabled') === 'true') return;
+
+    const checkoutUrl = checkoutButton.dataset.pradaFastCheckout;
+    if (!checkoutUrl) return;
+
+    event.preventDefault();
+    document.querySelectorAll('[data-prada-fast-checkout]').forEach((button) => {
+      button.setAttribute('aria-busy', 'true');
+      button.setAttribute('aria-disabled', 'true');
+      if ('disabled' in button) button.disabled = true;
+    });
+    window.location.assign(checkoutUrl);
+  });
+}
 
 const isPradaCartPage = () => {
   const cartPath = new URL(window.routes?.cart_url || '/cart', window.location.origin).pathname.replace(/\/+$/, '') || '/';
