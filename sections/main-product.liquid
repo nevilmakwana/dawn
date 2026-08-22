@@ -48,8 +48,17 @@
           <figure class="prada-product__media prada-product__media--{{ media.media_type }}" id="PradaMedia-{{ section.id }}-{{ forloop.index }}">
             {%- case media.media_type -%}
               {%- when 'image' -%}
+                {%- liquid
+                  assign media_loading = 'lazy'
+                  assign media_fetch_priority = 'auto'
+                  if forloop.first
+                    assign media_loading = 'eager'
+                    assign media_fetch_priority = 'high'
+                  endif
+                -%}
                 {{ media.preview_image | image_url: width: 1800 | image_tag:
-                  loading: 'lazy',
+                  loading: media_loading,
+                  fetchpriority: media_fetch_priority,
                   widths: '550, 750, 950, 1200, 1500, 1800',
                   sizes: '(min-width: 990px) 50vw, 100vw',
                   alt: media.alt | default: product.title,
