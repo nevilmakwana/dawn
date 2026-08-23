@@ -1463,13 +1463,30 @@
     }
 
     .prada-header .menu-drawer__close-button {
+      position: relative;
       min-height: 60px;
       margin: 0;
-      padding: 16px 30px !important;
+      padding: 16px 30px 16px 54px !important;
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
       color: #111111 !important;
       font-size: 16px !important;
       font-weight: 500;
+    }
+
+    .prada-header .menu-drawer__close-button > .svg-wrapper {
+      display: none !important;
+    }
+
+    .prada-header .menu-drawer__close-button::before {
+      position: absolute;
+      top: 50%;
+      left: 32px;
+      width: 9px;
+      height: 9px;
+      border-bottom: 1.9px solid currentColor;
+      border-left: 1.9px solid currentColor;
+      content: '';
+      transform: translateY(-50%) rotate(45deg);
     }
 
     .prada-header .menu-drawer__inner-submenu,
