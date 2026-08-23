@@ -1,12 +1,13 @@
-.prada-support-tabs {
+[data-prada-support-page] .prada-support-tabs {
   --prada-support-tab-indicator-left: 0px;
   --prada-support-tab-indicator-width: 0px;
 }
 
 @media screen and (max-width: 989px) {
-  .prada-contact-page__sidebar,
-  .prada-track-order__sidebar,
-  .prada-faq__sidebar {
+  [data-prada-support-page] .prada-contact-page__sidebar,
+  [data-prada-support-page] .prada-track-order__sidebar,
+  [data-prada-support-page].prada-faq .prada-faq__sidebar,
+  [data-prada-support-page] .prada-faq__sidebar {
     display: block;
     min-height: 0;
     padding: 18px;
@@ -16,13 +17,14 @@
     scrollbar-width: none;
   }
 
-  .prada-contact-page__sidebar::-webkit-scrollbar,
-  .prada-track-order__sidebar::-webkit-scrollbar,
-  .prada-faq__sidebar::-webkit-scrollbar {
+  [data-prada-support-page] .prada-contact-page__sidebar::-webkit-scrollbar,
+  [data-prada-support-page] .prada-track-order__sidebar::-webkit-scrollbar,
+  [data-prada-support-page].prada-faq .prada-faq__sidebar::-webkit-scrollbar,
+  [data-prada-support-page] .prada-faq__sidebar::-webkit-scrollbar {
     display: none;
   }
 
-  .prada-support-tabs {
+  [data-prada-support-page] .prada-support-tabs {
     position: relative;
     display: flex !important;
     width: max-content !important;
@@ -30,7 +32,7 @@
     align-items: stretch;
   }
 
-  .prada-support-tabs::after {
+  [data-prada-support-page] .prada-support-tabs::after {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -45,7 +47,7 @@
     will-change: transform, width;
   }
 
-  .prada-support-tabs a {
+  [data-prada-support-page] .prada-support-tabs a {
     display: inline-flex;
     align-items: center;
     min-height: 36px;
@@ -54,15 +56,15 @@
     white-space: nowrap;
   }
 
-  .prada-support-tabs a:first-child {
+  [data-prada-support-page] .prada-support-tabs a:first-child {
     padding-left: 0;
   }
 
-  .prada-support-tabs a.is-active {
+  [data-prada-support-page] .prada-support-tabs a.is-active {
     text-decoration: none !important;
   }
 
-  .prada-support-tabs__text {
+  [data-prada-support-page] .prada-support-tabs__text {
     display: inline-block;
     line-height: inherit;
   }

@@ -7,6 +7,7 @@
   let canvasContext;
 
   const textFrom = (element) => (element?.textContent || '').replace(/\s+/g, ' ').trim();
+  const isSupportStylesheet = (link) => link.href.includes('/prada-support-tabs.css');
 
   const getViewFromUrl = (url) => {
     const target = new URL(url, window.location.origin);
@@ -167,6 +168,10 @@
       if (alreadyLoaded) return;
       document.head.appendChild(link.cloneNode(true));
     });
+
+    const supportStylesheet = Array.from(document.querySelectorAll('link[rel="stylesheet"][href]'))
+      .find(isSupportStylesheet);
+    if (supportStylesheet) document.head.appendChild(supportStylesheet);
   };
 
   const syncScripts = (sourceDocument, callback) => {
