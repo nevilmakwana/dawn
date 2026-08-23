@@ -13,6 +13,14 @@
   if wishlist_media == blank
     assign wishlist_media = product.featured_media
   endif
+  assign has_color_option = false
+  for option in product.options_with_values
+    assign option_name = option.name | downcase
+    if option_name contains 'color' or option_name contains 'colour'
+      assign has_color_option = true
+      break
+    endif
+  endfor
 -%}
 
 <section
@@ -137,7 +145,6 @@
         {%- form 'product', product, id: form_id, class: 'prada-product__form' -%}
           <input type="hidden" name="id" value="{{ current_variant.id }}" data-prada-variant-id>
 
-        {%- unless product.has_only_default_variant -%}
           <div class="prada-product__options">
             {%- comment -%}Color is intentionally rendered first, regardless of Shopify option order.{%- endcomment -%}
             {%- for option in product.options_with_values -%}
@@ -193,9 +200,40 @@
               {%- endif -%}
             {%- endfor -%}
 
+            {%- unless has_color_option -%}
+              {%- liquid
+                assign fallback_swatch_media = current_variant.featured_media
+                if fallback_swatch_media == blank
+                  assign fallback_swatch_media = product.featured_media
+                endif
+              -%}
+              <div class="prada-product__option prada-product__option--color prada-product__option--fallback-color">
+                <div class="prada-product__color-heading">
+                  <strong>Color</strong>
+                  <span>As shown</span>
+                </div>
+                <div class="prada-product__swatches" aria-label="Product color">
+                  <span class="prada-product__swatch prada-product__swatch--static is-selected" role="img" aria-label="Color as shown">
+                    {%- if fallback_swatch_media != blank -%}
+                      <img src="{{ fallback_swatch_media.preview_image | image_url: width: 1800 }}" alt="" loading="lazy" width="84" height="105">
+                    {%- else -%}
+                      <span></span>
+                    {%- endif -%}
+                  </span>
+                </div>
+              </div>
+            {%- endunless -%}
+
             {%- for option in product.options_with_values -%}
               {%- assign option_name = option.name | downcase -%}
-              {%- unless option_name contains 'color' or option_name contains 'colour' -%}
+              {%- liquid
+                assign is_default_title_option = false
+                assign first_option_value = option.values.first | downcase
+                if option_name == 'title' and option.values.size == 1 and first_option_value == 'default title'
+                  assign is_default_title_option = true
+                endif
+              -%}
+              {%- unless option_name contains 'color' or option_name contains 'colour' or is_default_title_option -%}
                 <div class="prada-product__option{% if option_name contains 'size' %} prada-product__option--size{% endif %}">
                   {%- unless option_name contains 'size' -%}<span>{{ option.name }}</span>{%- endunless -%}
                   <button
@@ -219,7 +257,6 @@
               {%- endunless -%}
             {%- endfor -%}
           </div>
-        {%- endunless -%}
 
           <button class="prada-product__submit" type="submit" name="add" {% unless current_variant.available %}disabled{% endunless %} data-prada-submit>
             <span data-prada-submit-text>{%- if current_variant.available -%}Add to bag{%- else -%}Available soon{%- endif -%}</span>
