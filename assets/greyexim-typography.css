@@ -1,78 +1,77 @@
-/* Grey Exim typography system: restrained editorial hierarchy using Archivo. */
+/* Grey Exim typography system: Prada-matched hierarchy using Archivo. */
 :root {
   --font-body-weight: 400;
-  --font-body-weight-bold: 400;
-  --font-heading-weight: 400;
+  --font-body-weight-bold: 700;
+  --font-heading-weight: 500;
 
   --ge-font-family: Archivo, var(--font-body-family), Arial, sans-serif;
   --ge-weight-regular: 400;
   --ge-weight-active: 500;
+  --ge-weight-strong: 700;
 
-  --ge-type-nav: 12px;
-  --ge-type-meta: 11px;
-  --ge-type-mega-category: 14px;
-  --ge-type-mega-label: 10px;
-  --ge-type-mega-link: 12px;
-  --ge-type-eyebrow: 11px;
+  --ge-type-nav: 14px;
+  --ge-type-meta: 12px;
+  --ge-type-mega-category: 16px;
+  --ge-type-mega-label: 12px;
+  --ge-type-mega-link: 16px;
+  --ge-type-eyebrow: 12px;
   --ge-type-hero-title: 32px;
   --ge-type-hero-body: 14px;
-  --ge-type-section-title: 28px;
-  --ge-type-tile-title: 18px;
+  --ge-type-section-title: 24px;
+  --ge-type-tile-title: 14px;
   --ge-type-collection-title: 16px;
   --ge-type-body: 14px;
   --ge-type-news-heading: 24px;
-  --ge-type-news-title: 15px;
-  --ge-type-product-card-title: 13px;
-  --ge-type-product-card-secondary: 11px;
-  --ge-type-badge: 10px;
+  --ge-type-news-title: 16px;
+  --ge-type-product-card-title: 14px;
+  --ge-type-product-card-secondary: 14px;
+  --ge-type-badge: 12px;
   --ge-type-plp-editorial: 20px;
   --ge-type-pdp-title: 20px;
   --ge-type-pdp-price: 14px;
-  --ge-type-pdp-label: 12px;
-  --ge-type-pdp-value: 13px;
-  --ge-type-pdp-section: 16px;
-  --ge-type-pdp-copy: 13px;
+  --ge-type-pdp-label: 14px;
+  --ge-type-pdp-value: 14px;
+  --ge-type-pdp-section: 14px;
+  --ge-type-pdp-copy: 14px;
   --ge-type-editorial-h1: 32px;
-  --ge-type-editorial-h2: 22px;
-  --ge-type-service-h1: 28px;
+  --ge-type-editorial-h2: 20px;
+  --ge-type-service-h1: 24px;
   --ge-type-service-h2: 20px;
-  --ge-type-faq-question: 16px;
+  --ge-type-faq-question: 14px;
   --ge-type-form-label: 12px;
-  --ge-type-form-value: 13px;
-  --ge-type-legal-label: 15px;
+  --ge-type-form-value: 14px;
+  --ge-type-legal-label: 12px;
   --ge-type-legal-heading: 14px;
-  --ge-type-legal-body: 13px;
-  --ge-type-footer-heading: 11px;
+  --ge-type-legal-body: 14px;
+  --ge-type-footer-heading: 12px;
   --ge-type-footer-link: 12px;
-  --ge-type-copyright: 10px;
-  --ge-type-drawer-title: 18px;
+  --ge-type-copyright: 12px;
+  --ge-type-drawer-title: 16px;
 }
 
-@media screen and (max-width: 749px) {
+@media screen and (max-width: 1023px) {
   :root {
-    --ge-type-mega-category: 15px;
-    --ge-type-mega-link: 13px;
-    --ge-type-eyebrow: 10px;
-    --ge-type-hero-title: 24px;
-    --ge-type-hero-body: 13px;
-    --ge-type-section-title: 22px;
-    --ge-type-tile-title: 16px;
-    --ge-type-collection-title: 15px;
-    --ge-type-body: 13px;
-    --ge-type-news-heading: 20px;
-    --ge-type-news-title: 14px;
     --ge-type-product-card-title: 12px;
-    --ge-type-plp-editorial: 18px;
-    --ge-type-pdp-title: 18px;
-    --ge-type-pdp-price: 13px;
-    --ge-type-pdp-section: 15px;
-    --ge-type-editorial-h1: 24px;
-    --ge-type-editorial-h2: 20px;
-    --ge-type-service-h1: 22px;
-    --ge-type-service-h2: 18px;
-    --ge-type-faq-question: 15px;
-    --ge-type-legal-label: 14px;
-    --ge-type-drawer-title: 17px;
+    --ge-type-product-card-secondary: 12px;
+    --ge-type-pdp-title: 14px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  :root {
+    --ge-type-mega-category: 16px;
+    --ge-type-mega-link: 16px;
+    --ge-type-hero-title: 20px;
+    --ge-type-section-title: 20px;
+    --ge-type-tile-title: 12px;
+    --ge-type-news-heading: 20px;
+    --ge-type-news-title: 16px;
+    --ge-type-plp-editorial: 16px;
+    --ge-type-pdp-title: 16px;
+    --ge-type-editorial-h1: 20px;
+    --ge-type-editorial-h2: 16px;
+    --ge-type-service-h1: 20px;
+    --ge-type-service-h2: 16px;
   }
 }
 
@@ -91,7 +90,7 @@ select,
 
 body {
   font-size: var(--ge-type-body);
-  line-height: 1.45;
+  line-height: 20px;
 }
 
 h1,
@@ -109,7 +108,7 @@ h6,
 .h6,
 .title {
   font-family: var(--ge-font-family) !important;
-  font-weight: var(--ge-weight-regular) !important;
+  font-weight: var(--ge-weight-active) !important;
   letter-spacing: 0;
 }
 
@@ -117,22 +116,22 @@ h1,
 .h1,
 .title--primary {
   font-size: var(--ge-type-editorial-h1);
-  line-height: 1.1;
-  letter-spacing: -0.01em;
+  line-height: 1.17;
+  letter-spacing: 0;
 }
 
 h2,
 .h2,
 .title {
   font-size: var(--ge-type-section-title);
-  line-height: 1.1;
-  letter-spacing: -0.01em;
+  line-height: 1.25;
+  letter-spacing: 0;
 }
 
 h3,
 .h3 {
   font-size: var(--ge-type-tile-title);
-  line-height: 1.15;
+  line-height: 18px;
 }
 
 .text-body,
@@ -144,7 +143,7 @@ h3,
 .subtitle--medium {
   font-size: var(--ge-type-body);
   font-weight: var(--ge-weight-regular);
-  line-height: 1.45;
+  line-height: 20px;
   letter-spacing: 0;
 }
 
@@ -155,13 +154,13 @@ h3,
 .caption-with-letter-spacing--large {
   font-size: var(--ge-type-meta);
   font-weight: var(--ge-weight-regular);
-  line-height: 1.2;
+  line-height: 16px;
 }
 
 .caption-with-letter-spacing,
 .caption-with-letter-spacing--medium,
 .caption-with-letter-spacing--large {
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -170,10 +169,10 @@ h3,
 .customer button,
 .shopify-payment-button__button,
 .shopify-payment-button__button--unbranded {
-  font-size: 12px;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.2;
-  letter-spacing: 0.01em;
+  font-size: 14px;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 16px;
+  letter-spacing: 0;
 }
 
 .link,
@@ -205,7 +204,7 @@ h3,
   font-family: var(--ge-font-family) !important;
   font-size: var(--ge-type-nav) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.2 !important;
+  line-height: 18px !important;
   letter-spacing: 0 !important;
 }
 
@@ -218,8 +217,9 @@ h3,
 .prada-cart-badge,
 .cart-count-bubble {
   font-size: 10px !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.15 !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
 }
 
 .mega-menu__link,
@@ -235,7 +235,7 @@ h3,
   font-family: var(--ge-font-family) !important;
   font-size: var(--ge-type-mega-link) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.4 !important;
+  line-height: 22px !important;
   letter-spacing: 0 !important;
 }
 
@@ -244,7 +244,7 @@ h3,
 .prada-desktop-menu__toolbar-button {
   font-size: var(--ge-type-mega-category) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.25 !important;
+  line-height: 22px !important;
   letter-spacing: 0 !important;
 }
 
@@ -252,7 +252,7 @@ h3,
 .prada-desktop-menu__view-all,
 .prada-desktop-menu__grandchild-list a {
   font-size: var(--ge-type-mega-category) !important;
-  line-height: 1.25 !important;
+  line-height: 22px !important;
 }
 
 .prada-desktop-menu__primary-control:checked + .prada-desktop-menu__primary-link,
@@ -265,9 +265,9 @@ h3,
 .slideshow__text .banner__heading,
 .image-with-text__heading {
   font-size: var(--ge-type-hero-title) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.1 !important;
-  letter-spacing: -0.01em !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 1.17 !important;
+  letter-spacing: 0 !important;
 }
 
 .banner__text,
@@ -276,7 +276,7 @@ h3,
 .image-with-text__text p {
   font-size: var(--ge-type-hero-body) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.4 !important;
+  line-height: 20px !important;
   letter-spacing: 0 !important;
 }
 
@@ -284,17 +284,17 @@ h3,
 .slideshow .caption-with-letter-spacing,
 .image-with-text .caption-with-letter-spacing {
   font-size: var(--ge-type-eyebrow) !important;
-  line-height: 1.2 !important;
-  letter-spacing: 0.08em !important;
+  line-height: 16px !important;
+  letter-spacing: 0 !important;
   text-transform: uppercase;
 }
 
 .banner__buttons .button,
 .slideshow__text .button,
 .image-with-text__content .button {
-  font-size: 12px !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.2 !important;
+  font-size: 14px !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 16px !important;
   letter-spacing: 0 !important;
 }
 
@@ -304,9 +304,9 @@ h3,
 .multicolumn .title,
 .rich-text__heading {
   font-size: var(--ge-type-section-title) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.1 !important;
-  letter-spacing: -0.01em !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
 }
 
 .multicolumn-card__info h3,
@@ -314,29 +314,29 @@ h3,
 .article-card .card__heading,
 .collection-card-wrapper .card__heading {
   font-size: var(--ge-type-tile-title) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.15 !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 18px !important;
   letter-spacing: 0 !important;
 }
 
 .prada-category-showcase__heading {
   font-size: var(--ge-type-section-title) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.1 !important;
-  letter-spacing: -0.01em !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
 }
 
 .prada-category-showcase__text,
 .prada-category-showcase__text p {
   font-size: var(--ge-type-body) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.45 !important;
+  line-height: 20px !important;
 }
 
 .prada-category-showcase__tab {
-  font-size: 12px !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.2 !important;
+  font-size: 14px !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 18px !important;
   letter-spacing: 0 !important;
 }
 
@@ -346,8 +346,8 @@ h3,
 
 .prada-category-showcase__label {
   font-size: var(--ge-type-tile-title) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.15 !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 18px !important;
   letter-spacing: 0 !important;
 }
 
@@ -355,8 +355,8 @@ h3,
 .collection-hero__title,
 .prada-collection__title {
   font-size: var(--ge-type-collection-title) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.2 !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 20px !important;
   letter-spacing: 0 !important;
 }
 
@@ -377,9 +377,9 @@ h3,
 .mobile-facets__sort,
 .active-facets__button-wrapper *,
 span.active-facets__button-inner {
-  font-size: 12px !important;
+  font-size: 14px !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.25 !important;
+  line-height: 18px !important;
   letter-spacing: 0 !important;
 }
 
@@ -389,14 +389,18 @@ span.active-facets__button-inner {
   font-weight: var(--ge-weight-active) !important;
 }
 
+.prada-collection__tab {
+  font-weight: var(--ge-weight-active) !important;
+}
+
 .card__heading,
 .card__heading a,
 .product-card-wrapper .card__heading,
 .prada-product-tile__title,
-.quick-add-modal .product__title > h1 {
+.prada-wishlist-page__title {
   font-size: var(--ge-type-product-card-title) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.3 !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 18px !important;
   letter-spacing: 0 !important;
 }
 
@@ -408,10 +412,11 @@ span.active-facets__button-inner {
 .price-item,
 .unit-price,
 .prada-product-tile__price,
+.prada-wishlist-page__price,
 .card__caption {
   font-size: var(--ge-type-product-card-secondary) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.3 !important;
+  line-height: 18px !important;
   letter-spacing: 0 !important;
 }
 
@@ -420,27 +425,28 @@ span.active-facets__button-inner {
 .product__badge,
 .prada-product__status {
   font-size: var(--ge-type-badge) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.15 !important;
-  letter-spacing: 0.04em !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 16px !important;
+  letter-spacing: 0 !important;
   text-transform: uppercase;
 }
 
 .prada-featured-tile__heading,
 .product-grid .card--text .card__heading {
   font-size: var(--ge-type-plp-editorial) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.15 !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 1.25 !important;
 }
 
 /* Product detail pages */
 .product__title h1,
 .product__title .h1,
-.prada-product__heading-row h1 {
+.prada-product__heading-row h1,
+.quick-add-modal .product__title > h1 {
   font-size: var(--ge-type-pdp-title) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.2 !important;
-  letter-spacing: -0.005em !important;
+  font-weight: var(--ge-weight-strong) !important;
+  line-height: 24px !important;
+  letter-spacing: 0 !important;
 }
 
 .product .price,
@@ -448,7 +454,7 @@ span.active-facets__button-inner {
 .prada-product__price {
   font-size: var(--ge-type-pdp-price) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.25 !important;
+  line-height: 20px !important;
   letter-spacing: 0 !important;
 }
 
@@ -461,7 +467,7 @@ span.active-facets__button-inner {
 .product-form__input legend {
   font-size: var(--ge-type-pdp-label) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.25 !important;
+  line-height: 20px !important;
   letter-spacing: 0 !important;
 }
 
@@ -473,7 +479,7 @@ span.active-facets__button-inner {
 .prada-product__choice {
   font-size: var(--ge-type-pdp-value) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.25 !important;
+  line-height: 20px !important;
   letter-spacing: 0 !important;
 }
 
@@ -489,8 +495,8 @@ span.active-facets__button-inner {
 .prada-product__metafield-section h3,
 .prada-product__drawer-accordion summary {
   font-size: var(--ge-type-pdp-section) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.25 !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 20px !important;
   letter-spacing: 0 !important;
 }
 
@@ -502,36 +508,49 @@ span.active-facets__button-inner {
 .prada-product__drawer-pane li {
   font-size: var(--ge-type-pdp-copy) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.5 !important;
+  line-height: 20px !important;
   letter-spacing: 0 !important;
 }
 
 .prada-product__submit,
 .product-form__submit,
 .shopify-payment-button__button {
-  font-size: 12px !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.2 !important;
-  letter-spacing: 0.01em !important;
+  font-size: 14px !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 16px !important;
+  letter-spacing: 0 !important;
+}
+
+.prada-wishlist-page__heading {
+  font-size: var(--ge-type-collection-title) !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 20px !important;
+}
+
+.prada-wishlist-page__add {
+  font-size: 14px !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 16px !important;
+  letter-spacing: 0 !important;
 }
 
 /* Editorial, blog, news, and story pages */
 .ge-story__eyebrow,
 .article-card__excerpt + .caption-with-letter-spacing,
 .pradasphere-news__category {
-  font-size: 10px !important;
+  font-size: var(--ge-type-eyebrow) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.2 !important;
-  letter-spacing: 0.06em !important;
+  line-height: 16px !important;
+  letter-spacing: 0 !important;
   text-transform: uppercase;
 }
 
 .ge-story__heading,
 .article-template__title {
   font-size: var(--ge-type-editorial-h1) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.1 !important;
-  letter-spacing: -0.01em !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 1.17 !important;
+  letter-spacing: 0 !important;
 }
 
 .ge-story__intro,
@@ -544,22 +563,22 @@ span.active-facets__button-inner {
 .article-template__content li {
   font-size: var(--ge-type-body) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.45 !important;
+  line-height: 20px !important;
   letter-spacing: 0 !important;
 }
 
 .ge-story__date,
 .article-template__social-sharing + header .caption-with-letter-spacing {
-  font-size: 10px !important;
+  font-size: var(--ge-type-meta) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.2 !important;
+  line-height: 16px !important;
   letter-spacing: 0 !important;
 }
 
 .ge-story__cta {
-  font-size: 12px !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.3 !important;
+  font-size: 14px !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 16px !important;
   letter-spacing: 0 !important;
 }
 
@@ -567,23 +586,24 @@ span.active-facets__button-inner {
 .main-blog .title--primary,
 .pradasphere-news__heading {
   font-size: var(--ge-type-news-heading) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.15 !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 1.25 !important;
   letter-spacing: 0 !important;
 }
 
 .pradasphere-news__content h3,
 .article-card .card__heading {
   font-size: var(--ge-type-news-title) !important;
-  font-weight: var(--ge-weight-regular) !important;
+  font-weight: var(--ge-weight-active) !important;
   line-height: 1.25 !important;
   letter-spacing: 0 !important;
 }
 
 .pradasphere-news__discover {
-  font-size: 12px !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.2 !important;
+  font-size: 14px !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 16px !important;
+  letter-spacing: 0 !important;
 }
 
 /* Service, FAQ, contact, forms, account, search */
@@ -594,8 +614,8 @@ span.active-facets__button-inner {
 .template-search__header h1,
 .search__heading {
   font-size: var(--ge-type-service-h1) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.15 !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 1.25 !important;
   letter-spacing: 0 !important;
 }
 
@@ -606,8 +626,8 @@ span.active-facets__button-inner {
 .account h2,
 .order h2 {
   font-size: var(--ge-type-service-h2) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.2 !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 1.25 !important;
   letter-spacing: 0 !important;
 }
 
@@ -615,16 +635,16 @@ span.active-facets__button-inner {
 .prada-faq__topics h2,
 .prada-faq__topic-panel > h2 {
   font-size: var(--ge-type-service-h1) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.15 !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 1.25 !important;
 }
 
 .prada-faq__topic-list a,
 .prada-faq__topic-list strong,
 .prada-faq__accordions summary {
   font-size: var(--ge-type-faq-question) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.35 !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 20px !important;
   letter-spacing: 0 !important;
 }
 
@@ -636,7 +656,7 @@ span.active-facets__button-inner {
 .prada-track-order__body {
   font-size: var(--ge-type-pdp-copy) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.5 !important;
+  line-height: 20px !important;
 }
 
 .field__label,
@@ -677,15 +697,15 @@ label[for='AddressProvinceNew'] {
   font-size: var(--ge-type-legal-label) !important;
   font-weight: var(--ge-weight-regular) !important;
   line-height: 1.3 !important;
-  letter-spacing: 0.04em !important;
+  letter-spacing: 0 !important;
   text-transform: uppercase;
 }
 
 .grey-policy__hero h1 {
   font-size: var(--ge-type-editorial-h1) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.1 !important;
-  letter-spacing: -0.01em !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 1.17 !important;
+  letter-spacing: 0 !important;
 }
 
 .grey-policy__section h2,
@@ -697,8 +717,8 @@ label[for='AddressProvinceNew'] {
 .grey-cookie-policy__preference-list strong,
 .grey-cookie-policy__flow strong {
   font-size: var(--ge-type-legal-heading) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.4 !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 20px !important;
   letter-spacing: 0 !important;
 }
 
@@ -719,7 +739,7 @@ label[for='AddressProvinceNew'] {
 .grey-cookie-policy__sources li {
   font-size: var(--ge-type-legal-body) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.55 !important;
+  line-height: 20px !important;
   letter-spacing: 0 !important;
 }
 
@@ -728,15 +748,13 @@ label[for='AddressProvinceNew'] {
 .cart__empty-text,
 .cart__login-title,
 .cart-items th,
-.cart-item__name,
-.cart-item__title,
 .prada-cart-drawer .drawer__heading,
 .prada-cart-drawer__empty-message,
 .prada-contact-drawer__title,
 .prada-localization-drawer__content h2 {
   font-size: var(--ge-type-drawer-title) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.2 !important;
+  line-height: 22px !important;
   letter-spacing: 0 !important;
 }
 
@@ -757,24 +775,36 @@ label[for='AddressProvinceNew'] {
 .prada-localization-drawer__note {
   font-size: var(--ge-type-pdp-copy) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.45 !important;
+  line-height: 20px !important;
   letter-spacing: 0 !important;
+}
+
+.cart-item__name,
+.cart-item__title {
+  font-size: 14px !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 18px !important;
+  letter-spacing: 0 !important;
+}
+
+.prada-cart-drawer__remove {
+  font-weight: var(--ge-weight-active) !important;
 }
 
 .totals__total,
 .totals__total-value {
   font-size: var(--ge-type-pdp-price) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.25 !important;
+  line-height: 20px !important;
 }
 
 .cart__checkout-button,
 .prada-cart-drawer__view-cart,
 .prada-localization-drawer__confirm {
-  font-size: 12px !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.2 !important;
-  letter-spacing: 0.01em !important;
+  font-size: 14px !important;
+  font-weight: var(--ge-weight-active) !important;
+  line-height: 16px !important;
+  letter-spacing: 0 !important;
 }
 
 .footer,
@@ -789,8 +819,8 @@ label[for='AddressProvinceNew'] {
 .prada-footer h2,
 .prada-footer summary {
   font-size: var(--ge-type-footer-heading) !important;
-  font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.25 !important;
+  font-weight: var(--ge-weight-strong) !important;
+  line-height: 14px !important;
   letter-spacing: 0 !important;
 }
 
@@ -803,7 +833,7 @@ label[for='AddressProvinceNew'] {
 .prada-footer__shipping {
   font-size: var(--ge-type-footer-link) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.4 !important;
+  line-height: 16px !important;
   letter-spacing: 0 !important;
 }
 
@@ -814,7 +844,7 @@ label[for='AddressProvinceNew'] {
 .newsletter__subheading p {
   font-size: var(--ge-type-form-value) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.3 !important;
+  line-height: 20px !important;
   letter-spacing: 0 !important;
 }
 
@@ -826,13 +856,64 @@ label[for='AddressProvinceNew'] {
 .prada-footer__privacy {
   font-size: var(--ge-type-copyright) !important;
   font-weight: var(--ge-weight-regular) !important;
-  line-height: 1.3 !important;
+  line-height: 16px !important;
   letter-spacing: 0 !important;
 }
 
-@media screen and (max-width: 749px) {
+@media screen and (max-width: 1023px) {
+  .prada-collection__tab,
+  .prada-collection__count,
+  .prada-collection__controls,
+  .prada-collection__sort,
+  .facets__heading,
+  .facets__summary,
+  .facet-filters__label,
+  .facet-filters__sort,
+  .product-count__text,
+  .mobile-facets__open,
+  .mobile-facets__heading,
+  .mobile-facets__count,
+  .mobile-facets__summary,
+  .mobile-facets__label,
+  .mobile-facets__sort,
+  .active-facets__button-wrapper *,
+  span.active-facets__button-inner {
+    font-size: 12px !important;
+    line-height: 16px !important;
+  }
+
+  .card__heading,
+  .card__heading a,
+  .product-card-wrapper .card__heading,
+  .prada-product-tile__title,
+  .prada-wishlist-page__title {
+    line-height: 16px !important;
+  }
+
+  .product__title h1,
+  .product__title .h1,
+  .prada-product__heading-row h1,
+  .quick-add-modal .product__title > h1 {
+    line-height: 18px !important;
+  }
+}
+
+@media screen and (max-width: 767px) {
   body {
     font-size: var(--ge-type-body);
+  }
+
+  .banner__heading,
+  .slideshow__text .banner__heading,
+  .image-with-text__heading {
+    line-height: 24px !important;
+  }
+
+  .banner__text,
+  .banner__text p,
+  .image-with-text__text,
+  .image-with-text__text p {
+    line-height: 18px !important;
   }
 
   .prada-category-showcase__label {
@@ -840,10 +921,19 @@ label[for='AddressProvinceNew'] {
   }
 
   #send-us-email .contact__button .button {
-    font-size: 12px !important;
+    font-size: 14px !important;
   }
 
   .prada-footer summary {
     min-height: 64px;
+  }
+}
+
+@media screen and (max-width: 639px) {
+  .product__title h1,
+  .product__title .h1,
+  .prada-product__heading-row h1,
+  .quick-add-modal .product__title > h1 {
+    line-height: 20px !important;
   }
 }
