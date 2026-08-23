@@ -1,14 +1,15 @@
 {{ 'section-faq.css' | asset_url | stylesheet_tag }}
+{{ 'prada-support-tabs.css' | asset_url | stylesheet_tag }}
 
 {%- assign topic_keys = 'online,account,returns,shipments,payments,privacy' | split: ',' -%}
 
-<section class="prada-faq" data-prada-faq>
+<section class="prada-faq" data-prada-faq data-prada-support-page data-prada-support-view="faq">
   <aside class="prada-faq__sidebar" aria-label="Client service navigation">
-    <nav>
+    <nav class="prada-support-tabs" data-prada-support-tabs>
       <a href="/pages/contact#send-us-email">Contact us</a>
       <a href="/pages/contact?view=track-order">Track your order</a>
       <a href="/pages/contact?view=returns">Returns</a>
-      <a class="is-active" href="/pages/contact?view=faq">FAQ</a>
+      <a class="is-active" href="/pages/contact?view=faq" aria-current="page">FAQ</a>
     </nav>
     <div class="prada-faq__hours">{{ section.settings.opening_hours }}</div>
   </aside>
@@ -73,63 +74,8 @@
   </div>
 </section>
 
-<script>
-  (() => {
-    const root = document.querySelector('#shopify-section-{{ section.id }} [data-prada-faq]');
-    if (!root) return;
-    const overview = root.querySelector('[data-faq-overview]');
-    const details = root.querySelector('[data-faq-details]');
-    const panels = Array.from(root.querySelectorAll('[data-faq-panel]'));
-
-    const showOverview = (updateHistory = true) => {
-      details.hidden = true;
-      overview.hidden = false;
-      panels.forEach((panel) => panel.hidden = true);
-      if (updateHistory) history.pushState({}, '', `${location.pathname}${location.search}`);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const showTopic = (topic, questionId, updateHistory = true) => {
-      const panel = panels.find((item) => item.dataset.faqPanel === topic);
-      if (!panel) return;
-      overview.hidden = true;
-      details.hidden = false;
-      panels.forEach((item) => item.hidden = item !== panel);
-      panel.querySelectorAll('details').forEach((item) => item.open = item.id === questionId);
-      if (updateHistory) history.pushState({}, '', questionId ? `#${questionId}` : `#topic-${topic}`);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    root.addEventListener('click', (event) => {
-      const question = event.target.closest('[data-faq-question-link]');
-      const topic = event.target.closest('[data-faq-topic-link]');
-      if (question) {
-        event.preventDefault();
-        showTopic(question.dataset.faqTopic, question.hash.slice(1));
-      } else if (topic) {
-        event.preventDefault();
-        showTopic(topic.dataset.faqTopicLink);
-      } else if (event.target.closest('[data-faq-back]')) {
-        showOverview();
-      }
-    });
-
-    const applyHash = () => {
-      const hash = location.hash.slice(1);
-      if (hash.startsWith('topic-')) return showTopic(hash.replace('topic-', ''), null, false);
-      const question = hash && root.querySelector(`#${CSS.escape(hash)}`);
-      if (question) {
-        const blockLink = root.querySelector(`[href="#${CSS.escape(hash)}"]`);
-        showTopic(blockLink?.dataset.faqTopic || question.closest('[data-faq-panel]')?.dataset.faqPanel, hash, false);
-      } else showOverview(false);
-    };
-
-    window.addEventListener('popstate', applyHash);
-    applyHash();
-  })();
-</script>
-
 <script src="{{ 'prada-exclusive-accordion.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'prada-support-tabs.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
 {

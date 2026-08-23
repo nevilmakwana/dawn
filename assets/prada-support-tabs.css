@@ -1,0 +1,69 @@
+.prada-support-tabs {
+  --prada-support-tab-indicator-left: 0px;
+  --prada-support-tab-indicator-width: 0px;
+}
+
+@media screen and (max-width: 989px) {
+  .prada-contact-page__sidebar,
+  .prada-track-order__sidebar,
+  .prada-faq__sidebar {
+    display: block;
+    min-height: 0;
+    padding: 18px;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid #d8d8d8;
+    scrollbar-width: none;
+  }
+
+  .prada-contact-page__sidebar::-webkit-scrollbar,
+  .prada-track-order__sidebar::-webkit-scrollbar,
+  .prada-faq__sidebar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .prada-support-tabs {
+    position: relative;
+    display: flex !important;
+    width: max-content !important;
+    gap: 0 !important;
+    align-items: stretch;
+  }
+
+  .prada-support-tabs::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: var(--prada-support-tab-indicator-width);
+    height: 2px;
+    background: #111;
+    content: '';
+    transform: translate3d(var(--prada-support-tab-indicator-left), 0, 0);
+    transition:
+      transform 340ms cubic-bezier(0.33, 1, 0.68, 1),
+      width 340ms cubic-bezier(0.33, 1, 0.68, 1);
+    will-change: transform, width;
+  }
+
+  .prada-support-tabs a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 13px;
+    text-decoration: none !important;
+    white-space: nowrap;
+  }
+
+  .prada-support-tabs a:first-child {
+    padding-left: 0;
+  }
+
+  .prada-support-tabs a.is-active {
+    text-decoration: none !important;
+  }
+
+  .prada-support-tabs__text {
+    display: inline-block;
+    line-height: inherit;
+  }
+}

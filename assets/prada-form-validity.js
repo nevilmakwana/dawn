@@ -18,6 +18,8 @@
     });
   };
 
+  window.pradaInitializeForms = initializeForms;
+
   initializeForms();
   document.addEventListener('shopify:section:load', (event) => initializeForms(event.target));
 })();

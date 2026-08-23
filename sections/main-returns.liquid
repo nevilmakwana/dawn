@@ -1,11 +1,12 @@
 {{ 'section-track-order.css' | asset_url | stylesheet_tag }}
+{{ 'prada-support-tabs.css' | asset_url | stylesheet_tag }}
 
-<section class="prada-track-order prada-returns">
+<section class="prada-track-order prada-returns" data-prada-support-page data-prada-support-view="returns">
   <aside class="prada-track-order__sidebar" aria-label="Client service navigation">
-    <nav>
+    <nav class="prada-support-tabs" data-prada-support-tabs>
       <a href="/pages/contact#send-us-email">Contact us</a>
       <a href="/pages/contact?view=track-order">Track your order</a>
-      <a class="is-active" href="/pages/contact?view=returns">Returns</a>
+      <a class="is-active" href="/pages/contact?view=returns" aria-current="page">Returns</a>
       <a href="/pages/contact?view=faq">FAQ</a>
     </nav>
     <div class="prada-track-order__hours">{{ section.settings.opening_hours }}</div>
@@ -59,6 +60,7 @@
 </section>
 
 <script src="{{ 'prada-form-validity.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'prada-support-tabs.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
 {

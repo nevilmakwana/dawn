@@ -1,4 +1,5 @@
 {{ 'section-contact-form.css' | asset_url | stylesheet_tag }}
+{{ 'prada-support-tabs.css' | asset_url | stylesheet_tag }}
 
 {%- style -%}
   .section-{{ section.id }}-padding {
@@ -14,11 +15,11 @@
   }
 {%- endstyle -%}
 
-<div class="color-{{ section.settings.color_scheme }} gradient" id="send-us-email">
+<div class="color-{{ section.settings.color_scheme }} gradient" id="send-us-email" data-prada-support-page data-prada-support-view="contact">
   <div class="prada-contact-page">
     <aside class="prada-contact-page__sidebar" aria-label="Client service navigation">
-      <nav>
-        <a class="is-active" href="/pages/contact#send-us-email">Contact us</a>
+      <nav class="prada-support-tabs" data-prada-support-tabs>
+        <a class="is-active" href="/pages/contact#send-us-email" aria-current="page">Contact us</a>
         <a href="/pages/contact?view=track-order">Track your order</a>
         <a href="/pages/contact?view=returns">Returns</a>
         <a href="/pages/contact?view=faq">FAQ</a>
@@ -220,6 +221,7 @@
 </div>
 
 <script src="{{ 'prada-form-validity.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'prada-support-tabs.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
 {

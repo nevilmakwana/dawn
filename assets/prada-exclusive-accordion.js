@@ -61,6 +61,8 @@
     });
   };
 
+  window.pradaInitializeExclusiveAccordions = initialize;
+
   initialize();
   document.addEventListener('shopify:section:load', (event) => initialize(event.target));
 })();
