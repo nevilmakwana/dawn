@@ -1398,33 +1398,24 @@
     }
 
     .prada-header .menu-drawer summary.menu-drawer__menu-item {
+      position: relative;
       padding-right: 78px !important;
     }
 
     .prada-header .menu-drawer summary.menu-drawer__menu-item > .svg-wrapper {
-      right: 34px !important;
-      display: inline-flex !important;
-      width: 30px !important;
-      height: 22px !important;
-      align-items: center;
-      justify-content: center;
-      transform: translateY(-50%) !important;
-    }
-
-    .prada-header .menu-drawer summary.menu-drawer__menu-item > .svg-wrapper + .svg-wrapper {
       display: none !important;
     }
 
-    .prada-header .menu-drawer summary.menu-drawer__menu-item .icon-arrow {
-      display: block !important;
-      width: 28px !important;
-      height: 20px !important;
-      color: currentColor !important;
-    }
-
-    .prada-header .menu-drawer summary.menu-drawer__menu-item .icon-arrow path {
-      fill: currentColor !important;
-      stroke: none !important;
+    .prada-header .menu-drawer summary.menu-drawer__menu-item::after {
+      position: absolute;
+      top: 50%;
+      right: 42px;
+      width: 9px;
+      height: 9px;
+      border-top: 1.9px solid currentColor;
+      border-right: 1.9px solid currentColor;
+      content: '';
+      transform: translateY(-50%) rotate(45deg);
     }
 
     .prada-header .menu-drawer__menu-item:hover,
