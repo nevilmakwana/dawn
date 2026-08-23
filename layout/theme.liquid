@@ -367,8 +367,11 @@
     {%- endif -%}
 
     <script>
-      if (window.location.pathname.replace(/\/$/, '') === '/policies/terms-of-service') {
-        window.location.replace('{{ routes.root_url }}pages/terms-and-conditions');
+      if (
+        window.location.pathname.replace(/\/$/, '') === '/policies/terms-of-service' ||
+        window.location.pathname.replace(/\/$/, '') === '/pages/terms-and-conditions'
+      ) {
+        window.location.replace('{{ routes.root_url }}pages/contact?view=terms-and-conditions');
       }
 
       if (Shopify.designMode) {
