@@ -47,6 +47,10 @@
     will-change: transform, width;
   }
 
+  [data-prada-support-page] .prada-support-tabs[data-prada-support-indicator-settling='true']::after {
+    transition: none;
+  }
+
   [data-prada-support-page] .prada-support-tabs a {
     display: inline-flex;
     align-items: center;

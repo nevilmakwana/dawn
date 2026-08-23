@@ -61,6 +61,11 @@
     window.requestAnimationFrame(() => {
       window.requestAnimationFrame(() => {
         updateIndicator(tabs, tabs.querySelector('a.is-active'));
+        if (tabs.dataset.pradaSupportIndicatorSettling === 'true') {
+          window.requestAnimationFrame(() => {
+            delete tabs.dataset.pradaSupportIndicatorSettling;
+          });
+        }
       });
     });
   };
@@ -202,6 +207,21 @@
     });
   };
 
+  const copyIndicatorState = (fromRoot, toRoot) => {
+    const fromTabs = fromRoot.querySelector(TABS_SELECTOR);
+    const toTabs = toRoot.querySelector(TABS_SELECTOR);
+    if (!fromTabs || !toTabs) return;
+
+    updateIndicator(fromTabs, fromTabs.querySelector('a.is-active'));
+
+    ['--prada-support-tab-indicator-left', '--prada-support-tab-indicator-width'].forEach((property) => {
+      const value = fromTabs.style.getPropertyValue(property);
+      if (value) toTabs.style.setProperty(property, value);
+    });
+
+    toTabs.dataset.pradaSupportIndicatorSettling = 'true';
+  };
+
   const initializeSupportPage = (root) => {
     initializeTabs(root);
     initializeFaq(root);
@@ -216,6 +236,7 @@
     if (!sourceRoot || !targetRoot) return false;
 
     syncStyles(sourceDocument);
+    copyIndicatorState(targetRoot, sourceRoot);
     targetRoot.replaceWith(sourceRoot);
     document.title = sourceDocument.title || document.title;
     window.history.pushState({ pradaSupportUrl: targetUrl.href }, '', targetUrl.href);
