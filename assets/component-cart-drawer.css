@@ -699,6 +699,7 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
 
   cart-drawer.prada-cart-drawer .prada-cart-drawer__remove-wrap {
     display: inline-flex;
+    margin-left: 0;
   }
 
   cart-drawer.prada-cart-drawer .prada-cart-drawer__remove {
