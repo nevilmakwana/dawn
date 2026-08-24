@@ -1,13 +1,28 @@
 {%- if cart != empty -%}
   {%- for item in cart.items -%}
+    {%- liquid
+      assign notification_item_media = item.image
+      if notification_item_media == blank
+        assign notification_variant_gallery = item.variant.metafields.custom.variant_images.value
+        if notification_variant_gallery == blank
+          assign notification_variant_gallery = item.variant.metafields.custom.custom_variant_images.value
+        endif
+        for variant_media in notification_variant_gallery
+          if variant_media.media_type == 'image'
+            assign notification_item_media = variant_media
+            break
+          endif
+        endfor
+      endif
+    -%}
     <div id="cart-notification-product-{{ item.key }}" class="cart-item">
-      {%- if item.image -%}
+      {%- if notification_item_media -%}
         <div class="cart-notification-product__image global-media-settings">
           <img
-            src="{{ item.image | image_url: width: 140 }}"
-            alt="{{ item.image.alt | escape }}"
+            src="{{ notification_item_media | image_url: width: 140 }}"
+            alt="{{ notification_item_media.alt | default: item.product.title | escape }}"
             width="70"
-            height="{{ 70 | divided_by: item.image.aspect_ratio | ceil }}"
+            height="{{ 70 | divided_by: notification_item_media.aspect_ratio | ceil }}"
             loading="lazy"
           >
         </div>

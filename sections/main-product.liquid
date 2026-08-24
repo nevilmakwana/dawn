@@ -21,9 +21,24 @@
   if fallback_color_label == blank
     assign fallback_color_label = product_color_label
   endif
+  assign current_variant_gallery = current_variant.metafields.custom.variant_images.value
+  if current_variant_gallery == blank
+    assign current_variant_gallery = current_variant.metafields.custom.custom_variant_images.value
+  endif
+  assign current_variant_primary_image = blank
+  for variant_media in current_variant_gallery
+    if variant_media.media_type == 'image'
+      assign current_variant_primary_image = variant_media
+      break
+    endif
+  endfor
+  assign storefront_primary_media = product.featured_media
+  if storefront_primary_media == blank
+    assign storefront_primary_media = current_variant_primary_image
+  endif
   assign wishlist_media = current_variant.featured_media
   if wishlist_media == blank
-    assign wishlist_media = product.featured_media
+    assign wishlist_media = storefront_primary_media
   endif
   assign has_color_option = false
   for option in product.options_with_values
@@ -40,8 +55,8 @@
   id="PradaProduct-{{ section.id }}"
   data-section-id="{{ section.id }}"
   data-product-url="{{ product.url }}"
-  data-wishlist-fallback-image="{% if product.featured_media %}{{ product.featured_media.preview_image | image_url: width: 720 | escape }}{% endif %}"
-  data-wishlist-fallback-image-alt="{{ product.featured_media.alt | default: product.title | escape }}"
+  data-wishlist-fallback-image="{% if storefront_primary_media %}{{ storefront_primary_media.preview_image | image_url: width: 720 | escape }}{% endif %}"
+  data-wishlist-fallback-image-alt="{{ storefront_primary_media.alt | default: product.title | escape }}"
 >
   <div class="prada-product__gallery" aria-label="{{ product.title | escape }} gallery">
     <button
@@ -97,6 +112,17 @@
             {%- endcase -%}
           </figure>
         {%- endfor -%}
+      {%- elsif current_variant_gallery != blank -%}
+        {%- for media in current_variant_gallery -%}
+          {%- if media.media_type == 'image' or media.media_type == 'video' -%}
+            {%- render 'prada-variant-media',
+              media: media,
+              section_id: section.id,
+              variant_id: current_variant.id,
+              position: forloop.index
+            -%}
+          {%- endif -%}
+        {%- endfor -%}
       {%- else -%}
         <figure
           class="prada-product__media prada-product__media--placeholder"
@@ -108,12 +134,26 @@
       {%- endif -%}
     </div>
 
-    <nav class="prada-product__dots" aria-label="Choose product image"{% if product.media.size <= 1 %} hidden{% endif %}>
-      {%- for media in product.media -%}
-        <a href="#PradaMedia-{{ section.id }}-{{ forloop.index }}" data-prada-dot="{{ forloop.index0 }}" aria-label="View {{ media.media_type | replace: '_', ' ' }} {{ forloop.index }}"{% if forloop.first %} class="is-active" aria-current="true"{% endif %}>
-          <span></span>
-        </a>
-      {%- endfor -%}
+    {%- assign initial_gallery_count = product.media.size -%}
+    {%- if initial_gallery_count == 0 -%}
+      {%- assign initial_gallery_count = current_variant_gallery.size -%}
+    {%- endif -%}
+    <nav class="prada-product__dots" aria-label="Choose product image"{% if initial_gallery_count <= 1 %} hidden{% endif %}>
+      {%- if product.media.size > 0 -%}
+        {%- for media in product.media -%}
+          <a href="#PradaMedia-{{ section.id }}-{{ forloop.index }}" data-prada-dot="{{ forloop.index0 }}" aria-label="View {{ media.media_type | replace: '_', ' ' }} {{ forloop.index }}"{% if forloop.first %} class="is-active" aria-current="true"{% endif %}>
+            <span></span>
+          </a>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for media in current_variant_gallery -%}
+          {%- if media.media_type == 'image' or media.media_type == 'video' -%}
+            <a href="#PradaVariantMedia-{{ section.id }}-{{ current_variant.id }}-{{ forloop.index }}" data-prada-dot="{{ forloop.index0 }}" aria-label="View {{ media.media_type | replace: '_', ' ' }} {{ forloop.index }}"{% if forloop.first %} class="is-active" aria-current="true"{% endif %}>
+              <span></span>
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
     </nav>
     <div class="prada-product__scroll-hint" data-prada-scroll-hint aria-hidden="true">Scroll more pictures</div>
   </div>
@@ -232,7 +272,7 @@
               {%- liquid
                 assign fallback_swatch_media = current_variant.featured_media
                 if fallback_swatch_media == blank
-                  assign fallback_swatch_media = product.featured_media
+                  assign fallback_swatch_media = storefront_primary_media
                 endif
               -%}
               <div class="prada-product__option prada-product__option--color prada-product__option--fallback-color">
@@ -437,6 +477,12 @@
         .filter((template) => template.content.querySelector('.prada-product__media'))
         .map((template) => [template.dataset.pradaVariantGallery, template])
     );
+    const getVariantPrimaryImage = (variant) => {
+      const image = variantGalleryTemplates
+        .get(String(variant?.id))
+        ?.content.querySelector('.prada-product__gallery-image');
+      return image?.getAttribute('src') || '';
+    };
     const defaultPrimaryImage = defaultGalleryTemplate.content.querySelector('.prada-product__gallery-image');
     const defaultPrimarySource = defaultPrimaryImage?.currentSrc || defaultPrimaryImage?.src || '';
     let activeGalleryKey = 'default';
@@ -761,7 +807,7 @@
         const selectedImage = mediaList.querySelector('.prada-product__gallery-image');
         syncFallbackColorImage(selectedImage?.currentSrc || selectedImage?.src);
       } else {
-        const variantImage = variant.featured_image?.src || variant.featured_media?.preview_image?.src;
+        const variantImage = getVariantPrimaryImage(variant) || variant.featured_image?.src || variant.featured_media?.preview_image?.src;
         const fallbackSource = variantImage || defaultPrimarySource;
         morphImage(fallbackSource);
         syncFallbackColorImage(fallbackSource);

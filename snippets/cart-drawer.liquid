@@ -119,6 +119,21 @@
 
                   <tbody role="rowgroup">
                     {%- for item in cart.items -%}
+                      {%- liquid
+                        assign drawer_item_media = item.image
+                        if drawer_item_media == blank
+                          assign drawer_variant_gallery = item.variant.metafields.custom.variant_images.value
+                          if drawer_variant_gallery == blank
+                            assign drawer_variant_gallery = item.variant.metafields.custom.custom_variant_images.value
+                          endif
+                          for variant_media in drawer_variant_gallery
+                            if variant_media.media_type == 'image'
+                              assign drawer_item_media = variant_media
+                              break
+                            endif
+                          endfor
+                        endif
+                      -%}
                       <tr
                         id="CartDrawer-Item-{{ item.index | plus: 1 }}"
                         class="cart-item{% if item.parent_relationship.parent != null %} cart-item__nested-line{% endif %}"
@@ -132,16 +147,16 @@
                           role="cell"
                           headers="CartDrawer-ColumnProductImage"
                         >
-                          {% if item.image %}
+                          {% if drawer_item_media %}
                             {% comment %} Leave empty space due to a:empty CSS display: none rule {% endcomment %}
                             <a href="{{ item.url }}" class="cart-item__link" tabindex="-1" aria-hidden="true"> </a>
                             <img
                               class="cart-item__image"
-                              src="{{ item.image | image_url: width: 300 }}"
-                              alt="{{ item.image.alt | escape }}"
+                              src="{{ drawer_item_media | image_url: width: 300 }}"
+                              alt="{{ drawer_item_media.alt | default: item.product.title | escape }}"
                               loading="lazy"
                               width="150"
-                              height="{{ 150 | divided_by: item.image.aspect_ratio | ceil }}"
+                              height="{{ 150 | divided_by: drawer_item_media.aspect_ratio | ceil }}"
                             >
                           {% endif %}
                         </td>

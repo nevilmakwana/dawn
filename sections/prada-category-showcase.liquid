@@ -57,6 +57,25 @@
           if women_image == blank and fallback_product != blank
             assign women_image = fallback_product.featured_media.preview_image
           endif
+          if women_image == blank
+            assign women_image_product = block.settings.women_product
+            if women_image_product == blank and block.settings.women_collection != blank
+              assign women_image_product = block.settings.women_collection.products.first
+            endif
+            if women_image_product == blank
+              assign women_image_product = fallback_product
+            endif
+            assign women_variant_gallery = women_image_product.selected_or_first_available_variant.metafields.custom.variant_images.value
+            if women_variant_gallery == blank
+              assign women_variant_gallery = women_image_product.selected_or_first_available_variant.metafields.custom.custom_variant_images.value
+            endif
+            for variant_media in women_variant_gallery
+              if variant_media.media_type == 'image'
+                assign women_image = variant_media.preview_image
+                break
+              endif
+            endfor
+          endif
 
           if block.settings.women_collection != blank
             assign women_url = block.settings.women_collection.url
@@ -82,6 +101,25 @@
           endif
           if men_image == blank and fallback_product != blank
             assign men_image = fallback_product.featured_media.preview_image
+          endif
+          if men_image == blank
+            assign men_image_product = block.settings.product
+            if men_image_product == blank and block.settings.collection != blank
+              assign men_image_product = block.settings.collection.products.first
+            endif
+            if men_image_product == blank
+              assign men_image_product = fallback_product
+            endif
+            assign men_variant_gallery = men_image_product.selected_or_first_available_variant.metafields.custom.variant_images.value
+            if men_variant_gallery == blank
+              assign men_variant_gallery = men_image_product.selected_or_first_available_variant.metafields.custom.custom_variant_images.value
+            endif
+            for variant_media in men_variant_gallery
+              if variant_media.media_type == 'image'
+                assign men_image = variant_media.preview_image
+                break
+              endif
+            endfor
           endif
 
           if block.settings.collection != blank

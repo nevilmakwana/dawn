@@ -88,6 +88,21 @@
 
               <tbody>
                 {%- for item in cart.items -%}
+                  {%- liquid
+                    assign cart_item_media = item.image
+                    if cart_item_media == blank
+                      assign selected_cart_gallery = item.variant.metafields.custom.variant_images.value
+                      if selected_cart_gallery == blank
+                        assign selected_cart_gallery = item.variant.metafields.custom.custom_variant_images.value
+                      endif
+                      for variant_media in selected_cart_gallery
+                        if variant_media.media_type == 'image'
+                          assign cart_item_media = variant_media
+                          break
+                        endif
+                      endfor
+                    endif
+                  -%}
                   <tr
                     class="cart-item {% if item.parent_relationship.parent != null %}cart-item__nested-line{% endif %}"
                     id="CartItem-{{ item.index | plus: 1 }}"
@@ -96,17 +111,17 @@
                     {% endif %}
                   >
                     <td class="cart-item__media">
-                      {% if item.image %}
+                      {% if cart_item_media %}
                         {% comment %} Leave empty space due to a:empty CSS display: none rule {% endcomment %}
                         <a href="{{ item.url }}" class="cart-item__link" aria-hidden="true" tabindex="-1"> </a>
                         <div class="cart-item__image-container gradient {% if item.parent_relationship.parent == null %}global-media-settings{% endif %}">
                           <img
-                            src="{{ item.image | image_url: width: 300 }}"
+                            src="{{ cart_item_media | image_url: width: 300 }}"
                             class="cart-item__image {% if item.parent_relationship.parent != null %}global-media-settings{% endif %}"
-                            alt="{{ item.image.alt | escape }}"
+                            alt="{{ cart_item_media.alt | default: item.product.title | escape }}"
                             loading="lazy"
                             width="150"
-                            height="{{ 150 | divided_by: item.image.aspect_ratio | ceil }}"
+                            height="{{ 150 | divided_by: cart_item_media.aspect_ratio | ceil }}"
                           >
                         </div>
                       {% endif %}
@@ -450,8 +465,8 @@
                           data-product-id="{{ item.product.id }}"
                           data-product-title="{{ item.product.title | escape }}"
                           data-product-url="{{ item.url | escape }}"
-                          data-product-image="{% if item.image %}{{ item.image | image_url: width: 720 | escape }}{% endif %}"
-                          data-product-image-alt="{{ item.image.alt | default: item.product.title | escape }}"
+                          data-product-image="{% if cart_item_media %}{{ cart_item_media | image_url: width: 720 | escape }}{% endif %}"
+                          data-product-image-alt="{{ cart_item_media.alt | default: item.product.title | escape }}"
                           data-product-price="{{ item.final_price | money | strip_html | escape }}"
                           data-product-variant-id="{{ item.variant.id }}"
                           data-product-available="{{ item.variant.available }}"
@@ -477,7 +492,7 @@
                           "description": {{ item.product.description | json }},
                           "price": {{ item.final_price | money | strip_html | json }},
                           "colorLabel": {{ cart_category_color | json }},
-                          "image": {% if item.image %}{{ item.image | image_url: width: 1200 | json }}{% else %}null{% endif %},
+                          "image": {% if cart_item_media %}{{ cart_item_media | image_url: width: 1200 | json }}{% else %}null{% endif %},
                           "properties": {{ item.properties | json }},
                           "sellingPlan": {% if item.selling_plan_allocation %}{{ item.selling_plan_allocation.selling_plan.id | json }}{% else %}null{% endif %},
                           "options": [

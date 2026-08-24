@@ -10,6 +10,18 @@
   if editorial_image == blank
     assign editorial_image = product.featured_media.preview_image
   endif
+  if editorial_image == blank
+    assign editorial_variant_gallery = product.selected_or_first_available_variant.metafields.custom.variant_images.value
+    if editorial_variant_gallery == blank
+      assign editorial_variant_gallery = product.selected_or_first_available_variant.metafields.custom.custom_variant_images.value
+    endif
+    for variant_media in editorial_variant_gallery
+      if variant_media.media_type == 'image'
+        assign editorial_image = variant_media.preview_image
+        break
+      endif
+    endfor
+  endif
 -%}
 
 <article class="prada-featured-tile">

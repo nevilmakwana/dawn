@@ -89,7 +89,26 @@
               endif
             -%}
             {%- unless featured_tile_enabled -%}
-            {%- assign secondary_media = product.media[1] -%}
+            {%- liquid
+              assign primary_media = product.featured_media
+              assign secondary_media = product.media[1]
+              if primary_media == blank
+                assign collection_variant_gallery = product.selected_or_first_available_variant.metafields.custom.variant_images.value
+                if collection_variant_gallery == blank
+                  assign collection_variant_gallery = product.selected_or_first_available_variant.metafields.custom.custom_variant_images.value
+                endif
+                for variant_media in collection_variant_gallery
+                  if variant_media.media_type == 'image'
+                    if primary_media == blank
+                      assign primary_media = variant_media
+                    elsif secondary_media == blank
+                      assign secondary_media = variant_media
+                      break
+                    endif
+                  endif
+                endfor
+              endif
+            -%}
             {%- assign has_secondary_image = false -%}
             {%- if secondary_media and secondary_media.media_type == 'image' -%}
               {%- assign has_secondary_image = true -%}
@@ -105,22 +124,22 @@
                         data-prada-mobile-carousel
                       {% endif %}
                     >
-                    {%- if product.featured_media -%}
+                    {%- if primary_media -%}
                       <img
                         class="prada-product-tile__image"
                         srcset="
-                          {%- if product.featured_media.width >= 360 -%}{{ product.featured_media | image_url: width: 360 }} 360w,{%- endif -%}
-                          {%- if product.featured_media.width >= 533 -%}{{ product.featured_media | image_url: width: 533 }} 533w,{%- endif -%}
-                          {%- if product.featured_media.width >= 720 -%}{{ product.featured_media | image_url: width: 720 }} 720w,{%- endif -%}
-                          {%- if product.featured_media.width >= 940 -%}{{ product.featured_media | image_url: width: 940 }} 940w,{%- endif -%}
-                          {{ product.featured_media | image_url }} {{ product.featured_media.width }}w
+                          {%- if primary_media.width >= 360 -%}{{ primary_media | image_url: width: 360 }} 360w,{%- endif -%}
+                          {%- if primary_media.width >= 533 -%}{{ primary_media | image_url: width: 533 }} 533w,{%- endif -%}
+                          {%- if primary_media.width >= 720 -%}{{ primary_media | image_url: width: 720 }} 720w,{%- endif -%}
+                          {%- if primary_media.width >= 940 -%}{{ primary_media | image_url: width: 940 }} 940w,{%- endif -%}
+                          {{ primary_media | image_url }} {{ primary_media.width }}w
                         "
-                        src="{{ product.featured_media | image_url: width: 720 }}"
+                        src="{{ primary_media | image_url: width: 720 }}"
                         sizes="(min-width: 990px) 25vw, 50vw"
-                        alt="{{ product.featured_media.alt | default: product.title | escape }}"
+                        alt="{{ primary_media.alt | default: product.title | escape }}"
                         {% if forloop.index > 4 %}loading="lazy"{% endif %}
-                        width="{{ product.featured_media.width }}"
-                        height="{{ product.featured_media.height }}"
+                        width="{{ primary_media.width }}"
+                        height="{{ primary_media.height }}"
                       >
                       {%- if has_secondary_image -%}
                         <img
@@ -162,8 +181,8 @@
                     data-product-id="{{ product.id }}"
                     data-product-title="{{ product.title | escape }}"
                     data-product-url="{{ product.url | escape }}"
-                    data-product-image="{% if product.featured_media %}{{ product.featured_media | image_url: width: 720 | escape }}{% endif %}"
-                    data-product-image-alt="{{ product.featured_media.alt | default: product.title | escape }}"
+                    data-product-image="{% if primary_media %}{{ primary_media | image_url: width: 720 | escape }}{% endif %}"
+                    data-product-image-alt="{{ primary_media.alt | default: product.title | escape }}"
                     data-product-price="{{ product.price | money | strip_html | escape }}"
                     data-product-variant-id="{{ product.selected_or_first_available_variant.id }}"
                     data-product-available="{{ product.available }}"

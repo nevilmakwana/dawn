@@ -130,6 +130,21 @@
               aria-labelledby="predictive-search-products"
             >
               {%- for product in predictive_search.resources.products -%}
+                {%- liquid
+                  assign predictive_media = product.featured_media
+                  if predictive_media == blank
+                    assign predictive_gallery = product.selected_or_first_available_variant.metafields.custom.variant_images.value
+                    if predictive_gallery == blank
+                      assign predictive_gallery = product.selected_or_first_available_variant.metafields.custom.custom_variant_images.value
+                    endif
+                    for variant_media in predictive_gallery
+                      if variant_media.media_type == 'image'
+                        assign predictive_media = variant_media
+                        break
+                      endif
+                    endfor
+                  endif
+                -%}
                 <li
                   id="predictive-search-option-product-{{ forloop.index }}"
                   class="predictive-search__list-item"
@@ -142,13 +157,13 @@
                       class="predictive-search__item predictive-search__item--link-with-thumbnail link link--text"
                       tabindex="-1"
                     >
-                      {%- if product.featured_media != blank -%}
+                      {%- if predictive_media != blank -%}
                         <img
                           class="predictive-search__image"
-                          src="{{ product.featured_media | image_url: width: 150 }}"
-                          alt="{{ product.featured_media.alt | escape }}"
+                          src="{{ predictive_media | image_url: width: 150 }}"
+                          alt="{{ predictive_media.alt | default: product.title | escape }}"
                           width="50"
-                          height="{{ 50 | divided_by: product.featured_media.preview_image.aspect_ratio }}"
+                          height="{{ 50 | divided_by: predictive_media.aspect_ratio }}"
                         >
                       {%- endif -%}
                       <div class="predictive-search__item-content{% unless settings.predictive_search_show_vendor or settings.predictive_search_show_price %} predictive-search__item-content--centered{% endunless %}">
