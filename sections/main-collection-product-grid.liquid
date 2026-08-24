@@ -7,6 +7,43 @@
   data-section-id="{{ section.id }}"
 >
   {%- paginate collection.products by section.settings.products_per_page -%}
+    {%- liquid
+      assign linked_extra_count = 0
+
+      for linked_product in collections.all.products
+        assign linked_product_is_native = false
+        for native_collection in linked_product.collections
+          if native_collection.id == collection.id
+            assign linked_product_is_native = true
+            break
+          endif
+        endfor
+
+        unless linked_product_is_native
+          assign linked_match_found = false
+          for linked_variant in linked_product.variants
+            assign linked_collection_refs = linked_variant.metafields.custom.linked_collections.value
+            if linked_collection_refs == blank
+              assign linked_collection_refs = linked_variant.metafields.custom.custom_linked_collections.value
+            endif
+            for linked_collection in linked_collection_refs
+              if linked_collection.id == collection.id
+                assign linked_match_found = true
+                break
+              endif
+            endfor
+            if linked_match_found
+              break
+            endif
+          endfor
+          if linked_match_found
+            assign linked_extra_count = linked_extra_count | plus: 1
+          endif
+        endunless
+      endfor
+
+      assign displayed_product_count = collection.products_count | plus: linked_extra_count
+    -%}
     <header class="prada-collection__header">
       <div class="prada-collection__navigation">
         <h1 class="prada-collection__title" data-prada-collection-title>{{ collection.title | escape }}</h1>
@@ -37,7 +74,7 @@
       </div>
 
       <div class="prada-collection__toolbar">
-        <p class="prada-collection__count">{{ collection.products_count }} products</p>
+        <p class="prada-collection__count">{{ displayed_product_count }} products</p>
 
         <form class="prada-collection__controls" action="{{ collection.url }}" method="get">
           {%- if section.settings.enable_sorting -%}
@@ -57,7 +94,7 @@
     </header>
 
     <div class="prada-collection__grid-container" id="ProductGridContainer">
-      {%- if collection.products.size == 0 -%}
+      {%- if displayed_product_count == 0 -%}
         <div class="prada-collection__empty" id="product-grid" data-id="{{ section.id }}">
           <h2>{{ 'sections.collection_template.empty' | t }}</h2>
           <a href="{{ collection.url }}" class="underlined-link">View all products</a>
@@ -87,26 +124,49 @@
               if featured_tile_primary == 'true' or featured_tile_legacy == 'true'
                 assign featured_tile_enabled = true
               endif
+
+              assign collection_variant = blank
+              for candidate_variant in product.variants
+                assign candidate_collection_refs = candidate_variant.metafields.custom.linked_collections.value
+                if candidate_collection_refs == blank
+                  assign candidate_collection_refs = candidate_variant.metafields.custom.custom_linked_collections.value
+                endif
+                for candidate_collection in candidate_collection_refs
+                  if candidate_collection.id == collection.id
+                    assign collection_variant = candidate_variant
+                    break
+                  endif
+                endfor
+                if collection_variant != blank
+                  break
+                endif
+              endfor
+              if collection_variant == blank
+                assign collection_variant = product.selected_or_first_available_variant
+              endif
+              assign collection_product_url = product.url | append: '?variant=' | append: collection_variant.id
             -%}
             {%- unless featured_tile_enabled -%}
             {%- liquid
-              assign primary_media = product.featured_media
-              assign secondary_media = product.media[1]
-              if primary_media == blank
-                assign collection_variant_gallery = product.selected_or_first_available_variant.metafields.custom.variant_images.value
-                if collection_variant_gallery == blank
-                  assign collection_variant_gallery = product.selected_or_first_available_variant.metafields.custom.custom_variant_images.value
-                endif
-                for variant_media in collection_variant_gallery
-                  if variant_media.media_type == 'image'
-                    if primary_media == blank
-                      assign primary_media = variant_media
-                    elsif secondary_media == blank
-                      assign secondary_media = variant_media
-                      break
-                    endif
+              assign primary_media = blank
+              assign secondary_media = blank
+              assign collection_variant_gallery = collection_variant.metafields.custom.variant_images.value
+              if collection_variant_gallery == blank
+                assign collection_variant_gallery = collection_variant.metafields.custom.custom_variant_images.value
+              endif
+              for variant_media in collection_variant_gallery
+                if variant_media.media_type == 'image'
+                  if primary_media == blank
+                    assign primary_media = variant_media
+                  elsif secondary_media == blank
+                    assign secondary_media = variant_media
+                    break
                   endif
-                endfor
+                endif
+              endfor
+              if primary_media == blank
+                assign primary_media = collection_variant.featured_media | default: product.featured_media
+                assign secondary_media = product.media[1]
               endif
             -%}
             {%- assign has_secondary_image = false -%}
@@ -119,7 +179,7 @@
                   <div class="prada-product-tile__media">
                     <a
                       class="prada-product-tile__carousel"
-                      href="{{ product.url }}"
+                      href="{{ collection_product_url }}"
                       {% if has_secondary_image %}
                         data-prada-mobile-carousel
                       {% endif %}
@@ -180,12 +240,12 @@
                     data-prada-product-wishlist
                     data-product-id="{{ product.id }}"
                     data-product-title="{{ product.title | escape }}"
-                    data-product-url="{{ product.url | escape }}"
+                    data-product-url="{{ collection_product_url | escape }}"
                     data-product-image="{% if primary_media %}{{ primary_media | image_url: width: 720 | escape }}{% endif %}"
                     data-product-image-alt="{{ primary_media.alt | default: product.title | escape }}"
-                    data-product-price="{{ product.price | money | strip_html | escape }}"
-                    data-product-variant-id="{{ product.selected_or_first_available_variant.id }}"
-                    data-product-available="{{ product.available }}"
+                    data-product-price="{{ collection_variant.price | money | strip_html | escape }}"
+                    data-product-variant-id="{{ collection_variant.id }}"
+                    data-product-available="{{ collection_variant.available }}"
                     aria-label="Add {{ product.title | escape }} to wishlist"
                     aria-pressed="false"
                   >
@@ -193,9 +253,9 @@
                   </button>
 
                   <div class="prada-product-tile__information">
-                    <h2 class="prada-product-tile__title"><a href="{{ product.url }}">{{ product.title | escape }}</a></h2>
+                    <h2 class="prada-product-tile__title"><a href="{{ collection_product_url }}">{{ product.title | escape }}</a></h2>
                     <p class="prada-product-tile__price" data-currency-price>
-                      {%- if product.price_varies -%}From {% endif -%}<span class="money">{{ product.price | money }}</span>
+                      <span class="money">{{ collection_variant.price | money }}</span>
                     </p>
                   </div>
                 </article>
@@ -233,6 +293,42 @@
             {%- endfor -%}
             {%- endunless -%}
           {%- endfor -%}
+
+          {%- if paginate.current_page == 1 and linked_extra_count > 0 -%}
+            {%- for linked_product in collections.all.products -%}
+              {%- liquid
+                assign linked_product_is_native = false
+                for native_collection in linked_product.collections
+                  if native_collection.id == collection.id
+                    assign linked_product_is_native = true
+                    break
+                  endif
+                endfor
+
+                assign linked_variant_match = blank
+                unless linked_product_is_native
+                  for linked_variant in linked_product.variants
+                    assign linked_collection_refs = linked_variant.metafields.custom.linked_collections.value
+                    if linked_collection_refs == blank
+                      assign linked_collection_refs = linked_variant.metafields.custom.custom_linked_collections.value
+                    endif
+                    for linked_collection in linked_collection_refs
+                      if linked_collection.id == collection.id
+                        assign linked_variant_match = linked_variant
+                        break
+                      endif
+                    endfor
+                    if linked_variant_match != blank
+                      break
+                    endif
+                  endfor
+                endunless
+              -%}
+              {%- if linked_variant_match != blank -%}
+                {% render 'prada-linked-variant-card', product: linked_product, variant: linked_variant_match, lazy_load: true %}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
         </ul>
 
         {%- if paginate.pages > 1 -%}
