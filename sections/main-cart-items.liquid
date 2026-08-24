@@ -509,7 +509,7 @@
                               {%- if cart_variant_gallery == blank -%}
                                 {%- assign cart_variant_gallery = variant.metafields.custom.custom_variant_images.value -%}
                               {%- endif -%}
-                              {{ variant.id | json }}: [
+                              {{ variant.id | append: '' | json }}: [
                                 {%- assign cart_variant_image_count = 0 -%}
                                 {%- for media in cart_variant_gallery -%}
                                   {%- if media.media_type == 'image' -%}
