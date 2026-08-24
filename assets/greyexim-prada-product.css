@@ -65,12 +65,13 @@ body:has(main[data-template='product']) .section-header.shopify-section-group-he
 .prada-product__drawer-shell.is-open .prada-product__drawer { transform: translate3d(0, 0, 0); }
 .prada-product__drawer-header { position: sticky; z-index: 2; top: 0; display: flex; align-items: center; justify-content: space-between; min-height: 96px; padding: 0 48px; border-bottom: 0; background: #fff; }
 .prada-product__drawer-header h2 { margin: 0; font-size: 18px; line-height: 1.3; font-weight: 600; }
-.prada-product__drawer-close { display: grid; place-items: center; width: 40px; height: 40px; padding: 7px; border: 1px solid #111; border-radius: 0; background: #fff; color: #111; cursor: pointer; }
+.prada-product__drawer-close { display: grid; place-items: center; width: 40px; height: 40px; padding: 7px; border: 0; border-radius: 0; background: transparent; color: #111; cursor: pointer; transition: opacity .2s ease; }
+.prada-product__drawer-close:hover { opacity: .55; }
 .prada-product__drawer-close svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.6; }
-.prada-product__drawer-body { padding: 24px 48px 64px; }
+.prada-product__drawer-body { padding: 4px 48px 64px; }
 .prada-product__drawer-pane { max-width: 680px; font-size: 14px; line-height: 1.7; }
 .prada-product__metafield-section { padding-bottom: 30px; }
-.prada-product__metafield-section h3 { margin: 0 0 22px; font-size: 14px; line-height: 1.35; font-weight: 700; }
+.prada-product__metafield-section > div > :first-child,
 .prada-product__metafield-section .metafield-rich_text_field > :first-child { margin-top: 0; }
 .prada-product__drawer-accordion { overflow: hidden; border-top: 1px solid var(--prada-border); }
 .prada-product__drawer-accordion:last-child { border-bottom: 1px solid var(--prada-border); }
@@ -123,7 +124,7 @@ html.prada-drawer-open, html.prada-drawer-open body { overflow: hidden; }
   .prada-product__wishlist--mobile { display: none; }
   .prada-product__drawer { width: 100%; max-width: none; }
   .prada-product__drawer-header { min-height: 72px; padding: 0 20px; }
-  .prada-product__drawer-body { padding: 32px 20px; }
+  .prada-product__drawer-body { padding: 8px 20px 40px; }
 }
 
 @keyframes prada-mobile-gallery-nudge {

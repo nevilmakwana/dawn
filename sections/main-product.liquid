@@ -296,7 +296,6 @@
         <div class="prada-product__drawer-pane rte" data-prada-drawer-pane="details" hidden>
           {%- if detail_fit != blank or product.description != blank -%}
             <section class="prada-product__metafield-section">
-              <h3>Description &amp; fit</h3>
               <div>
                 {%- if detail_fit != blank -%}
                   {{ detail_fit | metafield_tag }}
