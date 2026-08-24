@@ -13,6 +13,8 @@ In **Settings > Custom data > Variants**, create and pin these definitions:
 
 Pin both definitions so they are visible while editing a variant. Then open a product, select a variant, and manage its images and linked collections in the variant metafields section.
 
+The storefront also supports Shopify's auto-generated `custom.custom_variant_images` key for backward compatibility. New definitions should still use the canonical `custom.variant_images` key.
+
 ## Storefront behavior
 
 - When `custom.variant_images` has images, the selected variant gets its own gallery in the saved order.

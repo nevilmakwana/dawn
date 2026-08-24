@@ -367,6 +367,9 @@
 
   {%- for variant in product.variants -%}
     {%- assign variant_gallery = variant.metafields.custom.variant_images.value -%}
+    {%- if variant_gallery == blank -%}
+      {%- assign variant_gallery = variant.metafields.custom.custom_variant_images.value -%}
+    {%- endif -%}
     {%- if variant_gallery != blank -%}
       <template data-prada-variant-gallery="{{ variant.id }}">
         {%- for media in variant_gallery -%}
@@ -542,7 +545,10 @@
         selector.value = choice.dataset.pradaOptionValue;
         morphImage(choice.dataset.pradaImage);
         selector.dispatchEvent(new Event('change', { bubbles: true }));
-        if (!choice.classList.contains('prada-product__swatch')) closeDrawer();
+        if (!choice.classList.contains('prada-product__swatch')) {
+          closeDrawer();
+          returnToVariantGallery();
+        }
       });
     });
     document.addEventListener('keydown', (event) => {
@@ -706,6 +712,26 @@
         const variantImage = variant.featured_image?.src || variant.featured_media?.preview_image?.src;
         morphImage(variantImage || defaultPrimarySource);
       }
+    };
+
+    const returnToVariantGallery = () => {
+      if (!mobileQuery.matches) return;
+      window.clearTimeout(onboardingTimer);
+      root.classList.remove(
+        'mobile-info-open',
+        'mobile-info-closing',
+        'mobile-info-dragging',
+        'mobile-info-settling',
+        'mobile-gallery-onboarding'
+      );
+      sheetHandle?.setAttribute('aria-expanded', 'false');
+      sheetHandle?.setAttribute('aria-label', 'Open product information');
+      mobileGallery?.scrollTo({ top: 0, behavior: 'auto' });
+      scrollHint?.classList.remove('is-visible');
+
+      window.requestAnimationFrame(() => {
+        (root.closest('.shopify-section') || root).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
     };
 
     const playMobileOnboarding = () => {
