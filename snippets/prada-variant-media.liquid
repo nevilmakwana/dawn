@@ -1,0 +1,28 @@
+{% comment %}
+  Renders one media item from a variant's custom.variant_images metafield.
+
+  Accepts:
+  - media: A MediaImage or Video file reference
+  - section_id: Product section ID
+  - variant_id: Product variant ID
+  - position: One-based position in the variant gallery
+{% endcomment %}
+
+<figure
+  class="prada-product__media prada-product__media--{{ media.media_type }}"
+  id="PradaVariantMedia-{{ section_id }}-{{ variant_id }}-{{ position }}"
+  data-prada-media-label="View {{ media.media_type | replace: '_', ' ' }} {{ position }}"
+>
+  {%- case media.media_type -%}
+    {%- when 'image' -%}
+      {{ media.preview_image | image_url: width: 1800 | image_tag:
+        loading: 'lazy',
+        widths: '550, 750, 950, 1200, 1500, 1800',
+        sizes: '(min-width: 990px) 50vw, 100vw',
+        alt: media.alt,
+        class: 'prada-product__gallery-image'
+      }}
+    {%- when 'video' -%}
+      {{ media | video_tag: controls: false, autoplay: true, loop: true, muted: true, playsinline: true, preload: 'metadata', image_size: '1200x' }}
+  {%- endcase -%}
+</figure>

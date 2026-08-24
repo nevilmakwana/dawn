@@ -50,10 +50,14 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"/></svg>
     </button>
 
-    {%- if product.media.size > 0 -%}
-      <div class="prada-product__media-list">
+    <div class="prada-product__media-list">
+      {%- if product.media.size > 0 -%}
         {%- for media in product.media -%}
-          <figure class="prada-product__media prada-product__media--{{ media.media_type }}" id="PradaMedia-{{ section.id }}-{{ forloop.index }}">
+          <figure
+            class="prada-product__media prada-product__media--{{ media.media_type }}"
+            id="PradaMedia-{{ section.id }}-{{ forloop.index }}"
+            data-prada-media-label="View {{ media.media_type | replace: '_', ' ' }} {{ forloop.index }}"
+          >
             {%- case media.media_type -%}
               {%- when 'image' -%}
                 {%- liquid
@@ -81,23 +85,25 @@
             {%- endcase -%}
           </figure>
         {%- endfor -%}
-      </div>
-
-      {%- if product.media.size > 1 -%}
-        <nav class="prada-product__dots" aria-label="Choose product image">
-          {%- for media in product.media -%}
-            <a href="#PradaMedia-{{ section.id }}-{{ forloop.index }}" data-prada-dot="{{ forloop.index0 }}" aria-label="View {{ media.media_type | replace: '_', ' ' }} {{ forloop.index }}"{% if forloop.first %} class="is-active" aria-current="true"{% endif %}>
-              <span></span>
-            </a>
-          {%- endfor -%}
-        </nav>
-        <div class="prada-product__scroll-hint" data-prada-scroll-hint aria-hidden="true">Scroll more pictures</div>
+      {%- else -%}
+        <figure
+          class="prada-product__media prada-product__media--placeholder"
+          id="PradaMedia-{{ section.id }}-1"
+          data-prada-media-label="View product image"
+        >
+          {{ 'product-1' | placeholder_svg_tag }}
+        </figure>
       {%- endif -%}
-    {%- else -%}
-      <figure class="prada-product__media prada-product__media--placeholder">
-        {{ 'product-1' | placeholder_svg_tag }}
-      </figure>
-    {%- endif -%}
+    </div>
+
+    <nav class="prada-product__dots" aria-label="Choose product image"{% if product.media.size <= 1 %} hidden{% endif %}>
+      {%- for media in product.media -%}
+        <a href="#PradaMedia-{{ section.id }}-{{ forloop.index }}" data-prada-dot="{{ forloop.index0 }}" aria-label="View {{ media.media_type | replace: '_', ' ' }} {{ forloop.index }}"{% if forloop.first %} class="is-active" aria-current="true"{% endif %}>
+          <span></span>
+        </a>
+      {%- endfor -%}
+    </nav>
+    <div class="prada-product__scroll-hint" data-prada-scroll-hint aria-hidden="true">Scroll more pictures</div>
   </div>
 
   <div class="prada-product__panel">
@@ -359,6 +365,24 @@
       </div>
     </aside>
   </div>
+
+  {%- for variant in product.variants -%}
+    {%- assign variant_gallery = variant.metafields.custom.variant_images.value -%}
+    {%- if variant_gallery != blank -%}
+      <template data-prada-variant-gallery="{{ variant.id }}">
+        {%- for media in variant_gallery -%}
+          {%- if media.media_type == 'image' or media.media_type == 'video' -%}
+            {%- render 'prada-variant-media',
+              media: media,
+              section_id: section.id,
+              variant_id: variant.id,
+              position: forloop.index
+            -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </template>
+    {%- endif -%}
+  {%- endfor -%}
 </section>
 
 <script type="application/json" id="PradaVariants-{{ section.id }}">{{ product.variants | json }}</script>
@@ -370,12 +394,23 @@
     const gallery = root.querySelector('.prada-product__gallery');
     const desktopWishlist = gallery?.querySelector(':scope > .prada-product__wishlist');
     const desktopDots = gallery?.querySelector('.prada-product__dots');
-    const lastMedia = gallery?.querySelector('.prada-product__media:last-child');
+    const mediaList = gallery?.querySelector('.prada-product__media-list');
+    const defaultGalleryTemplate = document.createElement('template');
+    defaultGalleryTemplate.innerHTML = mediaList?.innerHTML || '';
+    const variantGalleryTemplates = new Map(
+      [...root.querySelectorAll('[data-prada-variant-gallery]')]
+        .filter((template) => template.content.querySelector('.prada-product__media'))
+        .map((template) => [template.dataset.pradaVariantGallery, template])
+    );
+    const defaultPrimaryImage = defaultGalleryTemplate.content.querySelector('.prada-product__gallery-image');
+    const defaultPrimarySource = defaultPrimaryImage?.currentSrc || defaultPrimaryImage?.src || '';
+    let activeGalleryKey = 'default';
     let wishlistFrame;
 
     const syncDesktopWishlist = () => {
       window.cancelAnimationFrame(wishlistFrame);
       wishlistFrame = window.requestAnimationFrame(() => {
+        const lastMedia = mediaList?.querySelector('.prada-product__media:last-child');
         if (!gallery || !desktopWishlist || !lastMedia || !window.matchMedia('(min-width: 990px)').matches) {
           desktopWishlist?.classList.remove('is-on-last-media');
           desktopDots?.classList.remove('is-gallery-ended');
@@ -416,9 +451,9 @@
       return moneyFormat.replace(/\{\{\s*amount(?:_with_comma_separator)?\s*\}\}/, amount).replace(/<[^>]*>/g, '');
     };
 
-    const primaryImage = root.querySelector('.prada-product__media--image .prada-product__gallery-image');
     let morphTimer;
     const morphImage = (source) => {
+      const primaryImage = mediaList?.querySelector('.prada-product__media--image .prada-product__gallery-image');
       if (!primaryImage || !source || primaryImage.currentSrc === source || primaryImage.src === source) return;
       window.clearTimeout(morphTimer);
       primaryImage.classList.add('is-morphing');
@@ -429,7 +464,7 @@
       }, 180);
     };
 
-    const updateVariant = () => {
+    const updateVariant = ({ updateHistory = true } = {}) => {
       const selected = selectors.map((selector) => selector.value);
       const variant = variants.find((item) => item.options.every((value, index) => value === selected[index]));
       if (!variant) {
@@ -467,7 +502,8 @@
         button.dataset.productImageAlt =
           variantImageAlt || root.dataset.wishlistFallbackImageAlt || button.dataset.productTitle;
       });
-      window.history.replaceState({}, '', `${root.dataset.productUrl}?variant=${variant.id}`);
+      renderVariantGallery(variant);
+      if (updateHistory) window.history.replaceState({}, '', `${root.dataset.productUrl}?variant=${variant.id}`);
     };
 
     selectors.forEach((selector) => selector.addEventListener('change', updateVariant));
@@ -553,20 +589,42 @@
       });
     });
 
-    const galleryMedia = [...root.querySelectorAll('.prada-product__media')];
-    const galleryDots = [...root.querySelectorAll('[data-prada-dot]')];
-    if (galleryMedia.length > 1 && galleryDots.length === galleryMedia.length) {
-      const visibility = new Map();
-      const setActiveDot = (activeIndex) => {
-        galleryDots.forEach((dot, index) => {
-          const active = index === activeIndex;
-          dot.classList.toggle('is-active', active);
-          if (active) dot.setAttribute('aria-current', 'true');
-          else dot.removeAttribute('aria-current');
-        });
-      };
+    let galleryMedia = [];
+    let galleryDots = [];
+    let mediaObserver;
 
-      const mediaObserver = new IntersectionObserver((entries) => {
+    const setActiveDot = (activeIndex) => {
+      galleryDots.forEach((dot, index) => {
+        const active = index === activeIndex;
+        dot.classList.toggle('is-active', active);
+        if (active) dot.setAttribute('aria-current', 'true');
+        else dot.removeAttribute('aria-current');
+      });
+    };
+
+    const refreshGalleryTracking = () => {
+      mediaObserver?.disconnect();
+      galleryMedia = [...(mediaList?.querySelectorAll('.prada-product__media') || [])];
+      if (!desktopDots) return;
+
+      desktopDots.replaceChildren();
+      galleryMedia.forEach((media, index) => {
+        const dot = document.createElement('a');
+        dot.href = `#${media.id}`;
+        dot.dataset.pradaDot = String(index);
+        dot.setAttribute('aria-label', media.dataset.pradaMediaLabel || `View product image ${index + 1}`);
+        dot.append(document.createElement('span'));
+        dot.addEventListener('click', () => setActiveDot(index));
+        desktopDots.append(dot);
+      });
+
+      galleryDots = [...desktopDots.querySelectorAll('[data-prada-dot]')];
+      desktopDots.hidden = galleryDots.length <= 1;
+      setActiveDot(0);
+      if (galleryMedia.length <= 1) return;
+
+      const visibility = new Map();
+      mediaObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => visibility.set(entry.target, entry.intersectionRatio));
         let activeIndex = 0;
         let highestVisibility = -1;
@@ -581,8 +639,9 @@
       }, { threshold: [0, .15, .3, .5, .7, .9, 1] });
 
       galleryMedia.forEach((media) => mediaObserver.observe(media));
-      galleryDots.forEach((dot, index) => dot.addEventListener('click', () => setActiveDot(index)));
-    }
+    };
+
+    refreshGalleryTracking();
 
     const mobileQuery = window.matchMedia('(max-width: 989px)');
     const mobileGallery = root.querySelector('.prada-product__media-list');
@@ -598,6 +657,57 @@
     let suppressHandleClick = false;
     let onboardingTimer;
     let scrollHintConsumed = false;
+
+    const setupProductVideos = () => {
+      mediaList?.querySelectorAll('.prada-product__media video').forEach((video) => {
+        video.controls = false;
+        video.muted = true;
+        video.defaultMuted = true;
+        video.volume = 0;
+        video.setAttribute('muted', '');
+        video.setAttribute('playsinline', '');
+        video.play().catch(() => {});
+        video.addEventListener('volumechange', () => {
+          if (!video.muted || video.volume !== 0) {
+            video.muted = true;
+            video.volume = 0;
+          }
+        });
+      });
+    };
+
+    const renderVariantGallery = (variant) => {
+      if (!mediaList) return;
+      const variantTemplate = variantGalleryTemplates.get(String(variant.id));
+      const nextGalleryKey = variantTemplate ? String(variant.id) : 'default';
+
+      if (activeGalleryKey !== nextGalleryKey) {
+        window.clearTimeout(onboardingTimer);
+        root.classList.remove('mobile-gallery-onboarding');
+        scrollHint?.classList.remove('is-visible');
+        scrollHintConsumed = true;
+
+        const sourceTemplate = variantTemplate || defaultGalleryTemplate;
+        const galleryContent = sourceTemplate.content.cloneNode(true);
+        const firstImage = galleryContent.querySelector('.prada-product__gallery-image');
+        if (firstImage) {
+          firstImage.loading = 'eager';
+          firstImage.fetchPriority = 'high';
+        }
+
+        mediaList.replaceChildren(galleryContent);
+        activeGalleryKey = nextGalleryKey;
+        mobileGallery?.scrollTo({ top: 0, behavior: 'auto' });
+        refreshGalleryTracking();
+        setupProductVideos();
+        syncDesktopWishlist();
+      }
+
+      if (!variantTemplate) {
+        const variantImage = variant.featured_image?.src || variant.featured_media?.preview_image?.src;
+        morphImage(variantImage || defaultPrimarySource);
+      }
+    };
 
     const playMobileOnboarding = () => {
       if (!mobileQuery.matches || !mobileGallery || galleryMedia.length < 2) return;
@@ -728,21 +838,8 @@
       window.addEventListener('load', () => window.setTimeout(playMobileOnboarding, 650), { once: true });
     }
 
-    root.querySelectorAll('.prada-product__media video').forEach((video) => {
-      video.controls = false;
-      video.muted = true;
-      video.defaultMuted = true;
-      video.volume = 0;
-      video.setAttribute('muted', '');
-      video.setAttribute('playsinline', '');
-      video.play().catch(() => {});
-      video.addEventListener('volumechange', () => {
-        if (!video.muted || video.volume !== 0) {
-          video.muted = true;
-          video.volume = 0;
-        }
-      });
-    });
+    setupProductVideos();
+    updateVariant({ updateHistory: false });
   })();
 </script>
 
