@@ -10,9 +10,16 @@
   assign detail_care = product.metafields.custom.care_guide
   assign detail_delivery = product.metafields.custom.delivery_and_payment
   assign category_color_metafield = product.metafields.shopify['color-pattern']
-  assign fallback_color_label = category_color_metafield.value | map: 'label' | join: ', '
+  assign product_color_label = category_color_metafield.value | map: 'label' | join: ', '
+  if product_color_label == blank
+    assign product_color_label = 'As shown'
+  endif
+  assign fallback_color_label = current_variant.metafields.custom.variant_color.value
   if fallback_color_label == blank
-    assign fallback_color_label = 'As shown'
+    assign fallback_color_label = current_variant.metafields.custom.custom_variant_color.value
+  endif
+  if fallback_color_label == blank
+    assign fallback_color_label = product_color_label
   endif
   assign wishlist_media = current_variant.featured_media
   if wishlist_media == blank
@@ -180,9 +187,19 @@
                         {%- endif -%}
                       {%- endfor -%}
                       {%- for variant in product.variants -%}
-                        {%- if variant.options[color_option_index] == value and variant.featured_media != blank -%}
-                          {%- assign swatch_image = variant.featured_media.preview_image | image_url: width: 1800 -%}
-                          {%- break -%}
+                        {%- if variant.options[color_option_index] == value -%}
+                          {%- assign variant_swatch_gallery = variant.metafields.custom.variant_images.value -%}
+                          {%- if variant_swatch_gallery == blank -%}
+                            {%- assign variant_swatch_gallery = variant.metafields.custom.custom_variant_images.value -%}
+                          {%- endif -%}
+                          {%- assign variant_swatch_media = variant_swatch_gallery | first -%}
+                          {%- if variant_swatch_media.media_type == 'image' -%}
+                            {%- assign swatch_image = variant_swatch_media.preview_image | image_url: width: 1800 -%}
+                            {%- break -%}
+                          {%- elsif variant.featured_media != blank -%}
+                            {%- assign swatch_image = variant.featured_media.preview_image | image_url: width: 1800 -%}
+                            {%- break -%}
+                          {%- endif -%}
                         {%- endif -%}
                       {%- endfor -%}
                       <button
@@ -393,6 +410,17 @@
 </section>
 
 <script type="application/json" id="PradaVariants-{{ section.id }}">{{ product.variants | json }}</script>
+<script type="application/json" id="PradaVariantColors-{{ section.id }}">
+  {
+    {%- for variant in product.variants -%}
+      {%- assign variant_color_label = variant.metafields.custom.variant_color.value -%}
+      {%- if variant_color_label == blank -%}
+        {%- assign variant_color_label = variant.metafields.custom.custom_variant_color.value -%}
+      {%- endif -%}
+      {{ variant.id | append: '' | json }}: {{ variant_color_label | json }}{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  }
+</script>
 <script>
   (() => {
     const root = document.getElementById('PradaProduct-{{ section.id }}');
@@ -444,6 +472,8 @@
     syncDesktopWishlist();
 
     const variants = JSON.parse(document.getElementById('PradaVariants-{{ section.id }}').textContent);
+    const variantColors = JSON.parse(document.getElementById('PradaVariantColors-{{ section.id }}').textContent);
+    const productColorLabel = {{ product_color_label | json }};
     const selectors = [...root.querySelectorAll('[data-prada-option]')]
       .sort((a, b) => Number(a.dataset.pradaOption) - Number(b.dataset.pradaOption));
     const idInput = root.querySelector('[data-prada-variant-id]');
@@ -451,6 +481,8 @@
     const status = root.querySelector('[data-prada-status]');
     const submit = root.querySelector('[data-prada-submit]');
     const submitText = root.querySelector('[data-prada-submit-text]');
+    const fallbackColorValue = root.querySelector('[data-prada-fallback-color-value]');
+    const fallbackColorSwatch = root.querySelector('.prada-product__option--fallback-color .prada-product__swatch');
     const moneyFormat = {{ shop.money_format | json }};
 
     const formatMoney = (cents) => {
@@ -496,6 +528,11 @@
       submit.disabled = !variant.available;
       submitText.textContent = variant.available ? 'Add to bag' : 'Available soon';
       if (status) status.textContent = variant.available ? 'Available online' : 'Soon available online';
+      if (fallbackColorValue) {
+        const variantColorLabel = variantColors[String(variant.id)] || productColorLabel;
+        fallbackColorValue.textContent = variantColorLabel;
+        fallbackColorSwatch?.setAttribute('aria-label', `Color ${variantColorLabel}`);
+      }
       root.querySelectorAll('[data-prada-product-wishlist]').forEach((button) => {
         button.dataset.productVariantId = String(variant.id);
         button.dataset.productUrl = `${root.dataset.productUrl}?variant=${variant.id}`;

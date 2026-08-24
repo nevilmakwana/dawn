@@ -494,10 +494,18 @@
                           ],
                           "variants": [
                             {% for variant in item.product.variants %}
+                              {%- assign cart_variant_color = variant.metafields.custom.variant_color.value -%}
+                              {%- if cart_variant_color == blank -%}
+                                {%- assign cart_variant_color = variant.metafields.custom.custom_variant_color.value -%}
+                              {%- endif -%}
+                              {%- if cart_variant_color == blank -%}
+                                {%- assign cart_variant_color = cart_category_color -%}
+                              {%- endif -%}
                               {
                                 "id": {{ variant.id | json }},
                                 "available": {{ variant.available | json }},
                                 "price": {{ variant.price | money | strip_html | json }},
+                                "colorLabel": {{ cart_variant_color | json }},
                                 "options": [{{ variant.option1 | json }}, {{ variant.option2 | json }}, {{ variant.option3 | json }}],
                                 "image": {% if variant.image %}{{ variant.image | image_url: width: 1200 | json }}{% else %}null{% endif %}
                               }{% unless forloop.last %},{% endunless %}

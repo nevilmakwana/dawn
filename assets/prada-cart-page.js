@@ -442,7 +442,7 @@
       });
 
       if (!hasColorOption) {
-        const colorLabel = data.colorLabel || 'As shown';
+        const colorLabel = selectedVariant?.colorLabel || data.colorLabel || 'As shown';
         const colorThumbnail = getGalleryImages()[0]?.src || data.image || '';
         const colorRow = document.createElement('div');
         colorRow.className = 'prada-cart-edit-modal__option-row prada-cart-edit-modal__option-row--color';
