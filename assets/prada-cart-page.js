@@ -320,8 +320,17 @@
         productOptions.every((option, index) => variant.options[index] === selectedOptions[index])
       );
 
+    const getVariantGalleryImages = (variant) => {
+      if (!variant) return [];
+      const variantGallery = data.variantImages?.[String(variant.id)];
+      return Array.isArray(variantGallery) ? variantGallery.filter((image) => image?.src) : [];
+    };
+
     const getGalleryImages = () => {
       const selectedVariant = getSelectedVariant();
+      const variantGallery = getVariantGalleryImages(selectedVariant);
+      if (variantGallery.length) return variantGallery;
+
       const preferredImage = selectedVariant?.image;
       if (!preferredImage) return images;
 
@@ -413,7 +422,7 @@
                 index === optionIndex || !selectedOptions[index] || variant.options[index] === selectedOptions[index]
               )
             ) || variants.find((variant) => variant.options[optionIndex] === value);
-            const thumbnailSrc = matchingVariant?.image || images[0]?.src || data.image || '';
+            const thumbnailSrc = getVariantGalleryImages(matchingVariant)[0]?.src || matchingVariant?.image || images[0]?.src || data.image || '';
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'prada-cart-edit-modal__color-value';
@@ -433,16 +442,18 @@
       });
 
       if (!hasColorOption) {
+        const colorLabel = data.colorLabel || 'As shown';
+        const colorThumbnail = getGalleryImages()[0]?.src || data.image || '';
         const colorRow = document.createElement('div');
         colorRow.className = 'prada-cart-edit-modal__option-row prada-cart-edit-modal__option-row--color';
         colorRow.innerHTML = `
           <div class="prada-cart-edit-modal__color-heading">
             <span class="prada-cart-edit-modal__option-label">Color:</span>
-            <span>As shown</span>
+            <span>${escapeHtml(colorLabel)}</span>
           </div>
           <div class="prada-cart-edit-modal__color-values">
-            <span class="prada-cart-edit-modal__color-value" aria-label="Color as shown">
-              ${images[0]?.src || data.image ? `<img class="prada-cart-edit-modal__color-thumbnail" src="${escapeHtml(images[0]?.src || data.image)}" alt="${escapeHtml(data.title)}">` : '<span class="prada-cart-edit-modal__swatch"></span>'}
+            <span class="prada-cart-edit-modal__color-value" aria-label="Color: ${escapeHtml(colorLabel)}">
+              ${colorThumbnail ? `<img class="prada-cart-edit-modal__color-thumbnail" src="${escapeHtml(colorThumbnail)}" alt="${escapeHtml(data.title)}">` : '<span class="prada-cart-edit-modal__swatch"></span>'}
             </span>
           </div>`;
         optionsContainer.append(colorRow);

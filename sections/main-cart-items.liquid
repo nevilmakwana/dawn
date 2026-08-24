@@ -460,6 +460,12 @@
                           Move to wishlist
                         </button>
                       </div>
+                      {%- liquid
+                        assign cart_category_color = item.product.metafields.shopify['color-pattern'].value | map: 'label' | join: ', '
+                        if cart_category_color == blank
+                          assign cart_category_color = 'As shown'
+                        endif
+                      -%}
                       <script type="application/json" id="PradaCartEditData-{{ item.index | plus: 1 }}">
                         {
                           "line": {{ item.index | plus: 1 | json }},
@@ -470,6 +476,7 @@
                           "url": {{ item.url | json }},
                           "description": {{ item.product.description | json }},
                           "price": {{ item.final_price | money | strip_html | json }},
+                          "colorLabel": {{ cart_category_color | json }},
                           "image": {% if item.image %}{{ item.image | image_url: width: 1200 | json }}{% else %}null{% endif %},
                           "properties": {{ item.properties | json }},
                           "sellingPlan": {% if item.selling_plan_allocation %}{{ item.selling_plan_allocation.selling_plan.id | json }}{% else %}null{% endif %},
@@ -496,6 +503,27 @@
                               }{% unless forloop.last %},{% endunless %}
                             {% endfor %}
                           ],
+                          "variantImages": {
+                            {% for variant in item.product.variants %}
+                              {%- assign cart_variant_gallery = variant.metafields.custom.variant_images.value -%}
+                              {%- if cart_variant_gallery == blank -%}
+                                {%- assign cart_variant_gallery = variant.metafields.custom.custom_variant_images.value -%}
+                              {%- endif -%}
+                              {{ variant.id | json }}: [
+                                {%- assign cart_variant_image_count = 0 -%}
+                                {%- for media in cart_variant_gallery -%}
+                                  {%- if media.media_type == 'image' -%}
+                                    {%- if cart_variant_image_count > 0 -%},{%- endif -%}
+                                    {
+                                      "src": {{ media.preview_image | image_url: width: 1800 | json }},
+                                      "alt": {{ media.alt | default: item.product.title | json }}
+                                    }
+                                    {%- assign cart_variant_image_count = cart_variant_image_count | plus: 1 -%}
+                                  {%- endif -%}
+                                {%- endfor -%}
+                              ]{% unless forloop.last %},{% endunless %}
+                            {% endfor %}
+                          },
                           "images": [
                             {% for image in item.product.images %}
                               {
