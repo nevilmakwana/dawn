@@ -150,3 +150,7 @@ html.prada-drawer-open, html.prada-drawer-open body { overflow: hidden; }
 @media screen and (min-width: 990px) and (max-width: 1199px) {
   .prada-product__info { width: calc(100% - 64px); padding-top: 40px; }
 }
+
+@media screen and (min-width: 990px) {
+  .prada-product__swatch { width: 112px; height: 140px; }
+}

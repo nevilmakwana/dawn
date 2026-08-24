@@ -9,6 +9,11 @@
   assign detail_materials = product.metafields.custom.materials
   assign detail_care = product.metafields.custom.care_guide
   assign detail_delivery = product.metafields.custom.delivery_and_payment
+  assign category_color_metafield = product.metafields.shopify['color-pattern']
+  assign fallback_color_label = category_color_metafield.value | map: 'label' | join: ', '
+  if fallback_color_label == blank
+    assign fallback_color_label = 'As shown'
+  endif
   assign wishlist_media = current_variant.featured_media
   if wishlist_media == blank
     assign wishlist_media = product.featured_media
@@ -216,10 +221,10 @@
               <div class="prada-product__option prada-product__option--color prada-product__option--fallback-color">
                 <div class="prada-product__color-heading">
                   <strong>Color</strong>
-                  <span>As shown</span>
+                  <span data-prada-fallback-color-value>{{ fallback_color_label }}</span>
                 </div>
                 <div class="prada-product__swatches" aria-label="Product color">
-                  <span class="prada-product__swatch prada-product__swatch--static is-selected" role="img" aria-label="Color as shown">
+                  <span class="prada-product__swatch prada-product__swatch--static is-selected" role="img" aria-label="Color {{ fallback_color_label | escape }}">
                     {%- if fallback_swatch_media != blank -%}
                       <img src="{{ fallback_swatch_media.preview_image | image_url: width: 1800 }}" alt="" loading="lazy" width="84" height="105">
                     {%- else -%}
@@ -681,6 +686,13 @@
       });
     };
 
+    const syncFallbackColorImage = (source) => {
+      const fallbackImage = root.querySelector('.prada-product__option--fallback-color .prada-product__swatch img');
+      if (!fallbackImage || !source || fallbackImage.currentSrc === source || fallbackImage.src === source) return;
+      fallbackImage.removeAttribute('srcset');
+      fallbackImage.src = source;
+    };
+
     const renderVariantGallery = (variant) => {
       if (!mediaList) return;
       const variantTemplate = variantGalleryTemplates.get(String(variant.id));
@@ -708,9 +720,14 @@
         syncDesktopWishlist();
       }
 
-      if (!variantTemplate) {
+      if (variantTemplate) {
+        const selectedImage = mediaList.querySelector('.prada-product__gallery-image');
+        syncFallbackColorImage(selectedImage?.currentSrc || selectedImage?.src);
+      } else {
         const variantImage = variant.featured_image?.src || variant.featured_media?.preview_image?.src;
-        morphImage(variantImage || defaultPrimarySource);
+        const fallbackSource = variantImage || defaultPrimarySource;
+        morphImage(fallbackSource);
+        syncFallbackColorImage(fallbackSource);
       }
     };
 
