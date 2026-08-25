@@ -522,6 +522,11 @@
     const productColorLabel = {{ product_color_label | json }};
     const selectors = [...root.querySelectorAll('[data-prada-option]')]
       .sort((a, b) => Number(a.dataset.pradaOption) - Number(b.dataset.pradaOption));
+    const colorSelector = root.querySelector('.prada-product__option--color [data-prada-option]');
+    const colorOptionIndex = colorSelector ? Number(colorSelector.dataset.pradaOption) : -1;
+    const colorChoices = colorOptionIndex >= 0
+      ? [...root.querySelectorAll(`[data-prada-option-choice="${colorOptionIndex}"]`)]
+      : [];
     const idInput = root.querySelector('[data-prada-variant-id]');
     const price = root.querySelector('[data-prada-price]');
     const status = root.querySelector('[data-prada-status]');
@@ -549,7 +554,54 @@
       }, 180);
     };
 
+    const findVariantForColor = (colorValue) => variants.find((variant) =>
+      variant.options.every((value, index) => {
+        if (index === colorOptionIndex) return value === colorValue;
+        return value === selectors[index]?.value;
+      })
+    );
+
+    const syncCompatibleColors = () => {
+      if (!colorSelector || colorOptionIndex < 0) return;
+
+      let firstCompatibleChoice = null;
+      colorChoices.forEach((choice) => {
+        const matchingVariant = findVariantForColor(choice.dataset.pradaOptionValue);
+        const isCompatible = Boolean(matchingVariant);
+        choice.hidden = !isCompatible;
+        choice.disabled = !isCompatible;
+        choice.setAttribute('aria-hidden', isCompatible ? 'false' : 'true');
+
+        if (!matchingVariant) return;
+        if (!firstCompatibleChoice) firstCompatibleChoice = choice;
+
+        const source = getVariantPrimaryImage(matchingVariant)
+          || matchingVariant.featured_image?.src
+          || matchingVariant.featured_media?.preview_image?.src
+          || '';
+        if (!source) return;
+
+        let image = choice.querySelector('img');
+        if (!image) {
+          image = document.createElement('img');
+          image.alt = '';
+          image.loading = 'lazy';
+          image.width = 84;
+          image.height = 105;
+          choice.replaceChildren(image);
+        }
+        image.removeAttribute('srcset');
+        image.src = source;
+        choice.dataset.pradaImage = source;
+      });
+
+      if (!findVariantForColor(colorSelector.value) && firstCompatibleChoice) {
+        colorSelector.value = firstCompatibleChoice.dataset.pradaOptionValue;
+      }
+    };
+
     const updateVariant = ({ updateHistory = true } = {}) => {
+      syncCompatibleColors();
       const selected = selectors.map((selector) => selector.value);
       const variant = variants.find((item) => item.options.every((value, index) => value === selected[index]));
       if (!variant) {

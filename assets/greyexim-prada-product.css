@@ -44,6 +44,7 @@ body:has(main[data-template='product']) .section-header.shopify-section-group-he
 .prada-product__color-heading strong { font-weight: 700; }
 .prada-product__swatches { display: flex; flex-wrap: wrap; gap: 12px; padding: 0; }
 .prada-product__swatch { display: grid; place-items: center; width: 86px; height: 108px; padding: 3px; overflow: hidden; border: 1px solid #d8d8d8; border-radius: 0; background: #f3f3f3; cursor: pointer; }
+.prada-product__swatch[hidden] { display: none; }
 .prada-product__swatch > img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .prada-product__swatch > span { display: block; width: 100%; height: 100%; background: var(--swatch-color, #d8d8d8); }
 .prada-product__swatch.is-selected, .prada-product__swatch[aria-pressed='true'] { border: 2px solid #111; padding: 2px; }
