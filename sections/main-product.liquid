@@ -600,7 +600,7 @@
       }
     };
 
-    const updateVariant = ({ updateHistory = true } = {}) => {
+    const updateVariant = ({ updateHistory = true, revealGallery = false } = {}) => {
       syncCompatibleColors();
       const selected = selectors.map((selector) => selector.value);
       const variant = variants.find((item) => item.options.every((value, index) => value === selected[index]));
@@ -645,10 +645,13 @@
           variantImageAlt || root.dataset.wishlistFallbackImageAlt || button.dataset.productTitle;
       });
       renderVariantGallery(variant);
+      if (revealGallery) returnToVariantGallery({ behavior: 'smooth' });
       if (updateHistory) window.history.replaceState({}, '', `${root.dataset.productUrl}?variant=${variant.id}`);
     };
 
-    selectors.forEach((selector) => selector.addEventListener('change', updateVariant));
+    selectors.forEach((selector) => {
+      selector.addEventListener('change', () => updateVariant({ revealGallery: true }));
+    });
 
     const drawerShell = root.querySelector('[data-prada-drawer]');
     const drawerTitle = root.querySelector('[data-prada-drawer-title]');
@@ -682,13 +685,11 @@
     root.querySelectorAll('[data-prada-option-choice]').forEach((choice) => {
       choice.addEventListener('click', () => {
         const selector = selectors[Number(choice.dataset.pradaOptionChoice)];
+        const shouldCloseDrawer = !choice.classList.contains('prada-product__swatch');
         selector.value = choice.dataset.pradaOptionValue;
         morphImage(choice.dataset.pradaImage);
         selector.dispatchEvent(new Event('change', { bubbles: true }));
-        if (!choice.classList.contains('prada-product__swatch')) {
-          closeDrawer();
-          returnToVariantGallery();
-        }
+        if (shouldCloseDrawer) closeDrawer();
       });
     });
     document.addEventListener('keydown', (event) => {
@@ -866,8 +867,9 @@
       }
     };
 
-    const returnToVariantGallery = () => {
+    const returnToVariantGallery = ({ behavior = 'auto' } = {}) => {
       if (!mobileQuery.matches) return;
+      const scrollBehavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : behavior;
       window.clearTimeout(onboardingTimer);
       root.classList.remove(
         'mobile-info-open',
@@ -878,11 +880,12 @@
       );
       sheetHandle?.setAttribute('aria-expanded', 'false');
       sheetHandle?.setAttribute('aria-label', 'Open product information');
-      mobileGallery?.scrollTo({ top: 0, behavior: 'auto' });
+      setActiveDot(0);
+      mobileGallery?.scrollTo({ top: 0, behavior: scrollBehavior });
       scrollHint?.classList.remove('is-visible');
 
       window.requestAnimationFrame(() => {
-        (root.closest('.shopify-section') || root).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        (root.closest('.shopify-section') || root).scrollIntoView({ behavior: scrollBehavior, block: 'start' });
       });
     };
 
