@@ -60,7 +60,22 @@
     price.className = 'prada-wishlist-page__price money';
     price.dataset.currencyPrice = '';
     price.textContent = formatWishlistPrice(item.price);
-    details.append(title, price);
+
+    const options = document.createElement('dl');
+    options.className = 'prada-wishlist-page__options';
+    (item.options || []).forEach((option) => {
+      const row = document.createElement('div');
+      const name = document.createElement('dt');
+      const value = document.createElement('dd');
+      name.textContent = `${option.name}:`;
+      value.textContent = option.value;
+      row.append(name, value);
+      options.append(row);
+    });
+
+    details.append(title);
+    if (options.children.length) details.append(options);
+    details.append(price);
 
     const form = document.createElement('form');
     form.className = 'prada-wishlist-page__form';

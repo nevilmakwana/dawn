@@ -1,18 +1,19 @@
 {%- if cart != empty -%}
   {%- for item in cart.items -%}
     {%- liquid
-      assign notification_item_media = item.image
-      if notification_item_media == blank
-        assign notification_variant_gallery = item.variant.metafields.custom.variant_images.value
-        if notification_variant_gallery == blank
-          assign notification_variant_gallery = item.variant.metafields.custom.custom_variant_images.value
+      assign notification_item_media = blank
+      assign notification_variant_gallery = item.variant.metafields.custom.variant_images.value
+      if notification_variant_gallery == blank
+        assign notification_variant_gallery = item.variant.metafields.custom.custom_variant_images.value
+      endif
+      for variant_media in notification_variant_gallery
+        if variant_media.media_type == 'image'
+          assign notification_item_media = variant_media
+          break
         endif
-        for variant_media in notification_variant_gallery
-          if variant_media.media_type == 'image'
-            assign notification_item_media = variant_media
-            break
-          endif
-        endfor
+      endfor
+      if notification_item_media == blank
+        assign notification_item_media = item.image
       endif
     -%}
     <div id="cart-notification-product-{{ item.key }}" class="cart-item">

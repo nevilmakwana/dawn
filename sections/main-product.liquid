@@ -36,7 +36,16 @@
   if storefront_primary_media == blank
     assign storefront_primary_media = current_variant_primary_image
   endif
-  assign wishlist_media = current_variant.featured_media
+  assign wishlist_media = blank
+  for variant_media in current_variant_gallery
+    if variant_media.media_type == 'image'
+      assign wishlist_media = variant_media
+      break
+    endif
+  endfor
+  if wishlist_media == blank
+    assign wishlist_media = current_variant.featured_media
+  endif
   if wishlist_media == blank
     assign wishlist_media = storefront_primary_media
   endif
@@ -519,6 +528,7 @@
 
     const variants = JSON.parse(document.getElementById('PradaVariants-{{ section.id }}').textContent);
     const variantColors = JSON.parse(document.getElementById('PradaVariantColors-{{ section.id }}').textContent);
+    const optionNames = {{ product.options | json }};
     const productColorLabel = {{ product_color_label | json }};
     const selectors = [...root.querySelectorAll('[data-prada-option]')]
       .sort((a, b) => Number(a.dataset.pradaOption) - Number(b.dataset.pradaOption));
@@ -600,7 +610,7 @@
       }
     };
 
-    const updateVariant = ({ updateHistory = true, revealGallery = false } = {}) => {
+    const updateVariant = ({ updateHistory = true, revealGallery = false, syncWishlist = false } = {}) => {
       syncCompatibleColors();
       const selected = selectors.map((selector) => selector.value);
       const variant = variants.find((item) => item.options.every((value, index) => value === selected[index]));
@@ -631,26 +641,37 @@
         fallbackColorValue.textContent = variantColorLabel;
         fallbackColorSwatch?.setAttribute('aria-label', `Color ${variantColorLabel}`);
       }
-      root.querySelectorAll('[data-prada-product-wishlist]').forEach((button) => {
+      const selectedOptions = selectors.map((selector, index) => ({
+        name: optionNames[index] || `Option ${index + 1}`,
+        value: selector.value,
+      }));
+      const wishlistButtons = [...root.querySelectorAll('[data-prada-product-wishlist]')];
+      wishlistButtons.forEach((button) => {
         button.dataset.productVariantId = String(variant.id);
         button.dataset.productUrl = `${root.dataset.productUrl}?variant=${variant.id}`;
         button.dataset.productPrice = formatMoney(variant.price);
         button.dataset.productAvailable = String(variant.available);
+        button.dataset.productOptions = JSON.stringify(selectedOptions);
 
-        const variantImage = variant.featured_image?.src || variant.featured_media?.preview_image?.src;
+        const variantImage = getVariantPrimaryImage(variant)
+          || variant.featured_image?.src
+          || variant.featured_media?.preview_image?.src;
         button.dataset.productImage = variantImage || root.dataset.wishlistFallbackImage || '';
 
         const variantImageAlt = variant.featured_image?.alt || variant.featured_media?.alt;
         button.dataset.productImageAlt =
           variantImageAlt || root.dataset.wishlistFallbackImageAlt || button.dataset.productTitle;
       });
+      if (syncWishlist && wishlistButtons[0]) {
+        window.PradaWishlist?.updateFromButton?.(wishlistButtons[0]);
+      }
       renderVariantGallery(variant);
       if (revealGallery) returnToVariantGallery({ behavior: 'smooth' });
       if (updateHistory) window.history.replaceState({}, '', `${root.dataset.productUrl}?variant=${variant.id}`);
     };
 
     selectors.forEach((selector) => {
-      selector.addEventListener('change', () => updateVariant({ revealGallery: true }));
+      selector.addEventListener('change', () => updateVariant({ revealGallery: true, syncWishlist: true }));
     });
 
     const drawerShell = root.querySelector('[data-prada-drawer]');

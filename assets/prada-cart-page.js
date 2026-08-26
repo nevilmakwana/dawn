@@ -149,6 +149,7 @@
       price: moveButton.dataset.productPrice,
       variantId: moveButton.dataset.productVariantId,
       available: moveButton.dataset.productAvailable,
+      options: moveButton.dataset.productOptions,
     });
 
     moveButton.disabled = true;

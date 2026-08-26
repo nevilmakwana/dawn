@@ -17,6 +17,25 @@
     return parser.value.replace(/<[^>]*>/g, '').replace(/^\s*(?:Rs\.?|INR)\s*/i, '₹ ').trim();
   };
 
+  const normaliseOptions = (value) => {
+    let options = value;
+    if (typeof options === 'string') {
+      try {
+        options = JSON.parse(options);
+      } catch {
+        return [];
+      }
+    }
+    if (!Array.isArray(options)) return [];
+
+    return options
+      .map((option) => ({
+        name: String(option?.name || '').trim(),
+        value: String(option?.value || '').trim(),
+      }))
+      .filter((option) => option.name && option.value);
+  };
+
   const setThemeColor = (color) => {
     if (themeColorMeta) themeColorMeta.setAttribute('content', color);
   };
@@ -33,6 +52,7 @@
       price: normalisePrice(item.price),
       variantId: item.variantId ? String(item.variantId) : '',
       available: item.available !== false && item.available !== 'false',
+      options: normaliseOptions(item.options),
     };
   };
 
@@ -73,6 +93,7 @@
       price: button.dataset.productPrice,
       variantId: button.dataset.productVariantId,
       available: button.dataset.productAvailable,
+      options: button.dataset.productOptions,
     });
   };
 
@@ -191,6 +212,22 @@
     return notify();
   };
 
+  const update = (item) => {
+    const normalisedItem = normaliseItem(item);
+    if (!normalisedItem) return getItems();
+
+    let itemFound = false;
+    const items = getItems().map((savedItem) => {
+      if (savedItem.id !== normalisedItem.id) return savedItem;
+      itemFound = true;
+      return normalisedItem;
+    });
+    if (!itemFound) return items;
+
+    setItems(items);
+    return notify();
+  };
+
   const toggle = (item) => {
     const normalisedItem = normaliseItem(item);
     if (!normalisedItem) return { items: getItems(), isActive: false };
@@ -207,6 +244,8 @@
     remove,
     sync: notify,
     toggle,
+    update,
+    updateFromButton: (button) => update(itemFromButton(button)),
   };
 
   document.addEventListener('click', (event) => {
