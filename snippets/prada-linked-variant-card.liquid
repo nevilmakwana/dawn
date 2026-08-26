@@ -109,6 +109,7 @@
       <div class="prada-product-tile__information">
         <h2 class="prada-product-tile__title"><a href="{{ variant_url }}">{{ product.title | escape }}</a></h2>
         <p class="prada-product-tile__price" data-currency-price><span class="money">{{ display_variant.price | money }}</span></p>
+        {% render 'prada-collection-color-swatches', product: product, selected_variant: display_variant %}
       </div>
     </article>
   </product-component>

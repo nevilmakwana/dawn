@@ -1,0 +1,110 @@
+{%- liquid
+  assign color_option = blank
+  assign color_option_index = blank
+
+  for option in product.options_with_values
+    assign option_name = option.name | downcase
+    if option_name contains 'color' or option_name contains 'colour'
+      assign color_option = option
+      assign color_option_index = forloop.index0
+      break
+    endif
+  endfor
+-%}
+
+{%- if color_option != blank and color_option.values.size > 1 -%}
+  {%- assign selected_color = selected_variant.options[color_option_index] -%}
+  <div class="prada-product-tile__colors" aria-label="Available {{ color_option.name | escape }}">
+    {%- for value in color_option.values limit: 4 -%}
+      {%- liquid
+        assign color_variant = blank
+        assign fallback_variant = blank
+
+        for variant in product.variants
+          if variant.options[color_option_index] == value
+            if fallback_variant == blank
+              assign fallback_variant = variant
+            endif
+            if variant.available
+              assign color_variant = variant
+              break
+            endif
+          endif
+        endfor
+
+        if color_variant == blank
+          assign color_variant = fallback_variant
+        endif
+
+        assign swatch_background = blank
+        assign swatch_focal_point = blank
+        if value.swatch.image
+          assign swatch_image = value.swatch.image | image_url: width: 40
+          assign swatch_background = 'url(' | append: swatch_image | append: ')'
+          assign swatch_focal_point = value.swatch.image.presentation.focal_point
+        elsif value.swatch.color
+          assign swatch_background = 'rgb(' | append: value.swatch.color.rgb | append: ')'
+        else
+          assign normalized_color = value | downcase | strip
+          case normalized_color
+            when 'black'
+              assign swatch_background = '#0a0a0a'
+            when 'white'
+              assign swatch_background = '#f7f7f5'
+            when 'blue'
+              assign swatch_background = '#2454a6'
+            when 'navy', 'navy blue'
+              assign swatch_background = '#17243f'
+            when 'red'
+              assign swatch_background = '#a8242f'
+            when 'burgundy', 'maroon', 'wine'
+              assign swatch_background = '#681b2b'
+            when 'green'
+              assign swatch_background = '#315c43'
+            when 'olive', 'khaki'
+              assign swatch_background = '#777054'
+            when 'brown'
+              assign swatch_background = '#594238'
+            when 'beige', 'cream', 'ivory'
+              assign swatch_background = '#e8e0d2'
+            when 'grey', 'gray'
+              assign swatch_background = '#777777'
+            when 'yellow'
+              assign swatch_background = '#d8b62b'
+            when 'orange'
+              assign swatch_background = '#d56c32'
+            when 'pink'
+              assign swatch_background = '#d2859b'
+            when 'purple'
+              assign swatch_background = '#664276'
+            when 'gold'
+              assign swatch_background = '#a88d57'
+            when 'silver'
+              assign swatch_background = '#b9b9b9'
+            when 'multicolor', 'multi color', 'multi'
+              assign swatch_background = 'conic-gradient(#d94b4b, #e2bd3c, #3f8b60, #3f67a8, #d94b4b)'
+            else
+              assign swatch_background = '#d8d8d8'
+          endcase
+        endif
+
+        assign color_variant_url = product.url | append: '?variant=' | append: color_variant.id
+      -%}
+      <a
+        class="prada-product-tile__color{% if selected_color == value %} is-selected{% endif %}"
+        href="{{ color_variant_url }}"
+        aria-label="View {{ product.title | escape }} in {{ value | escape }}"
+        title="{{ value | escape }}"
+        {% if selected_color == value %}aria-current="true"{% endif %}
+        style="--prada-tile-color: {{ swatch_background }};{% if swatch_focal_point != blank %} --prada-tile-color-position: {{ swatch_focal_point }};{% endif %}"
+      >
+        <span class="visually-hidden">{{ value }}</span>
+      </a>
+    {%- endfor -%}
+    {%- if color_option.values.size > 4 -%}
+      <span class="prada-product-tile__color-more" aria-label="{{ color_option.values.size | minus: 4 }} more colors">
+        +{{ color_option.values.size | minus: 4 }}
+      </span>
+    {%- endif -%}
+  </div>
+{%- endif -%}

@@ -257,6 +257,7 @@
                     <p class="prada-product-tile__price" data-currency-price>
                       <span class="money">{{ collection_variant.price | money }}</span>
                     </p>
+                    {% render 'prada-collection-color-swatches', product: product, selected_variant: collection_variant %}
                   </div>
                 </article>
               </product-component>
