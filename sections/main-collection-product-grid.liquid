@@ -331,8 +331,18 @@
           {%- endif -%}
         </ul>
 
-        {%- if paginate.pages > 1 -%}
-          {% render 'pagination', paginate: paginate, anchor: '' %}
+        {%- if paginate.next -%}
+          <div class="prada-collection__show-more" data-prada-load-more>
+            <a
+              class="prada-collection__show-more-link"
+              href="{{ paginate.next.url }}"
+              data-prada-load-more-link
+              aria-controls="product-grid"
+            >
+              <span data-prada-load-more-label>Show more</span>
+            </a>
+            <p class="visually-hidden" role="status" aria-live="polite" data-prada-load-more-status></p>
+          </div>
         {%- endif -%}
       {%- endif -%}
     </div>
@@ -377,6 +387,83 @@
   }
 
   window.pradaCollectionCarouselSetup(document);
+
+  if (!window.pradaCollectionLoadMoreSetup) {
+    window.pradaCollectionLoadMoreSetup = true;
+
+    document.addEventListener('click', function (event) {
+      var link = event.target.closest('[data-prada-load-more-link]');
+      if (
+        !link ||
+        event.defaultPrevented ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey ||
+        event.button !== 0 ||
+        link.dataset.pradaLoadMoreFailed === 'true'
+      ) {
+        return;
+      }
+
+      var collectionRoot = link.closest('.prada-collection');
+      var targetGrid = collectionRoot?.querySelector('#product-grid');
+      var loadMore = link.closest('[data-prada-load-more]');
+      var label = link.querySelector('[data-prada-load-more-label]');
+      var status = loadMore?.querySelector('[data-prada-load-more-status]');
+      if (!collectionRoot || !targetGrid || !loadMore || link.getAttribute('aria-disabled') === 'true') return;
+
+      event.preventDefault();
+
+      var targetUrl = new URL(link.href, window.location.origin);
+      var requestUrl = new URL(targetUrl.href);
+      var sectionId = collectionRoot.dataset.sectionId;
+      if (sectionId) requestUrl.searchParams.set('section_id', sectionId);
+
+      link.setAttribute('aria-disabled', 'true');
+      link.classList.add('is-loading');
+      if (label) label.textContent = 'Loading';
+      if (status) status.textContent = 'Loading more products';
+
+      fetch(requestUrl.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(function (response) {
+          if (!response.ok) throw new Error('Unable to load more products');
+          return response.text();
+        })
+        .then(function (html) {
+          var sourceDocument = new DOMParser().parseFromString(html, 'text/html');
+          var sourceGrid = sourceDocument.querySelector('#product-grid');
+          var sourceNextLink = sourceDocument.querySelector('[data-prada-load-more-link]');
+          if (!sourceGrid) throw new Error('Product grid response is incomplete');
+
+          var newItems = Array.from(sourceGrid.children);
+          var fragment = document.createDocumentFragment();
+          newItems.forEach(function (item) {
+            fragment.appendChild(item);
+          });
+          targetGrid.appendChild(fragment);
+
+          if (sourceNextLink) {
+            link.href = new URL(sourceNextLink.getAttribute('href'), targetUrl.href).href;
+            link.removeAttribute('aria-disabled');
+            link.classList.remove('is-loading');
+            if (label) label.textContent = 'Show more';
+            if (status) status.textContent = newItems.length + ' more products loaded';
+          } else {
+            if (status) status.textContent = newItems.length + ' more products loaded. All products are shown.';
+            loadMore.remove();
+          }
+
+          if (window.pradaCollectionCarouselSetup) window.pradaCollectionCarouselSetup(targetGrid);
+          if (window.PradaWishlist) window.PradaWishlist.sync?.();
+          document.dispatchEvent(new Event('prada:collection:updated'));
+        })
+        .catch(function () {
+          link.dataset.pradaLoadMoreFailed = 'true';
+          window.location.href = targetUrl.href;
+        });
+    });
+  }
 
   if (!window.pradaCollectionNavigationSetup) {
     window.pradaCollectionNavigationState = window.pradaCollectionNavigationState || {
