@@ -159,14 +159,16 @@
       pointerStart = event.clientX;
       dragStart = indexPosition();
       didDrag = false;
-      track.setPointerCapture(pointerId);
       track.style.transition = 'none';
     });
 
     track.addEventListener('pointermove', (event) => {
       if (pointerId === null || event.pointerId !== pointerId) return;
       const distance = event.clientX - pointerStart;
-      didDrag = didDrag || Math.abs(distance) > 5;
+      if (!didDrag && Math.abs(distance) > 5) {
+        didDrag = true;
+        track.setPointerCapture(pointerId);
+      }
       const minimum = indexPosition(slides.length - 1);
       render(Math.max(minimum, Math.min(0, dragStart + distance)), false);
     });
