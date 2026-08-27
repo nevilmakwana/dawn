@@ -37,6 +37,11 @@
     assign has_mobile_video = true
   endif
 
+  assign has_mobile_media = false
+  if has_mobile_video or section.settings.mobile_image != blank
+    assign has_mobile_media = true
+  endif
+
   assign has_responsive_webm_video = false
   if desktop_webm_url != blank and mobile_webm_url != blank
     assign has_responsive_webm_video = true
@@ -50,6 +55,8 @@
   assign mobile_banner_aspect_ratio = desktop_banner_aspect_ratio
   if section.settings.mobile_video != blank
     assign mobile_banner_aspect_ratio = section.settings.mobile_video.aspect_ratio
+  elsif section.settings.mobile_image != blank
+    assign mobile_banner_aspect_ratio = section.settings.mobile_image.aspect_ratio
   endif
 
   assign use_full_media_adapt = false
@@ -61,6 +68,8 @@
   if section.settings.mobile_auto_subject_focus
     if section.settings.mobile_video != blank and section.settings.mobile_video.preview_image.presentation.focal_point != blank
       assign mobile_subject_focus_position = section.settings.mobile_video.preview_image.presentation.focal_point
+    elsif section.settings.mobile_image.presentation.focal_point != blank
+      assign mobile_subject_focus_position = section.settings.mobile_image.presentation.focal_point
     elsif section.settings.video != blank and section.settings.video.preview_image.presentation.focal_point != blank
       assign mobile_subject_focus_position = section.settings.video.preview_image.presentation.focal_point
     elsif section.settings.image.presentation.focal_point != blank
@@ -69,6 +78,68 @@
       assign mobile_subject_focus_position = section.settings.image_2.presentation.focal_point
     endif
   endif
+
+  assign desktop_content_position = section.settings.desktop_content_position | default: 'middle-center'
+  assign desktop_content_position_parts = desktop_content_position | split: '-'
+  assign desktop_content_vertical = desktop_content_position_parts | first
+  assign desktop_content_horizontal = desktop_content_position_parts | last
+  assign desktop_content_align_items = 'center'
+  assign desktop_content_justify_content = 'center'
+  case desktop_content_vertical
+    when 'top'
+      assign desktop_content_align_items = 'flex-start'
+    when 'bottom'
+      assign desktop_content_align_items = 'flex-end'
+  endcase
+  case desktop_content_horizontal
+    when 'left'
+      assign desktop_content_justify_content = 'flex-start'
+    when 'right'
+      assign desktop_content_justify_content = 'flex-end'
+  endcase
+
+  assign mobile_content_position = section.settings.mobile_content_position | default: desktop_content_position
+  assign mobile_content_position_parts = mobile_content_position | split: '-'
+  assign mobile_content_vertical = mobile_content_position_parts | first
+  assign mobile_content_horizontal = mobile_content_position_parts | last
+  assign mobile_content_align_items = 'center'
+  assign mobile_content_justify_content = 'center'
+  case mobile_content_vertical
+    when 'top'
+      assign mobile_content_align_items = 'flex-start'
+    when 'bottom'
+      assign mobile_content_align_items = 'flex-end'
+  endcase
+  case mobile_content_horizontal
+    when 'left'
+      assign mobile_content_justify_content = 'flex-start'
+    when 'right'
+      assign mobile_content_justify_content = 'flex-end'
+  endcase
+
+  assign desktop_button_alignment = section.settings.desktop_button_alignment | default: 'inherit'
+  if desktop_button_alignment == 'inherit'
+    assign desktop_button_alignment = section.settings.desktop_content_alignment | default: 'center'
+  endif
+  assign desktop_button_justify_content = 'center'
+  case desktop_button_alignment
+    when 'left'
+      assign desktop_button_justify_content = 'flex-start'
+    when 'right'
+      assign desktop_button_justify_content = 'flex-end'
+  endcase
+
+  assign mobile_button_alignment = section.settings.mobile_button_alignment | default: 'inherit'
+  if mobile_button_alignment == 'inherit'
+    assign mobile_button_alignment = section.settings.mobile_content_alignment | default: 'center'
+  endif
+  assign mobile_button_justify_content = 'center'
+  case mobile_button_alignment
+    when 'left'
+      assign mobile_button_justify_content = 'flex-start'
+    when 'right'
+      assign mobile_button_justify_content = 'flex-end'
+  endcase
 -%}
 
 {%- if has_responsive_webm_video -%}
@@ -112,6 +183,52 @@
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+
+  #Banner-{{ section.id }} .banner__media--mobile {
+    display: none !important;
+  }
+
+  #Banner-{{ section.id }} .banner__buttons {
+    width: 100%;
+    justify-content: {{ desktop_button_justify_content }};
+  }
+
+  @media screen and (min-width: 750px) {
+    #Banner-{{ section.id }} .banner__media--desktop {
+      display: block !important;
+    }
+
+    #Banner-{{ section.id }} .banner__media--mobile {
+      display: none !important;
+    }
+
+    #Banner-{{ section.id }} .banner__content {
+      align-items: {{ desktop_content_align_items }};
+      justify-content: {{ desktop_content_justify_content }};
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    #Banner-{{ section.id }} .banner__media--desktop {
+      display: none !important;
+    }
+
+    #Banner-{{ section.id }} .banner__media--mobile {
+      display: block !important;
+      width: 100% !important;
+      right: auto !important;
+      left: 0 !important;
+    }
+
+    #Banner-{{ section.id }} .banner__content {
+      align-items: {{ mobile_content_align_items }};
+      justify-content: {{ mobile_content_justify_content }};
+    }
+
+    #Banner-{{ section.id }} .banner__buttons {
+      justify-content: {{ mobile_button_justify_content }};
+    }
   }
 
   {%- if section.settings.prada_link_button -%}
@@ -227,8 +344,8 @@
 
   {%- if section.settings.full_screen_height and section.settings.mobile_center_zoom != true -%}
     #Banner-{{ section.id }} .banner__content {
-      align-items: flex-end !important;
-      justify-content: center !important;
+      align-items: {{ desktop_content_align_items }} !important;
+      justify-content: {{ desktop_content_justify_content }} !important;
       padding: 5rem 5rem 4rem !important;
     }
 
@@ -252,8 +369,8 @@
 
     @media screen and (max-width: 749px) {
       #Banner-{{ section.id }} .banner__content {
-        align-items: flex-end !important;
-        justify-content: center !important;
+        align-items: {{ mobile_content_align_items }} !important;
+        justify-content: {{ mobile_content_justify_content }} !important;
         padding: 0 2rem max(7rem, env(safe-area-inset-bottom)) !important;
       }
 
@@ -329,12 +446,12 @@
       }
 
       #Banner-{{ section.id }} .banner__box {
-        position: absolute !important;
-        right: 2rem !important;
-        bottom: max(4rem, env(safe-area-inset-bottom)) !important;
-        left: 2rem !important;
-        width: auto !important;
-        max-width: none !important;
+        position: relative !important;
+        right: auto !important;
+        bottom: auto !important;
+        left: auto !important;
+        width: 100% !important;
+        max-width: 42rem !important;
         margin: 0 !important;
       }
 
@@ -401,7 +518,7 @@
 
 <div
   id="Banner-{{ section.id }}"
-  class="banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if has_desktop_video == false and section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank and has_mobile_video == false %} banner--stacked{% endif %}{% if mobile_banner_aspect_ratio != blank and section.settings.image_height == 'adapt' or mobile_banner_aspect_ratio != blank and use_full_media_adapt %} banner--adapt{% endif %}{% if section.settings.show_full_media %} banner--show-full-media{% endif %}{% if section.settings.mobile_center_zoom %} banner--mobile-center-zoom{% endif %}{% if section.settings.mobile_center_zoom and section.settings.mobile_auto_subject_focus %} banner--mobile-auto-subject-focus{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}"
+  class="banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if has_desktop_video == false and section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank and has_mobile_media == false %} banner--stacked{% endif %}{% if mobile_banner_aspect_ratio != blank and section.settings.image_height == 'adapt' or mobile_banner_aspect_ratio != blank and use_full_media_adapt %} banner--adapt{% endif %}{% if section.settings.show_full_media %} banner--show-full-media{% endif %}{% if section.settings.mobile_center_zoom %} banner--mobile-center-zoom{% endif %}{% if section.settings.mobile_center_zoom and section.settings.mobile_auto_subject_focus %} banner--mobile-auto-subject-focus{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}"
 >
   {%- if has_responsive_webm_video -%}
     <div class="banner__media media{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
@@ -429,7 +546,7 @@
       </video>
     </div>
   {%- elsif has_desktop_video -%}
-    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
+    <div class="banner__media banner__media--desktop media{% if has_mobile_media %} small-hide{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
       {%- if desktop_webm_url != blank -%}
         <video
           class="banner__media-video"
@@ -467,7 +584,7 @@
       {%- endif -%}
     </div>
   {%- elsif section.settings.image != blank -%}
-    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image == blank and section.settings.image_2 == blank %} placeholder{% endif %}{% if section.settings.image_2 != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
+    <div class="banner__media banner__media--desktop media{% if has_mobile_media %} small-hide{% endif %}{% if section.settings.image == blank and section.settings.image_2 == blank %} placeholder{% endif %}{% if section.settings.image_2 != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
       {%- liquid
         assign image_height = section.settings.image.width | divided_by: section.settings.image.aspect_ratio
         if section.settings.image_2 != blank
@@ -495,12 +612,12 @@
       }}
     </div>
   {%- elsif section.settings.image_2 == blank -%}
-    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image == blank and section.settings.image_2 == blank %} placeholder{% endif %}{% if section.settings.image_2 != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
+    <div class="banner__media banner__media--desktop media{% if has_mobile_media %} small-hide{% endif %}{% if section.settings.image == blank and section.settings.image_2 == blank %} placeholder{% endif %}{% if section.settings.image_2 != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
       {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
     </div>
   {%- endif -%}
   {%- if has_desktop_video == false and section.settings.image_2 != blank -%}
-    <div class="banner__media media{% if has_mobile_video %} small-hide{% endif %}{% if section.settings.image != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
+    <div class="banner__media banner__media--desktop media{% if has_mobile_media %} small-hide{% endif %}{% if section.settings.image != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
       {%- liquid
         assign image_height_2 = section.settings.image_2.width | divided_by: section.settings.image_2.aspect_ratio
         if section.settings.image != blank
@@ -528,8 +645,26 @@
       }}
     </div>
   {%- endif -%}
+  {%- if has_mobile_video == false and section.settings.mobile_image != blank -%}
+    <div class="banner__media banner__media--mobile media medium-hide large-up-hide{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
+      {%- liquid
+        assign mobile_image_height = section.settings.mobile_image.width | divided_by: section.settings.mobile_image.aspect_ratio
+      -%}
+      {{
+        section.settings.mobile_image
+        | image_url: width: 1500
+        | image_tag:
+          width: section.settings.mobile_image.width,
+          height: mobile_image_height,
+          sizes: '100vw',
+          widths: '375, 550, 750, 900, 1100, 1500',
+          loading: image_loading,
+          fetchpriority: fetch_priority
+      }}
+    </div>
+  {%- endif -%}
   {%- if has_mobile_video and has_responsive_webm_video == false -%}
-    <div class="banner__media media medium-hide large-up-hide{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
+    <div class="banner__media banner__media--mobile media medium-hide large-up-hide{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
       {%- if mobile_webm_url != blank -%}
         <video
           class="banner__media-video"
@@ -639,6 +774,12 @@
       "type": "image_picker",
       "id": "image",
       "label": "t:sections.image-banner.settings.image.label"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile image",
+      "info": "Optional. This image replaces the desktop image or video on screens below 750px."
     },
     {
       "type": "video",
@@ -847,6 +988,30 @@
       "label": "t:sections.image-banner.settings.desktop_content_alignment.label"
     },
     {
+      "type": "select",
+      "id": "desktop_button_alignment",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "Same as text"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "inherit",
+      "label": "Desktop button alignment"
+    },
+    {
       "type": "checkbox",
       "id": "show_text_box",
       "default": true,
@@ -866,6 +1031,50 @@
     },    
     {
       "type": "select",
+      "id": "mobile_content_position",
+      "options": [
+        {
+          "value": "top-left",
+          "label": "Top left"
+        },
+        {
+          "value": "top-center",
+          "label": "Top center"
+        },
+        {
+          "value": "top-right",
+          "label": "Top right"
+        },
+        {
+          "value": "middle-left",
+          "label": "Middle left"
+        },
+        {
+          "value": "middle-center",
+          "label": "Middle center"
+        },
+        {
+          "value": "middle-right",
+          "label": "Middle right"
+        },
+        {
+          "value": "bottom-left",
+          "label": "Bottom left"
+        },
+        {
+          "value": "bottom-center",
+          "label": "Bottom center"
+        },
+        {
+          "value": "bottom-right",
+          "label": "Bottom right"
+        }
+      ],
+      "default": "bottom-center",
+      "label": "Mobile content position"
+    },
+    {
+      "type": "select",
       "id": "mobile_content_alignment",
       "options": [
         {
@@ -883,6 +1092,30 @@
       ],
       "default": "center",
       "label": "t:sections.image-banner.settings.mobile_content_alignment.label"
+    },
+    {
+      "type": "select",
+      "id": "mobile_button_alignment",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "Same as text"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "inherit",
+      "label": "Mobile button alignment"
     },
     {
       "type": "checkbox",
