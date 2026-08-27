@@ -179,10 +179,23 @@
                                           {%- elsif scan_child_grandchildren and grandchild_block.type == 'drawer_child' -%}
                                             {%- break -%}
                                           {%- elsif scan_child_grandchildren and grandchild_block.type == 'drawer_grandchild' and grandchild_title != blank -%}
+                                            {%- assign nested_product_template_id = 'PradaNestedProducts-' | append: section.id | append: '-' | append: grandchild_block.id -%}
                                             <li {{ grandchild_block.shopify_attributes }}>
-                                              <a href="{{ grandchild_url }}">
+                                              <a
+                                                href="{{ grandchild_url }}"
+                                                {% if grandchild_block.settings.products != blank and request.page_type == 'collection' %}
+                                                  data-prada-product-template="{{ nested_product_template_id }}"
+                                                {% endif %}
+                                              >
                                                 {{ grandchild_title | escape }}
                                               </a>
+                                              {%- if grandchild_block.settings.products != blank and request.page_type == 'collection' -%}
+                                                <template id="{{ nested_product_template_id }}">
+                                                  {%- for nested_product in grandchild_block.settings.products -%}
+                                                    {% render 'prada-nested-collection-product-card', product: nested_product, collection_context: collection %}
+                                                  {%- endfor -%}
+                                                </template>
+                                              {%- endif -%}
                                             </li>
                                           {%- endif -%}
                                         {%- endfor -%}

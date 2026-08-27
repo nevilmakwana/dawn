@@ -1,0 +1,144 @@
+{%- liquid
+  assign card_collection = collection_context | default: collection
+  assign collection_variant = blank
+
+  for candidate_variant in product.variants
+    assign candidate_collection_refs = candidate_variant.metafields.custom.linked_collections.value
+    if candidate_collection_refs == blank
+      assign candidate_collection_refs = candidate_variant.metafields.custom.custom_linked_collections.value
+    endif
+    for candidate_collection in candidate_collection_refs
+      if candidate_collection.id == card_collection.id
+        assign collection_variant = candidate_variant
+        break
+      endif
+    endfor
+    if collection_variant != blank
+      break
+    endif
+  endfor
+
+  if collection_variant == blank
+    assign collection_variant = product.selected_or_first_available_variant
+  endif
+
+  assign collection_product_url = product.url | append: '?variant=' | append: collection_variant.id
+  assign primary_media = blank
+  assign secondary_media = blank
+  assign collection_variant_gallery = collection_variant.metafields.custom.variant_images.value
+  if collection_variant_gallery == blank
+    assign collection_variant_gallery = collection_variant.metafields.custom.custom_variant_images.value
+  endif
+  for variant_media in collection_variant_gallery
+    if variant_media.media_type == 'image'
+      if primary_media == blank
+        assign primary_media = variant_media
+      elsif secondary_media == blank
+        assign secondary_media = variant_media
+        break
+      endif
+    endif
+  endfor
+  if primary_media == blank
+    assign primary_media = collection_variant.featured_media | default: product.featured_media
+    assign secondary_media = product.media[1]
+  endif
+
+  assign has_secondary_image = false
+  if secondary_media and secondary_media.media_type == 'image'
+    assign has_secondary_image = true
+  endif
+-%}
+
+<li
+  class="prada-collection__item"
+  data-prada-nested-product-id="{{ product.id }}"
+  data-prada-product-title="{{ product.title | escape }}"
+  data-prada-product-price="{{ collection_variant.price }}"
+>
+  <product-component view-event-payload="{{ product | standard_event_data: 'view', context: 'collection' | escape }}">
+    <article class="prada-product-tile">
+      <div class="prada-product-tile__media">
+        <a
+          class="prada-product-tile__carousel"
+          href="{{ collection_product_url }}"
+          {% if has_secondary_image %}data-prada-mobile-carousel{% endif %}
+        >
+          {%- if primary_media -%}
+            <img
+              class="prada-product-tile__image"
+              srcset="
+                {%- if primary_media.width >= 360 -%}{{ primary_media | image_url: width: 360 }} 360w,{%- endif -%}
+                {%- if primary_media.width >= 533 -%}{{ primary_media | image_url: width: 533 }} 533w,{%- endif -%}
+                {%- if primary_media.width >= 720 -%}{{ primary_media | image_url: width: 720 }} 720w,{%- endif -%}
+                {%- if primary_media.width >= 940 -%}{{ primary_media | image_url: width: 940 }} 940w,{%- endif -%}
+                {{ primary_media | image_url }} {{ primary_media.width }}w
+              "
+              src="{{ primary_media | image_url: width: 720 }}"
+              sizes="(min-width: 990px) 25vw, 50vw"
+              alt="{{ primary_media.alt | default: product.title | escape }}"
+              loading="lazy"
+              width="{{ primary_media.width }}"
+              height="{{ primary_media.height }}"
+            >
+            {%- if has_secondary_image -%}
+              <img
+                class="prada-product-tile__image prada-product-tile__image--secondary"
+                srcset="
+                  {%- if secondary_media.width >= 360 -%}{{ secondary_media | image_url: width: 360 }} 360w,{%- endif -%}
+                  {%- if secondary_media.width >= 533 -%}{{ secondary_media | image_url: width: 533 }} 533w,{%- endif -%}
+                  {%- if secondary_media.width >= 720 -%}{{ secondary_media | image_url: width: 720 }} 720w,{%- endif -%}
+                  {%- if secondary_media.width >= 940 -%}{{ secondary_media | image_url: width: 940 }} 940w,{%- endif -%}
+                  {{ secondary_media | image_url }} {{ secondary_media.width }}w
+                "
+                src="{{ secondary_media | image_url: width: 720 }}"
+                sizes="(min-width: 990px) 25vw, 50vw"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
+                width="{{ secondary_media.width }}"
+                height="{{ secondary_media.height }}"
+              >
+            {%- endif -%}
+          {%- else -%}
+            {{ 'product-apparel-2' | placeholder_svg_tag: 'prada-product-tile__placeholder' }}
+          {%- endif -%}
+        </a>
+
+        {%- if has_secondary_image -%}
+          <span class="prada-product-tile__pagination" aria-hidden="true">
+            <span class="prada-product-tile__pagination-dot is-active"></span>
+            <span class="prada-product-tile__pagination-dot"></span>
+          </span>
+        {%- endif -%}
+      </div>
+
+      <button
+        class="prada-product-wishlist-button"
+        type="button"
+        data-prada-product-wishlist
+        data-product-id="{{ product.id }}"
+        data-product-title="{{ product.title | escape }}"
+        data-product-url="{{ collection_product_url | escape }}"
+        data-product-image="{% if primary_media %}{{ primary_media | image_url: width: 720 | escape }}{% endif %}"
+        data-product-image-alt="{{ primary_media.alt | default: product.title | escape }}"
+        data-product-price="{{ collection_variant.price | money | strip_html | escape }}"
+        data-product-variant-id="{{ collection_variant.id }}"
+        data-product-available="{{ collection_variant.available }}"
+        aria-label="Add {{ product.title | escape }} to wishlist"
+        aria-pressed="false"
+      >
+        <span class="svg-wrapper">{{- 'prada-wishlist.svg' | inline_asset_content -}}</span>
+      </button>
+
+      <div class="prada-product-tile__information">
+        <h2 class="prada-product-tile__title"><a href="{{ collection_product_url }}">{{ product.title | escape }}</a></h2>
+        <p class="prada-product-tile__price" data-currency-price>
+          <span class="money">{{ collection_variant.price | money }}</span>
+        </p>
+        {% render 'prada-collection-color-swatches', product: product, selected_variant: collection_variant %}
+      </div>
+    </article>
+  </product-component>
+</li>

@@ -564,6 +564,8 @@
         }
 
         function prefetchCollection(tab) {
+          if (tab.dataset.pradaProductTemplate) return null;
+
           var targetUrl = new URL(tab.href, window.location.origin);
           var cacheKey = cacheKeyFromUrl(targetUrl);
 
@@ -626,7 +628,7 @@
           window.pradaCollectionNavigationState.cache.set(currentCacheKey, collectionRoot.outerHTML);
         }
 
-        function makeTab(label, href, active) {
+        function makeTab(label, href, active, productTemplateId) {
           var tab = document.createElement('a');
           var labelText = document.createElement('span');
 
@@ -635,6 +637,7 @@
           labelText.className = 'prada-collection__tab-text';
           labelText.textContent = label;
           tab.appendChild(labelText);
+          if (productTemplateId) tab.dataset.pradaProductTemplate = productTemplateId;
           if (active) tab.setAttribute('aria-current', 'page');
           return tab;
         }
@@ -762,11 +765,124 @@
           return true;
         }
 
+        var nestedViewAllSnapshot = null;
+
+        function nestedTabHandle(tab) {
+          return textFrom(tab)
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '');
+        }
+
+        function productTemplateForTab(tab) {
+          var templateId = tab?.dataset.pradaProductTemplate;
+          return templateId ? document.getElementById(templateId) : null;
+        }
+
+        function captureViewAllSnapshot() {
+          if (nestedViewAllSnapshot) return;
+
+          var gridContainer = document.querySelector('#ProductGridContainer');
+          var count = document.querySelector('.prada-collection__count');
+          if (!gridContainer) return;
+
+          nestedViewAllSnapshot = {
+            gridContainer: gridContainer.cloneNode(true),
+            count: count ? count.cloneNode(true) : null,
+          };
+        }
+
+        function renderNestedProducts(tab, updateHistory) {
+          var productTemplate = productTemplateForTab(tab);
+          var currentGridContainer = document.querySelector('#ProductGridContainer');
+          if (!productTemplate || !currentGridContainer) return false;
+
+          var productItems = Array.from(productTemplate.content.children).filter(function (item) {
+            return item.matches('.prada-collection__item');
+          });
+          if (!productItems.length) return false;
+
+          captureViewAllSnapshot();
+
+          var replacementContainer = currentGridContainer.cloneNode(false);
+          var replacementGrid = document.createElement('ul');
+          replacementGrid.className = 'prada-collection__grid is-prada-entering';
+          replacementGrid.id = 'product-grid';
+          replacementGrid.dataset.id = collectionRoot.dataset.sectionId || '';
+          replacementGrid.setAttribute('role', 'list');
+
+          productItems.forEach(function (item) {
+            replacementGrid.appendChild(item.cloneNode(true));
+          });
+
+          replacementContainer.appendChild(replacementGrid);
+          currentGridContainer.replaceWith(replacementContainer);
+
+          var count = document.querySelector('.prada-collection__count');
+          if (count) count.textContent = productItems.length + (productItems.length === 1 ? ' product' : ' products');
+
+          collectionRoot.dataset.pradaNestedActive = 'true';
+          setActiveTab(tabs, tab);
+          refreshCollectionCarousel();
+
+          if (updateHistory) {
+            var nestedUrl = new URL(window.location.href);
+            nestedUrl.hash = 'nested-' + nestedTabHandle(tab);
+            window.history.pushState({ pradaNestedCollection: nestedTabHandle(tab) }, '', nestedUrl.href);
+          }
+
+          scrollCollectionToStart(collectionRoot);
+          window.requestAnimationFrame(function () {
+            replacementGrid.classList.remove('is-prada-entering');
+          });
+          return true;
+        }
+
+        function restoreViewAllProducts(tab, targetUrl) {
+          if (!nestedViewAllSnapshot) return false;
+
+          var currentGridContainer = document.querySelector('#ProductGridContainer');
+          var currentCount = document.querySelector('.prada-collection__count');
+          if (!currentGridContainer) return false;
+
+          currentGridContainer.replaceWith(nestedViewAllSnapshot.gridContainer.cloneNode(true));
+          if (currentCount && nestedViewAllSnapshot.count) {
+            currentCount.replaceWith(nestedViewAllSnapshot.count.cloneNode(true));
+          }
+
+          delete collectionRoot.dataset.pradaNestedActive;
+          setActiveTab(tabs, tab);
+          window.history.pushState({ pradaCollectionUrl: targetUrl.href }, '', targetUrl.href);
+          refreshCollectionCarousel();
+          scrollCollectionToStart(collectionRoot);
+          return true;
+        }
+
         function navigateCollection(event) {
           var tab = event.target.closest('.prada-collection__tab');
           if (!tab || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
 
           var targetUrl = new URL(tab.href, window.location.origin);
+
+          if (productTemplateForTab(tab)) {
+            event.preventDefault();
+            if (window.pradaCollectionNavigationState.request) {
+              window.pradaCollectionNavigationState.request.abort();
+              window.pradaCollectionNavigationState.request = null;
+            }
+            window.pradaCollectionNavigationState.navigationId += 1;
+            renderNestedProducts(tab, true);
+            return;
+          }
+
+          if (
+            collectionRoot.dataset.pradaNestedActive === 'true' &&
+            normalizeUrl(targetUrl.href) === normalizeUrl(window.location.href)
+          ) {
+            event.preventDefault();
+            restoreViewAllProducts(tab, targetUrl);
+            return;
+          }
 
           if (targetUrl.origin !== window.location.origin || targetUrl.href === window.location.href) {
             if (window.pradaCollectionNavigationState.request) {
@@ -820,7 +936,7 @@
         var currentTitle = textFrom(title).toLowerCase();
         var match = null;
 
-        function addUniqueTab(tabList, label, href, path) {
+        function addUniqueTab(tabList, label, href, path, productTemplateId) {
           var normalizedLabel = (label || '').trim();
           var normalizedHref = (href || '').trim();
           var normalizedPath = path || '';
@@ -836,7 +952,12 @@
           )
             return;
 
-          tabList.push({ label: normalizedLabel, href: normalizedHref, path: normalizedPath });
+          tabList.push({
+            label: normalizedLabel,
+            href: normalizedHref,
+            path: normalizedPath,
+            productTemplateId: productTemplateId || '',
+          });
         }
 
         function collectGrandchildTabs(grandchildPanel, tabList, fallbackHref) {
@@ -848,7 +969,13 @@
               var grandchildPath = pathFromLink(grandchildLink);
               var grandchildHref = hrefFromLink(grandchildLink) || fallbackHref;
 
-              addUniqueTab(tabList, textFrom(grandchildLink), grandchildHref, grandchildPath);
+              addUniqueTab(
+                tabList,
+                textFrom(grandchildLink),
+                grandchildHref,
+                grandchildPath,
+                grandchildLink.dataset.pradaProductTemplate
+              );
             });
         }
 
@@ -941,7 +1068,7 @@
         tabs.setAttribute('aria-label', match.title + ' categories');
 
         match.tabs.forEach(function (tab) {
-          tabs.appendChild(makeTab(tab.label, tab.href, tab.path === match.activePath));
+          tabs.appendChild(makeTab(tab.label, tab.href, tab.path === match.activePath, tab.productTemplateId));
         });
 
         tabs.dataset.pradaNavigationState = 'ready';
@@ -953,6 +1080,18 @@
         });
         tabs.addEventListener('click', navigateCollection);
         enableTabPrefetch();
+        if (window.location.hash.indexOf('#nested-') === 0) {
+          var requestedNestedHandle = decodeURIComponent(window.location.hash.slice(8));
+          var requestedNestedTab = Array.from(tabs.querySelectorAll('[data-prada-product-template]')).find(function (tab) {
+            return nestedTabHandle(tab) === requestedNestedHandle;
+          });
+
+          if (requestedNestedTab) {
+            window.requestAnimationFrame(function () {
+              renderNestedProducts(requestedNestedTab, false);
+            });
+          }
+        }
         tabs.addEventListener('scroll', function () {
           updateTabIndicator(tabs, tabs.querySelector('.prada-collection__tab.is-active'));
         }, { passive: true });
