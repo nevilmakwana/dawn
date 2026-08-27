@@ -447,15 +447,15 @@
       visibility: hidden;
       z-index: 1998 !important;
       transition:
-        opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
-        visibility 0s linear 420ms;
+        opacity 360ms cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s linear 560ms;
     }
 
     .prada-header header-drawer > details[open] > summary::before {
       opacity: 1 !important;
       visibility: visible !important;
       transition:
-        opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 360ms cubic-bezier(0.22, 1, 0.36, 1) 100ms,
         visibility 0s linear 0s;
     }
 
@@ -463,8 +463,8 @@
       opacity: 0 !important;
       visibility: visible !important;
       transition:
-        opacity 760ms cubic-bezier(0.22, 1, 0.36, 1),
-        visibility 0s linear 760ms;
+        opacity 320ms cubic-bezier(0.4, 0, 0.2, 1),
+        visibility 0s linear 560ms;
     }
 
     .prada-header .menu-drawer {
@@ -572,6 +572,10 @@
       font-weight: 500;
       line-height: 1;
       cursor: pointer;
+    }
+
+    .prada-desktop-menu__toolbar-button[data-prada-drawer-close] {
+      transform: translateY(-4px);
     }
 
     .prada-desktop-menu__toolbar-button > span:last-child {
