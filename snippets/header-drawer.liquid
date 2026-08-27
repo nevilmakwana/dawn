@@ -700,9 +700,10 @@
     const pradaDesktopMenuMedia = window.matchMedia('(min-width: 990px)');
     const pradaMobileMenuMedia = window.matchMedia('(max-width: 989px)');
     const PRADA_DRAWER_CLOSE_DURATION = 560;
+    const PRADA_SUBMENU_FADE_DURATION = 420;
     const PRADA_MOBILE_MENU_PRESS_DURATION = 1200;
 
-    function updatePradaDesktopMenuLevel(menuDrawer) {
+    function updatePradaDesktopMenuLevel(menuDrawer, { immediate = false } = {}) {
       if (!menuDrawer) return;
 
       const activePrimaryControl = menuDrawer.querySelector('.prada-desktop-menu__primary-control:checked');
@@ -721,6 +722,23 @@
         if (label) label.setAttribute('aria-expanded', control.checked ? 'true' : 'false');
       });
 
+      window.clearTimeout(menuDrawer.pradaMenuLevelTimer);
+
+      const currentLevel = Number(menuDrawer.dataset.pradaMenuLevel || '1');
+      const nextLevel = Number(level);
+
+      if (!immediate && nextLevel < currentLevel) {
+        menuDrawer.classList.add('is-prada-submenu-closing');
+        menuDrawer.pradaMenuLevelTimer = window.setTimeout(function () {
+          menuDrawer.dataset.pradaMenuLevel = level;
+          menuDrawer.classList.remove('is-prada-submenu-closing');
+          menuDrawer.pradaMenuLevelTimer = null;
+        }, PRADA_SUBMENU_FADE_DURATION);
+        return;
+      }
+
+      menuDrawer.classList.remove('is-prada-submenu-closing');
+      menuDrawer.pradaMenuLevelTimer = null;
       menuDrawer.dataset.pradaMenuLevel = level;
     }
 
@@ -731,7 +749,7 @@
         control.checked = false;
       });
 
-      updatePradaDesktopMenuLevel(menuDrawer);
+      updatePradaDesktopMenuLevel(menuDrawer, { immediate: true });
     }
 
     function flashPradaMobileMenuOption(option, { blurAfter = false } = {}) {
