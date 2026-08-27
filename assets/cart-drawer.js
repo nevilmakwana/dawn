@@ -138,8 +138,16 @@ class CartDrawer extends HTMLElement {
       event.preventDefault();
       cartLink.setAttribute('role', 'button');
       cartLink.setAttribute('aria-haspopup', 'dialog');
-      this.open(cartLink);
-      this.refreshForHeader().catch(() => {});
+
+      if (this.classList.contains('active') || this.headerCartOpening) return;
+
+      this.headerCartOpening = true;
+      this.refreshForHeader()
+        .catch(() => {})
+        .finally(() => {
+          this.headerCartOpening = false;
+          this.open(cartLink);
+        });
     };
 
     document.addEventListener('click', openFromHeader);
@@ -167,22 +175,60 @@ class CartDrawer extends HTMLElement {
     if (triggeredBy) this.setActiveElement(triggeredBy);
     const cartDrawerNote = this.querySelector('[id^="Details-"] summary');
     if (cartDrawerNote && !cartDrawerNote.hasAttribute('role')) this.setSummaryAccessibility(cartDrawerNote);
-    // here the animation doesn't seem to always get triggered. A timeout seem to help
-    setTimeout(() => {
-      this.classList.add('animate', 'active');
+
+    if (this.openAnimationFrame) {
+      cancelAnimationFrame(this.openAnimationFrame);
+      this.openAnimationFrame = null;
+    }
+    if (this.openFocusTimer) {
+      clearTimeout(this.openFocusTimer);
+      this.openFocusTimer = null;
+    }
+    if (this.closeTimer) {
+      clearTimeout(this.closeTimer);
+      this.closeTimer = null;
+    }
+
+    const drawerInner = this.querySelector('.drawer__inner');
+    const focusOnOpen = () => {
+      const containerToTrapFocusOn = this.classList.contains('is-empty')
+        ? this.querySelector('.drawer__inner-empty')
+        : document.getElementById('CartDrawer');
+      const focusElement = this.querySelector('.drawer__inner') || this.querySelector('.drawer__close');
+      trapFocus(containerToTrapFocusOn, focusElement);
+    };
+
+    this.classList.remove('is-closing');
+    this.classList.add('animate');
+    this.openAnimationFrame = requestAnimationFrame(() => {
+      this.openAnimationFrame = requestAnimationFrame(() => {
+        this.classList.add('active');
+        this.openAnimationFrame = null;
+      });
     });
 
-    this.addEventListener(
-      'transitionend',
-      () => {
-        const containerToTrapFocusOn = this.classList.contains('is-empty')
-          ? this.querySelector('.drawer__inner-empty')
-          : document.getElementById('CartDrawer');
-        const focusElement = this.querySelector('.drawer__inner') || this.querySelector('.drawer__close');
-        trapFocus(containerToTrapFocusOn, focusElement);
-      },
-      { once: true },
-    );
+    if (!drawerInner || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      this.openFocusTimer = setTimeout(() => {
+        this.openFocusTimer = null;
+        if (this.classList.contains('active')) focusOnOpen();
+      });
+    } else {
+      const handleOpenTransitionEnd = (event) => {
+        if (event.target !== drawerInner || event.propertyName !== 'transform') return;
+
+        clearTimeout(this.openFocusTimer);
+        this.openFocusTimer = null;
+        drawerInner.removeEventListener('transitionend', handleOpenTransitionEnd);
+        if (this.classList.contains('active')) focusOnOpen();
+      };
+
+      this.openFocusTimer = setTimeout(() => {
+        this.openFocusTimer = null;
+        drawerInner.removeEventListener('transitionend', handleOpenTransitionEnd);
+        if (this.classList.contains('active')) focusOnOpen();
+      }, 700);
+      drawerInner.addEventListener('transitionend', handleOpenTransitionEnd);
+    }
 
     if (window.pradaDrawerScrollLock) {
       window.pradaDrawerScrollLock.lock();
@@ -197,7 +243,48 @@ class CartDrawer extends HTMLElement {
   }
 
   close() {
+    if (this.openAnimationFrame) {
+      cancelAnimationFrame(this.openAnimationFrame);
+      this.openAnimationFrame = null;
+    }
+    if (this.openFocusTimer) {
+      clearTimeout(this.openFocusTimer);
+      this.openFocusTimer = null;
+    }
+
+    const drawerInner = this.querySelector('.drawer__inner');
+    const finishClose = () => {
+      this.classList.remove('is-closing');
+      if (!this.classList.contains('active')) this.classList.remove('animate');
+    };
+
+    if (!this.classList.contains('active')) {
+      finishClose();
+      return;
+    }
+
+    this.classList.add('is-closing');
     this.classList.remove('active');
+    if (!drawerInner || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setTimeout(finishClose);
+    } else {
+      const handleCloseTransitionEnd = (event) => {
+        if (event.target !== drawerInner || event.propertyName !== 'transform') return;
+
+        clearTimeout(this.closeTimer);
+        this.closeTimer = null;
+        drawerInner.removeEventListener('transitionend', handleCloseTransitionEnd);
+        finishClose();
+      };
+
+      this.closeTimer = setTimeout(() => {
+        this.closeTimer = null;
+        drawerInner.removeEventListener('transitionend', handleCloseTransitionEnd);
+        finishClose();
+      }, 560);
+      drawerInner.addEventListener('transitionend', handleCloseTransitionEnd);
+    }
+
     removeTrapFocus(this.activeElement);
     if (window.pradaDrawerScrollLock) {
       window.pradaDrawerScrollLock.unlock();

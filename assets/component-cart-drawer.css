@@ -120,6 +120,24 @@ cart-drawer.prada-cart-drawer.is-empty-entering.is-empty-visible .prada-cart-dra
   visibility: visible;
 }
 
+cart-drawer.prada-cart-drawer {
+  --prada-cart-drawer-enter-duration: 560ms;
+  --prada-cart-drawer-exit-duration: 420ms;
+  --prada-cart-drawer-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --prada-cart-drawer-exit-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --prada-cart-drawer-overlay-duration: 420ms;
+  visibility: hidden;
+  pointer-events: none;
+  transition: visibility 0s linear var(--prada-cart-drawer-exit-duration);
+}
+
+cart-drawer.prada-cart-drawer.animate,
+cart-drawer.prada-cart-drawer.active {
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
 .drawer__inner {
   height: 100%;
   width: 40rem;
@@ -132,6 +150,22 @@ cart-drawer.prada-cart-drawer.is-empty-entering.is-empty-visible .prada-cart-dra
   flex-direction: column;
   transform: translateX(100%);
   transition: transform var(--duration-default) ease;
+}
+
+cart-drawer.prada-cart-drawer .drawer__inner {
+  transform: translate3d(104%, 0, 0);
+  transition: transform var(--prada-cart-drawer-enter-duration) var(--prada-cart-drawer-ease);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+cart-drawer.prada-cart-drawer.active .drawer__inner {
+  transform: translate3d(0, 0, 0);
+}
+
+cart-drawer.prada-cart-drawer.is-closing .drawer__inner {
+  transition-duration: var(--prada-cart-drawer-exit-duration);
+  transition-timing-function: var(--prada-cart-drawer-exit-ease);
 }
 
 .drawer__inner-empty {
@@ -535,11 +569,15 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
   cart-drawer.prada-cart-drawer .cart-drawer__overlay {
     background: rgba(0, 0, 0, 0.68);
     opacity: 0;
-    transition: opacity 260ms ease;
+    transition: opacity var(--prada-cart-drawer-overlay-duration) ease;
   }
 
   cart-drawer.prada-cart-drawer.active .cart-drawer__overlay {
     opacity: 1;
+  }
+
+  cart-drawer.prada-cart-drawer.is-closing .cart-drawer__overlay {
+    transition-duration: var(--prada-cart-drawer-exit-duration);
   }
 
   cart-drawer.prada-cart-drawer .drawer__inner {
@@ -551,7 +589,12 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     border: 0;
     background: #ffffff;
     color: #111111;
-    transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform var(--prada-cart-drawer-enter-duration) var(--prada-cart-drawer-ease);
+  }
+
+  cart-drawer.prada-cart-drawer.is-closing .drawer__inner {
+    transition-duration: var(--prada-cart-drawer-exit-duration);
+    transition-timing-function: var(--prada-cart-drawer-exit-ease);
   }
 
   cart-drawer.prada-cart-drawer .drawer__header {
@@ -838,11 +881,15 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
   cart-drawer.prada-cart-drawer .cart-drawer__overlay {
     background: rgba(0, 0, 0, 0.66);
     opacity: 0;
-    transition: opacity 240ms ease;
+    transition: opacity var(--prada-cart-drawer-overlay-duration) ease;
   }
 
   cart-drawer.prada-cart-drawer.active .cart-drawer__overlay {
     opacity: 1;
+  }
+
+  cart-drawer.prada-cart-drawer.is-closing .cart-drawer__overlay {
+    transition-duration: var(--prada-cart-drawer-exit-duration);
   }
 
   .prada-cart-drawer__heading-desktop {
@@ -869,12 +916,18 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     color: #111111;
     transform: translate3d(0, 105%, 0) !important;
     transition:
-      transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
-      height 360ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+      transform var(--prada-cart-drawer-enter-duration) var(--prada-cart-drawer-ease),
+      height 360ms var(--prada-cart-drawer-ease) !important;
   }
 
   cart-drawer.prada-cart-drawer:not(.is-empty).active .drawer__inner {
     transform: translate3d(0, 0, 0) !important;
+  }
+
+  cart-drawer.prada-cart-drawer:not(.is-empty).is-closing .drawer__inner {
+    transition:
+      transform var(--prada-cart-drawer-exit-duration) var(--prada-cart-drawer-exit-ease),
+      height 300ms var(--prada-cart-drawer-exit-ease) !important;
   }
 
   cart-drawer.prada-cart-drawer:not(.is-empty) .drawer__header {
@@ -1246,12 +1299,18 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     color: #111111;
     transform: translate3d(0, 105%, 0) !important;
     transition:
-      transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
-      height 360ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+      transform var(--prada-cart-drawer-enter-duration) var(--prada-cart-drawer-ease),
+      height 360ms var(--prada-cart-drawer-ease) !important;
   }
 
   cart-drawer.prada-cart-drawer.is-empty.active .drawer__inner {
     transform: translate3d(0, 0, 0) !important;
+  }
+
+  cart-drawer.prada-cart-drawer.is-empty.is-closing .drawer__inner {
+    transition:
+      transform var(--prada-cart-drawer-exit-duration) var(--prada-cart-drawer-exit-ease),
+      height 300ms var(--prada-cart-drawer-exit-ease) !important;
   }
 
   cart-drawer.prada-cart-drawer.is-empty .drawer__inner-empty {
@@ -1318,5 +1377,6 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
 @media (prefers-reduced-motion: reduce) {
   cart-drawer.prada-cart-drawer .drawer__inner {
     transition: none !important;
+    will-change: auto;
   }
 }
