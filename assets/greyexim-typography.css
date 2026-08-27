@@ -689,6 +689,17 @@ label[for='AddressProvinceNew'] {
 }
 
 /* Legal and policy pages */
+:where(.grey-policy, .prada-shipping-policy, .shopify-policy__container),
+:where(.grey-policy, .prada-shipping-policy, .shopify-policy__container)
+  :where(h1, h2, h3, h4, h5, h6, p, li, a, span, strong, em, address, summary, button, label, th, td, caption, blockquote, dl, dt, dd, small) {
+  font-family: var(--ge-font-family) !important;
+}
+
+.prada-footer__group--legal,
+.prada-footer__group--legal :where(summary, a, button, li, span) {
+  font-family: var(--ge-font-family) !important;
+}
+
 .grey-policy__eyebrow,
 .grey-policy__updated,
 .grey-policy__toc summary,
