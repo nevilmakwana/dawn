@@ -713,6 +713,14 @@
       list-style: none;
     }
 
+    .prada-desktop-menu__grandchild-products {
+      display: grid;
+      gap: 0;
+      margin: 8px 0 18px;
+      padding: 0;
+      list-style: none;
+    }
+
     .prada-desktop-menu__submenu-list > li {
       position: static;
       margin: 0;
@@ -788,6 +796,25 @@
       font-weight: var(--ge-weight-regular, 400) !important;
       line-height: 1.25 !important;
       transition: color 220ms cubic-bezier(0.33, 1, 0.68, 1);
+    }
+
+    .prada-desktop-menu__grandchild-product-link {
+      color: #555555 !important;
+      font-size: 12px !important;
+      line-height: 1.45 !important;
+    }
+
+    .menu-drawer__nested-products {
+      margin: -4px 0 10px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .menu-drawer__product-link {
+      padding-left: 3.2rem !important;
+      color: rgba(var(--color-foreground), 0.72) !important;
+      font-size: 1.3rem !important;
+      line-height: 1.35 !important;
     }
 
     .prada-desktop-menu__view-all {
@@ -2810,6 +2837,13 @@
           "type": "url",
           "id": "link",
           "label": "Link"
+        },
+        {
+          "type": "product_list",
+          "id": "products",
+          "label": "Products",
+          "limit": 12,
+          "info": "Optional. Selected products appear under this nested collection in the drawer menu."
         }
       ]
     }
