@@ -817,7 +817,25 @@
         }
 
         var currentPath = normalizeUrl(window.location.href);
+        var currentTitle = textFrom(title).toLowerCase();
         var match = null;
+
+        function addUniqueTab(tabList, label, href, path) {
+          if (!label || !href || !path) return;
+          if (tabList.some(function (tab) { return tab.path === path; })) return;
+
+          tabList.push({ label: label, href: href, path: path });
+        }
+
+        function collectGrandchildTabs(grandchildPanel, tabList) {
+          if (!grandchildPanel) return;
+
+          grandchildPanel
+            .querySelectorAll(':scope > .prada-desktop-menu__grandchild-list > li > a')
+            .forEach(function (grandchildLink) {
+              addUniqueTab(tabList, textFrom(grandchildLink), grandchildLink.href, pathFromLink(grandchildLink));
+            });
+        }
 
         desktopMenu.querySelectorAll('.prada-desktop-menu__item').forEach(function (parentItem) {
           if (match) return;
@@ -833,7 +851,7 @@
           var parentViewAllPath = pathFromLink(parentViewAll);
 
           if (parentViewAllPath) {
-            parentTabs.push({ label: 'View all', href: parentViewAll.href, path: parentViewAllPath });
+            addUniqueTab(parentTabs, 'View all', parentViewAll.href, parentViewAllPath);
           }
 
           childItems.forEach(function (childItem) {
@@ -846,32 +864,27 @@
             var childViewAll = grandchildPanel?.querySelector(':scope > .prada-desktop-menu__view-all');
             var childHref = hrefFromLink(childViewAll) || hrefFromLink(childLink);
             var childPath = pathFromLink(childViewAll) || pathFromLink(childLink);
+            var childTitleMatchesCurrentCollection = childTitle.toLowerCase() === currentTitle;
 
             if (childTitle && childHref) {
-              parentTabs.push({ label: childTitle, href: childHref, path: childPath });
+              addUniqueTab(parentTabs, childTitle, childHref, childPath);
             }
 
             if (grandchildPanel && childViewAll && childPath) {
-              var childTabs = [
-                { label: 'View all', href: childViewAll.href, path: childPath },
-              ];
+              var childTabs = [];
 
-              grandchildPanel.querySelectorAll(':scope > .prada-desktop-menu__grandchild-list a').forEach(function (grandchildLink) {
-                var grandchildPath = pathFromLink(grandchildLink);
-                if (!grandchildPath) return;
-
-                childTabs.push({ label: textFrom(grandchildLink), href: grandchildLink.href, path: grandchildPath });
-              });
+              addUniqueTab(childTabs, 'View all', childViewAll.href, childPath);
+              collectGrandchildTabs(grandchildPanel, childTabs);
 
               var activeChildTab = childTabs.find(function (tab) {
                 return tab.path === currentPath;
               });
 
-              if (activeChildTab) {
+              if ((activeChildTab || childTitleMatchesCurrentCollection) && childTabs.length > 1) {
                 match = {
                   title: childTitle,
                   tabs: childTabs,
-                  activePath: currentPath,
+                  activePath: activeChildTab ? currentPath : childPath,
                 };
               }
             } else if (childPath === currentPath && parentTabs.length > 1) {
