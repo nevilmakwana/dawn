@@ -20,3 +20,7 @@
 - Confirm that each variant has its matching native Shopify variant image. Notification thumbnails use Shopify line-item media and cannot use the theme's custom variant gallery.
 
 The template keeps Shopify's current order, delivery, payment, tax, refund, bundle, and gift-card Liquid logic. The changes are limited to customer-facing copy and email-safe presentation styles.
+
+## Brand assets
+
+The template uses Grey Exim's Shopify-hosted black wordmark. Its campaign area dynamically reuses the first ordered product's Shopify line-item image, so the visual stays relevant and owned by Grey Exim. The footer links to the verified Grey Exim Instagram, Facebook, Pinterest, YouTube, and LinkedIn profiles. If the wordmark is replaced in **Content > Files**, update its absolute CDN URL in the template and send another test email.

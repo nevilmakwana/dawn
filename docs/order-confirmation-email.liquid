@@ -21,7 +21,7 @@
   {% if has_pending_payment %}
     Order received
   {% else %}
-    Order confirmed
+    Thank you for your order!
   {% endif %}
 {% endcapture %}
 {% capture email_body %}
@@ -410,6 +410,301 @@
       }
     }
   </style>
+  <style>
+    body,
+    table.body {
+      background: #f3f3f3 !important;
+      color: #191919 !important;
+    }
+
+    .header {
+      background: #ffffff !important;
+      border-bottom: 0 !important;
+    }
+
+    .header__cell {
+      padding: 34px 20px 20px !important;
+    }
+
+    .brand-logo-cell {
+      text-align: center !important;
+    }
+
+    .brand-logo {
+      display: inline-block !important;
+      width: 220px !important;
+      max-width: 72% !important;
+      height: auto !important;
+      border: 0 !important;
+    }
+
+    .brand-nav-cell {
+      padding-top: 18px !important;
+      text-align: center !important;
+    }
+
+    .brand-nav-cell a {
+      display: inline-block !important;
+      margin: 0 10px !important;
+      color: #191919 !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      line-height: 1.4 !important;
+      text-decoration: none !important;
+      text-transform: uppercase !important;
+    }
+
+    .promo-strip {
+      background: #ffffff !important;
+    }
+
+    .promo-strip__cell {
+      padding: 11px 18px !important;
+      border: 1px solid #d7d7d7 !important;
+      color: #242424 !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      line-height: 1.4 !important;
+      text-align: center !important;
+      text-transform: uppercase !important;
+    }
+
+    .content {
+      background: #ffffff !important;
+    }
+
+    .content__cell {
+      padding: 54px 32px 44px !important;
+    }
+
+    .luxury-kicker {
+      margin: 0 0 18px !important;
+      color: #6b6b6b !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      line-height: 1.4 !important;
+      text-align: center !important;
+      text-transform: uppercase !important;
+    }
+
+    .content h2 {
+      margin: 0 auto 24px !important;
+      max-width: 460px !important;
+      color: #171717 !important;
+      font-family: Georgia, 'Times New Roman', serif !important;
+      font-size: 43px !important;
+      font-weight: 400 !important;
+      line-height: 1.08 !important;
+      text-align: center !important;
+    }
+
+    .content .confirmation-intro,
+    .content .email-status,
+    .content .order-reference {
+      margin-right: auto !important;
+      margin-left: auto !important;
+      max-width: 500px !important;
+      color: #3f3f3f !important;
+      font-size: 13px !important;
+      line-height: 1.7 !important;
+      text-align: center !important;
+    }
+
+    .content .confirmation-intro {
+      margin-bottom: 12px !important;
+    }
+
+    .content .email-status {
+      margin-bottom: 14px !important;
+    }
+
+    .content .order-reference {
+      margin-top: 20px !important;
+      color: #6b6b6b !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+    }
+
+    .content .actions {
+      margin-top: 28px !important;
+    }
+
+    .content .button__cell,
+    .content .actions-buttons .button__cell--primary,
+    .content .actions-buttons .button__cell--shop-app {
+      border: 1px solid #111111 !important;
+      background: #111111 !important;
+    }
+
+    .content .button__text,
+    .content .button__text--shop-app {
+      color: #ffffff !important;
+    }
+
+    .content .link__cell,
+    .content .link__cell a {
+      color: #4b4b4b !important;
+    }
+
+    .section {
+      background: #ffffff !important;
+    }
+
+    .section__cell {
+      padding: 42px 32px !important;
+      border-top: 1px solid #d9d9d9 !important;
+    }
+
+    .section h3 {
+      margin-bottom: 24px !important;
+      color: #171717 !important;
+      font-size: 12px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+    }
+
+    .order-list__item__cell {
+      padding: 24px 0 !important;
+    }
+
+    .order-list__image,
+    .order-list__product-image {
+      border: 0 !important;
+    }
+
+    .campaign {
+      background: #ffffff !important;
+    }
+
+    .campaign__cell {
+      padding: 0 20px 42px !important;
+    }
+
+    .campaign__image {
+      display: block !important;
+      width: 100% !important;
+      max-width: 600px !important;
+      height: auto !important;
+      border: 0 !important;
+    }
+
+    .campaign__caption {
+      padding: 22px 24px !important;
+      background: #111111 !important;
+      color: #ffffff !important;
+      text-align: center !important;
+    }
+
+    .campaign__title {
+      margin: 0 0 12px !important;
+      color: #ffffff !important;
+      font-family: Georgia, 'Times New Roman', serif !important;
+      font-size: 25px !important;
+      font-weight: 400 !important;
+      line-height: 1.2 !important;
+    }
+
+    .campaign__link {
+      color: #ffffff !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      line-height: 1.4 !important;
+      text-decoration: underline !important;
+      text-transform: uppercase !important;
+    }
+
+    .footer {
+      background: #ffffff !important;
+    }
+
+    .footer__cell {
+      padding: 34px 20px 42px !important;
+      border-top: 1px solid #d9d9d9 !important;
+    }
+
+    .social-links {
+      margin: 0 auto 22px !important;
+    }
+
+    .social-links td {
+      padding: 0 8px 10px !important;
+      text-align: center !important;
+    }
+
+    .social-links a {
+      color: #171717 !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      line-height: 1.4 !important;
+      text-decoration: none !important;
+      text-transform: uppercase !important;
+    }
+
+    .footer .disclaimer__subtext,
+    .footer .disclaimer__subtext a,
+    .footer .policy-links,
+    .footer .policy-links a {
+      color: #686868 !important;
+      font-size: 10px !important;
+      line-height: 1.7 !important;
+      text-align: center !important;
+    }
+
+    .footer .policy-links {
+      margin: 14px 0 0 !important;
+    }
+
+    .footer .policy-links a {
+      margin: 0 7px !important;
+      text-decoration: underline !important;
+    }
+
+    @media only screen and (max-width: 620px) {
+      .header__cell {
+        padding: 26px 16px 16px !important;
+      }
+
+      .brand-logo {
+        width: 190px !important;
+      }
+
+      .brand-nav-cell a {
+        margin: 0 5px !important;
+        font-size: 9px !important;
+      }
+
+      .promo-strip__cell {
+        border-right: 0 !important;
+        border-left: 0 !important;
+      }
+
+      .content__cell {
+        padding: 44px 22px 36px !important;
+      }
+
+      .content h2 {
+        font-size: 35px !important;
+      }
+
+      .section__cell {
+        padding: 34px 22px !important;
+      }
+
+      .campaign__cell {
+        padding: 0 0 32px !important;
+      }
+
+      .social-links td {
+        padding-right: 4px !important;
+        padding-left: 4px !important;
+      }
+
+      .social-links a {
+        font-size: 9px !important;
+      }
+    }
+  </style>
 </head>
 
   <body>
@@ -419,58 +714,50 @@
     <table class="body">
       <tr>
         <td>
-          <table class="header row">
-  <tr>
-    <td class="header__cell">
-      <center>
+          <table class="header row" role="presentation">
+            <tr>
+              <td class="header__cell">
+                <center>
+                  <table class="container" role="presentation">
+                    <tr>
+                      <td class="brand-logo-cell">
+                        <a href="{{ shop.url }}" aria-label="Visit Grey Exim">
+                          <img
+                            src="https://www.greyexim.com/cdn/shop/files/Logo-Wordmark_Black.png?v=1777105537&amp;width=440"
+                            alt="Grey Exim"
+                            width="220"
+                            class="brand-logo"
+                          >
+                        </a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="brand-nav-cell">
+                        <a href="{{ shop.url }}/collections/all">Shop</a>
+                        <a href="{{ shop.url }}/collections/all?sort_by=created-descending">New arrivals</a>
+                        <a href="{{ shop.url }}/search?q=scarf">Scarves</a>
+                        <a href="{{ shop.url }}/pages/contact">Contact</a>
+                      </td>
+                    </tr>
+                  </table>
+                </center>
+              </td>
+            </tr>
+          </table>
 
-        <table class="container">
-          <tr>
-            <td>
-
-              <table class="row">
-                <tr>
-                  <td class="shop-name__cell">
-                    {%- if shop.email_logo_url %}
-                      <img src="{{shop.email_logo_url}}" alt="{{ shop.name }}" width="{{ shop.email_logo_width }}">
-                    {%- else %}
-                      <h1 class="shop-name__text">
-                        <a href="{{shop.url}}">{{ shop.name }}</a>
-                      </h1>
-                    {%- endif %}
-                  </td>
-
-                    <td>
-                      <table class="order-po-number__container">
-                        <tr>
-                          <td class="order-number__cell">
-                            <span class="order-number__text">
-                              Order {{ order_name }}
-                            </span>
-                          </td>
-                        </tr>
-                        {%- if po_number %}
-                            <tr>
-                              <td class="po-number__cell">
-                                <span class="po-number__text">
-                                  PO number #{{ po_number }}
-                                </span>
-                              </td>
-                            </tr>
-                        {%- endif %}
-                      </table>
-                    </td>
-                </tr>
-              </table>
-
-            </td>
-          </tr>
-        </table>
-
-      </center>
-    </td>
-  </tr>
-</table>
+          <table class="promo-strip row" role="presentation">
+            <tr>
+              <td>
+                <center>
+                  <table class="container" role="presentation">
+                    <tr>
+                      <td class="promo-strip__cell">Quiet pieces. Distinctly Grey.</td>
+                    </tr>
+                  </table>
+                </center>
+              </td>
+            </tr>
+          </table>
 
           <table class="row content">
   <tr>
@@ -480,9 +767,13 @@
           <tr>
             <td>
 
-            <p class="luxury-kicker">Grey Exim / {{ order_name }}</p>
+            <p class="luxury-kicker">Order {{ order_name }}</p>
             <h2>{{ email_title }}</h2>
-            <p>{{ email_body }}</p>
+            <p class="confirmation-intro">
+              {% if customer.first_name != blank %}Dear {{ customer.first_name }}, {% endif %}this email confirms that Grey Exim has received your order.
+            </p>
+            <p class="email-status">{{ email_body }}</p>
+            <p class="order-reference">Placed on {{ created_at | date: "%B %d, %Y" }}</p>
             {% assign transaction_count = transactions | size %}
   {% if transaction_count > 0 %}
     {% for transaction in transactions %}
@@ -4118,22 +4409,69 @@
   </tr>
 </table>
 
-          <table class="row footer">
-  <tr>
-    <td class="footer__cell">
-      <center>
-        <table class="container">
-          <tr>
-            <td>
+          {% assign campaign_line_item = line_items.first %}
+          {% if campaign_line_item.image %}
+            <table class="row campaign" role="presentation">
+              <tr>
+                <td class="campaign__cell">
+                  <center>
+                    <table class="container" role="presentation">
+                      <tr>
+                        <td>
+                          <a href="{{ shop.url }}/collections/all">
+                            <img
+                              src="{{ campaign_line_item | img_url: '1200x' }}"
+                              alt="{{ campaign_line_item.title | escape }}"
+                              width="600"
+                              class="campaign__image"
+                            >
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="campaign__caption">
+                          <p class="campaign__title">Objects of everyday expression.</p>
+                          <a class="campaign__link" href="{{ shop.url }}/collections/all">Discover the collection</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </center>
+                </td>
+              </tr>
+            </table>
+          {% endif %}
 
-              <p class="disclaimer__subtext">Questions about your order? Reply to this email or contact <a href="mailto:{{ shop.email }}">{{ shop.email }}</a>. Our client care team will be happy to assist.<!-- shopify-shop-marketplace-footer --></p>
-            </td>
-          </tr>
-        </table>
-      </center>
-    </td>
-  </tr>
-</table>
+          <table class="row footer" role="presentation">
+            <tr>
+              <td class="footer__cell">
+                <center>
+                  <table class="container" role="presentation">
+                    <tr>
+                      <td>
+                        <table class="social-links" role="presentation" align="center">
+                          <tr>
+                            <td><a href="https://www.instagram.com/greyexim">Instagram</a></td>
+                            <td><a href="https://www.facebook.com/GreyExim/">Facebook</a></td>
+                            <td><a href="https://www.pinterest.com/greyexim">Pinterest</a></td>
+                            <td><a href="https://www.youtube.com/@GreyExim">YouTube</a></td>
+                            <td><a href="https://www.linkedin.com/company/grey-exim/">LinkedIn</a></td>
+                          </tr>
+                        </table>
+
+                        <p class="disclaimer__subtext">Questions about your order? Reply to this email or contact <a href="mailto:{{ shop.email }}">{{ shop.email }}</a>. Our client care team will be happy to assist.<!-- shopify-shop-marketplace-footer --></p>
+                        <p class="policy-links">
+                          <a href="{{ shop.url }}/pages/contact">Contact</a>
+                          <a href="{{ shop.url }}/policies/shipping-policy">Shipping</a>
+                          <a href="{{ shop.url }}/policies/refund-policy">Returns</a>
+                          <a href="{{ shop.url }}/policies/privacy-policy">Privacy</a>
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </center>
+              </td>
+            </tr>
+          </table>
 
 <img src="{{ 'notifications/spacer.png' | shopify_asset_url }}" class="spacer" height="1" />
 
