@@ -36,6 +36,12 @@
         <div class="menu-drawer__navigation-container">
           <nav class="prada-desktop-menu" aria-label="{{ 'sections.header.menu' | t }}">
             <div class="prada-desktop-menu__toolbar">
+              <button type="button" class="prada-desktop-menu__toolbar-button" data-prada-drawer-close>
+                <span class="prada-desktop-menu__toolbar-icon">
+                  {{- 'prada-close.svg' | inline_asset_content -}}
+                </span>
+                <span>Close</span>
+              </button>
               <button type="button" class="prada-desktop-menu__toolbar-button" data-prada-drawer-search>
                 <span class="prada-desktop-menu__toolbar-icon">
                   {{- 'prada-search.svg' | inline_asset_content -}}
