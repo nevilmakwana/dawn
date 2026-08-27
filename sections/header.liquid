@@ -485,6 +485,8 @@
       box-shadow: none !important;
       filter: none !important;
       z-index: 1999 !important;
+      backface-visibility: hidden;
+      will-change: transform, opacity;
       transition:
         opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
         transform 420ms cubic-bezier(0.33, 1, 0.68, 1),
@@ -512,7 +514,7 @@
     .js .prada-header header-drawer > details[open].is-prada-closing > .menu-drawer {
       opacity: 0 !important;
       visibility: visible !important;
-      transform: translateX(0) !important;
+      transform: translateX(-105%) !important;
       transition:
         opacity 760ms cubic-bezier(0.22, 1, 0.36, 1),
         transform 760ms cubic-bezier(0.33, 1, 0.68, 1),

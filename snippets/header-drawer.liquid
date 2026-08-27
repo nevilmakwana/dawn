@@ -759,6 +759,9 @@
       const header = drawer.closest('.section-header');
       const breakpoint = drawer.dataset.breakpoint || 'tablet';
 
+      window.cancelAnimationFrame(drawer.openAnimationFrame);
+      drawer.openAnimationFrame = null;
+      window.removeEventListener('resize', drawer.onResize);
       details.classList.add('is-prada-closing');
       details.classList.remove('menu-opening');
       summary?.setAttribute('aria-expanded', 'false');
