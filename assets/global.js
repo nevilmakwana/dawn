@@ -424,6 +424,7 @@ class MenuDrawer extends HTMLElement {
     super();
 
     this.mainDetailsToggle = this.querySelector('details');
+    this.openAnimationFrame = null;
 
     this.addEventListener('keyup', this.onKeyUp.bind(this));
     this.addEventListener('focusout', this.onFocusOut.bind(this));
@@ -482,8 +483,17 @@ class MenuDrawer extends HTMLElement {
   }
 
   openMenuDrawer(summaryElement) {
-    setTimeout(() => {
-      this.mainDetailsToggle.classList.add('menu-opening');
+    cancelAnimationFrame(this.openAnimationFrame);
+    this.mainDetailsToggle.classList.remove('menu-opening');
+
+    this.openAnimationFrame = requestAnimationFrame(() => {
+      this.openAnimationFrame = requestAnimationFrame(() => {
+        this.openAnimationFrame = null;
+
+        if (!this.mainDetailsToggle.open || this.mainDetailsToggle.classList.contains('is-prada-closing')) return;
+
+        this.mainDetailsToggle.classList.add('menu-opening');
+      });
     });
     summaryElement.setAttribute('aria-expanded', true);
     trapFocus(this.mainDetailsToggle, summaryElement);
@@ -493,6 +503,8 @@ class MenuDrawer extends HTMLElement {
   closeMenuDrawer(event, elementToFocus = false) {
     if (event === undefined) return;
 
+    cancelAnimationFrame(this.openAnimationFrame);
+    this.openAnimationFrame = null;
     this.mainDetailsToggle.classList.remove('menu-opening');
     this.mainDetailsToggle.querySelectorAll('details').forEach((details) => {
       details.removeAttribute('open');
