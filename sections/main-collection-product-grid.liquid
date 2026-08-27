@@ -821,19 +821,34 @@
         var match = null;
 
         function addUniqueTab(tabList, label, href, path) {
-          if (!label || !href || !path) return;
-          if (tabList.some(function (tab) { return tab.path === path; })) return;
+          var normalizedLabel = (label || '').trim();
+          var normalizedHref = (href || '').trim();
+          var normalizedPath = path || '';
 
-          tabList.push({ label: label, href: href, path: path });
+          if (!normalizedLabel || !normalizedHref) return;
+          if (
+            tabList.some(function (tab) {
+              return (
+                tab.label.toLowerCase() === normalizedLabel.toLowerCase() &&
+                (tab.path || tab.href) === (normalizedPath || normalizedHref)
+              );
+            })
+          )
+            return;
+
+          tabList.push({ label: normalizedLabel, href: normalizedHref, path: normalizedPath });
         }
 
-        function collectGrandchildTabs(grandchildPanel, tabList) {
+        function collectGrandchildTabs(grandchildPanel, tabList, fallbackHref) {
           if (!grandchildPanel) return;
 
           grandchildPanel
             .querySelectorAll(':scope > .prada-desktop-menu__grandchild-list > li > a')
             .forEach(function (grandchildLink) {
-              addUniqueTab(tabList, textFrom(grandchildLink), grandchildLink.href, pathFromLink(grandchildLink));
+              var grandchildPath = pathFromLink(grandchildLink);
+              var grandchildHref = hrefFromLink(grandchildLink) || fallbackHref;
+
+              addUniqueTab(tabList, textFrom(grandchildLink), grandchildHref, grandchildPath);
             });
         }
 
@@ -874,10 +889,10 @@
               var childTabs = [];
 
               addUniqueTab(childTabs, 'View all', childViewAll.href, childPath);
-              collectGrandchildTabs(grandchildPanel, childTabs);
+              collectGrandchildTabs(grandchildPanel, childTabs, childViewAll.href);
 
               var activeChildTab = childTabs.find(function (tab) {
-                return tab.path === currentPath;
+                return tab.path && tab.path === currentPath;
               });
 
               if ((activeChildTab || childTitleMatchesCurrentCollection) && childTabs.length > 1) {
