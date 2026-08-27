@@ -153,7 +153,7 @@ cart-drawer.prada-cart-drawer.active {
 }
 
 cart-drawer.prada-cart-drawer .drawer__inner {
-  transform: translate3d(-104%, 0, 0);
+  transform: translate3d(104%, 0, 0);
   transition: transform var(--prada-cart-drawer-enter-duration) var(--prada-cart-drawer-ease);
   backface-visibility: hidden;
   will-change: transform;
