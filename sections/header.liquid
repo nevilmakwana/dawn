@@ -489,7 +489,7 @@
       filter: none !important;
       z-index: 1999 !important;
       backface-visibility: hidden;
-      will-change: transform;
+      will-change: transform, opacity;
       transition:
         transform var(--prada-menu-slide-duration) var(--prada-menu-slide-in-ease),
         visibility 0s linear var(--prada-menu-slide-duration) !important;
@@ -512,9 +512,11 @@
     }
 
     .js .prada-header header-drawer > details[open].is-prada-closing > .menu-drawer {
+      opacity: 0 !important;
       visibility: visible !important;
       transform: translateX(-105%) !important;
       transition:
+        opacity 420ms cubic-bezier(0.4, 0, 0.2, 1),
         transform var(--prada-menu-slide-duration) var(--prada-menu-slide-out-ease),
         visibility 0s linear var(--prada-menu-slide-duration) !important;
     }
@@ -555,6 +557,7 @@
       height: 88px;
       padding: 0 36px;
       background: #ffffff;
+      transform: translateY(-8px);
     }
 
     .prada-desktop-menu__toolbar-button {
@@ -572,10 +575,6 @@
       font-weight: 500;
       line-height: 1;
       cursor: pointer;
-    }
-
-    .prada-desktop-menu__toolbar-button[data-prada-drawer-close] {
-      transform: translateY(-4px);
     }
 
     .prada-desktop-menu__toolbar-button > span:last-child {
