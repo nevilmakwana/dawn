@@ -76,11 +76,9 @@
                               break
                             elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_child'
                               break
-                            elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_grandchild'
-                              if grandchild_check_block.settings.title != blank or grandchild_check_block.settings.products != blank
-                                assign parent_has_grandchild_blocks = true
-                                break
-                              endif
+                            elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_grandchild' and grandchild_check_block.settings.title != blank
+                              assign parent_has_grandchild_blocks = true
+                              break
                             endif
                           endfor
                         endif
@@ -135,11 +133,9 @@
                                       break
                                     elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_child'
                                       break
-                                    elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_grandchild'
-                                      if grandchild_check_block.settings.title != blank or grandchild_check_block.settings.products != blank
-                                        assign has_grandchild_blocks = true
-                                        break
-                                      endif
+                                    elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_grandchild' and grandchild_check_block.settings.title != blank
+                                      assign has_grandchild_blocks = true
+                                      break
                                     endif
                                   endfor
                                 -%}
@@ -175,7 +171,6 @@
                                           {%- liquid
                                             assign grandchild_title = grandchild_block.settings.title
                                             assign grandchild_url = grandchild_block.settings.link | default: '#'
-                                            assign grandchild_products = grandchild_block.settings.products
                                           -%}
                                           {%- if grandchild_block.id == child_block.id -%}
                                             {%- assign scan_child_grandchildren = true -%}
@@ -183,27 +178,12 @@
                                             {%- break -%}
                                           {%- elsif scan_child_grandchildren and grandchild_block.type == 'drawer_child' -%}
                                             {%- break -%}
-                                          {%- elsif scan_child_grandchildren and grandchild_block.type == 'drawer_grandchild' -%}
-                                            {%- if grandchild_title != blank or grandchild_products != blank -%}
-                                              <li class="prada-desktop-menu__grandchild-item{% if grandchild_products != blank %} has-products{% endif %}" {{ grandchild_block.shopify_attributes }}>
-                                                {%- if grandchild_title != blank -%}
-                                                  <a class="prada-desktop-menu__grandchild-link" href="{{ grandchild_url }}">
-                                                    {{ grandchild_title | escape }}
-                                                  </a>
-                                                {%- endif -%}
-                                                {%- if grandchild_products != blank -%}
-                                                  <ul class="prada-desktop-menu__grandchild-products" role="list">
-                                                    {%- for product in grandchild_products -%}
-                                                      <li>
-                                                        <a class="prada-desktop-menu__grandchild-product-link" href="{{ product.url }}">
-                                                          {{ product.title | escape }}
-                                                        </a>
-                                                      </li>
-                                                    {%- endfor -%}
-                                                  </ul>
-                                                {%- endif -%}
-                                              </li>
-                                            {%- endif -%}
+                                          {%- elsif scan_child_grandchildren and grandchild_block.type == 'drawer_grandchild' and grandchild_title != blank -%}
+                                            <li {{ grandchild_block.shopify_attributes }}>
+                                              <a href="{{ grandchild_url }}">
+                                                {{ grandchild_title | escape }}
+                                              </a>
+                                            </li>
                                           {%- endif -%}
                                         {%- endfor -%}
                                       </ul>
@@ -428,11 +408,9 @@
                                           break
                                         elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_child'
                                           break
-                                        elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_grandchild'
-                                          if grandchild_check_block.settings.title != blank or grandchild_check_block.settings.products != blank
-                                            assign has_grandchild_blocks = true
-                                            break
-                                          endif
+                                        elsif scan_child_grandchildren and grandchild_check_block.type == 'drawer_grandchild' and grandchild_check_block.settings.title != blank
+                                          assign has_grandchild_blocks = true
+                                          break
                                         endif
                                       endfor
                                     -%}
@@ -479,7 +457,6 @@
                                                 {%- liquid
                                                   assign grandchild_title = grandchild_block.settings.title
                                                   assign grandchild_url = grandchild_block.settings.link | default: '#'
-                                                  assign grandchild_products = grandchild_block.settings.products
                                                 -%}
                                                 {%- if grandchild_block.id == child_block.id -%}
                                                   {%- assign scan_child_grandchildren = true -%}
@@ -487,34 +464,16 @@
                                                   {%- break -%}
                                                 {%- elsif scan_child_grandchildren and grandchild_block.type == 'drawer_child' -%}
                                                   {%- break -%}
-                                                {%- elsif scan_child_grandchildren and grandchild_block.type == 'drawer_grandchild' -%}
-                                                  {%- if grandchild_title != blank or grandchild_products != blank -%}
-                                                    <li class="menu-drawer__nested-item{% if grandchild_products != blank %} has-products{% endif %}" {{ grandchild_block.shopify_attributes }}>
-                                                      {%- if grandchild_title != blank -%}
-                                                        <a
-                                                          id="HeaderDrawer-{{ parent_key }}-{{ child_key }}-{{ grandchild_title | handleize }}"
-                                                          href="{{ grandchild_url }}"
-                                                          class="menu-drawer__menu-item link link--text list-menu__item focus-inset"
-                                                        >
-                                                          {{ grandchild_title | escape }}
-                                                        </a>
-                                                      {%- endif -%}
-                                                      {%- if grandchild_products != blank -%}
-                                                        <ul class="menu-drawer__nested-products list-menu" role="list">
-                                                          {%- for product in grandchild_products -%}
-                                                            <li>
-                                                              <a
-                                                                href="{{ product.url }}"
-                                                                class="menu-drawer__menu-item menu-drawer__product-link link link--text list-menu__item focus-inset"
-                                                              >
-                                                                {{ product.title | escape }}
-                                                              </a>
-                                                            </li>
-                                                          {%- endfor -%}
-                                                        </ul>
-                                                      {%- endif -%}
-                                                    </li>
-                                                  {%- endif -%}
+                                                {%- elsif scan_child_grandchildren and grandchild_block.type == 'drawer_grandchild' and grandchild_title != blank -%}
+                                                  <li {{ grandchild_block.shopify_attributes }}>
+                                                    <a
+                                                      id="HeaderDrawer-{{ parent_key }}-{{ child_key }}-{{ grandchild_title | handleize }}"
+                                                      href="{{ grandchild_url }}"
+                                                      class="menu-drawer__menu-item link link--text list-menu__item focus-inset"
+                                                    >
+                                                      {{ grandchild_title | escape }}
+                                                    </a>
+                                                  </li>
                                                 {%- endif -%}
                                               {%- endfor -%}
                                             </ul>
