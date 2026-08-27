@@ -36,12 +36,6 @@
         <div class="menu-drawer__navigation-container">
           <nav class="prada-desktop-menu" aria-label="{{ 'sections.header.menu' | t }}">
             <div class="prada-desktop-menu__toolbar">
-              <button type="button" class="prada-desktop-menu__toolbar-button" data-prada-drawer-close>
-                <span class="prada-desktop-menu__toolbar-icon">
-                  {{- 'prada-close.svg' | inline_asset_content -}}
-                </span>
-                <span>Close</span>
-              </button>
               <button type="button" class="prada-desktop-menu__toolbar-button" data-prada-drawer-search>
                 <span class="prada-desktop-menu__toolbar-icon">
                   {{- 'prada-search.svg' | inline_asset_content -}}
@@ -699,7 +693,7 @@
     window.pradaDrawerToolbarBound = true;
     const pradaDesktopMenuMedia = window.matchMedia('(min-width: 990px)');
     const pradaMobileMenuMedia = window.matchMedia('(max-width: 989px)');
-    const PRADA_DRAWER_CLOSE_DURATION = 760;
+    const PRADA_DRAWER_CLOSE_DURATION = 560;
     const PRADA_MOBILE_MENU_PRESS_DURATION = 1200;
 
     function updatePradaDesktopMenuLevel(menuDrawer) {
