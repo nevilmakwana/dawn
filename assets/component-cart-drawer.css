@@ -131,6 +131,24 @@ cart-drawer.prada-cart-drawer {
   transition: visibility 0s linear var(--prada-cart-drawer-exit-duration);
 }
 
+@keyframes prada-cart-drawer-slide-in {
+  from {
+    transform: translate3d(104%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes prada-cart-drawer-slide-out {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(104%, 0, 0);
+  }
+}
+
 cart-drawer.prada-cart-drawer.animate,
 cart-drawer.prada-cart-drawer.active {
   visibility: visible;
@@ -595,6 +613,16 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
 
   cart-drawer.prada-cart-drawer.active .drawer__inner {
     transform: translate3d(0, 0, 0) !important;
+  }
+
+  cart-drawer.prada-cart-drawer.is-opening.active .drawer__inner {
+    animation: prada-cart-drawer-slide-in var(--prada-cart-drawer-enter-duration) var(--prada-cart-drawer-ease)
+      both;
+  }
+
+  cart-drawer.prada-cart-drawer.is-closing .drawer__inner {
+    animation: prada-cart-drawer-slide-out var(--prada-cart-drawer-exit-duration)
+      var(--prada-cart-drawer-exit-ease) both;
   }
 
   cart-drawer.prada-cart-drawer.is-closing .drawer__inner {
@@ -1381,6 +1409,7 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
 
 @media (prefers-reduced-motion: reduce) {
   cart-drawer.prada-cart-drawer .drawer__inner {
+    animation: none !important;
     transition: none !important;
     will-change: auto;
   }

@@ -199,7 +199,7 @@ class CartDrawer extends HTMLElement {
     };
 
     this.classList.remove('is-closing');
-    this.classList.add('animate');
+    this.classList.add('animate', 'is-opening');
     // Commit the off-canvas frame before activating the drawer. This keeps
     // async header refreshes from collapsing both states into one paint.
     drawerInner?.getBoundingClientRect();
@@ -211,24 +211,38 @@ class CartDrawer extends HTMLElement {
     if (!drawerInner || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       this.openFocusTimer = setTimeout(() => {
         this.openFocusTimer = null;
+        this.classList.remove('is-opening');
         if (this.classList.contains('active')) focusOnOpen();
       });
     } else {
-      const handleOpenTransitionEnd = (event) => {
-        if (event.target !== drawerInner || event.propertyName !== 'transform') return;
+      const finishOpen = () => {
+        if (!this.classList.contains('is-opening')) return;
 
         clearTimeout(this.openFocusTimer);
         this.openFocusTimer = null;
         drawerInner.removeEventListener('transitionend', handleOpenTransitionEnd);
+        drawerInner.removeEventListener('animationend', handleOpenAnimationEnd);
+        this.classList.remove('is-opening');
         if (this.classList.contains('active')) focusOnOpen();
+      };
+      const handleOpenTransitionEnd = (event) => {
+        if (event.target !== drawerInner || event.propertyName !== 'transform') return;
+        finishOpen();
+      };
+      const handleOpenAnimationEnd = (event) => {
+        if (event.target !== drawerInner || event.animationName !== 'prada-cart-drawer-slide-in') return;
+        finishOpen();
       };
 
       this.openFocusTimer = setTimeout(() => {
         this.openFocusTimer = null;
         drawerInner.removeEventListener('transitionend', handleOpenTransitionEnd);
+        drawerInner.removeEventListener('animationend', handleOpenAnimationEnd);
+        this.classList.remove('is-opening');
         if (this.classList.contains('active')) focusOnOpen();
       }, 700);
       drawerInner.addEventListener('transitionend', handleOpenTransitionEnd);
+      drawerInner.addEventListener('animationend', handleOpenAnimationEnd);
     }
 
     if (window.pradaDrawerScrollLock) {
@@ -257,7 +271,7 @@ class CartDrawer extends HTMLElement {
 
     const drawerInner = this.querySelector('.drawer__inner');
     const finishClose = () => {
-      this.classList.remove('is-closing');
+      this.classList.remove('is-closing', 'is-opening');
       if (!this.classList.contains('active')) this.classList.remove('animate');
     };
 
@@ -266,6 +280,7 @@ class CartDrawer extends HTMLElement {
       return;
     }
 
+    this.classList.remove('is-opening');
     this.classList.add('is-closing');
     // Commit the fully open frame before moving the panel off canvas.
     drawerInner?.getBoundingClientRect();
@@ -284,15 +299,27 @@ class CartDrawer extends HTMLElement {
         clearTimeout(this.closeTimer);
         this.closeTimer = null;
         drawerInner.removeEventListener('transitionend', handleCloseTransitionEnd);
+        drawerInner.removeEventListener('animationend', handleCloseAnimationEnd);
+        finishClose();
+      };
+      const handleCloseAnimationEnd = (event) => {
+        if (event.target !== drawerInner || event.animationName !== 'prada-cart-drawer-slide-out') return;
+
+        clearTimeout(this.closeTimer);
+        this.closeTimer = null;
+        drawerInner.removeEventListener('transitionend', handleCloseTransitionEnd);
+        drawerInner.removeEventListener('animationend', handleCloseAnimationEnd);
         finishClose();
       };
 
       this.closeTimer = setTimeout(() => {
         this.closeTimer = null;
         drawerInner.removeEventListener('transitionend', handleCloseTransitionEnd);
+        drawerInner.removeEventListener('animationend', handleCloseAnimationEnd);
         finishClose();
       }, 560);
       drawerInner.addEventListener('transitionend', handleCloseTransitionEnd);
+      drawerInner.addEventListener('animationend', handleCloseAnimationEnd);
     }
 
     removeTrapFocus(this.activeElement);
