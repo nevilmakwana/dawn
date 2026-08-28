@@ -170,7 +170,16 @@
                                         {%- for grandchild_block in section.blocks -%}
                                           {%- liquid
                                             assign grandchild_title = grandchild_block.settings.title
-                                            assign grandchild_url = grandchild_block.settings.link | default: '#'
+                                            assign grandchild_key = grandchild_title | handleize
+                                            assign grandchild_url = grandchild_block.settings.link
+                                            if grandchild_url == blank
+                                              if grandchild_block.settings.products != blank and child_url != blank and child_url != '#'
+                                                assign child_collection_url = child_url | split: '#' | first
+                                                assign grandchild_url = child_collection_url | append: '#nested-' | append: grandchild_key
+                                              else
+                                                assign grandchild_url = routes.collections_url | append: '/' | append: grandchild_key
+                                              endif
+                                            endif
                                           -%}
                                           {%- if grandchild_block.id == child_block.id -%}
                                             {%- assign scan_child_grandchildren = true -%}
@@ -183,6 +192,7 @@
                                             <li {{ grandchild_block.shopify_attributes }}>
                                               <a
                                                 href="{{ grandchild_url }}"
+                                                data-prada-nested-link
                                                 {% if grandchild_block.settings.products != blank and request.page_type == 'collection' %}
                                                   data-prada-product-template="{{ nested_product_template_id }}"
                                                 {% endif %}
@@ -469,7 +479,17 @@
                                               {%- for grandchild_block in section.blocks -%}
                                                 {%- liquid
                                                   assign grandchild_title = grandchild_block.settings.title
-                                                  assign grandchild_url = grandchild_block.settings.link | default: '#'
+                                                  assign grandchild_key = grandchild_title | handleize
+                                                  assign grandchild_url = grandchild_block.settings.link
+                                                  if grandchild_url == blank
+                                                    if grandchild_block.settings.products != blank and child_url != blank and child_url != '#'
+                                                      assign child_collection_url = child_url | split: '#' | first
+                                                      assign grandchild_url = child_collection_url | append: '#nested-' | append: grandchild_key
+                                                    else
+                                                      assign grandchild_url = routes.collections_url | append: '/' | append: grandchild_key
+                                                    endif
+                                                  endif
+                                                  assign nested_product_template_id = 'PradaNestedProducts-' | append: section.id | append: '-' | append: grandchild_block.id
                                                 -%}
                                                 {%- if grandchild_block.id == child_block.id -%}
                                                   {%- assign scan_child_grandchildren = true -%}
@@ -483,6 +503,10 @@
                                                       id="HeaderDrawer-{{ parent_key }}-{{ child_key }}-{{ grandchild_title | handleize }}"
                                                       href="{{ grandchild_url }}"
                                                       class="menu-drawer__menu-item link link--text list-menu__item focus-inset"
+                                                      data-prada-nested-link
+                                                      {% if grandchild_block.settings.products != blank and request.page_type == 'collection' %}
+                                                        data-prada-product-template="{{ nested_product_template_id }}"
+                                                      {% endif %}
                                                     >
                                                       {{ grandchild_title | escape }}
                                                     </a>

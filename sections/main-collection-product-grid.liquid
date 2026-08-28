@@ -966,7 +966,8 @@
           grandchildPanel
             .querySelectorAll(':scope > .prada-desktop-menu__grandchild-list > li > a')
             .forEach(function (grandchildLink) {
-              var grandchildPath = pathFromLink(grandchildLink);
+              var productTemplateId = grandchildLink.dataset.pradaProductTemplate;
+              var grandchildPath = productTemplateId ? '' : pathFromLink(grandchildLink);
               var grandchildHref = hrefFromLink(grandchildLink) || fallbackHref;
 
               addUniqueTab(
@@ -974,9 +975,46 @@
                 textFrom(grandchildLink),
                 grandchildHref,
                 grandchildPath,
-                grandchildLink.dataset.pradaProductTemplate
+                productTemplateId
               );
             });
+        }
+
+        function enableNestedMenuNavigation() {
+          var headerDrawer = desktopMenu.closest('header-drawer');
+          if (!headerDrawer) return;
+
+          if (headerDrawer.pradaNestedNavigationHandler) {
+            headerDrawer.removeEventListener('click', headerDrawer.pradaNestedNavigationHandler);
+          }
+
+          headerDrawer.pradaNestedNavigationHandler = function (event) {
+            var nestedLink = event.target.closest('[data-prada-nested-link][data-prada-product-template]');
+            if (
+              !nestedLink ||
+              event.defaultPrevented ||
+              event.metaKey ||
+              event.ctrlKey ||
+              event.shiftKey ||
+              event.altKey ||
+              event.button !== 0
+            ) {
+              return;
+            }
+
+            var templateId = nestedLink.dataset.pradaProductTemplate;
+            var nestedTab = Array.from(tabs.querySelectorAll('[data-prada-product-template]')).find(function (tab) {
+              return tab.dataset.pradaProductTemplate === templateId;
+            });
+
+            if (!nestedTab) return;
+
+            event.preventDefault();
+            nestedTab.click();
+            headerDrawer.querySelector('[data-prada-drawer-close]')?.click();
+          };
+
+          headerDrawer.addEventListener('click', headerDrawer.pradaNestedNavigationHandler);
         }
 
         desktopMenu.querySelectorAll('.prada-desktop-menu__item').forEach(function (parentItem) {
@@ -1056,6 +1094,7 @@
             queueTabIndicatorUpdate(tabs);
           });
           tabs.addEventListener('click', navigateCollection);
+          enableNestedMenuNavigation();
           enableTabPrefetch();
           window.addEventListener('resize', function () {
             queueTabIndicatorUpdate(tabs);
@@ -1079,6 +1118,7 @@
           queueTabIndicatorUpdate(tabs);
         });
         tabs.addEventListener('click', navigateCollection);
+        enableNestedMenuNavigation();
         enableTabPrefetch();
         if (window.location.hash.indexOf('#nested-') === 0) {
           var requestedNestedHandle = decodeURIComponent(window.location.hash.slice(8));
