@@ -130,7 +130,6 @@ cart-drawer.prada-cart-drawer {
   pointer-events: none;
   transition: visibility 0s linear var(--prada-cart-drawer-exit-duration);
 }
-
 @keyframes prada-cart-drawer-slide-in {
   from {
     transform: translate3d(104%, 0, 0);
@@ -1404,13 +1403,5 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     line-height: 1.35;
     text-decoration: underline;
     text-underline-offset: 4px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  cart-drawer.prada-cart-drawer .drawer__inner {
-    animation: none !important;
-    transition: none !important;
-    will-change: auto;
   }
 }

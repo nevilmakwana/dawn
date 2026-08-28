@@ -208,7 +208,7 @@ class CartDrawer extends HTMLElement {
       this.openAnimationFrame = null;
     });
 
-    if (!drawerInner || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (!drawerInner) {
       this.openFocusTimer = setTimeout(() => {
         this.openFocusTimer = null;
         this.classList.remove('is-opening');
@@ -284,7 +284,7 @@ class CartDrawer extends HTMLElement {
     this.classList.add('is-closing');
     // Commit the fully open frame before moving the panel off canvas.
     drawerInner?.getBoundingClientRect();
-    if (!drawerInner || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (!drawerInner) {
       this.classList.remove('active');
       setTimeout(finishClose);
     } else {
