@@ -200,11 +200,12 @@ class CartDrawer extends HTMLElement {
 
     this.classList.remove('is-closing');
     this.classList.add('animate');
+    // Commit the off-canvas frame before activating the drawer. This keeps
+    // async header refreshes from collapsing both states into one paint.
+    drawerInner?.getBoundingClientRect();
     this.openAnimationFrame = requestAnimationFrame(() => {
-      this.openAnimationFrame = requestAnimationFrame(() => {
-        this.classList.add('active');
-        this.openAnimationFrame = null;
-      });
+      this.classList.add('active');
+      this.openAnimationFrame = null;
     });
 
     if (!drawerInner || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -243,6 +244,8 @@ class CartDrawer extends HTMLElement {
   }
 
   close() {
+    if (this.classList.contains('is-closing')) return;
+
     if (this.openAnimationFrame) {
       cancelAnimationFrame(this.openAnimationFrame);
       this.openAnimationFrame = null;
@@ -264,10 +267,17 @@ class CartDrawer extends HTMLElement {
     }
 
     this.classList.add('is-closing');
-    this.classList.remove('active');
+    // Commit the fully open frame before moving the panel off canvas.
+    drawerInner?.getBoundingClientRect();
     if (!drawerInner || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      this.classList.remove('active');
       setTimeout(finishClose);
     } else {
+      this.closeAnimationFrame = requestAnimationFrame(() => {
+        this.classList.remove('active');
+        this.closeAnimationFrame = null;
+      });
+
       const handleCloseTransitionEnd = (event) => {
         if (event.target !== drawerInner || event.propertyName !== 'transform') return;
 
