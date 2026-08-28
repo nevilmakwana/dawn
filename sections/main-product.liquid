@@ -613,7 +613,12 @@
     const updateVariant = ({ updateHistory = true, revealGallery = false, syncWishlist = false } = {}) => {
       syncCompatibleColors();
       const selected = selectors.map((selector) => selector.value);
-      const variant = variants.find((item) => item.options.every((value, index) => value === selected[index]));
+      const selectedVariantId = Number(idInput.value);
+      const variant = selectors.length
+        ? variants.find((item) => item.options.every((value, index) => value === selected[index]))
+        : variants.find((item) => Number(item.id) === selectedVariantId)
+          || variants.find((item) => item.available)
+          || variants[0];
       if (!variant) {
         submit.disabled = true;
         submitText.textContent = 'Unavailable';
