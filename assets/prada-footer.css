@@ -210,7 +210,7 @@
 
 .prada-localization-drawer {
   position: fixed;
-  z-index: 6000;
+  z-index: var(--ge-layer-global-dialog, 21000);
   inset: 0;
   visibility: hidden;
   pointer-events: none;

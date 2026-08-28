@@ -2148,6 +2148,16 @@
       isolation: isolate;
     }
   }
+
+  /* Header-owned overlays must escape page-specific sticky/transform layers. */
+  .section-header.menu-open,
+  .section-header:has(.prada-header .header__search details[open]),
+  .section-header:has([data-header-overlay][aria-hidden='false']) {
+    top: 0 !important;
+    z-index: var(--ge-layer-header-overlay) !important;
+    transform: none !important;
+    will-change: auto !important;
+  }
 {%- endstyle -%}
 
 {%- if settings.cart_type == 'notification' -%}
@@ -2348,7 +2358,7 @@
   })();
 </script>
 
-<aside class="prada-contact-drawer" id="PradaContactDrawer-{{ section.id }}" data-prada-contact-drawer aria-hidden="true" hidden>
+<aside class="prada-contact-drawer" id="PradaContactDrawer-{{ section.id }}" data-prada-contact-drawer data-header-overlay aria-hidden="true" hidden>
   <button class="prada-contact-drawer__overlay" type="button" data-prada-contact-close tabindex="-1" aria-label="Close contact panel"></button>
   <div class="prada-contact-drawer__panel" data-prada-contact-panel role="dialog" aria-modal="true" aria-labelledby="PradaContactTitle-{{ section.id }}">
     <button class="prada-contact-drawer__close" type="button" data-prada-contact-close aria-label="Close contact panel">&times;</button>

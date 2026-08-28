@@ -1,6 +1,6 @@
 .drawer {
   position: fixed;
-  z-index: 1000;
+  z-index: var(--ge-layer-global-dialog, 21000);
   left: 0;
   top: 0;
   width: 100vw;
@@ -562,7 +562,7 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
 
 @media screen and (min-width: 990px) {
   cart-drawer.prada-cart-drawer {
-    z-index: 3000;
+    z-index: var(--ge-layer-global-dialog, 21000);
     background: transparent;
   }
 
@@ -874,7 +874,7 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
 
 @media screen and (max-width: 989px) {
   cart-drawer.prada-cart-drawer {
-    z-index: 3000;
+    z-index: var(--ge-layer-global-dialog, 21000);
     background: transparent;
   }
 
