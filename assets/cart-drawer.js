@@ -91,33 +91,6 @@ class CartDrawer extends HTMLElement {
     overlay.addEventListener('click', this.close.bind(this));
   }
 
-  async refreshForHeader() {
-    const cartUrl = window.routes?.cart_url || '/cart';
-    const response = await fetch(`${cartUrl}?section_id=cart-drawer`);
-
-    if (!response.ok) throw new Error('Unable to refresh cart drawer');
-
-    const responseDocument = new DOMParser().parseFromString(await response.text(), 'text/html');
-    const sourceDrawer = responseDocument.querySelector('cart-drawer');
-    const sourceContents = sourceDrawer?.querySelector('#CartDrawer');
-    const targetContents = this.querySelector('#CartDrawer');
-
-    if (!sourceDrawer || !sourceContents || !targetContents) return;
-
-    targetContents.innerHTML = sourceContents.innerHTML;
-    this.classList.toggle('is-empty', sourceDrawer.classList.contains('is-empty'));
-    this.classList.toggle(
-      'prada-cart-drawer--multiple',
-      sourceDrawer.classList.contains('prada-cart-drawer--multiple'),
-    );
-    const itemCount = Number.parseInt(sourceDrawer.dataset.cartItemCount || '', 10);
-    if (Number.isFinite(itemCount)) {
-      this.dataset.cartItemCount = String(itemCount);
-      updatePradaCartIcon(itemCount);
-    }
-    this.bindOverlay();
-  }
-
   setHeaderCartIconAccessibility() {
     if (this.headerCartControlBound) return;
 
@@ -141,15 +114,9 @@ class CartDrawer extends HTMLElement {
       cartLink.setAttribute('role', 'button');
       cartLink.setAttribute('aria-haspopup', 'dialog');
 
-      if (this.classList.contains('active') || this.headerCartOpening) return;
+      if (this.classList.contains('active') || this.classList.contains('is-opening')) return;
 
-      this.headerCartOpening = true;
-      this.refreshForHeader()
-        .catch(() => {})
-        .finally(() => {
-          this.headerCartOpening = false;
-          this.open(cartLink);
-        });
+      this.open(cartLink);
     };
 
     document.addEventListener('click', openFromHeader);
