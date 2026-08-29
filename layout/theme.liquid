@@ -44,10 +44,6 @@
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
     {%- endif -%}
 
-    {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
-      <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
-    {%- endunless -%}
-
     <title>
       {{ page_title }}
       {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
@@ -57,6 +53,8 @@
 
     {% if page_description %}
       <meta name="description" content="{{ page_description | escape }}">
+    {% elsif request.page_type == 'index' %}
+      <meta name="description" content="Shop Grey Exim scarves, bandanas, accessories, scented candles and lifestyle pieces, designed for contemporary wardrobes and homes.">
     {% endif %}
 
     {% render 'meta-tags' %}
@@ -319,18 +317,20 @@
     {% endstyle %}
 
     {{ 'base.css' | asset_url | stylesheet_tag }}
-    {{ 'prada-product-wishlist.css' | asset_url | stylesheet_tag }}
+    <link rel="stylesheet" href="{{ 'prada-product-wishlist.css' | asset_url }}" media="print" onload="this.media='all'">
+    <noscript>{{ 'prada-product-wishlist.css' | asset_url | stylesheet_tag }}</noscript>
     <script src="{{ 'prada-product-wishlist.js' | asset_url }}" defer="defer"></script>
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 
     {%- if settings.cart_type == 'drawer' -%}
-      {{ 'prada-drawer-scroll-lock.css' | asset_url | stylesheet_tag }}
+      <link rel="stylesheet" href="{{ 'prada-drawer-scroll-lock.css' | asset_url }}" media="print" onload="this.media='all'">
       <link rel="stylesheet" href="{{ 'component-cart-drawer.css' | asset_url }}" media="print" onload="this.media='all'">
       <link rel="stylesheet" href="{{ 'component-cart.css' | asset_url }}" media="print" onload="this.media='all'">
       <link rel="stylesheet" href="{{ 'component-totals.css' | asset_url }}" media="print" onload="this.media='all'">
       <link rel="stylesheet" href="{{ 'component-price.css' | asset_url }}" media="print" onload="this.media='all'">
       <link rel="stylesheet" href="{{ 'component-discounts.css' | asset_url }}" media="print" onload="this.media='all'">
       <noscript>
+        {{ 'prada-drawer-scroll-lock.css' | asset_url | stylesheet_tag }}
         {{ 'component-cart-drawer.css' | asset_url | stylesheet_tag }}
         {{ 'component-cart.css' | asset_url | stylesheet_tag }}
         {{ 'component-totals.css' | asset_url | stylesheet_tag }}
