@@ -56,20 +56,22 @@
 
   {%- if is_best_sellers -%}
     {%- liquid
-      assign products_to_show = section.settings.products_to_show | default: 4
+      assign products_to_show = 8
       assign target_tag = section.settings.product_tag | default: 'Best Sellers' | handleize
-      assign source_collection = section.settings.source_collection
-      if source_collection == blank
-        assign source_collection = collections['best-sellers']
-      endif
-      if source_collection == blank
-        assign source_collection = collections.all
-      endif
+      assign source_collection = collections.all
       assign rendered_product_ids = ','
       assign products_rendered = 0
     -%}
 
-    <div id="PradaCategoryGrid-{{ section.id }}" class="prada-category-showcase__viewport prada-category-showcase__grid">
+    <div class="prada-best-sellers__carousel" data-best-sellers-carousel>
+      <div
+        id="PradaCategoryGrid-{{ section.id }}"
+        class="prada-category-showcase__viewport prada-category-showcase__grid"
+        data-best-sellers-track
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="{{ section.settings.heading | default: 'Best Sellers' | escape }} carousel"
+      >
       {%- for block in section.blocks -%}
         {%- if products_rendered >= products_to_show -%}{%- break -%}{%- endif -%}
         {%- liquid
@@ -106,6 +108,12 @@
                 if product_tag_handle == target_tag
                   assign has_best_seller_tag = true
                   break
+                elsif target_tag == 'best-sellers' and product_tag_handle == 'best-seller'
+                  assign has_best_seller_tag = true
+                  break
+                elsif target_tag == 'best-seller' and product_tag_handle == 'best-sellers'
+                  assign has_best_seller_tag = true
+                  break
                 endif
               endfor
               assign tagged_product_marker = ',' | append: tagged_product.id | append: ','
@@ -124,7 +132,31 @@
       {%- endif -%}
 
       {%- if products_rendered == 0 and request.design_mode -%}
-        <p class="prada-category-showcase__empty">Tag products "{{ section.settings.product_tag | default: 'Best Sellers' | escape }}" or add a Manual product block.</p>
+        <p class="prada-category-showcase__empty">Tag products "best-seller" or add a Manual product block.</p>
+      {%- endif -%}
+      </div>
+
+      {%- if products_rendered > 2 -%}
+        <div class="prada-best-sellers__controls" data-best-sellers-controls hidden>
+          <button
+            type="button"
+            class="prada-best-sellers__button prada-best-sellers__button--prev"
+            data-best-sellers-prev
+            aria-label="Previous best sellers"
+            title="Previous best sellers"
+          >
+            {{- 'icon-arrow.svg' | inline_asset_content -}}
+          </button>
+          <button
+            type="button"
+            class="prada-best-sellers__button prada-best-sellers__button--next"
+            data-best-sellers-next
+            aria-label="Next best sellers"
+            title="Next best sellers"
+          >
+            {{- 'icon-arrow.svg' | inline_asset_content -}}
+          </button>
+        </div>
       {%- endif -%}
     </div>
   {%- else -%}
@@ -313,6 +345,80 @@
     background: #ffffff;
   }
 
+  #shopify-section-{{ section.id }} .prada-best-sellers__carousel {
+    position: relative;
+    background: #ffffff;
+  }
+
+  #shopify-section-{{ section.id }} [data-showcase-mode='best_sellers'] .prada-category-showcase__grid {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #shopify-section-{{ section.id }} [data-showcase-mode='best_sellers'] .prada-category-showcase__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  #shopify-section-{{ section.id }} [data-showcase-mode='best_sellers'] .prada-category-showcase__slot {
+    flex: 0 0 25%;
+    scroll-snap-align: start;
+  }
+
+  #shopify-section-{{ section.id }} .prada-best-sellers__controls[hidden] {
+    display: none;
+  }
+
+  #shopify-section-{{ section.id }} .prada-best-sellers__button {
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    display: grid;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid #d8d8d8;
+    border-radius: 0;
+    background: #ffffff;
+    color: #000000;
+    place-items: center;
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+
+  #shopify-section-{{ section.id }} .prada-best-sellers__button--prev {
+    left: 16px;
+  }
+
+  #shopify-section-{{ section.id }} .prada-best-sellers__button--next {
+    right: 16px;
+  }
+
+  #shopify-section-{{ section.id }} .prada-best-sellers__button .icon-arrow {
+    width: 18px;
+    height: 18px;
+  }
+
+  #shopify-section-{{ section.id }} .prada-best-sellers__button--prev .icon-arrow {
+    transform: rotate(180deg);
+  }
+
+  #shopify-section-{{ section.id }} .prada-best-sellers__button:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #shopify-section-{{ section.id }} .prada-best-sellers__button:focus-visible {
+    outline: 2px solid #000000;
+    outline-offset: 2px;
+  }
+
   #shopify-section-{{ section.id }} .prada-category-showcase__slot {
     display: grid;
     min-width: 0;
@@ -459,6 +565,23 @@
       background: #ffffff;
     }
 
+    #shopify-section-{{ section.id }} [data-showcase-mode='best_sellers'] .prada-category-showcase__slot {
+      flex-basis: 50%;
+    }
+
+    #shopify-section-{{ section.id }} .prada-best-sellers__button {
+      width: 40px;
+      height: 40px;
+    }
+
+    #shopify-section-{{ section.id }} .prada-best-sellers__button--prev {
+      left: 10px;
+    }
+
+    #shopify-section-{{ section.id }} .prada-best-sellers__button--next {
+      right: 10px;
+    }
+
     #shopify-section-{{ section.id }} .prada-category-showcase__item {
       grid-template-rows: auto 58px;
     }
@@ -499,7 +622,46 @@
 
 {% endstyle %}
 
-{%- unless is_best_sellers -%}
+{%- if is_best_sellers -%}
+<script>
+  (() => {
+    const root = document.querySelector('#shopify-section-{{ section.id }} [data-best-sellers-carousel]');
+    if (!root || root.dataset.carouselReady === 'true') return;
+
+    const track = root.querySelector('[data-best-sellers-track]');
+    const controls = root.querySelector('[data-best-sellers-controls]');
+    const previousButton = root.querySelector('[data-best-sellers-prev]');
+    const nextButton = root.querySelector('[data-best-sellers-next]');
+    if (!track || !controls || !previousButton || !nextButton) return;
+
+    root.dataset.carouselReady = 'true';
+    let updateFrame;
+
+    const updateControls = () => {
+      const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+      controls.hidden = maxScroll <= 1;
+      previousButton.disabled = track.scrollLeft <= 1;
+      nextButton.disabled = track.scrollLeft >= maxScroll - 1;
+    };
+
+    const queueUpdate = () => {
+      window.cancelAnimationFrame(updateFrame);
+      updateFrame = window.requestAnimationFrame(updateControls);
+    };
+
+    const movePage = (direction) => {
+      track.scrollBy({ left: direction * track.clientWidth, behavior: 'smooth' });
+    };
+
+    previousButton.addEventListener('click', () => movePage(-1));
+    nextButton.addEventListener('click', () => movePage(1));
+    track.addEventListener('scroll', queueUpdate, { passive: true });
+
+    new ResizeObserver(queueUpdate).observe(track);
+    queueUpdate();
+  })();
+</script>
+{%- else -%}
 <script>
   (() => {
     const root = document.querySelector('#shopify-section-{{ section.id }} .prada-category-showcase');
@@ -553,7 +715,7 @@
     }));
   })();
 </script>
-{%- endunless -%}
+{%- endif -%}
 
 {% schema %}
 {
@@ -604,22 +766,7 @@
       "id": "product_tag",
       "label": "Product tag",
       "default": "Best Sellers",
-      "info": "Products with this tag are added after manually selected products."
-    },
-    {
-      "type": "collection",
-      "id": "source_collection",
-      "label": "Automatic tag collection",
-      "info": "For a large catalog, select an automatic collection whose rule matches the product tag."
-    },
-    {
-      "type": "range",
-      "id": "products_to_show",
-      "min": 2,
-      "max": 12,
-      "step": 1,
-      "label": "Products to show",
-      "default": 4
+      "info": "Matches both best-seller and best-sellers across the full Online Store catalog."
     },
     {
       "type": "header",
