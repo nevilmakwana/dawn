@@ -197,11 +197,13 @@
 
   .prada-track-order__content h1 { font-size: 24px; }
   .prada-track-order__intro,
-  .prada-track-order__fields input,
   .prada-track-order__form button,
   .prada-track-order__question-list a,
   .prada-track-order__faq-link { font-size: 13px; }
-  .prada-track-order__fields input { height: 54px; }
+  .prada-track-order__fields input {
+    height: 54px;
+    font-size: 16px;
+  }
   .prada-track-order__fields span { font-size: 11px; }
   .prada-track-order__form button {
     height: 52px;
