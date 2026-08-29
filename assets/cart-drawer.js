@@ -72,6 +72,8 @@ const isPradaCartPage = () => {
   return currentPath === cartPath;
 };
 
+const PRADA_CART_DRAWER_TRANSITION_DURATION = 560;
+
 class CartDrawer extends HTMLElement {
   constructor() {
     super();
@@ -171,8 +173,11 @@ class CartDrawer extends HTMLElement {
   }
 
   open(triggeredBy) {
-    if (this.classList.contains('active')) return;
-    if (triggeredBy) this.setActiveElement(triggeredBy);
+    if (this.classList.contains('active') && !this.classList.contains('is-closing')) return;
+    if (triggeredBy) {
+      this.setActiveElement(triggeredBy);
+      triggeredBy.setAttribute('aria-expanded', 'true');
+    }
     const cartDrawerNote = this.querySelector('[id^="Details-"] summary');
     if (cartDrawerNote && !cartDrawerNote.hasAttribute('role')) this.setSummaryAccessibility(cartDrawerNote);
 
@@ -189,7 +194,6 @@ class CartDrawer extends HTMLElement {
       this.closeTimer = null;
     }
 
-    const drawerInner = this.querySelector('.drawer__inner');
     const focusOnOpen = () => {
       const containerToTrapFocusOn = this.classList.contains('is-empty')
         ? this.querySelector('.drawer__inner-empty')
@@ -200,50 +204,21 @@ class CartDrawer extends HTMLElement {
 
     this.classList.remove('is-closing');
     this.classList.add('animate', 'is-opening');
-    // Commit the off-canvas frame before activating the drawer. This keeps
-    // async header refreshes from collapsing both states into one paint.
-    drawerInner?.getBoundingClientRect();
+    this.classList.remove('active');
     this.openAnimationFrame = requestAnimationFrame(() => {
-      this.classList.add('active');
-      this.openAnimationFrame = null;
+      this.openAnimationFrame = requestAnimationFrame(() => {
+        this.openAnimationFrame = null;
+        if (this.classList.contains('is-closing')) return;
+
+        this.classList.add('active');
+      });
     });
 
-    if (!drawerInner) {
-      this.openFocusTimer = setTimeout(() => {
-        this.openFocusTimer = null;
-        this.classList.remove('is-opening');
-        if (this.classList.contains('active')) focusOnOpen();
-      });
-    } else {
-      const finishOpen = () => {
-        if (!this.classList.contains('is-opening')) return;
-
-        clearTimeout(this.openFocusTimer);
-        this.openFocusTimer = null;
-        drawerInner.removeEventListener('transitionend', handleOpenTransitionEnd);
-        drawerInner.removeEventListener('animationend', handleOpenAnimationEnd);
-        this.classList.remove('is-opening');
-        if (this.classList.contains('active')) focusOnOpen();
-      };
-      const handleOpenTransitionEnd = (event) => {
-        if (event.target !== drawerInner || event.propertyName !== 'transform') return;
-        finishOpen();
-      };
-      const handleOpenAnimationEnd = (event) => {
-        if (event.target !== drawerInner || event.animationName !== 'prada-cart-drawer-slide-in') return;
-        finishOpen();
-      };
-
-      this.openFocusTimer = setTimeout(() => {
-        this.openFocusTimer = null;
-        drawerInner.removeEventListener('transitionend', handleOpenTransitionEnd);
-        drawerInner.removeEventListener('animationend', handleOpenAnimationEnd);
-        this.classList.remove('is-opening');
-        if (this.classList.contains('active')) focusOnOpen();
-      }, 700);
-      drawerInner.addEventListener('transitionend', handleOpenTransitionEnd);
-      drawerInner.addEventListener('animationend', handleOpenAnimationEnd);
-    }
+    this.openFocusTimer = setTimeout(() => {
+      this.openFocusTimer = null;
+      this.classList.remove('is-opening');
+      if (this.classList.contains('active')) focusOnOpen();
+    }, PRADA_CART_DRAWER_TRANSITION_DURATION);
 
     if (window.pradaDrawerScrollLock) {
       window.pradaDrawerScrollLock.lock();
@@ -269,65 +244,28 @@ class CartDrawer extends HTMLElement {
       this.openFocusTimer = null;
     }
 
-    const drawerInner = this.querySelector('.drawer__inner');
     const finishClose = () => {
-      this.classList.remove('is-closing', 'is-opening');
-      if (!this.classList.contains('active')) this.classList.remove('animate');
+      this.closeTimer = null;
+      this.classList.remove('active', 'animate', 'is-closing', 'is-opening');
+      removeTrapFocus(this.activeElement);
+      this.activeElement?.setAttribute?.('aria-expanded', 'false');
+
+      if (window.pradaDrawerScrollLock) {
+        window.pradaDrawerScrollLock.unlock();
+      } else {
+        document.body.classList.remove('overflow-hidden');
+      }
     };
 
-    if (!this.classList.contains('active')) {
+    if (!this.classList.contains('active') && !this.classList.contains('animate')) {
       finishClose();
       return;
     }
 
     this.classList.remove('is-opening');
     this.classList.add('is-closing');
-    // Commit the fully open frame before moving the panel off canvas.
-    drawerInner?.getBoundingClientRect();
-    if (!drawerInner) {
-      this.classList.remove('active');
-      setTimeout(finishClose);
-    } else {
-      this.closeAnimationFrame = requestAnimationFrame(() => {
-        this.classList.remove('active');
-        this.closeAnimationFrame = null;
-      });
-
-      const handleCloseTransitionEnd = (event) => {
-        if (event.target !== drawerInner || event.propertyName !== 'transform') return;
-
-        clearTimeout(this.closeTimer);
-        this.closeTimer = null;
-        drawerInner.removeEventListener('transitionend', handleCloseTransitionEnd);
-        drawerInner.removeEventListener('animationend', handleCloseAnimationEnd);
-        finishClose();
-      };
-      const handleCloseAnimationEnd = (event) => {
-        if (event.target !== drawerInner || event.animationName !== 'prada-cart-drawer-slide-out') return;
-
-        clearTimeout(this.closeTimer);
-        this.closeTimer = null;
-        drawerInner.removeEventListener('transitionend', handleCloseTransitionEnd);
-        drawerInner.removeEventListener('animationend', handleCloseAnimationEnd);
-        finishClose();
-      };
-
-      this.closeTimer = setTimeout(() => {
-        this.closeTimer = null;
-        drawerInner.removeEventListener('transitionend', handleCloseTransitionEnd);
-        drawerInner.removeEventListener('animationend', handleCloseAnimationEnd);
-        finishClose();
-      }, 560);
-      drawerInner.addEventListener('transitionend', handleCloseTransitionEnd);
-      drawerInner.addEventListener('animationend', handleCloseAnimationEnd);
-    }
-
-    removeTrapFocus(this.activeElement);
-    if (window.pradaDrawerScrollLock) {
-      window.pradaDrawerScrollLock.unlock();
-    } else {
-      document.body.classList.remove('overflow-hidden');
-    }
+    this.classList.remove('active');
+    this.closeTimer = setTimeout(finishClose, PRADA_CART_DRAWER_TRANSITION_DURATION);
   }
 
   setSummaryAccessibility(cartDrawerNote) {
