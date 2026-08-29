@@ -1360,35 +1360,27 @@
     }
 
     .prada-header .menu-drawer {
-      --prada-mobile-menu-slide-duration: 400ms;
       position: fixed !important;
       top: var(--header-height, 56px) !important;
       left: 0 !important;
       width: 100vw !important;
       height: calc(100dvh - var(--header-height, 56px)) !important;
       max-width: none !important;
-      transform: translate3d(-100%, 0, 0) !important;
-      opacity: 1 !important;
-      visibility: hidden !important;
+      transform: none !important;
+      opacity: 0 !important;
       background: #ffffff !important;
       border-right: 0 !important;
       box-shadow: none !important;
       filter: none !important;
       overflow: hidden !important;
       z-index: 1001 !important;
-      will-change: transform;
-      transition:
-        transform var(--prada-mobile-menu-slide-duration) cubic-bezier(0.22, 1, 0.36, 1),
-        visibility 0s linear var(--prada-mobile-menu-slide-duration) !important;
+      transition: opacity 260ms ease, visibility 260ms ease !important;
     }
 
     .js .prada-header details[open].menu-opening > .menu-drawer {
-      transform: translate3d(0, 0, 0) !important;
+      transform: none !important;
       opacity: 1 !important;
       visibility: visible !important;
-      transition:
-        transform var(--prada-mobile-menu-slide-duration) cubic-bezier(0.22, 1, 0.36, 1),
-        visibility 0s linear 0s !important;
     }
 
     .prada-header .menu-drawer__navigation-container,
