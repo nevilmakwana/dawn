@@ -489,7 +489,7 @@
       filter: none !important;
       z-index: 1999 !important;
       backface-visibility: hidden;
-      will-change: transform, opacity;
+      will-change: transform;
       transition:
         transform var(--prada-menu-slide-duration) var(--prada-menu-slide-in-ease),
         visibility 0s linear var(--prada-menu-slide-duration) !important;
@@ -512,11 +512,10 @@
     }
 
     .js .prada-header header-drawer > details[open].is-prada-closing > .menu-drawer {
-      opacity: 0 !important;
+      opacity: 1 !important;
       visibility: visible !important;
       transform: translateX(-105%) !important;
       transition:
-        opacity 420ms cubic-bezier(0.4, 0, 0.2, 1),
         transform var(--prada-menu-slide-duration) var(--prada-menu-slide-out-ease),
         visibility 0s linear var(--prada-menu-slide-duration) !important;
     }
@@ -1361,27 +1360,35 @@
     }
 
     .prada-header .menu-drawer {
+      --prada-mobile-menu-slide-duration: 400ms;
       position: fixed !important;
       top: var(--header-height, 56px) !important;
       left: 0 !important;
       width: 100vw !important;
       height: calc(100dvh - var(--header-height, 56px)) !important;
       max-width: none !important;
-      transform: none !important;
-      opacity: 0 !important;
+      transform: translate3d(-100%, 0, 0) !important;
+      opacity: 1 !important;
+      visibility: hidden !important;
       background: #ffffff !important;
       border-right: 0 !important;
       box-shadow: none !important;
       filter: none !important;
       overflow: hidden !important;
       z-index: 1001 !important;
-      transition: opacity 260ms ease, visibility 260ms ease !important;
+      will-change: transform;
+      transition:
+        transform var(--prada-mobile-menu-slide-duration) cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s linear var(--prada-mobile-menu-slide-duration) !important;
     }
 
     .js .prada-header details[open].menu-opening > .menu-drawer {
-      transform: none !important;
+      transform: translate3d(0, 0, 0) !important;
       opacity: 1 !important;
       visibility: visible !important;
+      transition:
+        transform var(--prada-mobile-menu-slide-duration) cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s linear 0s !important;
     }
 
     .prada-header .menu-drawer__navigation-container,
