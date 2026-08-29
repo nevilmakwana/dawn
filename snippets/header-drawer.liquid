@@ -57,7 +57,21 @@
                     {%- liquid
                       assign parent_title = parent_block.settings.title
                       assign parent_key = parent_title | handleize
-                      assign parent_url = parent_block.settings.link | default: '#'
+                      assign parent_url = parent_block.settings.link
+                      if parent_url == blank
+                        assign scan_parent_fallback = false
+                        for parent_fallback_block in section.blocks
+                          if parent_fallback_block.id == parent_block.id
+                            assign scan_parent_fallback = true
+                          elsif scan_parent_fallback and parent_fallback_block.type == 'drawer_parent'
+                            break
+                          elsif scan_parent_fallback and parent_fallback_block.settings.link != blank
+                            assign parent_url = parent_fallback_block.settings.link
+                            break
+                          endif
+                        endfor
+                      endif
+                      assign parent_url = parent_url | default: '#'
                       assign has_child_blocks = false
                       assign parent_has_grandchild_blocks = false
                       assign scan_parent_children = false
@@ -116,7 +130,26 @@
                               {%- liquid
                                 assign child_title = child_block.settings.title
                                 assign child_key = child_title | handleize
-                                assign child_url = child_block.settings.link | default: '#'
+                                assign child_url = child_block.settings.link
+                                if child_url == blank
+                                  assign scan_child_fallback = false
+                                  for child_fallback_block in section.blocks
+                                    if child_fallback_block.id == child_block.id
+                                      assign scan_child_fallback = true
+                                    elsif scan_child_fallback and child_fallback_block.type == 'drawer_parent'
+                                      break
+                                    elsif scan_child_fallback and child_fallback_block.type == 'drawer_child'
+                                      break
+                                    elsif scan_child_fallback and child_fallback_block.type == 'drawer_grandchild' and child_fallback_block.settings.link != blank
+                                      assign child_url = child_fallback_block.settings.link
+                                      break
+                                    endif
+                                  endfor
+                                endif
+                                if child_url == blank and parent_url != '#'
+                                  assign child_url = parent_url
+                                endif
+                                assign child_url = child_url | default: '#'
                                 assign has_grandchild_blocks = false
                               -%}
                               {%- if child_block.id == parent_block.id -%}
@@ -154,7 +187,13 @@
                                         assign has_child_aggregate_products = true
                                       else
                                         assign aggregate_collection_path = aggregate_check_block.settings.link | split: '?' | first | split: '#' | first
-                                        if aggregate_collection_path contains '/collections/'
+                                        if aggregate_collection_path contains 'shopify://collections/'
+                                          assign aggregate_collection_handle = aggregate_collection_path | split: 'shopify://collections/' | last | split: '/' | first
+                                          assign aggregate_collection = collections[aggregate_collection_handle]
+                                          if aggregate_collection != blank and aggregate_collection.products_count > 0
+                                            assign has_child_aggregate_products = true
+                                          endif
+                                        elsif aggregate_collection_path contains '/collections/'
                                           assign aggregate_collection_handle = aggregate_collection_path | split: '/collections/' | last | split: '/' | first
                                           assign aggregate_collection = collections[aggregate_collection_handle]
                                           if aggregate_collection != blank and aggregate_collection.products_count > 0
@@ -271,7 +310,10 @@
                                                 {%- liquid
                                                   assign aggregate_collection_path = aggregate_block.settings.link | split: '?' | first | split: '#' | first
                                                   assign aggregate_collection = blank
-                                                  if aggregate_collection_path contains '/collections/'
+                                                  if aggregate_collection_path contains 'shopify://collections/'
+                                                    assign aggregate_collection_handle = aggregate_collection_path | split: 'shopify://collections/' | last | split: '/' | first
+                                                    assign aggregate_collection = collections[aggregate_collection_handle]
+                                                  elsif aggregate_collection_path contains '/collections/'
                                                     assign aggregate_collection_handle = aggregate_collection_path | split: '/collections/' | last | split: '/' | first
                                                     assign aggregate_collection = collections[aggregate_collection_handle]
                                                   endif
@@ -442,7 +484,21 @@
                     {%- liquid
                       assign parent_title = parent_block.settings.title
                       assign parent_key = parent_title | handleize
-                      assign parent_url = parent_block.settings.link | default: '#'
+                      assign parent_url = parent_block.settings.link
+                      if parent_url == blank
+                        assign scan_parent_fallback = false
+                        for parent_fallback_block in section.blocks
+                          if parent_fallback_block.id == parent_block.id
+                            assign scan_parent_fallback = true
+                          elsif scan_parent_fallback and parent_fallback_block.type == 'drawer_parent'
+                            break
+                          elsif scan_parent_fallback and parent_fallback_block.settings.link != blank
+                            assign parent_url = parent_fallback_block.settings.link
+                            break
+                          endif
+                        endfor
+                      endif
+                      assign parent_url = parent_url | default: '#'
                       assign has_child_blocks = false
                       assign scan_parent_children = false
                       for child_check_block in section.blocks
@@ -494,7 +550,26 @@
                                   {%- liquid
                                     assign child_title = child_block.settings.title
                                     assign child_key = child_title | handleize
-                                    assign child_url = child_block.settings.link | default: '#'
+                                    assign child_url = child_block.settings.link
+                                    if child_url == blank
+                                      assign scan_child_fallback = false
+                                      for child_fallback_block in section.blocks
+                                        if child_fallback_block.id == child_block.id
+                                          assign scan_child_fallback = true
+                                        elsif scan_child_fallback and child_fallback_block.type == 'drawer_parent'
+                                          break
+                                        elsif scan_child_fallback and child_fallback_block.type == 'drawer_child'
+                                          break
+                                        elsif scan_child_fallback and child_fallback_block.type == 'drawer_grandchild' and child_fallback_block.settings.link != blank
+                                          assign child_url = child_fallback_block.settings.link
+                                          break
+                                        endif
+                                      endfor
+                                    endif
+                                    if child_url == blank and parent_url != '#'
+                                      assign child_url = parent_url
+                                    endif
+                                    assign child_url = child_url | default: '#'
                                     assign has_grandchild_blocks = false
                                   -%}
                                   {%- if child_block.id == parent_block.id -%}
