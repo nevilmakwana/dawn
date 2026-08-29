@@ -27,6 +27,26 @@
     endif
   endif
 
+  assign desktop_video_fallback_url = ''
+  if section.settings.video != blank
+    for video_source in section.settings.video.sources
+      if video_source.mime_type == 'video/mp4'
+        assign desktop_video_fallback_url = video_source.url
+        break
+      endif
+    endfor
+  endif
+
+  assign mobile_video_fallback_url = ''
+  if section.settings.mobile_video != blank
+    for video_source in section.settings.mobile_video.sources
+      if video_source.mime_type == 'video/mp4'
+        assign mobile_video_fallback_url = video_source.url
+        break
+      endif
+    endfor
+  endif
+
   assign has_desktop_video = false
   if section.settings.video != blank or desktop_webm_url != blank
     assign has_desktop_video = true
@@ -524,6 +544,12 @@
         data-responsive-webm
         data-mobile-src="{{ mobile_webm_url | escape }}"
         data-desktop-src="{{ desktop_webm_url | escape }}"
+        {% if mobile_video_fallback_url != blank %}
+          data-mobile-fallback-src="{{ mobile_video_fallback_url | escape }}"
+        {% endif %}
+        {% if desktop_video_fallback_url != blank %}
+          data-desktop-fallback-src="{{ desktop_video_fallback_url | escape }}"
+        {% endif %}
         {% if section.settings.mobile_video.preview_image != blank %}
           data-mobile-poster="{{ section.settings.mobile_video.preview_image | image_url: width: 900 }}"
         {% endif %}
@@ -538,7 +564,13 @@
         preload="{% if section.index == 1 %}auto{% else %}metadata{% endif %}"
       >
         <source src="{{ mobile_webm_url }}" type="video/webm" media="(max-width: 749px)">
+        {% if mobile_video_fallback_url != blank %}
+          <source src="{{ mobile_video_fallback_url }}" type="video/mp4" media="(max-width: 749px)">
+        {% endif %}
         <source src="{{ desktop_webm_url }}" type="video/webm" media="(min-width: 750px)">
+        {% if desktop_video_fallback_url != blank %}
+          <source src="{{ desktop_video_fallback_url }}" type="video/mp4" media="(min-width: 750px)">
+        {% endif %}
       </video>
       <script src="{{ 'image-banner-responsive-video.js' | asset_url }}" async></script>
     </div>
