@@ -1,4 +1,17 @@
-<section class="prada-category-showcase color-{{ section.settings.color_scheme }} gradient">
+{%- liquid
+  assign showcase_mode = section.settings.content_mode | default: 'categories'
+  assign heading_handle = section.settings.heading | handleize
+  if showcase_mode == 'categories' and heading_handle == 'best-sellers'
+    assign showcase_mode = 'best_sellers'
+  endif
+
+  assign is_best_sellers = false
+  if showcase_mode == 'best_sellers'
+    assign is_best_sellers = true
+  endif
+-%}
+
+<section class="prada-category-showcase color-{{ section.settings.color_scheme }} gradient" data-showcase-mode="{{ showcase_mode }}">
   <div class="prada-category-showcase__intro">
     {%- if section.settings.heading != blank -%}
       <h2 class="prada-category-showcase__heading">{{ section.settings.heading | escape }}</h2>
@@ -10,7 +23,8 @@
       </div>
     {%- endif -%}
 
-    <div class="prada-category-showcase__tabs" role="tablist" aria-label="Category tabs">
+    {%- unless is_best_sellers -%}
+      <div class="prada-category-showcase__tabs" role="tablist" aria-label="Category tabs">
       {%- if section.settings.women_label != blank -%}
         <button
           type="button"
@@ -36,10 +50,85 @@
           {{ section.settings.men_label }}
         </button>
       {%- endif -%}
-    </div>
+      </div>
+    {%- endunless -%}
   </div>
 
-  <div id="PradaCategoryGrid-{{ section.id }}" class="prada-category-showcase__viewport prada-category-showcase__grid" role="tabpanel" data-prada-category-viewport data-active="{{ section.settings.active_tab }}">
+  {%- if is_best_sellers -%}
+    {%- liquid
+      assign products_to_show = section.settings.products_to_show | default: 4
+      assign target_tag = section.settings.product_tag | default: 'Best Sellers' | handleize
+      assign source_collection = section.settings.source_collection
+      if source_collection == blank
+        assign source_collection = collections['best-sellers']
+      endif
+      if source_collection == blank
+        assign source_collection = collections.all
+      endif
+      assign rendered_product_ids = ','
+      assign products_rendered = 0
+    -%}
+
+    <div id="PradaCategoryGrid-{{ section.id }}" class="prada-category-showcase__viewport prada-category-showcase__grid">
+      {%- for block in section.blocks -%}
+        {%- if products_rendered >= products_to_show -%}{%- break -%}{%- endif -%}
+        {%- liquid
+          assign manual_product = blank
+          if block.type == 'manual_product'
+            assign manual_product = block.settings.product
+          elsif block.settings.product != blank
+            assign manual_product = block.settings.product
+          endif
+          assign manual_product_marker = blank
+          if manual_product != blank
+            assign manual_product_marker = ',' | append: manual_product.id | append: ','
+          endif
+        -%}
+        {%- if manual_product != blank -%}
+          {%- unless rendered_product_ids contains manual_product_marker -%}
+            <div class="prada-category-showcase__slot" style="--tile-index: {{ products_rendered }};">
+              {%- render 'prada-best-seller-tile', product: manual_product, block: block -%}
+            </div>
+            {%- assign rendered_product_ids = rendered_product_ids | append: manual_product.id | append: ',' -%}
+            {%- assign products_rendered = products_rendered | plus: 1 -%}
+          {%- endunless -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if products_rendered < products_to_show -%}
+        {%- paginate source_collection.products by 250 -%}
+          {%- for tagged_product in source_collection.products -%}
+            {%- if products_rendered >= products_to_show -%}{%- break -%}{%- endif -%}
+            {%- liquid
+              assign has_best_seller_tag = false
+              for product_tag in tagged_product.tags
+                assign product_tag_handle = product_tag | handleize
+                if product_tag_handle == target_tag
+                  assign has_best_seller_tag = true
+                  break
+                endif
+              endfor
+              assign tagged_product_marker = ',' | append: tagged_product.id | append: ','
+            -%}
+            {%- if has_best_seller_tag -%}
+              {%- unless rendered_product_ids contains tagged_product_marker -%}
+                <div class="prada-category-showcase__slot" style="--tile-index: {{ products_rendered }};">
+                  {%- render 'prada-best-seller-tile', product: tagged_product -%}
+                </div>
+                {%- assign rendered_product_ids = rendered_product_ids | append: tagged_product.id | append: ',' -%}
+                {%- assign products_rendered = products_rendered | plus: 1 -%}
+              {%- endunless -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endpaginate -%}
+      {%- endif -%}
+
+      {%- if products_rendered == 0 and request.design_mode -%}
+        <p class="prada-category-showcase__empty">Tag products "{{ section.settings.product_tag | default: 'Best Sellers' | escape }}" or add a Manual product block.</p>
+      {%- endif -%}
+    </div>
+  {%- else -%}
+    <div id="PradaCategoryGrid-{{ section.id }}" class="prada-category-showcase__viewport prada-category-showcase__grid" role="tabpanel" data-prada-category-viewport data-active="{{ section.settings.active_tab }}">
     {%- for block in section.blocks -%}
       <div class="prada-category-showcase__slot" style="--tile-index: {{ forloop.index0 }};">
         {%- liquid
@@ -138,7 +227,8 @@
         {%- render 'prada-category-tile', tile_image: men_image, tile_url: men_url, tile_title: men_title, tile_gender: 'men', active_tab: section.settings.active_tab, block: block -%}
       </div>
     {%- endfor -%}
-  </div>
+    </div>
+  {%- endif -%}
 </section>
 
 {% style %}
@@ -228,6 +318,14 @@
     min-width: 0;
     overflow: hidden;
     background: #ffffff;
+  }
+
+  #shopify-section-{{ section.id }} .prada-category-showcase__empty {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 48px 24px;
+    color: #000000;
+    text-align: center;
   }
 
   #shopify-section-{{ section.id }} .prada-category-showcase__item {
@@ -401,6 +499,7 @@
 
 {% endstyle %}
 
+{%- unless is_best_sellers -%}
 <script>
   (() => {
     const root = document.querySelector('#shopify-section-{{ section.id }} .prada-category-showcase');
@@ -454,6 +553,7 @@
     }));
   })();
 </script>
+{%- endunless -%}
 
 {% schema %}
 {
@@ -468,6 +568,22 @@
       "default": "scheme-1"
     },
     {
+      "type": "select",
+      "id": "content_mode",
+      "label": "Content mode",
+      "default": "categories",
+      "options": [
+        {
+          "value": "categories",
+          "label": "Category tabs"
+        },
+        {
+          "value": "best_sellers",
+          "label": "Best sellers"
+        }
+      ]
+    },
+    {
       "type": "text",
       "id": "heading",
       "label": "Heading",
@@ -478,6 +594,36 @@
       "id": "text",
       "label": "Intro text",
       "default": "<p>Rooted in memory and shaped by transformation, evolving forms and refined details reveal new expressions of individuality.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Best sellers"
+    },
+    {
+      "type": "text",
+      "id": "product_tag",
+      "label": "Product tag",
+      "default": "Best Sellers",
+      "info": "Products with this tag are added after manually selected products."
+    },
+    {
+      "type": "collection",
+      "id": "source_collection",
+      "label": "Automatic tag collection",
+      "info": "For a large catalog, select an automatic collection whose rule matches the product tag."
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "label": "Products to show",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Category tabs"
     },
     {
       "type": "text",
@@ -605,9 +751,21 @@
           "label": "Women link"
         }
       ]
+    },
+    {
+      "type": "manual_product",
+      "name": "Manual product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product",
+          "info": "Manual products appear first and do not need the best-seller tag."
+        }
+      ]
     }
   ],
-  "max_blocks": 4,
+  "max_blocks": 12,
   "presets": [
     {
       "name": "Prada category showcase",

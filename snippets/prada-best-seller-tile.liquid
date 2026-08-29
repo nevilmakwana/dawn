@@ -1,0 +1,40 @@
+{%- liquid
+  assign tile_image = product.featured_media.preview_image
+  if tile_image == blank
+    assign variant_gallery = product.selected_or_first_available_variant.metafields.custom.variant_images.value
+    if variant_gallery == blank
+      assign variant_gallery = product.selected_or_first_available_variant.metafields.custom.custom_variant_images.value
+    endif
+    for variant_media in variant_gallery
+      if variant_media.media_type == 'image'
+        assign tile_image = variant_media.preview_image
+        break
+      endif
+    endfor
+  endif
+-%}
+
+<a
+  class="prada-category-showcase__item prada-category-showcase__product is-active"
+  href="{{ product.url }}"
+  aria-label="View {{ product.title | escape }}"
+  {% if block != blank %}{{ block.shopify_attributes }}{% endif %}
+>
+  <div class="prada-category-showcase__media">
+    {%- if tile_image != blank -%}
+      {{
+        tile_image
+        | image_url: width: 1100
+        | image_tag:
+          loading: 'lazy',
+          widths: '240, 320, 360, 384, 480, 640, 800, 960, 1100',
+          sizes: '(min-width: 990px) 25vw, 50vw',
+          class: 'prada-category-showcase__image',
+          alt: product.title
+      }}
+    {%- else -%}
+      {{ 'product-apparel-1' | placeholder_svg_tag: 'prada-category-showcase__placeholder placeholder-svg' }}
+    {%- endif -%}
+  </div>
+  <div class="prada-category-showcase__label">{{ product.title | escape }}</div>
+</a>
