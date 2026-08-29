@@ -678,7 +678,8 @@ body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
   }
 
   .prada-collection__sort select {
-    max-width: 12rem;
+    width: auto;
+    max-width: 18rem;
   }
 
   .prada-collection__grid {
