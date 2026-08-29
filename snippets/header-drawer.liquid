@@ -138,6 +138,32 @@
                                       break
                                     endif
                                   endfor
+
+                                  assign child_aggregate_template_id = 'PradaNestedViewAll-' | append: section.id | append: '-' | append: child_block.id
+                                  assign has_child_aggregate_products = false
+                                  assign scan_child_aggregate = false
+                                  for aggregate_check_block in section.blocks
+                                    if aggregate_check_block.id == child_block.id
+                                      assign scan_child_aggregate = true
+                                    elsif scan_child_aggregate and aggregate_check_block.type == 'drawer_parent'
+                                      break
+                                    elsif scan_child_aggregate and aggregate_check_block.type == 'drawer_child'
+                                      break
+                                    elsif scan_child_aggregate and aggregate_check_block.type == 'drawer_grandchild' and aggregate_check_block.settings.title != blank
+                                      if aggregate_check_block.settings.products != blank
+                                        assign has_child_aggregate_products = true
+                                      else
+                                        assign aggregate_collection_path = aggregate_check_block.settings.link | split: '?' | first | split: '#' | first
+                                        if aggregate_collection_path contains '/collections/'
+                                          assign aggregate_collection_handle = aggregate_collection_path | split: '/collections/' | last | split: '/' | first
+                                          assign aggregate_collection = collections[aggregate_collection_handle]
+                                          if aggregate_collection != blank and aggregate_collection.products_count > 0
+                                            assign has_child_aggregate_products = true
+                                          endif
+                                        endif
+                                      endif
+                                    endif
+                                  endfor
                                 -%}
                                 <li class="prada-desktop-menu__submenu-item{% if has_grandchild_blocks %} has-grandchildren{% endif %}" {{ child_block.shopify_attributes }}>
                                   {%- if has_grandchild_blocks -%}
@@ -164,7 +190,16 @@
                                       id="PradaDesktopGrandchildPanel-{{ section.id }}-{{ parent_block.id }}-{{ child_block.id }}"
                                       aria-label="{{ child_title | escape }}"
                                     >
-                                      <a class="prada-desktop-menu__view-all" href="{{ child_url }}">View all</a>
+                                      <a
+                                        class="prada-desktop-menu__view-all"
+                                        href="{{ child_url }}"
+                                        {% if has_child_aggregate_products and request.page_type == 'collection' %}
+                                          data-prada-product-template="{{ child_aggregate_template_id }}"
+                                          data-prada-aggregate-products="true"
+                                        {% endif %}
+                                      >
+                                        View all
+                                      </a>
                                       <ul class="prada-desktop-menu__grandchild-list" role="list">
                                         {%- assign scan_child_grandchildren = false -%}
                                         {%- for grandchild_block in section.blocks -%}
@@ -210,6 +245,51 @@
                                           {%- endif -%}
                                         {%- endfor -%}
                                       </ul>
+                                      {%- if has_child_aggregate_products and request.page_type == 'collection' -%}
+                                        <template id="{{ child_aggregate_template_id }}">
+                                          {%- liquid
+                                            assign aggregate_product_ids = '|'
+                                            assign scan_child_aggregate = false
+                                          -%}
+                                          {%- for aggregate_block in section.blocks -%}
+                                            {%- if aggregate_block.id == child_block.id -%}
+                                              {%- assign scan_child_aggregate = true -%}
+                                            {%- elsif scan_child_aggregate and aggregate_block.type == 'drawer_parent' -%}
+                                              {%- break -%}
+                                            {%- elsif scan_child_aggregate and aggregate_block.type == 'drawer_child' -%}
+                                              {%- break -%}
+                                            {%- elsif scan_child_aggregate and aggregate_block.type == 'drawer_grandchild' and aggregate_block.settings.title != blank -%}
+                                              {%- if aggregate_block.settings.products != blank -%}
+                                                {%- for aggregate_product in aggregate_block.settings.products -%}
+                                                  {%- assign aggregate_product_key = '|' | append: aggregate_product.id | append: '|' -%}
+                                                  {%- unless aggregate_product_ids contains aggregate_product_key -%}
+                                                    {%- assign aggregate_product_ids = aggregate_product_ids | append: aggregate_product.id | append: '|' -%}
+                                                    {% render 'prada-nested-collection-product-card', product: aggregate_product, collection_context: collection %}
+                                                  {%- endunless -%}
+                                                {%- endfor -%}
+                                              {%- else -%}
+                                                {%- liquid
+                                                  assign aggregate_collection_path = aggregate_block.settings.link | split: '?' | first | split: '#' | first
+                                                  assign aggregate_collection = blank
+                                                  if aggregate_collection_path contains '/collections/'
+                                                    assign aggregate_collection_handle = aggregate_collection_path | split: '/collections/' | last | split: '/' | first
+                                                    assign aggregate_collection = collections[aggregate_collection_handle]
+                                                  endif
+                                                -%}
+                                                {%- if aggregate_collection != blank -%}
+                                                  {%- for aggregate_product in aggregate_collection.products -%}
+                                                    {%- assign aggregate_product_key = '|' | append: aggregate_product.id | append: '|' -%}
+                                                    {%- unless aggregate_product_ids contains aggregate_product_key -%}
+                                                      {%- assign aggregate_product_ids = aggregate_product_ids | append: aggregate_product.id | append: '|' -%}
+                                                      {% render 'prada-nested-collection-product-card', product: aggregate_product, collection_context: collection %}
+                                                    {%- endunless -%}
+                                                  {%- endfor -%}
+                                                {%- endif -%}
+                                              {%- endif -%}
+                                            {%- endif -%}
+                                          {%- endfor -%}
+                                        </template>
+                                      {%- endif -%}
                                     </div>
                                   {%- else -%}
                                     <a class="prada-desktop-menu__submenu-link" href="{{ child_url }}">

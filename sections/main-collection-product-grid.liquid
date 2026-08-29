@@ -628,7 +628,7 @@
           window.pradaCollectionNavigationState.cache.set(currentCacheKey, collectionRoot.outerHTML);
         }
 
-        function makeTab(label, href, active, productTemplateId) {
+        function makeTab(label, href, active, productTemplateId, aggregateProducts) {
           var tab = document.createElement('a');
           var labelText = document.createElement('span');
 
@@ -638,6 +638,7 @@
           labelText.textContent = label;
           tab.appendChild(labelText);
           if (productTemplateId) tab.dataset.pradaProductTemplate = productTemplateId;
+          if (aggregateProducts) tab.dataset.pradaAggregateProducts = 'true';
           if (active) tab.setAttribute('aria-current', 'page');
           return tab;
         }
@@ -826,9 +827,15 @@
           refreshCollectionCarousel();
 
           if (updateHistory) {
-            var nestedUrl = new URL(window.location.href);
-            nestedUrl.hash = 'nested-' + nestedTabHandle(tab);
-            window.history.pushState({ pradaNestedCollection: nestedTabHandle(tab) }, '', nestedUrl.href);
+            if (tab.dataset.pradaAggregateProducts === 'true') {
+              var aggregateUrl = new URL(tab.href, window.location.origin);
+              aggregateUrl.hash = '';
+              window.history.pushState({ pradaAggregateCollection: true }, '', aggregateUrl.href);
+            } else {
+              var nestedUrl = new URL(window.location.href);
+              nestedUrl.hash = 'nested-' + nestedTabHandle(tab);
+              window.history.pushState({ pradaNestedCollection: nestedTabHandle(tab) }, '', nestedUrl.href);
+            }
           }
 
           scrollCollectionToStart(collectionRoot);
@@ -936,7 +943,7 @@
         var currentTitle = textFrom(title).toLowerCase();
         var match = null;
 
-        function addUniqueTab(tabList, label, href, path, productTemplateId) {
+        function addUniqueTab(tabList, label, href, path, productTemplateId, aggregateProducts) {
           var normalizedLabel = (label || '').trim();
           var normalizedHref = (href || '').trim();
           var normalizedPath = path || '';
@@ -957,6 +964,7 @@
             href: normalizedHref,
             path: normalizedPath,
             productTemplateId: productTemplateId || '',
+            aggregateProducts: Boolean(aggregateProducts),
           });
         }
 
@@ -989,7 +997,7 @@
           }
 
           headerDrawer.pradaNestedNavigationHandler = function (event) {
-            var nestedLink = event.target.closest('[data-prada-nested-link][data-prada-product-template]');
+            var nestedLink = event.target.closest('a[data-prada-product-template]');
             if (
               !nestedLink ||
               event.defaultPrevented ||
@@ -1052,8 +1060,16 @@
 
             if (grandchildPanel && childViewAll && childPath) {
               var childTabs = [];
+              var childViewAllTemplateId = childViewAll.dataset.pradaProductTemplate;
 
-              addUniqueTab(childTabs, 'View all', childViewAll.href, childPath);
+              addUniqueTab(
+                childTabs,
+                'View all',
+                childViewAll.href,
+                childPath,
+                childViewAllTemplateId,
+                childViewAll.dataset.pradaAggregateProducts === 'true'
+              );
               collectGrandchildTabs(grandchildPanel, childTabs, childViewAll.href);
 
               var activeChildTab = childTabs.find(function (tab) {
@@ -1107,7 +1123,9 @@
         tabs.setAttribute('aria-label', match.title + ' categories');
 
         match.tabs.forEach(function (tab) {
-          tabs.appendChild(makeTab(tab.label, tab.href, tab.path === match.activePath, tab.productTemplateId));
+          tabs.appendChild(
+            makeTab(tab.label, tab.href, tab.path === match.activePath, tab.productTemplateId, tab.aggregateProducts)
+          );
         });
 
         tabs.dataset.pradaNavigationState = 'ready';
@@ -1129,6 +1147,15 @@
           if (requestedNestedTab) {
             window.requestAnimationFrame(function () {
               renderNestedProducts(requestedNestedTab, false);
+            });
+          }
+        } else {
+          var initialAggregateTab = tabs.querySelector(
+            '.prada-collection__tab.is-active[data-prada-aggregate-products="true"]'
+          );
+          if (initialAggregateTab) {
+            window.requestAnimationFrame(function () {
+              renderNestedProducts(initialAggregateTab, false);
             });
           }
         }
