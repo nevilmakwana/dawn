@@ -127,6 +127,23 @@ body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
   line-height: inherit;
 }
 
+@media screen and (min-width: 990px) {
+  .prada-collection__navigation {
+    grid-template-columns: minmax(17rem, 1fr) auto minmax(17rem, 1fr);
+  }
+
+  .prada-collection__title {
+    grid-column: 1;
+  }
+
+  .prada-collection__tabs {
+    grid-column: 2;
+    justify-content: center;
+    width: max-content;
+    max-width: calc(100vw - 34rem);
+  }
+}
+
 .prada-collection__toolbar {
   display: flex;
   align-items: center;
