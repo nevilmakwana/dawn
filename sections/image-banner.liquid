@@ -160,6 +160,11 @@
     when 'right'
       assign mobile_button_justify_content = 'flex-end'
   endcase
+
+  assign use_prada_link_button = section.settings.prada_link_button
+  if request.page_type == 'index' and section.index == 1
+    assign use_prada_link_button = true
+  endif
 -%}
 
 {%- if mobile_banner_aspect_ratio != blank and section.settings.image_height == 'adapt' or mobile_banner_aspect_ratio != blank and use_full_media_adapt -%}
@@ -247,7 +252,7 @@
     }
   }
 
-  {%- if section.settings.prada_link_button -%}
+  {%- if use_prada_link_button -%}
     #Banner-{{ section.id }} .banner__buttons {
       margin-top: 2rem;
     }
@@ -758,9 +763,9 @@
                   {% else %}
                     href="{{ block.settings.button_link_1 }}"
                   {% endif %}
-                  class="button{% if block.settings.button_style_secondary_1 %} button--secondary{% else %} button--primary{% endif %}{% if section.settings.prada_link_button %} prada-banner-link-button{% endif %}"
+                  class="button{% if block.settings.button_style_secondary_1 %} button--secondary{% else %} button--primary{% endif %}{% if use_prada_link_button %} prada-banner-link-button{% endif %}"
                 >
-                  {%- if section.settings.prada_link_button -%}
+                  {%- if use_prada_link_button -%}
                     <span class="prada-banner-link-label">{{- block.settings.button_label_1 | escape -}}</span>
                   {%- else -%}
                     {{- block.settings.button_label_1 | escape -}}
@@ -774,9 +779,9 @@
                   {% else %}
                     href="{{ block.settings.button_link_2 }}"
                   {% endif %}
-                  class="button{% if block.settings.button_style_secondary_2 %} button--secondary{% else %} button--primary{% endif %}{% if section.settings.prada_link_button %} prada-banner-link-button{% endif %}"
+                  class="button{% if block.settings.button_style_secondary_2 %} button--secondary{% else %} button--primary{% endif %}{% if use_prada_link_button %} prada-banner-link-button{% endif %}"
                 >
-                  {%- if section.settings.prada_link_button -%}
+                  {%- if use_prada_link_button -%}
                     <span class="prada-banner-link-label">{{- block.settings.button_label_2 | escape -}}</span>
                   {%- else -%}
                     {{- block.settings.button_label_2 | escape -}}
