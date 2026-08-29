@@ -142,10 +142,6 @@
   endcase
 -%}
 
-{%- if has_responsive_webm_video -%}
-  <script src="{{ 'image-banner-responsive-video.js' | asset_url }}" defer="defer"></script>
-{%- endif -%}
-
 {%- if mobile_banner_aspect_ratio != blank and section.settings.image_height == 'adapt' or mobile_banner_aspect_ratio != blank and use_full_media_adapt -%}
   {%- style -%}
     @media screen and (max-width: 749px) {
@@ -544,6 +540,7 @@
         <source src="{{ mobile_webm_url }}" type="video/webm" media="(max-width: 749px)">
         <source src="{{ desktop_webm_url }}" type="video/webm" media="(min-width: 750px)">
       </video>
+      <script src="{{ 'image-banner-responsive-video.js' | asset_url }}" async></script>
     </div>
   {%- elsif has_desktop_video -%}
     <div class="banner__media banner__media--desktop media{% if has_mobile_media %} small-hide{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
