@@ -1,0 +1,809 @@
+{%- liquid
+  assign section_heading = section.settings.heading | strip
+  assign section_label = section_heading | default: 'Collection showcase'
+  assign image_sizes = '(max-width: 749px) ' | append: section.settings.mobile_card_width | append: 'px, ' | append: section.settings.desktop_card_width | append: 'px'
+-%}
+
+<collection-showcase
+  class="collection-showcase color-{{ section.settings.color_scheme }} gradient"
+  data-collection-showcase
+  style="
+    --showcase-max-width: {{ section.settings.max_width }}px;
+    --showcase-card-width: {{ section.settings.desktop_card_width }}px;
+    --showcase-mobile-card-width: {{ section.settings.mobile_card_width }}px;
+    --showcase-gap: {{ section.settings.card_gap }}px;
+    --showcase-inline-padding: {{ section.settings.horizontal_padding }}px;
+    --showcase-image-ratio: {{ section.settings.image_ratio }};
+    --showcase-image-fit: {{ section.settings.image_fit }};
+    --showcase-image-background: {{ section.settings.image_background }};
+    --showcase-heading-size: {{ section.settings.heading_size }}px;
+    --showcase-title-size: {{ section.settings.title_size }}px;
+    --showcase-subtitle-size: {{ section.settings.subtitle_size }}px;
+    --showcase-padding-top: {{ section.settings.padding_top }}px;
+    --showcase-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --showcase-mobile-padding-top: {{ section.settings.mobile_padding_top }}px;
+    --showcase-mobile-padding-bottom: {{ section.settings.mobile_padding_bottom }}px;
+  "
+>
+  {%- if section_heading != blank or section.settings.intro_text != blank -%}
+    <div class="collection-showcase__intro collection-showcase__intro--{{ section.settings.intro_alignment }}">
+      {%- if section_heading != blank -%}
+        <h2 class="collection-showcase__heading">{{ section_heading | escape }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.intro_text != blank -%}
+        <div class="collection-showcase__intro-text rte">{{ section.settings.intro_text }}</div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="collection-showcase__carousel">
+    <div
+      id="CollectionShowcaseViewport-{{ section.id }}"
+      class="collection-showcase__viewport"
+      data-showcase-viewport
+      role="region"
+      aria-label="{{ section_label | escape }}"
+      tabindex="0"
+    >
+      <div class="collection-showcase__list" data-showcase-list>
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign selected_collection = block.settings.collection
+            if selected_collection == blank and block.settings.collection_list != blank
+              assign selected_collection = block.settings.collection_list.first
+            endif
+
+            assign selected_product = blank
+            if block.settings.product_list != blank
+              assign selected_product = block.settings.product_list.first
+            endif
+
+            assign card_image = block.settings.image
+            if card_image == blank and selected_collection != blank
+              assign card_image = selected_collection.image
+              if card_image == blank and selected_collection.products.first != blank
+                assign card_image = selected_collection.products.first.featured_media.preview_image
+              endif
+            endif
+            if card_image == blank and selected_product != blank
+              assign card_image = selected_product.featured_media.preview_image
+            endif
+
+            assign card_title = block.settings.title | strip
+            if card_title == blank and selected_collection != blank
+              assign card_title = selected_collection.title
+            endif
+            if card_title == blank and selected_product != blank
+              assign card_title = selected_product.title
+            endif
+            if card_title == blank
+              assign card_title = 'Collection'
+            endif
+
+            assign card_url = block.settings.link
+            assign tag_handle = block.settings.product_tag | handleize
+            if card_url == blank and selected_collection != blank and tag_handle != blank
+              assign card_url = selected_collection.url | append: '/' | append: tag_handle
+            elsif card_url == blank and selected_collection != blank
+              assign card_url = selected_collection.url
+            elsif card_url == blank and selected_product != blank
+              assign card_url = selected_product.url
+            elsif card_url == blank and tag_handle != blank
+              assign card_url = routes.all_products_collection_url | append: '/' | append: tag_handle
+            endif
+
+            assign card_alt = card_image.alt | default: card_title
+          -%}
+
+          <article class="collection-showcase__card" {{ block.shopify_attributes }}>
+            {%- if card_url != blank -%}
+              <a class="collection-showcase__link" href="{{ card_url }}">
+            {%- else -%}
+              <div class="collection-showcase__link collection-showcase__link--static">
+            {%- endif -%}
+
+              <div class="collection-showcase__media">
+                {%- if card_image != blank -%}
+                  {{-
+                    card_image
+                    | image_url: width: 1000
+                    | image_tag:
+                      class: 'collection-showcase__image',
+                      widths: '160, 220, 320, 400, 480, 640, 800, 1000',
+                      sizes: image_sizes,
+                      loading: 'lazy',
+                      alt: card_alt
+                  -}}
+                {%- else -%}
+                  {{ 'collection-1' | placeholder_svg_tag: 'collection-showcase__placeholder placeholder-svg' }}
+                {%- endif -%}
+              </div>
+
+              <div class="collection-showcase__content collection-showcase__content--{{ section.settings.text_alignment }}">
+                <h3 class="collection-showcase__title">{{ card_title | escape }}</h3>
+                {%- if block.settings.subtitle != blank -%}
+                  <p class="collection-showcase__subtitle">{{ block.settings.subtitle | escape }}</p>
+                {%- endif -%}
+              </div>
+
+            {%- if card_url != blank -%}
+              </a>
+            {%- else -%}
+              </div>
+            {%- endif -%}
+          </article>
+        {%- else -%}
+          {%- if request.design_mode -%}
+            <p class="collection-showcase__empty">Add showcase cards to build this row.</p>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+    {%- if section.settings.show_desktop_arrows and section.blocks.size > 0 -%}
+      <div class="collection-showcase__controls" data-showcase-controls hidden>
+        <button
+          type="button"
+          class="collection-showcase__arrow collection-showcase__arrow--previous"
+          data-showcase-previous
+          aria-controls="CollectionShowcaseViewport-{{ section.id }}"
+          aria-label="Previous cards"
+          title="Previous cards"
+        >
+          {{- 'icon-caret.svg' | inline_asset_content -}}
+        </button>
+        <button
+          type="button"
+          class="collection-showcase__arrow collection-showcase__arrow--next"
+          data-showcase-next
+          aria-controls="CollectionShowcaseViewport-{{ section.id }}"
+          aria-label="Next cards"
+          title="Next cards"
+        >
+          {{- 'icon-caret.svg' | inline_asset_content -}}
+        </button>
+      </div>
+    {%- endif -%}
+  </div>
+</collection-showcase>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    background: rgb(var(--color-background));
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase {
+    display: block;
+    width: 100%;
+    padding-block: var(--showcase-padding-top) var(--showcase-padding-bottom);
+    overflow: hidden;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__intro {
+    width: min(100%, var(--showcase-max-width));
+    margin-inline: auto;
+    padding: 0 var(--showcase-inline-padding) 34px;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__intro--center {
+    text-align: center;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__intro--left {
+    text-align: left;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__heading {
+    margin: 0;
+    color: rgb(var(--color-foreground));
+    font-family: inherit;
+    font-size: var(--showcase-heading-size);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__intro-text {
+    max-width: 680px;
+    margin: 12px auto 0;
+    color: rgb(var(--color-foreground));
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__intro--left .collection-showcase__intro-text {
+    margin-left: 0;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__intro-text p {
+    margin: 0;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__carousel {
+    position: relative;
+    width: min(100%, var(--showcase-max-width));
+    margin-inline: auto;
+    padding-inline: var(--showcase-inline-padding);
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__viewport {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 1px;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__viewport:focus-visible {
+    outline: 2px solid rgb(var(--color-foreground));
+    outline-offset: 3px;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__list {
+    display: flex;
+    width: max-content;
+    min-width: 100%;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--showcase-gap);
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__card {
+    flex: 0 0 var(--showcase-card-width);
+    width: var(--showcase-card-width);
+    min-width: 0;
+    scroll-snap-align: center;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__link {
+    display: block;
+    color: rgb(var(--color-foreground));
+    text-decoration: none;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__media {
+    position: relative;
+    display: grid;
+    width: 100%;
+    aspect-ratio: var(--showcase-image-ratio);
+    overflow: hidden;
+    background: var(--showcase-image-background);
+    place-items: center;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: var(--showcase-image-fit);
+    transition: transform 300ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__placeholder {
+    width: 72%;
+    height: 72%;
+    opacity: 0.4;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    #shopify-section-{{ section.id }} .collection-showcase__link[href]:hover .collection-showcase__image {
+      transform: scale(1.025);
+    }
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__content {
+    min-height: 66px;
+    padding: 14px 8px 4px;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__content--center {
+    text-align: center;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__content--left {
+    text-align: left;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__title {
+    margin: 0;
+    color: rgb(var(--color-foreground));
+    font-family: inherit;
+    font-size: var(--showcase-title-size);
+    font-weight: {{ section.settings.title_weight }};
+    line-height: 1.3;
+    letter-spacing: 0;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__subtitle {
+    margin: 5px 0 0;
+    color: rgba(var(--color-foreground), 0.68);
+    font-size: var(--showcase-subtitle-size);
+    line-height: 1.35;
+    letter-spacing: 0;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__empty {
+    width: 100%;
+    margin: 0;
+    padding: 42px 20px;
+    text-align: center;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__controls[hidden] {
+    display: none;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__arrow {
+    position: absolute;
+    top: calc((var(--showcase-card-width) / 2) - 20px);
+    z-index: 2;
+    display: grid;
+    width: 40px;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    border: 1px solid rgba(var(--color-foreground), 0.18);
+    border-radius: 0;
+    background: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+    cursor: pointer;
+    place-items: center;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__arrow--previous {
+    left: var(--showcase-inline-padding);
+    transform: translate(-50%, 0);
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__arrow--next {
+    right: var(--showcase-inline-padding);
+    transform: translate(50%, 0);
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__arrow .icon-caret {
+    width: 12px;
+    height: 8px;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__arrow--previous .icon-caret {
+    transform: rotate(90deg);
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__arrow--next .icon-caret {
+    transform: rotate(-90deg);
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__arrow:disabled {
+    opacity: 0.28;
+    cursor: default;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__arrow:focus-visible {
+    outline: 2px solid rgb(var(--color-foreground));
+    outline-offset: 2px;
+  }
+
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} .collection-showcase {
+      padding-block: var(--showcase-mobile-padding-top) var(--showcase-mobile-padding-bottom);
+    }
+
+    #shopify-section-{{ section.id }} .collection-showcase__intro {
+      padding-inline: 20px;
+      padding-bottom: 24px;
+    }
+
+    #shopify-section-{{ section.id }} .collection-showcase__carousel {
+      padding-inline: 20px;
+    }
+
+    #shopify-section-{{ section.id }} .collection-showcase__card {
+      flex-basis: var(--showcase-mobile-card-width);
+      width: var(--showcase-mobile-card-width);
+    }
+
+    #shopify-section-{{ section.id }} .collection-showcase__content {
+      min-height: 58px;
+      padding: 12px 6px 2px;
+    }
+
+    #shopify-section-{{ section.id }} .collection-showcase__controls {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #shopify-section-{{ section.id }} .collection-showcase__viewport {
+      scroll-behavior: auto;
+    }
+
+    #shopify-section-{{ section.id }} .collection-showcase__image {
+      transition: none;
+    }
+  }
+{% endstyle %}
+
+<script>
+  (() => {
+    if (customElements.get('collection-showcase')) return;
+
+    class CollectionShowcase extends HTMLElement {
+      connectedCallback() {
+        this.viewport = this.querySelector('[data-showcase-viewport]');
+        this.list = this.querySelector('[data-showcase-list]');
+        this.controls = this.querySelector('[data-showcase-controls]');
+        this.previousButton = this.querySelector('[data-showcase-previous]');
+        this.nextButton = this.querySelector('[data-showcase-next]');
+        if (!this.viewport || !this.list || !this.controls || !this.previousButton || !this.nextButton) return;
+
+        this.updateFrame = null;
+        this.handleScroll = this.queueUpdate.bind(this);
+        this.handlePrevious = () => this.move(-1);
+        this.handleNext = () => this.move(1);
+        this.handleKeydown = this.onKeydown.bind(this);
+
+        this.viewport.addEventListener('scroll', this.handleScroll, { passive: true });
+        this.viewport.addEventListener('keydown', this.handleKeydown);
+        this.previousButton.addEventListener('click', this.handlePrevious);
+        this.nextButton.addEventListener('click', this.handleNext);
+
+        this.resizeObserver = new ResizeObserver(() => this.queueUpdate());
+        this.resizeObserver.observe(this.viewport);
+        this.resizeObserver.observe(this.list);
+        this.queueUpdate();
+      }
+
+      disconnectedCallback() {
+        if (!this.viewport) return;
+        this.viewport.removeEventListener('scroll', this.handleScroll);
+        this.viewport.removeEventListener('keydown', this.handleKeydown);
+        this.previousButton?.removeEventListener('click', this.handlePrevious);
+        this.nextButton?.removeEventListener('click', this.handleNext);
+        this.resizeObserver?.disconnect();
+        window.cancelAnimationFrame(this.updateFrame);
+      }
+
+      queueUpdate() {
+        window.cancelAnimationFrame(this.updateFrame);
+        this.updateFrame = window.requestAnimationFrame(() => this.updateControls());
+      }
+
+      updateControls() {
+        const maxScroll = Math.max(0, this.viewport.scrollWidth - this.viewport.clientWidth);
+        const desktop = window.matchMedia('(min-width: 750px)').matches;
+        this.controls.hidden = !desktop || maxScroll <= 1;
+        this.previousButton.disabled = this.viewport.scrollLeft <= 1;
+        this.nextButton.disabled = this.viewport.scrollLeft >= maxScroll - 1;
+      }
+
+      move(direction) {
+        const firstCard = this.list.querySelector('.collection-showcase__card');
+        const styles = window.getComputedStyle(this.list);
+        const gap = Number.parseFloat(styles.columnGap || styles.gap) || 0;
+        const cardWidth = firstCard?.getBoundingClientRect().width || this.viewport.clientWidth;
+        const visibleCards = Math.max(1, Math.floor(this.viewport.clientWidth / (cardWidth + gap)));
+        this.viewport.scrollBy({
+          left: direction * visibleCards * (cardWidth + gap),
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        });
+      }
+
+      onKeydown(event) {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        event.preventDefault();
+        this.move(event.key === 'ArrowLeft' ? -1 : 1);
+      }
+    }
+
+    customElements.define('collection-showcase', CollectionShowcase);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Collection showcase",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Explore collections"
+    },
+    {
+      "type": "richtext",
+      "id": "intro_text",
+      "label": "Intro text"
+    },
+    {
+      "type": "select",
+      "id": "intro_alignment",
+      "label": "Intro alignment",
+      "default": "center",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 960,
+      "max": 1920,
+      "step": 40,
+      "unit": "px",
+      "label": "Maximum content width",
+      "default": 1440
+    },
+    {
+      "type": "range",
+      "id": "desktop_card_width",
+      "min": 160,
+      "max": 320,
+      "step": 4,
+      "unit": "px",
+      "label": "Desktop card width",
+      "default": 196
+    },
+    {
+      "type": "range",
+      "id": "mobile_card_width",
+      "min": 128,
+      "max": 220,
+      "step": 4,
+      "unit": "px",
+      "label": "Mobile card width",
+      "default": 156
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Space between cards",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "horizontal_padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Desktop side padding",
+      "default": 40
+    },
+    {
+      "type": "checkbox",
+      "id": "show_desktop_arrows",
+      "label": "Show desktop carousel arrows",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Images"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image aspect ratio",
+      "default": "1 / 1",
+      "options": [
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "4 / 3", "label": "Landscape" },
+        { "value": "3 / 2", "label": "Wide" },
+        { "value": "4 / 5", "label": "Portrait" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Image fit",
+      "default": "contain",
+      "options": [
+        { "value": "contain", "label": "Contain" },
+        { "value": "cover", "label": "Cover" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "image_background",
+      "label": "Image background",
+      "default": "#f2f2f2"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 18,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading size",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Card title size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Card subtitle size",
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "title_weight",
+      "label": "Card title weight",
+      "default": "600",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semibold" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Card text alignment",
+      "default": "center",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Desktop top padding",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Desktop bottom padding",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Mobile top padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Mobile bottom padding",
+      "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Showcase card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Custom title"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Custom link",
+          "info": "This overrides all automatic destinations below."
+        },
+        {
+          "type": "header",
+          "content": "Collections and products"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Primary collection"
+        },
+        {
+          "type": "collection_list",
+          "id": "collection_list",
+          "label": "Additional collections",
+          "limit": 50
+        },
+        {
+          "type": "product_list",
+          "id": "product_list",
+          "label": "Products",
+          "limit": 50
+        },
+        {
+          "type": "text",
+          "id": "product_tag",
+          "label": "Product tag filter",
+          "info": "When set with a collection, the card opens that collection filtered by this tag."
+        },
+        {
+          "type": "paragraph",
+          "content": "Destination priority: custom link, collection with tag, primary or first selected collection, first selected product, then all products filtered by tag."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection showcase",
+      "blocks": [
+        { "type": "card" },
+        { "type": "card" },
+        { "type": "card" },
+        { "type": "card" },
+        { "type": "card" }
+      ]
+    }
+  ]
+}
+{% endschema %}
