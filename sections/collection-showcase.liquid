@@ -5,10 +5,42 @@
   assign allowed_paths = section.settings.allowed_paths | strip
   assign show_showcase = true
   assign parent_count = 0
+  assign active_parent_block_id = blank
 
   for block in section.blocks
     if block.type == 'card'
       assign parent_count = parent_count | plus: 1
+
+      assign landing_collection = block.settings.landing_collection
+      if landing_collection == blank and block.settings.collection_list != blank
+        assign landing_collection = block.settings.collection_list.first
+      endif
+      if landing_collection == blank
+        assign landing_collection = block.settings.collection
+      endif
+
+      if request.page_type == 'collection' and landing_collection.id == collection.id
+        assign candidate_title = block.settings.title | strip
+        if candidate_title == blank
+          assign candidate_title = landing_collection.title
+        endif
+        assign candidate_group_key = block.settings.group_key | default: candidate_title | handleize
+        assign candidate_child_count = 0
+
+        for child_block in section.blocks
+          if child_block.type == 'child_collection'
+            assign child_parent_key = child_block.settings.parent_group | handleize
+            if child_parent_key != blank and child_parent_key == candidate_group_key
+              assign candidate_child_count = candidate_child_count | plus: 1
+            endif
+          endif
+        endfor
+
+        if candidate_child_count > 0
+          assign active_parent_block_id = block.id
+          break
+        endif
+      endif
     endif
   endfor
 
@@ -23,6 +55,10 @@
       endif
     endfor
   endif
+
+  if active_parent_block_id != blank
+    assign show_showcase = true
+  endif
 -%}
 
 <collection-showcase
@@ -30,6 +66,7 @@
   data-collection-showcase
   data-showcase-placement="{{ section.settings.placement }}"
   data-allowed-paths="{{ allowed_paths | escape }}"
+  data-showcase-parent-page="{% if active_parent_block_id != blank %}true{% else %}false{% endif %}"
   {% unless show_showcase %}hidden{% endunless %}
   style="
     --showcase-max-width: {{ section.settings.max_width }}px;
@@ -49,7 +86,7 @@
     --showcase-mobile-padding-bottom: {{ section.settings.mobile_padding_bottom }}px;
   "
 >
-  <div data-showcase-root-view>
+  <div data-showcase-root-view {% if active_parent_block_id != blank %}hidden{% endif %}>
     {%- if section_heading != blank or section.settings.intro_text != blank -%}
       <div class="collection-showcase__intro collection-showcase__intro--{{ section.settings.intro_alignment }}">
         {%- if section_heading != blank -%}
@@ -78,8 +115,15 @@
             {%- endunless -%}
           {%- liquid
             assign selected_collection = block.settings.collection
-            if selected_collection == blank and block.settings.collection_list != blank
-              assign selected_collection = block.settings.collection_list.first
+            assign landing_collection = block.settings.landing_collection
+            if landing_collection == blank and block.settings.collection_list != blank
+              assign landing_collection = block.settings.collection_list.first
+            endif
+            if landing_collection == blank
+              assign landing_collection = selected_collection
+            endif
+            if selected_collection == blank
+              assign selected_collection = landing_collection
             endif
 
             assign selected_product = blank
@@ -123,7 +167,7 @@
             assign card_url = block.settings.link
             assign tag_handle = block.settings.product_tag | handleize
             if card_url == blank and child_count > 0
-              assign card_url = blank
+              assign card_url = landing_collection.url
             elsif card_url == blank and selected_collection != blank and tag_handle != blank
               assign card_url = selected_collection.url | append: '/' | append: tag_handle
             elsif card_url == blank and selected_collection != blank
@@ -226,9 +270,17 @@
     {%- endunless -%}
 
     {%- liquid
+      assign parent_landing_collection = parent_block.settings.landing_collection
+      if parent_landing_collection == blank and parent_block.settings.collection_list != blank
+        assign parent_landing_collection = parent_block.settings.collection_list.first
+      endif
+      if parent_landing_collection == blank
+        assign parent_landing_collection = parent_block.settings.collection
+      endif
+
       assign parent_title = parent_block.settings.title | strip
-      if parent_title == blank and parent_block.settings.collection != blank
-        assign parent_title = parent_block.settings.collection.title
+      if parent_title == blank and parent_landing_collection != blank
+        assign parent_title = parent_landing_collection.title
       endif
       if parent_title == blank
         assign parent_title = 'Collections'
@@ -252,13 +304,15 @@
         class="collection-showcase__panel"
         data-showcase-panel="{{ parent_block.id }}"
         aria-labelledby="CollectionShowcasePanelTitle-{{ section.id }}-{{ parent_block.id }}"
-        hidden
+        {% unless parent_block.id == active_parent_block_id %}hidden{% endunless %}
       >
         <div class="collection-showcase__panel-header">
-          <button type="button" class="collection-showcase__back" data-showcase-back>
-            {{- 'icon-caret.svg' | inline_asset_content -}}
-            <span>Back</span>
-          </button>
+          {%- unless parent_block.id == active_parent_block_id -%}
+            <button type="button" class="collection-showcase__back" data-showcase-back>
+              {{- 'icon-caret.svg' | inline_asset_content -}}
+              <span>Back</span>
+            </button>
+          {%- endunless -%}
           <h2
             id="CollectionShowcasePanelTitle-{{ section.id }}-{{ parent_block.id }}"
             class="collection-showcase__panel-title"
@@ -305,9 +359,10 @@
                     assign child_title = 'Collection'
                   endif
 
+                  assign child_tab_handle = child_block.settings.tab_handle | default: child_title | handleize
                   assign child_url = child_block.settings.link
                   if child_url == blank and child_collection != blank
-                    assign child_url = child_collection.url
+                    assign child_url = child_collection.url | append: '#nested-' | append: child_tab_handle
                   endif
                   assign child_alt = child_image.alt | default: child_title
                 -%}
@@ -319,7 +374,11 @@
                   {{ child_block.shopify_attributes }}
                 >
                   {%- if child_url != blank -%}
-                    <a class="collection-showcase__link" href="{{ child_url }}">
+                    <a
+                      class="collection-showcase__link"
+                      href="{{ child_url }}"
+                      data-showcase-tab-handle="{{ child_tab_handle }}"
+                    >
                   {%- else -%}
                     <div class="collection-showcase__link collection-showcase__link--static">
                   {%- endif -%}
@@ -594,6 +653,7 @@
 
   #shopify-section-{{ section.id }} .collection-showcase__back {
     display: inline-flex;
+    grid-column: 1;
     width: max-content;
     margin: 0;
     padding: 8px 0;
@@ -621,6 +681,7 @@
   }
 
   #shopify-section-{{ section.id }} .collection-showcase__panel-title {
+    grid-column: 2;
     margin: 0;
     color: rgb(var(--color-foreground));
     font-family: inherit;
@@ -749,7 +810,8 @@
 
         this.rootView = this.querySelector('[data-showcase-root-view]');
         this.panels = Array.from(this.querySelectorAll('[data-showcase-panel]'));
-        this.activePanel = null;
+        this.isParentPage = this.dataset.showcaseParentPage === 'true';
+        this.activePanel = this.panels.find((panel) => !panel.hidden) || null;
         this.activeOpener = null;
 
         this.handleVisibilityChange = this.updateVisibility.bind(this);
@@ -825,6 +887,15 @@
       }
 
       updateVisibility() {
+        if (this.dataset.showcaseParentPage === 'true') {
+          const activeTab = document.querySelector('[data-prada-collection-tabs] .prada-collection__tab.is-active');
+          const activeTabHandle = this.handleize(activeTab?.textContent || '');
+          this.hidden =
+            window.location.hash.indexOf('#nested-') === 0 ||
+            (activeTabHandle !== '' && activeTabHandle !== 'view-all');
+          return;
+        }
+
         const allowedPaths = (this.dataset.allowedPaths || '')
           .split(',')
           .map((path) => path.trim())
@@ -875,7 +946,36 @@
         return this.carousels?.find((carousel) => carousel.element === carouselElement);
       }
 
+      handleize(value) {
+        return String(value || '')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '');
+      }
+
       onClick(event) {
+        const childLink = event.target.closest('[data-showcase-tab-handle]');
+        if (childLink && this.contains(childLink)) {
+          const targetUrl = new URL(childLink.href, window.location.origin);
+          if (targetUrl.origin === window.location.origin && targetUrl.pathname === window.location.pathname) {
+            const requestedHandle = childLink.dataset.showcaseTabHandle;
+            const matchingTab = Array.from(
+              document.querySelectorAll('[data-prada-collection-tabs] .prada-collection__tab')
+            ).find((tab) => this.handleize(tab.textContent) === requestedHandle);
+
+            event.preventDefault();
+            if (matchingTab) {
+              matchingTab.click();
+              window.history.replaceState(window.history.state, '', targetUrl.href);
+              this.updateVisibility();
+            } else {
+              window.history.pushState({ showcaseTab: requestedHandle }, '', targetUrl.href);
+              window.location.reload();
+            }
+            return;
+          }
+        }
+
         const openButton = event.target.closest('[data-showcase-open]');
         if (openButton && this.contains(openButton)) {
           this.openPanel(openButton.dataset.showcaseOpen, openButton);
@@ -922,7 +1022,7 @@
       }
 
       closePanel(moveFocus = true) {
-        if (!this.rootView) return;
+        if (!this.rootView || this.isParentPage) return;
         const opener = this.activeOpener;
         this.panels.forEach((panel) => {
           panel.hidden = true;
@@ -946,7 +1046,7 @@
       }
 
       onKeydown(event) {
-        if (event.key === 'Escape' && this.activePanel) {
+        if (event.key === 'Escape' && this.activePanel && !this.isParentPage) {
           event.preventDefault();
           this.closePanel();
           return;
@@ -1212,7 +1312,7 @@
       "settings": [
         {
           "type": "paragraph",
-          "content": "Add Child collection blocks with the same group key to open an intermediate collection showcase from this card."
+          "content": "Add Child collection blocks with the same group key. This card loads the parent collection page, where the matching child showcase appears above its products."
         },
         {
           "type": "image_picker",
@@ -1229,6 +1329,12 @@
           "id": "group_key",
           "label": "Group key",
           "info": "Use a unique value such as scarves. Child collection blocks must use the same value. If blank, the parent title is used."
+        },
+        {
+          "type": "collection",
+          "id": "landing_collection",
+          "label": "Parent landing collection",
+          "info": "Required for parent-child navigation. The parent card loads this collection page, where its child showcase appears above the combined product grid."
         },
         {
           "type": "text",
@@ -1248,13 +1354,13 @@
         {
           "type": "collection",
           "id": "collection",
-          "label": "Primary collection"
+          "label": "Direct fallback collection"
         },
         {
           "type": "collection_list",
           "id": "collection_list",
-          "label": "Fallback collections (legacy)",
-          "info": "Only the first selection is used as a direct fallback. Use Child collection blocks for a multi-collection showcase.",
+          "label": "Parent page fallback (legacy)",
+          "info": "Kept for existing cards. When Parent landing collection is blank, the first selection is used as the parent page.",
           "limit": 50
         },
         {
@@ -1271,7 +1377,7 @@
         },
         {
           "type": "paragraph",
-          "content": "Destination priority: custom link, linked child showcase, collection with tag, primary or first fallback collection, first selected product, then all products filtered by tag."
+          "content": "Destination priority: custom link, parent landing collection for linked children, collection with tag, direct fallback collection, first selected product, then all products filtered by tag."
         }
       ]
     },
@@ -1301,6 +1407,12 @@
           "id": "title",
           "label": "Custom title",
           "info": "Optional. Falls back to the collection title."
+        },
+        {
+          "type": "text",
+          "id": "tab_handle",
+          "label": "Tab handle",
+          "info": "Optional. Must match the collection navigation tab, for example crepe-scarves. Falls back to the custom or collection title."
         },
         {
           "type": "text",

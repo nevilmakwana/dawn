@@ -1142,13 +1142,18 @@
         enableTabPrefetch();
         if (window.location.hash.indexOf('#nested-') === 0) {
           var requestedNestedHandle = decodeURIComponent(window.location.hash.slice(8));
-          var requestedNestedTab = Array.from(tabs.querySelectorAll('[data-prada-product-template]')).find(function (tab) {
+          var requestedNestedTab = Array.from(tabs.querySelectorAll('.prada-collection__tab')).find(function (tab) {
             return nestedTabHandle(tab) === requestedNestedHandle;
           });
 
           if (requestedNestedTab) {
             window.requestAnimationFrame(function () {
-              renderNestedProducts(requestedNestedTab, false);
+              if (productTemplateForTab(requestedNestedTab)) {
+                renderNestedProducts(requestedNestedTab, false);
+              } else {
+                setActiveTab(tabs, requestedNestedTab);
+                document.dispatchEvent(new Event('prada:collection:updated'));
+              }
             });
           }
         } else {
