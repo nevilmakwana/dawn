@@ -4,6 +4,13 @@
   assign image_sizes = '(max-width: 749px) ' | append: section.settings.mobile_card_width | append: 'px, ' | append: section.settings.desktop_card_width | append: 'px'
   assign allowed_paths = section.settings.allowed_paths | strip
   assign show_showcase = true
+  assign parent_count = 0
+
+  for block in section.blocks
+    if block.type == 'card'
+      assign parent_count = parent_count | plus: 1
+    endif
+  endfor
 
   if allowed_paths != blank
     assign show_showcase = false
@@ -42,29 +49,33 @@
     --showcase-mobile-padding-bottom: {{ section.settings.mobile_padding_bottom }}px;
   "
 >
-  {%- if section_heading != blank or section.settings.intro_text != blank -%}
-    <div class="collection-showcase__intro collection-showcase__intro--{{ section.settings.intro_alignment }}">
-      {%- if section_heading != blank -%}
-        <h2 class="collection-showcase__heading">{{ section_heading | escape }}</h2>
-      {%- endif -%}
+  <div data-showcase-root-view>
+    {%- if section_heading != blank or section.settings.intro_text != blank -%}
+      <div class="collection-showcase__intro collection-showcase__intro--{{ section.settings.intro_alignment }}">
+        {%- if section_heading != blank -%}
+          <h2 class="collection-showcase__heading">{{ section_heading | escape }}</h2>
+        {%- endif -%}
 
-      {%- if section.settings.intro_text != blank -%}
-        <div class="collection-showcase__intro-text rte">{{ section.settings.intro_text }}</div>
-      {%- endif -%}
-    </div>
-  {%- endif -%}
+        {%- if section.settings.intro_text != blank -%}
+          <div class="collection-showcase__intro-text rte">{{ section.settings.intro_text }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
 
-  <div class="collection-showcase__carousel">
-    <div
-      id="CollectionShowcaseViewport-{{ section.id }}"
-      class="collection-showcase__viewport"
-      data-showcase-viewport
-      role="region"
-      aria-label="{{ section_label | escape }}"
-      tabindex="0"
-    >
-      <div class="collection-showcase__list" data-showcase-list>
-        {%- for block in section.blocks -%}
+    <div class="collection-showcase__carousel" data-showcase-carousel>
+      <div
+        id="CollectionShowcaseViewport-{{ section.id }}"
+        class="collection-showcase__viewport"
+        data-showcase-viewport
+        role="region"
+        aria-label="{{ section_label | escape }}"
+        tabindex="0"
+      >
+        <div class="collection-showcase__list" data-showcase-list>
+          {%- for block in section.blocks -%}
+            {%- unless block.type == 'card' -%}
+              {%- continue -%}
+            {%- endunless -%}
           {%- liquid
             assign selected_collection = block.settings.collection
             if selected_collection == blank and block.settings.collection_list != blank
@@ -98,9 +109,22 @@
               assign card_title = 'Collection'
             endif
 
+            assign parent_group_key = block.settings.group_key | default: card_title | handleize
+            assign child_count = 0
+            for child_block in section.blocks
+              if child_block.type == 'child_collection'
+                assign child_parent_key = child_block.settings.parent_group | handleize
+                if child_parent_key != blank and child_parent_key == parent_group_key
+                  assign child_count = child_count | plus: 1
+                endif
+              endif
+            endfor
+
             assign card_url = block.settings.link
             assign tag_handle = block.settings.product_tag | handleize
-            if card_url == blank and selected_collection != blank and tag_handle != blank
+            if card_url == blank and child_count > 0
+              assign card_url = blank
+            elsif card_url == blank and selected_collection != blank and tag_handle != blank
               assign card_url = selected_collection.url | append: '/' | append: tag_handle
             elsif card_url == blank and selected_collection != blank
               assign card_url = selected_collection.url
@@ -116,6 +140,15 @@
           <article class="collection-showcase__card" {{ block.shopify_attributes }}>
             {%- if card_url != blank -%}
               <a class="collection-showcase__link" href="{{ card_url }}">
+            {%- elsif child_count > 0 -%}
+              <button
+                type="button"
+                class="collection-showcase__link collection-showcase__link--button"
+                data-showcase-open="{{ block.id }}"
+                aria-controls="CollectionShowcasePanel-{{ section.id }}-{{ block.id }}"
+                aria-expanded="false"
+                aria-label="Explore {{ card_title | escape }}"
+              >
             {%- else -%}
               <div class="collection-showcase__link collection-showcase__link--static">
             {%- endif -%}
@@ -146,43 +179,213 @@
 
             {%- if card_url != blank -%}
               </a>
+            {%- elsif child_count > 0 -%}
+              </button>
             {%- else -%}
               </div>
             {%- endif -%}
           </article>
-        {%- else -%}
-          {%- if request.design_mode -%}
-            <p class="collection-showcase__empty">Add showcase cards to build this row.</p>
-          {%- endif -%}
-        {%- endfor -%}
-      </div>
-    </div>
+          {%- endfor -%}
 
-    {%- if section.settings.show_desktop_arrows and section.blocks.size > 0 -%}
-      <div class="collection-showcase__controls" data-showcase-controls hidden>
-        <button
-          type="button"
-          class="collection-showcase__arrow collection-showcase__arrow--previous"
-          data-showcase-previous
-          aria-controls="CollectionShowcaseViewport-{{ section.id }}"
-          aria-label="Previous cards"
-          title="Previous cards"
-        >
-          {{- 'icon-caret.svg' | inline_asset_content -}}
-        </button>
-        <button
-          type="button"
-          class="collection-showcase__arrow collection-showcase__arrow--next"
-          data-showcase-next
-          aria-controls="CollectionShowcaseViewport-{{ section.id }}"
-          aria-label="Next cards"
-          title="Next cards"
-        >
-          {{- 'icon-caret.svg' | inline_asset_content -}}
-        </button>
+          {%- if parent_count == 0 and request.design_mode -%}
+            <p class="collection-showcase__empty">Add a parent showcase block to build this row.</p>
+          {%- endif -%}
+        </div>
       </div>
-    {%- endif -%}
+
+      {%- if section.settings.show_desktop_arrows and parent_count > 0 -%}
+        <div class="collection-showcase__controls" data-showcase-controls hidden>
+          <button
+            type="button"
+            class="collection-showcase__arrow collection-showcase__arrow--previous"
+            data-showcase-previous
+            aria-controls="CollectionShowcaseViewport-{{ section.id }}"
+            aria-label="Previous cards"
+            title="Previous cards"
+          >
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+          </button>
+          <button
+            type="button"
+            class="collection-showcase__arrow collection-showcase__arrow--next"
+            data-showcase-next
+            aria-controls="CollectionShowcaseViewport-{{ section.id }}"
+            aria-label="Next cards"
+            title="Next cards"
+          >
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+          </button>
+        </div>
+      {%- endif -%}
+    </div>
   </div>
+
+  {%- for parent_block in section.blocks -%}
+    {%- unless parent_block.type == 'card' -%}
+      {%- continue -%}
+    {%- endunless -%}
+
+    {%- liquid
+      assign parent_title = parent_block.settings.title | strip
+      if parent_title == blank and parent_block.settings.collection != blank
+        assign parent_title = parent_block.settings.collection.title
+      endif
+      if parent_title == blank
+        assign parent_title = 'Collections'
+      endif
+
+      assign parent_group_key = parent_block.settings.group_key | default: parent_title | handleize
+      assign child_count = 0
+      for child_block in section.blocks
+        if child_block.type == 'child_collection'
+          assign child_parent_key = child_block.settings.parent_group | handleize
+          if child_parent_key != blank and child_parent_key == parent_group_key
+            assign child_count = child_count | plus: 1
+          endif
+        endif
+      endfor
+    -%}
+
+    {%- if child_count > 0 -%}
+      <section
+        id="CollectionShowcasePanel-{{ section.id }}-{{ parent_block.id }}"
+        class="collection-showcase__panel"
+        data-showcase-panel="{{ parent_block.id }}"
+        aria-labelledby="CollectionShowcasePanelTitle-{{ section.id }}-{{ parent_block.id }}"
+        hidden
+      >
+        <div class="collection-showcase__panel-header">
+          <button type="button" class="collection-showcase__back" data-showcase-back>
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+            <span>Back</span>
+          </button>
+          <h2
+            id="CollectionShowcasePanelTitle-{{ section.id }}-{{ parent_block.id }}"
+            class="collection-showcase__panel-title"
+          >
+            {{- parent_title | escape -}}
+          </h2>
+        </div>
+
+        <div class="collection-showcase__carousel" data-showcase-carousel>
+          <div
+            id="CollectionShowcaseChildViewport-{{ section.id }}-{{ parent_block.id }}"
+            class="collection-showcase__viewport"
+            data-showcase-viewport
+            role="region"
+            aria-label="{{ parent_title | escape }} collections"
+            tabindex="0"
+          >
+            <div class="collection-showcase__list" data-showcase-list>
+              {%- for child_block in section.blocks -%}
+                {%- unless child_block.type == 'child_collection' -%}
+                  {%- continue -%}
+                {%- endunless -%}
+
+                {%- assign child_parent_key = child_block.settings.parent_group | handleize -%}
+                {%- unless child_parent_key != blank and child_parent_key == parent_group_key -%}
+                  {%- continue -%}
+                {%- endunless -%}
+
+                {%- liquid
+                  assign child_collection = child_block.settings.collection
+                  assign child_image = child_block.settings.image
+                  if child_image == blank and child_collection != blank
+                    assign child_image = child_collection.image
+                    if child_image == blank and child_collection.products.first != blank
+                      assign child_image = child_collection.products.first.featured_media.preview_image
+                    endif
+                  endif
+
+                  assign child_title = child_block.settings.title | strip
+                  if child_title == blank and child_collection != blank
+                    assign child_title = child_collection.title
+                  endif
+                  if child_title == blank
+                    assign child_title = 'Collection'
+                  endif
+
+                  assign child_url = child_block.settings.link
+                  if child_url == blank and child_collection != blank
+                    assign child_url = child_collection.url
+                  endif
+                  assign child_alt = child_image.alt | default: child_title
+                -%}
+
+                <article
+                  class="collection-showcase__card"
+                  data-showcase-child-card
+                  data-showcase-parent="{{ parent_block.id }}"
+                  {{ child_block.shopify_attributes }}
+                >
+                  {%- if child_url != blank -%}
+                    <a class="collection-showcase__link" href="{{ child_url }}">
+                  {%- else -%}
+                    <div class="collection-showcase__link collection-showcase__link--static">
+                  {%- endif -%}
+
+                    <div class="collection-showcase__media">
+                      {%- if child_image != blank -%}
+                        {{-
+                          child_image
+                          | image_url: width: 1000
+                          | image_tag:
+                            class: 'collection-showcase__image',
+                            widths: '160, 220, 320, 400, 480, 640, 800, 1000',
+                            sizes: image_sizes,
+                            loading: 'lazy',
+                            alt: child_alt
+                        -}}
+                      {%- else -%}
+                        {{ 'collection-1' | placeholder_svg_tag: 'collection-showcase__placeholder placeholder-svg' }}
+                      {%- endif -%}
+                    </div>
+
+                    <div class="collection-showcase__content collection-showcase__content--{{ section.settings.text_alignment }}">
+                      <h3 class="collection-showcase__title">{{ child_title | escape }}</h3>
+                      {%- if child_block.settings.subtitle != blank -%}
+                        <p class="collection-showcase__subtitle">{{ child_block.settings.subtitle | escape }}</p>
+                      {%- endif -%}
+                    </div>
+
+                  {%- if child_url != blank -%}
+                    </a>
+                  {%- else -%}
+                    </div>
+                  {%- endif -%}
+                </article>
+              {%- endfor -%}
+            </div>
+          </div>
+
+          {%- if section.settings.show_desktop_arrows and child_count > 0 -%}
+            <div class="collection-showcase__controls" data-showcase-controls hidden>
+              <button
+                type="button"
+                class="collection-showcase__arrow collection-showcase__arrow--previous"
+                data-showcase-previous
+                aria-controls="CollectionShowcaseChildViewport-{{ section.id }}-{{ parent_block.id }}"
+                aria-label="Previous collections"
+                title="Previous collections"
+              >
+                {{- 'icon-caret.svg' | inline_asset_content -}}
+              </button>
+              <button
+                type="button"
+                class="collection-showcase__arrow collection-showcase__arrow--next"
+                data-showcase-next
+                aria-controls="CollectionShowcaseChildViewport-{{ section.id }}-{{ parent_block.id }}"
+                aria-label="Next collections"
+                title="Next collections"
+              >
+                {{- 'icon-caret.svg' | inline_asset_content -}}
+              </button>
+            </div>
+          {%- endif -%}
+        </div>
+      </section>
+    {%- endif -%}
+  {%- endfor -%}
 </collection-showcase>
 
 {% style %}
@@ -198,6 +401,7 @@
   }
 
   #shopify-section-{{ section.id }} .collection-showcase[hidden],
+  #shopify-section-{{ section.id }} .collection-showcase [hidden],
   #shopify-section-{{ section.id }} .collection-showcase[data-showcase-placement='below_collection_toolbar']:not([data-showcase-mounted]) {
     display: none !important;
   }
@@ -292,6 +496,23 @@
     text-decoration: none;
   }
 
+  #shopify-section-{{ section.id }} .collection-showcase__link--button {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font: inherit;
+    text-align: inherit;
+    cursor: pointer;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__link--button:focus-visible {
+    outline: 2px solid rgb(var(--color-foreground));
+    outline-offset: 3px;
+  }
+
   #shopify-section-{{ section.id }} .collection-showcase__media {
     position: relative;
     display: grid;
@@ -357,6 +578,56 @@
     width: 100%;
     margin: 0;
     padding: 42px 20px;
+    text-align: center;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__panel-header {
+    position: relative;
+    display: grid;
+    width: min(100%, var(--showcase-max-width));
+    min-height: 40px;
+    margin: 0 auto 24px;
+    padding-inline: var(--showcase-inline-padding);
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__back {
+    display: inline-flex;
+    width: max-content;
+    margin: 0;
+    padding: 8px 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: rgb(var(--color-foreground));
+    font: inherit;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    gap: 9px;
+    align-items: center;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__back .icon-caret {
+    width: 10px;
+    height: 7px;
+    transform: rotate(90deg);
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__back:focus-visible {
+    outline: 2px solid rgb(var(--color-foreground));
+    outline-offset: 2px;
+  }
+
+  #shopify-section-{{ section.id }} .collection-showcase__panel-title {
+    margin: 0;
+    color: rgb(var(--color-foreground));
+    font-family: inherit;
+    font-size: var(--showcase-heading-size);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0;
     text-align: center;
   }
 
@@ -428,6 +699,15 @@
       padding-inline: 20px;
     }
 
+    #shopify-section-{{ section.id }} .collection-showcase__panel-header {
+      margin-bottom: 20px;
+      padding-inline: 20px;
+    }
+
+    #shopify-section-{{ section.id }} .collection-showcase__panel-title {
+      font-size: min(var(--showcase-heading-size), 22px);
+    }
+
     #shopify-section-{{ section.id }} .collection-showcase__card {
       flex-basis: var(--showcase-mobile-card-width);
       width: var(--showcase-mobile-card-width);
@@ -467,33 +747,38 @@
         if (this.dataset.showcaseReady === 'true') return;
         this.dataset.showcaseReady = 'true';
 
-        this.viewport = this.querySelector('[data-showcase-viewport]');
-        this.list = this.querySelector('[data-showcase-list]');
-        this.controls = this.querySelector('[data-showcase-controls]');
-        this.previousButton = this.querySelector('[data-showcase-previous]');
-        this.nextButton = this.querySelector('[data-showcase-next]');
+        this.rootView = this.querySelector('[data-showcase-root-view]');
+        this.panels = Array.from(this.querySelectorAll('[data-showcase-panel]'));
+        this.activePanel = null;
+        this.activeOpener = null;
 
         this.handleVisibilityChange = this.updateVisibility.bind(this);
+        this.handleClick = this.onClick.bind(this);
+        this.handleKeydown = this.onKeydown.bind(this);
+        this.handleScroll = this.queueUpdate.bind(this);
+        this.handleBlockSelect = this.onBlockSelect.bind(this);
         window.addEventListener('popstate', this.handleVisibilityChange);
         document.addEventListener('prada:collection:updated', this.handleVisibilityChange);
+        document.addEventListener('shopify:block:select', this.handleBlockSelect);
+        this.addEventListener('click', this.handleClick);
+        this.addEventListener('keydown', this.handleKeydown);
         this.updateVisibility();
 
-        if (!this.viewport || !this.list || !this.controls || !this.previousButton || !this.nextButton) return;
-
         this.updateFrame = null;
-        this.handleScroll = this.queueUpdate.bind(this);
-        this.handlePrevious = () => this.move(-1);
-        this.handleNext = () => this.move(1);
-        this.handleKeydown = this.onKeydown.bind(this);
-
-        this.viewport.addEventListener('scroll', this.handleScroll, { passive: true });
-        this.viewport.addEventListener('keydown', this.handleKeydown);
-        this.previousButton.addEventListener('click', this.handlePrevious);
-        this.nextButton.addEventListener('click', this.handleNext);
-
+        this.carousels = Array.from(this.querySelectorAll('[data-showcase-carousel]')).map((carousel) => ({
+          element: carousel,
+          viewport: carousel.querySelector('[data-showcase-viewport]'),
+          list: carousel.querySelector('[data-showcase-list]'),
+          controls: carousel.querySelector('[data-showcase-controls]'),
+          previousButton: carousel.querySelector('[data-showcase-previous]'),
+          nextButton: carousel.querySelector('[data-showcase-next]'),
+        }));
         this.resizeObserver = new ResizeObserver(() => this.queueUpdate());
-        this.resizeObserver.observe(this.viewport);
-        this.resizeObserver.observe(this.list);
+        this.carousels.forEach((carousel) => {
+          carousel.viewport?.addEventListener('scroll', this.handleScroll, { passive: true });
+          if (carousel.viewport) this.resizeObserver.observe(carousel.viewport);
+          if (carousel.list) this.resizeObserver.observe(carousel.list);
+        });
         this.queueUpdate();
       }
 
@@ -504,10 +789,10 @@
         }
         window.removeEventListener('popstate', this.handleVisibilityChange);
         document.removeEventListener('prada:collection:updated', this.handleVisibilityChange);
-        this.viewport?.removeEventListener('scroll', this.handleScroll);
-        this.viewport?.removeEventListener('keydown', this.handleKeydown);
-        this.previousButton?.removeEventListener('click', this.handlePrevious);
-        this.nextButton?.removeEventListener('click', this.handleNext);
+        document.removeEventListener('shopify:block:select', this.handleBlockSelect);
+        this.removeEventListener('click', this.handleClick);
+        this.removeEventListener('keydown', this.handleKeydown);
+        this.carousels?.forEach((carousel) => carousel.viewport?.removeEventListener('scroll', this.handleScroll));
         this.resizeObserver?.disconnect();
         window.cancelAnimationFrame(this.updateFrame);
         delete this.dataset.showcaseReady;
@@ -562,29 +847,116 @@
       }
 
       updateControls() {
-        const maxScroll = Math.max(0, this.viewport.scrollWidth - this.viewport.clientWidth);
         const desktop = window.matchMedia('(min-width: 750px)').matches;
-        this.controls.hidden = !desktop || maxScroll <= 1;
-        this.previousButton.disabled = this.viewport.scrollLeft <= 1;
-        this.nextButton.disabled = this.viewport.scrollLeft >= maxScroll - 1;
+        this.carousels?.forEach((carousel) => {
+          if (!carousel.viewport || !carousel.controls || !carousel.previousButton || !carousel.nextButton) return;
+          const maxScroll = Math.max(0, carousel.viewport.scrollWidth - carousel.viewport.clientWidth);
+          carousel.controls.hidden = !desktop || maxScroll <= 1 || carousel.element.closest('[hidden]');
+          carousel.previousButton.disabled = carousel.viewport.scrollLeft <= 1;
+          carousel.nextButton.disabled = carousel.viewport.scrollLeft >= maxScroll - 1;
+        });
       }
 
-      move(direction) {
-        const firstCard = this.list.querySelector('.collection-showcase__card');
-        const styles = window.getComputedStyle(this.list);
+      move(carousel, direction) {
+        if (!carousel?.viewport || !carousel.list) return;
+        const firstCard = carousel.list.querySelector('.collection-showcase__card');
+        const styles = window.getComputedStyle(carousel.list);
         const gap = Number.parseFloat(styles.columnGap || styles.gap) || 0;
-        const cardWidth = firstCard?.getBoundingClientRect().width || this.viewport.clientWidth;
-        const visibleCards = Math.max(1, Math.floor(this.viewport.clientWidth / (cardWidth + gap)));
-        this.viewport.scrollBy({
+        const cardWidth = firstCard?.getBoundingClientRect().width || carousel.viewport.clientWidth;
+        const visibleCards = Math.max(1, Math.floor(carousel.viewport.clientWidth / (cardWidth + gap)));
+        carousel.viewport.scrollBy({
           left: direction * visibleCards * (cardWidth + gap),
           behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
         });
       }
 
+      findCarousel(element) {
+        const carouselElement = element?.closest('[data-showcase-carousel]');
+        return this.carousels?.find((carousel) => carousel.element === carouselElement);
+      }
+
+      onClick(event) {
+        const openButton = event.target.closest('[data-showcase-open]');
+        if (openButton && this.contains(openButton)) {
+          this.openPanel(openButton.dataset.showcaseOpen, openButton);
+          return;
+        }
+
+        const backButton = event.target.closest('[data-showcase-back]');
+        if (backButton && this.contains(backButton)) {
+          this.closePanel();
+          return;
+        }
+
+        const previousButton = event.target.closest('[data-showcase-previous]');
+        if (previousButton && this.contains(previousButton)) {
+          this.move(this.findCarousel(previousButton), -1);
+          return;
+        }
+
+        const nextButton = event.target.closest('[data-showcase-next]');
+        if (nextButton && this.contains(nextButton)) this.move(this.findCarousel(nextButton), 1);
+      }
+
+      openPanel(parentId, opener = null, moveFocus = true) {
+        const panel = this.panels.find((candidate) => candidate.dataset.showcasePanel === parentId);
+        if (!panel || !this.rootView) return;
+
+        this.panels.forEach((candidate) => {
+          candidate.hidden = candidate !== panel;
+        });
+        this.querySelectorAll('[data-showcase-open]').forEach((button) => {
+          button.setAttribute('aria-expanded', String(button.dataset.showcaseOpen === parentId));
+        });
+        this.rootView.hidden = true;
+        panel.hidden = false;
+        this.activePanel = panel;
+        this.activeOpener =
+          opener ||
+          Array.from(this.querySelectorAll('[data-showcase-open]')).find(
+            (button) => button.dataset.showcaseOpen === parentId
+          );
+        panel.querySelector('[data-showcase-viewport]')?.scrollTo({ left: 0, behavior: 'auto' });
+        this.queueUpdate();
+        if (moveFocus) panel.querySelector('[data-showcase-back]')?.focus({ preventScroll: true });
+      }
+
+      closePanel(moveFocus = true) {
+        if (!this.rootView) return;
+        const opener = this.activeOpener;
+        this.panels.forEach((panel) => {
+          panel.hidden = true;
+        });
+        this.querySelectorAll('[data-showcase-open]').forEach((button) => button.setAttribute('aria-expanded', 'false'));
+        this.rootView.hidden = false;
+        this.activePanel = null;
+        this.activeOpener = null;
+        this.queueUpdate();
+        if (moveFocus) opener?.focus({ preventScroll: true });
+      }
+
+      onBlockSelect(event) {
+        if (!event.target || !this.contains(event.target)) return;
+        const childCard = event.target.closest('[data-showcase-child-card]');
+        if (childCard) {
+          this.openPanel(childCard.dataset.showcaseParent, null, false);
+          return;
+        }
+        if (event.target.closest('.collection-showcase__card')) this.closePanel(false);
+      }
+
       onKeydown(event) {
+        if (event.key === 'Escape' && this.activePanel) {
+          event.preventDefault();
+          this.closePanel();
+          return;
+        }
+
         if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        const viewport = event.target.closest('[data-showcase-viewport]');
+        if (!viewport) return;
         event.preventDefault();
-        this.move(event.key === 'ArrowLeft' ? -1 : 1);
+        this.move(this.findCarousel(viewport), event.key === 'ArrowLeft' ? -1 : 1);
       }
     }
 
@@ -836,8 +1208,12 @@
   "blocks": [
     {
       "type": "card",
-      "name": "Showcase card",
+      "name": "Parent showcase",
       "settings": [
+        {
+          "type": "paragraph",
+          "content": "Add Child collection blocks with the same group key to open an intermediate collection showcase from this card."
+        },
         {
           "type": "image_picker",
           "id": "image",
@@ -847,6 +1223,12 @@
           "type": "text",
           "id": "title",
           "label": "Custom title"
+        },
+        {
+          "type": "text",
+          "id": "group_key",
+          "label": "Group key",
+          "info": "Use a unique value such as scarves. Child collection blocks must use the same value. If blank, the parent title is used."
         },
         {
           "type": "text",
@@ -871,7 +1253,8 @@
         {
           "type": "collection_list",
           "id": "collection_list",
-          "label": "Additional collections",
+          "label": "Fallback collections (legacy)",
+          "info": "Only the first selection is used as a direct fallback. Use Child collection blocks for a multi-collection showcase.",
           "limit": 50
         },
         {
@@ -888,7 +1271,47 @@
         },
         {
           "type": "paragraph",
-          "content": "Destination priority: custom link, collection with tag, primary or first selected collection, first selected product, then all products filtered by tag."
+          "content": "Destination priority: custom link, linked child showcase, collection with tag, primary or first fallback collection, first selected product, then all products filtered by tag."
+        }
+      ]
+    },
+    {
+      "type": "child_collection",
+      "name": "Child collection",
+      "settings": [
+        {
+          "type": "text",
+          "id": "parent_group",
+          "label": "Parent group key",
+          "info": "Enter the exact group key used by the Parent showcase block, for example scarves."
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Shopify collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom image",
+          "info": "Optional. Falls back to the collection image, then its first product image."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Custom title",
+          "info": "Optional. Falls back to the collection title."
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Custom link",
+          "info": "Optional. Overrides the selected collection destination."
         }
       ]
     }
