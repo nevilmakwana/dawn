@@ -1,5 +1,67 @@
 {
   "sections": {
+    "collection_showcase_Pc3XDB": {
+      "type": "collection-showcase",
+      "blocks": {
+        "card_wUCFgi": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/imgi_3_w.jpg",
+            "title": "Bags",
+            "subtitle": "",
+            "link": "",
+            "collection": "women-cotton-scarves",
+            "collection_list": [],
+            "product_list": [],
+            "product_tag": ""
+          }
+        },
+        "card_kUc9Gx": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/imgi_4_m.jpg",
+            "title": "Shoes",
+            "subtitle": "",
+            "link": "",
+            "collection": "",
+            "collection_list": [],
+            "product_list": [],
+            "product_tag": "best-seller"
+          }
+        }
+      },
+      "block_order": [
+        "card_wUCFgi",
+        "card_kUc9Gx"
+      ],
+      "name": "Collection showcase",
+      "settings": {
+        "color_scheme": "",
+        "heading": "",
+        "intro_text": "",
+        "intro_alignment": "center",
+        "placement": "below_collection_toolbar",
+        "allowed_paths": "/collections/all",
+        "max_width": 1440,
+        "desktop_card_width": 156,
+        "mobile_card_width": 156,
+        "card_gap": 1,
+        "horizontal_padding": 40,
+        "show_desktop_arrows": true,
+        "image_ratio": "1 / 1",
+        "image_fit": "contain",
+        "image_background": "#f2f2f2",
+        "heading_size": 24,
+        "title_size": 14,
+        "subtitle_size": 12,
+        "title_weight": "600",
+        "text_alignment": "center",
+        "padding_top": 40,
+        "padding_bottom": 28,
+        "mobile_padding_top": 40,
+        "mobile_padding_bottom": 40
+      }
+    },
     "product-grid": {
       "type": "main-collection-product-grid",
       "settings": {
@@ -11,6 +73,7 @@
     }
   },
   "order": [
-    "product-grid"
+    "product-grid",
+    "collection_showcase_Pc3XDB"
   ]
 }

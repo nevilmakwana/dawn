@@ -2,11 +2,28 @@
   assign section_heading = section.settings.heading | strip
   assign section_label = section_heading | default: 'Collection showcase'
   assign image_sizes = '(max-width: 749px) ' | append: section.settings.mobile_card_width | append: 'px, ' | append: section.settings.desktop_card_width | append: 'px'
+  assign allowed_paths = section.settings.allowed_paths | strip
+  assign show_showcase = true
+
+  if allowed_paths != blank
+    assign show_showcase = false
+    assign allowed_path_list = allowed_paths | split: ','
+    for allowed_path_entry in allowed_path_list
+      assign allowed_path = allowed_path_entry | strip
+      if request.path == allowed_path
+        assign show_showcase = true
+        break
+      endif
+    endfor
+  endif
 -%}
 
 <collection-showcase
   class="collection-showcase color-{{ section.settings.color_scheme }} gradient"
   data-collection-showcase
+  data-showcase-placement="{{ section.settings.placement }}"
+  data-allowed-paths="{{ allowed_paths | escape }}"
+  {% unless show_showcase %}hidden{% endunless %}
   style="
     --showcase-max-width: {{ section.settings.max_width }}px;
     --showcase-card-width: {{ section.settings.desktop_card_width }}px;
@@ -180,6 +197,11 @@
     overflow: hidden;
   }
 
+  #shopify-section-{{ section.id }} .collection-showcase[hidden],
+  #shopify-section-{{ section.id }} .collection-showcase[data-showcase-placement='below_collection_toolbar']:not([data-showcase-mounted]) {
+    display: none !important;
+  }
+
   #shopify-section-{{ section.id }} .collection-showcase__intro {
     width: min(100%, var(--showcase-max-width));
     margin-inline: auto;
@@ -301,8 +323,8 @@
   }
 
   #shopify-section-{{ section.id }} .collection-showcase__content {
-    min-height: 66px;
-    padding: 14px 8px 4px;
+    min-height: 56px;
+    padding: 16px 8px 2px;
   }
 
   #shopify-section-{{ section.id }} .collection-showcase__content--center {
@@ -438,11 +460,24 @@
 
     class CollectionShowcase extends HTMLElement {
       connectedCallback() {
+        const placementState = this.mountAtRequestedPosition();
+        if (placementState === 'pending' || placementState === 'moved') return;
+
+        this.dataset.showcaseMounted = 'true';
+        if (this.dataset.showcaseReady === 'true') return;
+        this.dataset.showcaseReady = 'true';
+
         this.viewport = this.querySelector('[data-showcase-viewport]');
         this.list = this.querySelector('[data-showcase-list]');
         this.controls = this.querySelector('[data-showcase-controls]');
         this.previousButton = this.querySelector('[data-showcase-previous]');
         this.nextButton = this.querySelector('[data-showcase-next]');
+
+        this.handleVisibilityChange = this.updateVisibility.bind(this);
+        window.addEventListener('popstate', this.handleVisibilityChange);
+        document.addEventListener('prada:collection:updated', this.handleVisibilityChange);
+        this.updateVisibility();
+
         if (!this.viewport || !this.list || !this.controls || !this.previousButton || !this.nextButton) return;
 
         this.updateFrame = null;
@@ -463,13 +498,62 @@
       }
 
       disconnectedCallback() {
-        if (!this.viewport) return;
-        this.viewport.removeEventListener('scroll', this.handleScroll);
-        this.viewport.removeEventListener('keydown', this.handleKeydown);
+        if (this.pendingMount) {
+          document.removeEventListener('DOMContentLoaded', this.pendingMount);
+          this.pendingMount = null;
+        }
+        window.removeEventListener('popstate', this.handleVisibilityChange);
+        document.removeEventListener('prada:collection:updated', this.handleVisibilityChange);
+        this.viewport?.removeEventListener('scroll', this.handleScroll);
+        this.viewport?.removeEventListener('keydown', this.handleKeydown);
         this.previousButton?.removeEventListener('click', this.handlePrevious);
         this.nextButton?.removeEventListener('click', this.handleNext);
         this.resizeObserver?.disconnect();
         window.cancelAnimationFrame(this.updateFrame);
+        delete this.dataset.showcaseReady;
+      }
+
+      mountAtRequestedPosition() {
+        if (this.dataset.showcasePlacement !== 'below_collection_toolbar') return 'stable';
+
+        const anchor = document.querySelector('[data-collection-showcase-anchor]');
+        const sectionWrapper = this.closest('.shopify-section');
+        if (!anchor || !sectionWrapper) {
+          if (document.readyState === 'loading') {
+            this.pendingMount = () => {
+              this.pendingMount = null;
+              const nextState = this.mountAtRequestedPosition();
+              if (nextState === 'stable') this.connectedCallback();
+            };
+            document.addEventListener('DOMContentLoaded', this.pendingMount, { once: true });
+            return 'pending';
+          }
+          return 'stable';
+        }
+
+        if (anchor.nextElementSibling !== sectionWrapper) {
+          anchor.insertAdjacentElement('afterend', sectionWrapper);
+          return 'moved';
+        }
+
+        return 'stable';
+      }
+
+      updateVisibility() {
+        const allowedPaths = (this.dataset.allowedPaths || '')
+          .split(',')
+          .map((path) => path.trim())
+          .filter(Boolean);
+        if (!allowedPaths.length) {
+          this.hidden = false;
+          return;
+        }
+
+        const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+        this.hidden = !allowedPaths.some((path) => {
+          const allowedPath = new URL(path, window.location.origin).pathname.replace(/\/+$/, '') || '/';
+          return currentPath === allowedPath;
+        });
       }
 
       queueUpdate() {
@@ -546,6 +630,22 @@
       "content": "Layout"
     },
     {
+      "type": "select",
+      "id": "placement",
+      "label": "Placement",
+      "default": "below_collection_toolbar",
+      "options": [
+        { "value": "below_collection_toolbar", "label": "Below product count and sort" },
+        { "value": "template_position", "label": "Theme template position" }
+      ]
+    },
+    {
+      "type": "textarea",
+      "id": "allowed_paths",
+      "label": "Show only on URL paths",
+      "info": "Optional. Enter comma-separated paths, for example /collections/all, /pages/gifts. Leave blank to show wherever this template is used."
+    },
+    {
       "type": "range",
       "id": "max_width",
       "min": 960,
@@ -558,12 +658,12 @@
     {
       "type": "range",
       "id": "desktop_card_width",
-      "min": 160,
-      "max": 320,
+      "min": 120,
+      "max": 280,
       "step": 4,
       "unit": "px",
       "label": "Desktop card width",
-      "default": 196
+      "default": 156
     },
     {
       "type": "range",
@@ -700,7 +800,7 @@
       "step": 4,
       "unit": "px",
       "label": "Desktop top padding",
-      "default": 64
+      "default": 40
     },
     {
       "type": "range",
@@ -710,7 +810,7 @@
       "step": 4,
       "unit": "px",
       "label": "Desktop bottom padding",
-      "default": 64
+      "default": 28
     },
     {
       "type": "range",
