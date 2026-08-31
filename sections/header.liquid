@@ -553,10 +553,10 @@
       align-items: center;
       gap: 28px;
       width: var(--prada-menu-column-width);
-      height: 88px;
+      height: var(--prada-desktop-header-height, 89px);
       padding: 0 36px;
       background: #ffffff;
-      transform: translateY(-8px);
+      transform: none;
     }
 
     .prada-desktop-menu__toolbar-button {
@@ -2038,9 +2038,9 @@
     .section-header .header-wrapper,
     .section-header .header-wrapper > header.prada-header,
     .section-header .header-wrapper > .prada-header {
-      height: 68px !important;
-      min-height: 68px !important;
-      max-height: 68px !important;
+      height: var(--prada-desktop-header-height, 89px) !important;
+      min-height: var(--prada-desktop-header-height, 89px) !important;
+      max-height: var(--prada-desktop-header-height, 89px) !important;
     }
 
     .section-header .prada-header {
@@ -2102,9 +2102,9 @@
     body div.header-wrapper,
     body header.header.prada-header {
       box-sizing: border-box !important;
-      block-size: 68px !important;
-      min-block-size: 68px !important;
-      max-block-size: 68px !important;
+      block-size: var(--prada-desktop-header-height, 89px) !important;
+      min-block-size: var(--prada-desktop-header-height, 89px) !important;
+      max-block-size: var(--prada-desktop-header-height, 89px) !important;
     }
 
     body header.header.prada-header {
@@ -2184,7 +2184,7 @@
     data-sticky-type="{{ section.settings.sticky_header_type }}"
   {% endif %}
   class="header-wrapper color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator %} header-wrapper--border-bottom{% endif %}"
-  style="--prada-desktop-header-height: 68px;"
+  style="--prada-desktop-header-height: 89px;"
 >
   {%- liquid
     assign social_links = false
@@ -2323,11 +2323,13 @@
     const section = shell.closest('.section-header');
     const desktop = window.matchMedia('(min-width: 990px)');
     const properties = ['height', 'min-height', 'max-height'];
+    const desktopHeaderHeight =
+      getComputedStyle(shell).getPropertyValue('--prada-desktop-header-height').trim() || '89px';
 
     const syncCompactHeader = () => {
       [section, shell, header].filter(Boolean).forEach((element) => {
         properties.forEach((property) => {
-          if (desktop.matches) element.style.setProperty(property, '68px', 'important');
+          if (desktop.matches) element.style.setProperty(property, desktopHeaderHeight, 'important');
           else element.style.removeProperty(property);
         });
       });
