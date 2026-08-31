@@ -145,7 +145,7 @@
             aria-label="Previous best sellers"
             title="Previous best sellers"
           >
-            {{- 'icon-arrow.svg' | inline_asset_content -}}
+            {{- 'icon-caret.svg' | inline_asset_content -}}
           </button>
           <button
             type="button"
@@ -154,7 +154,7 @@
             aria-label="Next best sellers"
             title="Next best sellers"
           >
-            {{- 'icon-arrow.svg' | inline_asset_content -}}
+            {{- 'icon-caret.svg' | inline_asset_content -}}
           </button>
         </div>
       {%- endif -%}
@@ -380,37 +380,42 @@
     top: 50%;
     z-index: 3;
     display: grid;
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 88px;
     padding: 0;
-    border: 1px solid #d8d8d8;
+    border: 0;
     border-radius: 0;
-    background: #ffffff;
+    background: transparent;
     color: #000000;
     place-items: center;
     cursor: pointer;
     transform: translateY(-50%);
+    transition: opacity 160ms ease;
   }
 
   #shopify-section-{{ section.id }} .prada-best-sellers__button--prev {
-    left: 16px;
+    left: 0;
   }
 
   #shopify-section-{{ section.id }} .prada-best-sellers__button--next {
-    right: 16px;
+    right: 0;
   }
 
-  #shopify-section-{{ section.id }} .prada-best-sellers__button .icon-arrow {
-    width: 18px;
-    height: 18px;
+  #shopify-section-{{ section.id }} .prada-best-sellers__button .icon-caret {
+    width: 14px;
+    height: 9px;
   }
 
-  #shopify-section-{{ section.id }} .prada-best-sellers__button--prev .icon-arrow {
-    transform: rotate(180deg);
+  #shopify-section-{{ section.id }} .prada-best-sellers__button--prev .icon-caret {
+    transform: rotate(90deg);
+  }
+
+  #shopify-section-{{ section.id }} .prada-best-sellers__button--next .icon-caret {
+    transform: rotate(-90deg);
   }
 
   #shopify-section-{{ section.id }} .prada-best-sellers__button:disabled {
-    opacity: 0;
+    opacity: 0.24;
     pointer-events: none;
   }
 
@@ -571,15 +576,15 @@
 
     #shopify-section-{{ section.id }} .prada-best-sellers__button {
       width: 40px;
-      height: 40px;
+      height: 72px;
     }
 
     #shopify-section-{{ section.id }} .prada-best-sellers__button--prev {
-      left: 10px;
+      left: 0;
     }
 
     #shopify-section-{{ section.id }} .prada-best-sellers__button--next {
-      right: 10px;
+      right: 0;
     }
 
     #shopify-section-{{ section.id }} .prada-category-showcase__item {
