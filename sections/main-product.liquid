@@ -551,17 +551,75 @@
       return moneyFormat.replace(/\{\{\s*amount(?:_with_comma_separator)?\s*\}\}/, amount).replace(/<[^>]*>/g, '');
     };
 
-    let morphTimer;
-    const morphImage = (source) => {
+    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let galleryMorphReady = false;
+    let primaryMorphSequence = 0;
+    let primaryMorphAnimation = null;
+
+    const preloadImage = (source, timeout = 500) => new Promise((resolve) => {
+      if (!source) {
+        resolve();
+        return;
+      }
+
+      const loader = new Image();
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeoutId);
+        resolve();
+      };
+      const timeoutId = window.setTimeout(finish, timeout);
+      loader.addEventListener('load', finish, { once: true });
+      loader.addEventListener('error', finish, { once: true });
+      loader.src = source;
+      if (loader.complete) finish();
+    });
+
+    const morphImage = async (source, { animate = galleryMorphReady } = {}) => {
       const primaryImage = mediaList?.querySelector('.prada-product__media--image .prada-product__gallery-image');
       if (!primaryImage || !source || primaryImage.currentSrc === source || primaryImage.src === source) return;
-      window.clearTimeout(morphTimer);
-      primaryImage.classList.add('is-morphing');
-      morphTimer = window.setTimeout(() => {
-        primaryImage.removeAttribute('srcset');
-        primaryImage.src = source;
-        primaryImage.addEventListener('load', () => primaryImage.classList.remove('is-morphing'), { once: true });
-      }, 180);
+
+      const sequence = ++primaryMorphSequence;
+      primaryMorphAnimation?.cancel();
+      primaryMorphAnimation = null;
+      await preloadImage(source);
+      if (sequence !== primaryMorphSequence) return;
+
+      const shouldAnimate = animate && !reducedMotionQuery.matches;
+      if (shouldAnimate) {
+        primaryMorphAnimation = primaryImage.animate(
+          [
+            { opacity: 1, transform: 'scale(1)', filter: 'blur(0)' },
+            { opacity: 0, transform: 'scale(.985)', filter: 'blur(2px)' },
+          ],
+          { duration: 180, easing: 'cubic-bezier(.4, 0, 1, 1)', fill: 'forwards' }
+        );
+        await primaryMorphAnimation.finished.catch(() => {});
+        if (sequence !== primaryMorphSequence) return;
+      }
+
+      primaryImage.removeAttribute('srcset');
+      primaryImage.src = source;
+      await primaryImage.decode?.().catch(() => {});
+      if (sequence !== primaryMorphSequence) return;
+
+      primaryMorphAnimation?.cancel();
+      if (!shouldAnimate) return;
+
+      primaryMorphAnimation = primaryImage.animate(
+        [
+          { opacity: 0, transform: 'scale(1.015)', filter: 'blur(2px)' },
+          { opacity: 1, transform: 'scale(1)', filter: 'blur(0)' },
+        ],
+        { duration: 460, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'both' }
+      );
+      await primaryMorphAnimation.finished.catch(() => {});
+      if (sequence === primaryMorphSequence) {
+        primaryMorphAnimation?.cancel();
+        primaryMorphAnimation = null;
+      }
     };
 
     const findVariantForColor = (colorValue) => variants.find((variant) =>
@@ -713,7 +771,6 @@
         const selector = selectors[Number(choice.dataset.pradaOptionChoice)];
         const shouldCloseDrawer = !choice.classList.contains('prada-product__swatch');
         selector.value = choice.dataset.pradaOptionValue;
-        morphImage(choice.dataset.pradaImage);
         selector.dispatchEvent(new Event('change', { bubbles: true }));
         if (shouldCloseDrawer) closeDrawer();
       });
@@ -855,42 +912,100 @@
       fallbackImage.src = source;
     };
 
+    let galleryMorphSequence = 0;
+    let galleryMorphAnimation = null;
+
+    const commitGalleryContent = (galleryContent, nextGalleryKey) => {
+      mediaList.replaceChildren(galleryContent);
+      activeGalleryKey = nextGalleryKey;
+      mobileGallery?.scrollTo({ top: 0, behavior: 'auto' });
+      refreshGalleryTracking();
+      setupProductVideos();
+      syncDesktopWishlist();
+    };
+
+    const morphVariantGallery = async (sourceTemplate, nextGalleryKey, primaryOverride = '') => {
+      const sequence = ++galleryMorphSequence;
+      galleryMorphAnimation?.cancel();
+      galleryMorphAnimation = null;
+      mediaList.classList.remove('is-variant-morphing');
+
+      const galleryContent = sourceTemplate.content.cloneNode(true);
+      const firstImage = galleryContent.querySelector('.prada-product__gallery-image');
+      if (firstImage) {
+        firstImage.loading = 'eager';
+        firstImage.fetchPriority = 'high';
+        if (primaryOverride) {
+          firstImage.removeAttribute('srcset');
+          firstImage.src = primaryOverride;
+        }
+      }
+
+      const shouldAnimate = galleryMorphReady && !reducedMotionQuery.matches;
+      if (!shouldAnimate) {
+        commitGalleryContent(galleryContent, nextGalleryKey);
+        return;
+      }
+
+      const nextPrimarySource = firstImage?.getAttribute('src') || '';
+      await preloadImage(nextPrimarySource);
+      if (sequence !== galleryMorphSequence) return;
+
+      mediaList.classList.add('is-variant-morphing');
+      galleryMorphAnimation = mediaList.animate(
+        [
+          { opacity: 1, transform: 'scale(1)', filter: 'blur(0)' },
+          { opacity: 0, transform: 'scale(.992)', filter: 'blur(2px)' },
+        ],
+        { duration: 180, easing: 'cubic-bezier(.4, 0, 1, 1)', fill: 'forwards' }
+      );
+      await galleryMorphAnimation.finished.catch(() => {});
+      if (sequence !== galleryMorphSequence) return;
+
+      commitGalleryContent(galleryContent, nextGalleryKey);
+      galleryMorphAnimation?.cancel();
+      galleryMorphAnimation = mediaList.animate(
+        [
+          { opacity: 0, transform: 'scale(1.012)', filter: 'blur(2px)' },
+          { opacity: 1, transform: 'scale(1)', filter: 'blur(0)' },
+        ],
+        { duration: 460, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'both' }
+      );
+      await galleryMorphAnimation.finished.catch(() => {});
+
+      if (sequence === galleryMorphSequence) {
+        galleryMorphAnimation?.cancel();
+        galleryMorphAnimation = null;
+        mediaList.classList.remove('is-variant-morphing');
+      }
+    };
+
     const renderVariantGallery = (variant) => {
       if (!mediaList) return;
       const variantTemplate = variantGalleryTemplates.get(String(variant.id));
       const nextGalleryKey = variantTemplate ? String(variant.id) : 'default';
+      const galleryChanged = activeGalleryKey !== nextGalleryKey;
+      const variantImage = getVariantPrimaryImage(variant) || variant.featured_image?.src || variant.featured_media?.preview_image?.src;
+      const fallbackSource = variantImage || defaultPrimarySource;
 
-      if (activeGalleryKey !== nextGalleryKey) {
+      if (galleryChanged) {
         window.clearTimeout(onboardingTimer);
         root.classList.remove('mobile-gallery-onboarding');
         scrollHint?.classList.remove('is-visible');
         scrollHintConsumed = true;
 
         const sourceTemplate = variantTemplate || defaultGalleryTemplate;
-        const galleryContent = sourceTemplate.content.cloneNode(true);
-        const firstImage = galleryContent.querySelector('.prada-product__gallery-image');
-        if (firstImage) {
-          firstImage.loading = 'eager';
-          firstImage.fetchPriority = 'high';
-        }
-
-        mediaList.replaceChildren(galleryContent);
         activeGalleryKey = nextGalleryKey;
-        mobileGallery?.scrollTo({ top: 0, behavior: 'auto' });
-        refreshGalleryTracking();
-        setupProductVideos();
-        syncDesktopWishlist();
+        morphVariantGallery(sourceTemplate, nextGalleryKey, variantTemplate ? '' : fallbackSource);
       }
 
       if (variantTemplate) {
-        const selectedImage = mediaList.querySelector('.prada-product__gallery-image');
-        syncFallbackColorImage(selectedImage?.currentSrc || selectedImage?.src);
+        syncFallbackColorImage(getVariantPrimaryImage(variant));
       } else {
-        const variantImage = getVariantPrimaryImage(variant) || variant.featured_image?.src || variant.featured_media?.preview_image?.src;
-        const fallbackSource = variantImage || defaultPrimarySource;
-        morphImage(fallbackSource);
+        if (!galleryChanged) morphImage(fallbackSource, { animate: galleryMorphReady });
         syncFallbackColorImage(fallbackSource);
       }
+      galleryMorphReady = true;
     };
 
     const returnToVariantGallery = ({ behavior = 'auto' } = {}) => {
