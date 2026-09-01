@@ -553,8 +553,11 @@
 
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     let galleryMorphReady = false;
-    let primaryMorphSequence = 0;
+    let variantMorphSequence = 0;
     let primaryMorphAnimation = null;
+    let galleryMorphAnimation = null;
+    let morphOverlays = [];
+    let morphOverlayAnimations = [];
 
     const preloadImage = (source, timeout = 500) => new Promise((resolve) => {
       if (!source) {
@@ -577,49 +580,91 @@
       if (loader.complete) finish();
     });
 
+    const clearMorphLayers = () => {
+      primaryMorphAnimation?.cancel();
+      galleryMorphAnimation?.cancel();
+      morphOverlayAnimations.forEach((animation) => animation.cancel());
+      morphOverlays.forEach((overlay) => overlay.remove());
+      primaryMorphAnimation = null;
+      galleryMorphAnimation = null;
+      morphOverlayAnimations = [];
+      morphOverlays = [];
+      mediaList?.classList.remove('is-variant-morphing');
+    };
+
+    const createMorphOverlays = (mediaItems) => {
+      if (!gallery || !mediaItems.length) return [];
+
+      const galleryRect = gallery.getBoundingClientRect();
+      const visibleItems = mediaItems.filter((media) => {
+        const rect = media.getBoundingClientRect();
+        return rect.bottom > 0 && rect.top < window.innerHeight;
+      });
+      const itemsToClone = visibleItems.length ? visibleItems : mediaItems.slice(0, 1);
+
+      return itemsToClone.map((media) => {
+        const rect = media.getBoundingClientRect();
+        const overlay = media.cloneNode(true);
+        overlay.removeAttribute('id');
+        overlay.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
+        overlay.classList.add('prada-product__variant-morph-overlay');
+        overlay.setAttribute('aria-hidden', 'true');
+        overlay.style.setProperty('--morph-left', `${rect.left - galleryRect.left}px`);
+        overlay.style.setProperty('--morph-top', `${rect.top - galleryRect.top}px`);
+        overlay.style.setProperty('--morph-width', `${rect.width}px`);
+        overlay.style.setProperty('--morph-height', `${rect.height}px`);
+        overlay.querySelectorAll('video').forEach((video) => {
+          video.muted = true;
+          video.pause();
+        });
+        gallery.append(overlay);
+        return overlay;
+      });
+    };
+
+    const dissolveMorphOverlays = () => {
+      morphOverlayAnimations = morphOverlays.map((overlay) => overlay.animate(
+        [
+          { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
+          { opacity: 0, transform: 'translate3d(-.25%, .15%, 0) scale(.992)' },
+        ],
+        { duration: 620, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'forwards' }
+      ));
+      return Promise.all(morphOverlayAnimations.map((animation) => animation.finished.catch(() => {})));
+    };
+
     const morphImage = async (source, { animate = galleryMorphReady } = {}) => {
       const primaryImage = mediaList?.querySelector('.prada-product__media--image .prada-product__gallery-image');
       if (!primaryImage || !source || primaryImage.currentSrc === source || primaryImage.src === source) return;
 
-      const sequence = ++primaryMorphSequence;
-      primaryMorphAnimation?.cancel();
-      primaryMorphAnimation = null;
+      const sequence = ++variantMorphSequence;
+      clearMorphLayers();
       await preloadImage(source);
-      if (sequence !== primaryMorphSequence) return;
+      if (sequence !== variantMorphSequence) return;
 
       const shouldAnimate = animate && !reducedMotionQuery.matches;
-      if (shouldAnimate) {
-        primaryMorphAnimation = primaryImage.animate(
-          [
-            { opacity: 1, transform: 'scale(1)', filter: 'blur(0)' },
-            { opacity: 0, transform: 'scale(.985)', filter: 'blur(2px)' },
-          ],
-          { duration: 180, easing: 'cubic-bezier(.4, 0, 1, 1)', fill: 'forwards' }
-        );
-        await primaryMorphAnimation.finished.catch(() => {});
-        if (sequence !== primaryMorphSequence) return;
-      }
+      const primaryMedia = primaryImage.closest('.prada-product__media');
+      if (shouldAnimate && primaryMedia) morphOverlays = createMorphOverlays([primaryMedia]);
 
       primaryImage.removeAttribute('srcset');
       primaryImage.src = source;
       await primaryImage.decode?.().catch(() => {});
-      if (sequence !== primaryMorphSequence) return;
+      if (sequence !== variantMorphSequence) return;
 
-      primaryMorphAnimation?.cancel();
       if (!shouldAnimate) return;
 
       primaryMorphAnimation = primaryImage.animate(
         [
-          { opacity: 0, transform: 'scale(1.015)', filter: 'blur(2px)' },
-          { opacity: 1, transform: 'scale(1)', filter: 'blur(0)' },
+          { opacity: 0, transform: 'translate3d(.35%, -.15%, 0) scale(1.012)' },
+          { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
         ],
-        { duration: 460, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'both' }
+        { duration: 620, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'both' }
       );
-      await primaryMorphAnimation.finished.catch(() => {});
-      if (sequence === primaryMorphSequence) {
-        primaryMorphAnimation?.cancel();
-        primaryMorphAnimation = null;
-      }
+      await Promise.all([
+        primaryMorphAnimation.finished.catch(() => {}),
+        dissolveMorphOverlays(),
+      ]);
+      if (sequence === variantMorphSequence) clearMorphLayers();
     };
 
     const findVariantForColor = (colorValue) => variants.find((variant) =>
@@ -912,9 +957,6 @@
       fallbackImage.src = source;
     };
 
-    let galleryMorphSequence = 0;
-    let galleryMorphAnimation = null;
-
     const commitGalleryContent = (galleryContent, nextGalleryKey) => {
       mediaList.replaceChildren(galleryContent);
       activeGalleryKey = nextGalleryKey;
@@ -925,10 +967,8 @@
     };
 
     const morphVariantGallery = async (sourceTemplate, nextGalleryKey, primaryOverride = '') => {
-      const sequence = ++galleryMorphSequence;
-      galleryMorphAnimation?.cancel();
-      galleryMorphAnimation = null;
-      mediaList.classList.remove('is-variant-morphing');
+      const sequence = ++variantMorphSequence;
+      clearMorphLayers();
 
       const galleryContent = sourceTemplate.content.cloneNode(true);
       const firstImage = galleryContent.querySelector('.prada-product__gallery-image');
@@ -949,35 +989,27 @@
 
       const nextPrimarySource = firstImage?.getAttribute('src') || '';
       await preloadImage(nextPrimarySource);
-      if (sequence !== galleryMorphSequence) return;
+      if (sequence !== variantMorphSequence) return;
 
+      morphOverlays = createMorphOverlays([...(mediaList.querySelectorAll('.prada-product__media'))]);
       mediaList.classList.add('is-variant-morphing');
       galleryMorphAnimation = mediaList.animate(
         [
-          { opacity: 1, transform: 'scale(1)', filter: 'blur(0)' },
-          { opacity: 0, transform: 'scale(.992)', filter: 'blur(2px)' },
+          { opacity: 0, transform: 'translate3d(.35%, -.15%, 0) scale(1.012)' },
+          { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
         ],
-        { duration: 180, easing: 'cubic-bezier(.4, 0, 1, 1)', fill: 'forwards' }
+        { duration: 620, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'both' }
       );
-      await galleryMorphAnimation.finished.catch(() => {});
-      if (sequence !== galleryMorphSequence) return;
-
+      galleryMorphAnimation.pause();
+      galleryMorphAnimation.currentTime = 0;
       commitGalleryContent(galleryContent, nextGalleryKey);
-      galleryMorphAnimation?.cancel();
-      galleryMorphAnimation = mediaList.animate(
-        [
-          { opacity: 0, transform: 'scale(1.012)', filter: 'blur(2px)' },
-          { opacity: 1, transform: 'scale(1)', filter: 'blur(0)' },
-        ],
-        { duration: 460, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'both' }
-      );
-      await galleryMorphAnimation.finished.catch(() => {});
+      galleryMorphAnimation.play();
+      await Promise.all([
+        galleryMorphAnimation.finished.catch(() => {}),
+        dissolveMorphOverlays(),
+      ]);
 
-      if (sequence === galleryMorphSequence) {
-        galleryMorphAnimation?.cancel();
-        galleryMorphAnimation = null;
-        mediaList.classList.remove('is-variant-morphing');
-      }
+      if (sequence === variantMorphSequence) clearMorphLayers();
     };
 
     const renderVariantGallery = (variant) => {
