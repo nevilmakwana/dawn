@@ -62,6 +62,7 @@
 <section
   class="prada-product"
   id="PradaProduct-{{ section.id }}"
+  style="--prada-placeholder-logo: url('{{ 'grey-exim-wordmark-logo-white.png' | asset_url }}');"
   data-section-id="{{ section.id }}"
   data-product-url="{{ product.url }}"
   data-wishlist-fallback-image="{% if storefront_primary_media %}{{ storefront_primary_media.preview_image | image_url: width: 720 | escape }}{% endif %}"
@@ -551,120 +552,39 @@
       return moneyFormat.replace(/\{\{\s*amount(?:_with_comma_separator)?\s*\}\}/, amount).replace(/<[^>]*>/g, '');
     };
 
-    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let galleryMorphReady = false;
-    let variantMorphSequence = 0;
-    let primaryMorphAnimation = null;
-    let galleryMorphAnimation = null;
-    let morphOverlays = [];
-    let morphOverlayAnimations = [];
+    const initializeProductImage = (image) => {
+      const media = image.closest('.prada-product__media--image');
+      if (!media) return;
 
-    const preloadImage = (source, timeout = 500) => new Promise((resolve) => {
-      if (!source) {
-        resolve();
-        return;
-      }
+      const loadToken = `${image.currentSrc || image.src}-${performance.now()}`;
+      image.dataset.pradaLoadToken = loadToken;
+      media.classList.add('is-image-loading');
+      media.classList.remove('is-image-loaded');
 
-      const loader = new Image();
-      let settled = false;
-      const finish = () => {
-        if (settled) return;
-        settled = true;
-        window.clearTimeout(timeoutId);
-        resolve();
-      };
-      const timeoutId = window.setTimeout(finish, timeout);
-      loader.addEventListener('load', finish, { once: true });
-      loader.addEventListener('error', finish, { once: true });
-      loader.src = source;
-      if (loader.complete) finish();
-    });
-
-    const clearMorphLayers = () => {
-      primaryMorphAnimation?.cancel();
-      galleryMorphAnimation?.cancel();
-      morphOverlayAnimations.forEach((animation) => animation.cancel());
-      morphOverlays.forEach((overlay) => overlay.remove());
-      primaryMorphAnimation = null;
-      galleryMorphAnimation = null;
-      morphOverlayAnimations = [];
-      morphOverlays = [];
-      mediaList?.classList.remove('is-variant-morphing');
-    };
-
-    const createMorphOverlays = (mediaItems) => {
-      if (!gallery || !mediaItems.length) return [];
-
-      const galleryRect = gallery.getBoundingClientRect();
-      const visibleItems = mediaItems.filter((media) => {
-        const rect = media.getBoundingClientRect();
-        return rect.bottom > 0 && rect.top < window.innerHeight;
-      });
-      const itemsToClone = visibleItems.length ? visibleItems : mediaItems.slice(0, 1);
-
-      return itemsToClone.map((media) => {
-        const rect = media.getBoundingClientRect();
-        const overlay = media.cloneNode(true);
-        overlay.removeAttribute('id');
-        overlay.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
-        overlay.classList.add('prada-product__variant-morph-overlay');
-        overlay.setAttribute('aria-hidden', 'true');
-        overlay.style.setProperty('--morph-left', `${rect.left - galleryRect.left}px`);
-        overlay.style.setProperty('--morph-top', `${rect.top - galleryRect.top}px`);
-        overlay.style.setProperty('--morph-width', `${rect.width}px`);
-        overlay.style.setProperty('--morph-height', `${rect.height}px`);
-        overlay.querySelectorAll('video').forEach((video) => {
-          video.muted = true;
-          video.pause();
+      const revealImage = async () => {
+        await image.decode?.().catch(() => {});
+        if (image.dataset.pradaLoadToken !== loadToken) return;
+        window.requestAnimationFrame(() => {
+          media.classList.remove('is-image-loading');
+          media.classList.add('is-image-loaded');
         });
-        gallery.append(overlay);
-        return overlay;
-      });
+      };
+
+      if (image.complete && image.naturalWidth > 0) revealImage();
+      else image.addEventListener('load', revealImage, { once: true });
     };
 
-    const dissolveMorphOverlays = () => {
-      morphOverlayAnimations = morphOverlays.map((overlay) => overlay.animate(
-        [
-          { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
-          { opacity: 0, transform: 'translate3d(-.25%, .15%, 0) scale(.992)' },
-        ],
-        { duration: 620, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'forwards' }
-      ));
-      return Promise.all(morphOverlayAnimations.map((animation) => animation.finished.catch(() => {})));
+    const initializeImageLoading = (scope = mediaList) => {
+      scope?.querySelectorAll('.prada-product__media--image .prada-product__gallery-image')
+        .forEach(initializeProductImage);
     };
 
-    const morphImage = async (source, { animate = galleryMorphReady } = {}) => {
+    const replacePrimaryImage = (source) => {
       const primaryImage = mediaList?.querySelector('.prada-product__media--image .prada-product__gallery-image');
       if (!primaryImage || !source || primaryImage.currentSrc === source || primaryImage.src === source) return;
-
-      const sequence = ++variantMorphSequence;
-      clearMorphLayers();
-      await preloadImage(source);
-      if (sequence !== variantMorphSequence) return;
-
-      const shouldAnimate = animate && !reducedMotionQuery.matches;
-      const primaryMedia = primaryImage.closest('.prada-product__media');
-      if (shouldAnimate && primaryMedia) morphOverlays = createMorphOverlays([primaryMedia]);
-
       primaryImage.removeAttribute('srcset');
       primaryImage.src = source;
-      await primaryImage.decode?.().catch(() => {});
-      if (sequence !== variantMorphSequence) return;
-
-      if (!shouldAnimate) return;
-
-      primaryMorphAnimation = primaryImage.animate(
-        [
-          { opacity: 0, transform: 'translate3d(.35%, -.15%, 0) scale(1.012)' },
-          { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
-        ],
-        { duration: 620, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'both' }
-      );
-      await Promise.all([
-        primaryMorphAnimation.finished.catch(() => {}),
-        dissolveMorphOverlays(),
-      ]);
-      if (sequence === variantMorphSequence) clearMorphLayers();
+      initializeProductImage(primaryImage);
     };
 
     const findVariantForColor = (colorValue) => variants.find((variant) =>
@@ -961,55 +881,10 @@
       mediaList.replaceChildren(galleryContent);
       activeGalleryKey = nextGalleryKey;
       mobileGallery?.scrollTo({ top: 0, behavior: 'auto' });
+      initializeImageLoading(mediaList);
       refreshGalleryTracking();
       setupProductVideos();
       syncDesktopWishlist();
-    };
-
-    const morphVariantGallery = async (sourceTemplate, nextGalleryKey, primaryOverride = '') => {
-      const sequence = ++variantMorphSequence;
-      clearMorphLayers();
-
-      const galleryContent = sourceTemplate.content.cloneNode(true);
-      const firstImage = galleryContent.querySelector('.prada-product__gallery-image');
-      if (firstImage) {
-        firstImage.loading = 'eager';
-        firstImage.fetchPriority = 'high';
-        if (primaryOverride) {
-          firstImage.removeAttribute('srcset');
-          firstImage.src = primaryOverride;
-        }
-      }
-
-      const shouldAnimate = galleryMorphReady && !reducedMotionQuery.matches;
-      if (!shouldAnimate) {
-        commitGalleryContent(galleryContent, nextGalleryKey);
-        return;
-      }
-
-      const nextPrimarySource = firstImage?.getAttribute('src') || '';
-      await preloadImage(nextPrimarySource);
-      if (sequence !== variantMorphSequence) return;
-
-      morphOverlays = createMorphOverlays([...(mediaList.querySelectorAll('.prada-product__media'))]);
-      mediaList.classList.add('is-variant-morphing');
-      galleryMorphAnimation = mediaList.animate(
-        [
-          { opacity: 0, transform: 'translate3d(.35%, -.15%, 0) scale(1.012)' },
-          { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
-        ],
-        { duration: 620, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'both' }
-      );
-      galleryMorphAnimation.pause();
-      galleryMorphAnimation.currentTime = 0;
-      commitGalleryContent(galleryContent, nextGalleryKey);
-      galleryMorphAnimation.play();
-      await Promise.all([
-        galleryMorphAnimation.finished.catch(() => {}),
-        dissolveMorphOverlays(),
-      ]);
-
-      if (sequence === variantMorphSequence) clearMorphLayers();
     };
 
     const renderVariantGallery = (variant) => {
@@ -1027,17 +902,26 @@
         scrollHintConsumed = true;
 
         const sourceTemplate = variantTemplate || defaultGalleryTemplate;
+        const galleryContent = sourceTemplate.content.cloneNode(true);
+        const firstImage = galleryContent.querySelector('.prada-product__gallery-image');
+        if (firstImage) {
+          firstImage.loading = 'eager';
+          firstImage.fetchPriority = 'high';
+          if (!variantTemplate && fallbackSource) {
+            firstImage.removeAttribute('srcset');
+            firstImage.src = fallbackSource;
+          }
+        }
         activeGalleryKey = nextGalleryKey;
-        morphVariantGallery(sourceTemplate, nextGalleryKey, variantTemplate ? '' : fallbackSource);
+        commitGalleryContent(galleryContent, nextGalleryKey);
       }
 
       if (variantTemplate) {
         syncFallbackColorImage(getVariantPrimaryImage(variant));
       } else {
-        if (!galleryChanged) morphImage(fallbackSource, { animate: galleryMorphReady });
+        if (!galleryChanged) replacePrimaryImage(fallbackSource);
         syncFallbackColorImage(fallbackSource);
       }
-      galleryMorphReady = true;
     };
 
     const returnToVariantGallery = ({ behavior = 'auto' } = {}) => {
@@ -1191,6 +1075,7 @@
       window.addEventListener('load', () => window.setTimeout(playMobileOnboarding, 650), { once: true });
     }
 
+    initializeImageLoading(mediaList);
     setupProductVideos();
     updateVariant({ updateHistory: false });
   })();
