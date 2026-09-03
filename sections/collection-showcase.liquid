@@ -1008,6 +1008,7 @@
 
       disconnectedCallback() {
         if (this.pendingMount) {
+          document.removeEventListener('prada:collection:showcase-anchor-ready', this.pendingMount);
           document.removeEventListener('DOMContentLoaded', this.pendingMount);
           this.pendingMount = null;
         }
@@ -1030,10 +1031,13 @@
         if (!anchor || !sectionWrapper) {
           if (document.readyState === 'loading') {
             this.pendingMount = () => {
+              document.removeEventListener('prada:collection:showcase-anchor-ready', this.pendingMount);
+              document.removeEventListener('DOMContentLoaded', this.pendingMount);
               this.pendingMount = null;
               const nextState = this.mountAtRequestedPosition();
               if (nextState === 'stable') this.connectedCallback();
             };
+            document.addEventListener('prada:collection:showcase-anchor-ready', this.pendingMount, { once: true });
             document.addEventListener('DOMContentLoaded', this.pendingMount, { once: true });
             return 'pending';
           }
