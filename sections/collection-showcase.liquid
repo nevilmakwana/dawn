@@ -29,10 +29,6 @@
       assign candidate_selected_ids = '|'
       assign candidate_matches_current = false
 
-      if request.page_type == 'collection' and landing_collection.id == collection.id
-        assign candidate_matches_current = true
-      endif
-
       for child_block in section.blocks
         if child_block.type == 'child_collection'
           assign child_parent_key = child_block.settings.parent_group | handleize
@@ -43,14 +39,24 @@
               assign child_collection = child_block.settings.collection
               assign child_custom_path = child_block.settings.link | split: '?' | first | split: '#' | first
               if block.settings.collection_list == blank and block.settings.collection == blank
-                if child_collection.id == collection.id or child_custom_path == collection.url
+                if child_collection != blank and child_collection.id == collection.id
+                  assign candidate_matches_current = true
+                elsif child_custom_path != blank and child_custom_path == collection.url
                   assign candidate_matches_current = true
                 endif
               endif
             endif
+
+            if landing_collection == blank and child_block.settings.collection != blank
+              assign landing_collection = child_block.settings.collection
+            endif
           endif
         endif
       endfor
+
+      if request.page_type == 'collection' and landing_collection != blank and landing_collection.id == collection.id
+        assign candidate_matches_current = true
+      endif
 
       for selected_collection in block.settings.collection_list
         assign selected_collection_key = '|' | append: selected_collection.id | append: '|'
@@ -209,9 +215,15 @@
                 assign child_parent_key = child_block.settings.parent_group | handleize
                 if child_parent_key != blank and child_parent_key == parent_group_key
                   assign child_count = child_count | plus: 1
+                  if landing_collection == blank and child_block.settings.collection != blank
+                    assign landing_collection = child_block.settings.collection
+                  endif
                 endif
               endif
             endfor
+            if selected_collection == blank
+              assign selected_collection = landing_collection
+            endif
 
             assign card_url = block.settings.link
             assign tag_handle = block.settings.product_tag | handleize
@@ -347,6 +359,9 @@
           assign child_parent_key = child_block.settings.parent_group | handleize
           if child_parent_key != blank and child_parent_key == parent_group_key
             assign child_count = child_count | plus: 1
+            if parent_landing_collection == blank and child_block.settings.collection != blank
+              assign parent_landing_collection = child_block.settings.collection
+            endif
           endif
         endif
       endfor
