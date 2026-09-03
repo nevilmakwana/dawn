@@ -484,7 +484,7 @@
         var desktopMenu = document.querySelector('.prada-desktop-menu');
         var title = tabs.closest('.prada-collection__navigation')?.querySelector('[data-prada-collection-title]');
         var collectionRoot = tabs.closest('.prada-collection');
-        if (!desktopMenu || !title || !collectionRoot) {
+        if (!title || !collectionRoot) {
           tabs.dataset.pradaNavigationState = 'ready';
           return;
         }
@@ -990,7 +990,48 @@
             });
         }
 
+        function getShowcaseNavigationMatch() {
+          var showcase = Array.from(
+            document.querySelectorAll('collection-showcase[data-showcase-active-parent]')
+          ).find(function (candidate) {
+            return Boolean(candidate.dataset.showcaseActiveParent);
+          });
+          var activeParentId = showcase?.dataset.showcaseActiveParent;
+          if (!showcase || !activeParentId) return null;
+
+          var panel = Array.from(showcase.querySelectorAll('[data-showcase-panel]')).find(function (candidate) {
+            return candidate.dataset.showcasePanel === activeParentId;
+          });
+          var viewAllHref = panel?.dataset.showcaseViewAllUrl;
+          if (!panel || !normalizeUrl(viewAllHref)) return null;
+
+          var showcaseTabs = [];
+          addUniqueTab(showcaseTabs, 'View all', viewAllHref, normalizeUrl(viewAllHref));
+
+          panel.querySelectorAll('[data-showcase-tab-handle]').forEach(function (childLink) {
+            var childHref = childLink.href;
+            addUniqueTab(
+              showcaseTabs,
+              childLink.dataset.showcaseTabLabel || textFrom(childLink),
+              childHref,
+              normalizeUrl(childHref)
+            );
+          });
+
+          var activeTab = showcaseTabs.find(function (tab) {
+            return tab.path === currentPath;
+          });
+          if (!activeTab || showcaseTabs.length < 2) return null;
+
+          return {
+            title: panel.dataset.showcaseNavigationTitle || title.textContent,
+            tabs: showcaseTabs,
+            activePath: activeTab.path,
+          };
+        }
+
         function enableNestedMenuNavigation() {
+          if (!desktopMenu) return;
           var headerDrawer = desktopMenu.closest('header-drawer');
           if (!headerDrawer) return;
 
@@ -1027,7 +1068,9 @@
           headerDrawer.addEventListener('click', headerDrawer.pradaNestedNavigationHandler);
         }
 
-        desktopMenu.querySelectorAll('.prada-desktop-menu__item').forEach(function (parentItem) {
+        match = getShowcaseNavigationMatch();
+
+        desktopMenu?.querySelectorAll('.prada-desktop-menu__item').forEach(function (parentItem) {
           if (match) return;
 
           var parentLabel = parentItem.querySelector('.prada-desktop-menu__primary-link span:first-child');
@@ -1172,6 +1215,7 @@
         window.addEventListener('resize', function () {
           queueTabIndicatorUpdate(tabs);
         });
+        document.dispatchEvent(new Event('prada:collection:updated'));
       });
     };
 
@@ -1184,7 +1228,17 @@
     });
   }
 
-  window.pradaCollectionNavigationSetup(document);
+  if (document.readyState === 'loading') {
+    document.addEventListener(
+      'DOMContentLoaded',
+      function () {
+        window.pradaCollectionNavigationSetup(document);
+      },
+      { once: true }
+    );
+  } else {
+    window.pradaCollectionNavigationSetup(document);
+  }
 </script>
 
 {% schema %}
