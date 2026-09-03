@@ -6,7 +6,6 @@
   assign show_showcase = true
   assign parent_count = 0
   assign active_parent_block_id = blank
-  assign active_parent_is_landing = false
 
   for block in section.blocks
     if block.type == 'card'
@@ -26,12 +25,12 @@
       endif
       assign candidate_group_key = block.settings.group_key | default: candidate_title | handleize
       assign candidate_child_count = 0
+      assign candidate_selected_count = 0
+      assign candidate_selected_ids = '|'
       assign candidate_matches_current = false
-      assign candidate_is_landing = false
 
       if request.page_type == 'collection' and landing_collection.id == collection.id
         assign candidate_matches_current = true
-        assign candidate_is_landing = true
       endif
 
       for child_block in section.blocks
@@ -43,17 +42,46 @@
             if request.page_type == 'collection'
               assign child_collection = child_block.settings.collection
               assign child_custom_path = child_block.settings.link | split: '?' | first | split: '#' | first
-              if child_collection.id == collection.id or child_custom_path == collection.url
-                assign candidate_matches_current = true
+              if block.settings.collection_list == blank and block.settings.collection == blank
+                if child_collection.id == collection.id or child_custom_path == collection.url
+                  assign candidate_matches_current = true
+                endif
               endif
             endif
           endif
         endif
       endfor
 
-      if candidate_matches_current and candidate_child_count > 0
+      for selected_collection in block.settings.collection_list
+        assign selected_collection_key = '|' | append: selected_collection.id | append: '|'
+        unless candidate_selected_ids contains selected_collection_key
+          assign candidate_selected_ids = candidate_selected_ids | append: selected_collection.id | append: '|'
+          assign candidate_selected_count = candidate_selected_count | plus: 1
+          if request.page_type == 'collection' and selected_collection.id == collection.id
+            assign candidate_matches_current = true
+          endif
+        endunless
+      endfor
+
+      assign direct_collection = block.settings.collection
+      if direct_collection != blank
+        assign direct_collection_key = '|' | append: direct_collection.id | append: '|'
+        unless candidate_selected_ids contains direct_collection_key
+          assign candidate_selected_count = candidate_selected_count | plus: 1
+          if request.page_type == 'collection' and direct_collection.id == collection.id
+            assign candidate_matches_current = true
+          endif
+        endunless
+      endif
+
+      if candidate_selected_count > 0
+        assign candidate_navigation_count = candidate_selected_count
+      else
+        assign candidate_navigation_count = candidate_child_count
+      endif
+
+      if candidate_matches_current and candidate_navigation_count > 0
         assign active_parent_block_id = block.id
-        assign active_parent_is_landing = candidate_is_landing
         break
       endif
     endif
@@ -74,6 +102,11 @@
   if active_parent_block_id != blank
     assign show_showcase = true
   endif
+
+  assign hide_showcase = false
+  if show_showcase == false or active_parent_block_id != blank
+    assign hide_showcase = true
+  endif
 -%}
 
 <collection-showcase
@@ -82,9 +115,8 @@
   data-showcase-placement="{{ section.settings.placement }}"
   data-allowed-paths="{{ allowed_paths | escape }}"
   data-showcase-parent-page="{% if active_parent_block_id != blank %}true{% else %}false{% endif %}"
-  data-showcase-current-page="{% if active_parent_is_landing %}view-all{% elsif active_parent_block_id != blank %}child{% endif %}"
   data-showcase-active-parent="{{ active_parent_block_id }}"
-  {% unless show_showcase %}hidden{% endunless %}
+  {% if hide_showcase %}hidden{% endif %}
   style="
     --showcase-max-width: {{ section.settings.max_width }}px;
     --showcase-card-width: {{ section.settings.desktop_card_width }}px;
@@ -183,9 +215,12 @@
 
             assign card_url = block.settings.link
             assign tag_handle = block.settings.product_tag | handleize
-            if card_url == blank and child_count > 0
-              assign card_url = landing_collection.url
-            elsif card_url == blank and selected_collection != blank and tag_handle != blank
+            if card_url == blank
+              if child_count > 0 or block.settings.collection_list != blank
+                assign card_url = landing_collection.url
+              endif
+            endif
+            if card_url == blank and selected_collection != blank and tag_handle != blank
               assign card_url = selected_collection.url | append: '/' | append: tag_handle
             elsif card_url == blank and selected_collection != blank
               assign card_url = selected_collection.url
@@ -305,6 +340,8 @@
 
       assign parent_group_key = parent_block.settings.group_key | default: parent_title | handleize
       assign child_count = 0
+      assign parent_selected_count = 0
+      assign parent_selected_ids = '|'
       for child_block in section.blocks
         if child_block.type == 'child_collection'
           assign child_parent_key = child_block.settings.parent_group | handleize
@@ -313,9 +350,25 @@
           endif
         endif
       endfor
+
+      for parent_selected_collection in parent_block.settings.collection_list
+        assign parent_selected_key = '|' | append: parent_selected_collection.id | append: '|'
+        unless parent_selected_ids contains parent_selected_key
+          assign parent_selected_ids = parent_selected_ids | append: parent_selected_collection.id | append: '|'
+          assign parent_selected_count = parent_selected_count | plus: 1
+        endunless
+      endfor
+
+      assign parent_direct_collection = parent_block.settings.collection
+      if parent_direct_collection != blank
+        assign parent_direct_key = '|' | append: parent_direct_collection.id | append: '|'
+        unless parent_selected_ids contains parent_direct_key
+          assign parent_selected_count = parent_selected_count | plus: 1
+        endunless
+      endif
     -%}
 
-    {%- if child_count > 0 -%}
+    {%- if child_count > 0 or parent_selected_count > 0 -%}
       <section
         id="CollectionShowcasePanel-{{ section.id }}-{{ parent_block.id }}"
         class="collection-showcase__panel"
@@ -325,6 +378,79 @@
         aria-labelledby="CollectionShowcasePanelTitle-{{ section.id }}-{{ parent_block.id }}"
         {% unless parent_block.id == active_parent_block_id %}hidden{% endunless %}
       >
+        {%- if parent_selected_count > 0 -%}
+          <div data-showcase-selected-navigation hidden>
+            {%- assign rendered_selected_ids = '|' -%}
+            {%- for navigation_collection in parent_block.settings.collection_list -%}
+              {%- liquid
+                assign navigation_collection_key = '|' | append: navigation_collection.id | append: '|'
+                if rendered_selected_ids contains navigation_collection_key
+                  continue
+                endif
+                assign rendered_selected_ids = rendered_selected_ids | append: navigation_collection.id | append: '|'
+                assign navigation_title = navigation_collection.title
+                assign navigation_tab_handle = blank
+
+                for title_block in section.blocks
+                  if title_block.type == 'child_collection'
+                    assign title_parent_key = title_block.settings.parent_group | handleize
+                    if title_parent_key == parent_group_key and title_block.settings.collection.id == navigation_collection.id
+                      assign custom_navigation_title = title_block.settings.title | strip
+                      if custom_navigation_title != blank
+                        assign navigation_title = custom_navigation_title
+                      endif
+                      assign navigation_tab_handle = title_block.settings.tab_handle
+                      break
+                    endif
+                  endif
+                endfor
+
+                assign navigation_tab_handle = navigation_tab_handle | default: navigation_title | handleize
+                assign navigation_url = navigation_collection.url | append: '#nested-' | append: navigation_tab_handle
+              -%}
+              <a
+                href="{{ navigation_url }}"
+                data-showcase-navigation-link
+                data-showcase-tab-handle="{{ navigation_tab_handle }}"
+                data-showcase-tab-label="{{ navigation_title | escape }}"
+              ></a>
+            {%- endfor -%}
+
+            {%- if parent_direct_collection != blank -%}
+              {%- assign navigation_collection_key = '|' | append: parent_direct_collection.id | append: '|' -%}
+              {%- unless rendered_selected_ids contains navigation_collection_key -%}
+                {%- liquid
+                  assign navigation_title = parent_direct_collection.title
+                  assign navigation_tab_handle = blank
+
+                  for title_block in section.blocks
+                    if title_block.type == 'child_collection'
+                      assign title_parent_key = title_block.settings.parent_group | handleize
+                      if title_parent_key == parent_group_key and title_block.settings.collection.id == parent_direct_collection.id
+                        assign custom_navigation_title = title_block.settings.title | strip
+                        if custom_navigation_title != blank
+                          assign navigation_title = custom_navigation_title
+                        endif
+                        assign navigation_tab_handle = title_block.settings.tab_handle
+                        break
+                      endif
+                    endif
+                  endfor
+
+                  assign navigation_tab_handle = navigation_tab_handle | default: navigation_title | handleize
+                  assign navigation_url = parent_direct_collection.url | append: '#nested-' | append: navigation_tab_handle
+                -%}
+                <a
+                  href="{{ navigation_url }}"
+                  data-showcase-navigation-link
+                  data-showcase-tab-handle="{{ navigation_tab_handle }}"
+                  data-showcase-tab-label="{{ navigation_title | escape }}"
+                ></a>
+              {%- endunless -%}
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
         <div class="collection-showcase__panel-header">
           {%- unless parent_block.id == active_parent_block_id -%}
             <button type="button" class="collection-showcase__back" data-showcase-back>
@@ -396,6 +522,7 @@
                     <a
                       class="collection-showcase__link"
                       href="{{ child_url }}"
+                      data-showcase-navigation-link
                       data-showcase-tab-handle="{{ child_tab_handle }}"
                       data-showcase-tab-label="{{ child_title | escape }}"
                     >
@@ -908,16 +1035,7 @@
 
       updateVisibility() {
         if (this.dataset.showcaseParentPage === 'true') {
-          const activeTab = document.querySelector('[data-prada-collection-tabs] .prada-collection__tab.is-active');
-          const navigation = activeTab?.closest('[data-prada-collection-tabs]');
-          if (this.dataset.showcaseCurrentPage === 'child' && navigation?.dataset.pradaNavigationReady !== 'true') {
-            this.hidden = true;
-            return;
-          }
-          const activeTabHandle = this.handleize(activeTab?.textContent || '');
-          this.hidden =
-            window.location.hash.indexOf('#nested-') === 0 ||
-            (activeTabHandle !== '' && activeTabHandle !== 'view-all');
+          this.hidden = true;
           return;
         }
 
@@ -1337,7 +1455,7 @@
       "settings": [
         {
           "type": "paragraph",
-          "content": "Add Child collection blocks with the same group key. This card loads the parent collection page, where the matching child showcase appears above its products."
+          "content": "The parent card opens a collection page with View all plus the selected collection tabs. The image-card showcase stays hidden on that collection page. Child blocks remain optional for custom tab titles and card images."
         },
         {
           "type": "image_picker",
@@ -1358,8 +1476,8 @@
         {
           "type": "collection",
           "id": "landing_collection",
-          "label": "Parent landing collection",
-          "info": "Required for parent-child navigation. The parent card loads this collection page, where its child showcase appears above the combined product grid."
+          "label": "View all collection",
+          "info": "Recommended. This is the parent card destination and the collection shown by View all."
         },
         {
           "type": "text",
@@ -1379,13 +1497,14 @@
         {
           "type": "collection",
           "id": "collection",
-          "label": "Direct fallback collection"
+          "label": "Additional tab collection",
+          "info": "Optional single collection kept for existing cards. It is added to the parent collection tabs without duplicating a selection below."
         },
         {
           "type": "collection_list",
           "id": "collection_list",
-          "label": "Parent page fallback (legacy)",
-          "info": "Kept for existing cards. When Parent landing collection is blank, the first selection is used as the parent page.",
+          "label": "Tab collections",
+          "info": "Select every collection that should appear beside View all. If View all collection is blank, the first selection becomes the parent destination.",
           "limit": 50
         },
         {
@@ -1402,7 +1521,7 @@
         },
         {
           "type": "paragraph",
-          "content": "Destination priority: custom link, parent landing collection for linked children, collection with tag, direct fallback collection, first selected product, then all products filtered by tag."
+          "content": "Destination priority: custom link, View all collection, first Tab collection, Additional tab collection, first selected product, then all products filtered by tag."
         }
       ]
     },

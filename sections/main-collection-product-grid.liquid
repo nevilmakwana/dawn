@@ -1008,7 +1008,11 @@
           var showcaseTabs = [];
           addUniqueTab(showcaseTabs, 'View all', viewAllHref, normalizeUrl(viewAllHref));
 
-          panel.querySelectorAll('[data-showcase-tab-handle]').forEach(function (childLink) {
+          var selectedLinks = Array.from(panel.querySelectorAll('[data-showcase-selected-navigation] a'));
+          var childLinks = Array.from(panel.querySelectorAll('[data-showcase-child-card] [data-showcase-navigation-link]'));
+          var navigationLinks = selectedLinks.length ? selectedLinks : childLinks;
+
+          navigationLinks.forEach(function (childLink) {
             var childHref = childLink.href;
             addUniqueTab(
               showcaseTabs,
