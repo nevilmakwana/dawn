@@ -65,6 +65,7 @@
   style="--prada-placeholder-logo: url('{{ 'grey-exim-wordmark-logo-white.png' | asset_url }}');"
   data-section-id="{{ section.id }}"
   data-product-url="{{ product.url }}"
+  data-initial-gallery-key="{% if current_variant_gallery != blank %}{{ current_variant.id }}{% else %}default{% endif %}"
   data-wishlist-fallback-image="{% if storefront_primary_media %}{{ storefront_primary_media.preview_image | image_url: width: 720 | escape }}{% endif %}"
   data-wishlist-fallback-image-alt="{{ storefront_primary_media.alt | default: product.title | escape }}"
 >
@@ -88,7 +89,33 @@
     </button>
 
     <div class="prada-product__media-list">
-      {%- if product.media.size > 0 -%}
+      {%- if current_variant_gallery != blank -%}
+        {%- assign initial_image_prioritized = false -%}
+        {%- for media in current_variant_gallery -%}
+          {%- if media.media_type == 'image' or media.media_type == 'video' -%}
+            {%- liquid
+              assign initial_media_loading = 'lazy'
+              assign initial_media_fetch_priority = 'low'
+              assign initial_media_preload = false
+              if media.media_type == 'image' and initial_image_prioritized == false
+                assign initial_media_loading = 'eager'
+                assign initial_media_fetch_priority = 'high'
+                assign initial_media_preload = true
+                assign initial_image_prioritized = true
+              endif
+            -%}
+            {%- render 'prada-variant-media',
+              media: media,
+              section_id: section.id,
+              variant_id: current_variant.id,
+              position: forloop.index,
+              loading: initial_media_loading,
+              fetchpriority: initial_media_fetch_priority,
+              preload: initial_media_preload
+            -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- elsif product.media.size > 0 -%}
         {%- for media in product.media -%}
           <figure
             class="prada-product__media prada-product__media--{{ media.media_type }}"
@@ -99,16 +126,19 @@
               {%- when 'image' -%}
                 {%- liquid
                   assign media_loading = 'lazy'
-                  assign media_fetch_priority = 'auto'
+                  assign media_fetch_priority = 'low'
+                  assign media_preload = false
                   if forloop.first
                     assign media_loading = 'eager'
                     assign media_fetch_priority = 'high'
+                    assign media_preload = true
                   endif
                 -%}
                 {{ media.preview_image | image_url: width: 1800 | image_tag:
                   loading: media_loading,
                   fetchpriority: media_fetch_priority,
-                  widths: '550, 750, 950, 1200, 1500, 1800',
+                  preload: media_preload,
+                  widths: '360, 480, 550, 640, 750, 950, 1200, 1500, 1800',
                   sizes: '(min-width: 990px) 50vw, 100vw',
                   alt: media.alt | default: product.title,
                   class: 'prada-product__gallery-image'
@@ -122,17 +152,6 @@
             {%- endcase -%}
           </figure>
         {%- endfor -%}
-      {%- elsif current_variant_gallery != blank -%}
-        {%- for media in current_variant_gallery -%}
-          {%- if media.media_type == 'image' or media.media_type == 'video' -%}
-            {%- render 'prada-variant-media',
-              media: media,
-              section_id: section.id,
-              variant_id: current_variant.id,
-              position: forloop.index
-            -%}
-          {%- endif -%}
-        {%- endfor -%}
       {%- else -%}
         <figure
           class="prada-product__media prada-product__media--placeholder"
@@ -144,24 +163,24 @@
       {%- endif -%}
     </div>
 
-    {%- assign initial_gallery_count = product.media.size -%}
+    {%- assign initial_gallery_count = current_variant_gallery.size -%}
     {%- if initial_gallery_count == 0 -%}
-      {%- assign initial_gallery_count = current_variant_gallery.size -%}
+      {%- assign initial_gallery_count = product.media.size -%}
     {%- endif -%}
     <nav class="prada-product__dots" aria-label="Choose product image"{% if initial_gallery_count <= 1 %} hidden{% endif %}>
-      {%- if product.media.size > 0 -%}
-        {%- for media in product.media -%}
-          <a href="#PradaMedia-{{ section.id }}-{{ forloop.index }}" data-prada-dot="{{ forloop.index0 }}" aria-label="View {{ media.media_type | replace: '_', ' ' }} {{ forloop.index }}"{% if forloop.first %} class="is-active" aria-current="true"{% endif %}>
-            <span></span>
-          </a>
-        {%- endfor -%}
-      {%- else -%}
+      {%- if current_variant_gallery != blank -%}
         {%- for media in current_variant_gallery -%}
           {%- if media.media_type == 'image' or media.media_type == 'video' -%}
             <a href="#PradaVariantMedia-{{ section.id }}-{{ current_variant.id }}-{{ forloop.index }}" data-prada-dot="{{ forloop.index0 }}" aria-label="View {{ media.media_type | replace: '_', ' ' }} {{ forloop.index }}"{% if forloop.first %} class="is-active" aria-current="true"{% endif %}>
               <span></span>
             </a>
           {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        {%- for media in product.media -%}
+          <a href="#PradaMedia-{{ section.id }}-{{ forloop.index }}" data-prada-dot="{{ forloop.index0 }}" aria-label="View {{ media.media_type | replace: '_', ' ' }} {{ forloop.index }}"{% if forloop.first %} class="is-active" aria-current="true"{% endif %}>
+            <span></span>
+          </a>
         {%- endfor -%}
       {%- endif -%}
     </nav>
@@ -244,10 +263,10 @@
                           {%- endif -%}
                           {%- assign variant_swatch_media = variant_swatch_gallery | first -%}
                           {%- if variant_swatch_media.media_type == 'image' -%}
-                            {%- assign swatch_image = variant_swatch_media.preview_image | image_url: width: 1800 -%}
+                            {%- assign swatch_image = variant_swatch_media.preview_image -%}
                             {%- break -%}
                           {%- elsif variant.featured_media != blank -%}
-                            {%- assign swatch_image = variant.featured_media.preview_image | image_url: width: 1800 -%}
+                            {%- assign swatch_image = variant.featured_media.preview_image -%}
                             {%- break -%}
                           {%- endif -%}
                         {%- endif -%}
@@ -259,10 +278,16 @@
                         aria-pressed="{% if option.selected_value == value %}true{% else %}false{% endif %}"
                         data-prada-option-choice="{{ color_option_index }}"
                         data-prada-option-value="{{ value | escape }}"
-                        {% if swatch_image != blank %}data-prada-image="{{ swatch_image }}"{% endif %}
+                        {% if swatch_image != blank %}data-prada-image="{{ swatch_image | image_url: width: 1800 }}"{% endif %}
                       >
                         {%- if swatch_image != blank -%}
-                          <img src="{{ swatch_image }}" alt="" loading="lazy" width="84" height="105">
+                          {{ swatch_image | image_url: width: 336 | image_tag:
+                            loading: 'lazy',
+                            fetchpriority: 'low',
+                            widths: '84, 112, 168, 224, 252, 336',
+                            sizes: '(min-width: 990px) 112px, 84px',
+                            alt: ''
+                          }}
                         {%- else -%}
                           <span style="--swatch-color: {% if configured_swatch != blank %}{{ configured_swatch }}{% elsif value.swatch.color != blank %}{{ value.swatch.color }}{% else %}{{ value | handle | replace: '-', ' ' }}{% endif %};"></span>
                         {%- endif -%}
@@ -293,7 +318,13 @@
                 <div class="prada-product__swatches" aria-label="Product color">
                   <span class="prada-product__swatch prada-product__swatch--static is-selected" role="img" aria-label="Color {{ fallback_color_label | escape }}">
                     {%- if fallback_swatch_media != blank -%}
-                      <img src="{{ fallback_swatch_media.preview_image | image_url: width: 1800 }}" alt="" loading="lazy" width="84" height="105">
+                      {{ fallback_swatch_media.preview_image | image_url: width: 336 | image_tag:
+                        loading: 'lazy',
+                        fetchpriority: 'low',
+                        widths: '84, 112, 168, 224, 252, 336',
+                        sizes: '(min-width: 990px) 112px, 84px',
+                        alt: ''
+                      }}
                     {%- else -%}
                       <span></span>
                     {%- endif -%}
@@ -437,6 +468,36 @@
     </aside>
   </div>
 
+  {%- if current_variant_gallery != blank and product.media.size > 0 -%}
+    <template data-prada-default-gallery>
+      {%- for media in product.media -%}
+        <figure
+          class="prada-product__media prada-product__media--{{ media.media_type }}"
+          id="PradaMedia-{{ section.id }}-{{ forloop.index }}"
+          data-prada-media-label="View {{ media.media_type | replace: '_', ' ' }} {{ forloop.index }}"
+        >
+          {%- case media.media_type -%}
+            {%- when 'image' -%}
+              {{ media.preview_image | image_url: width: 1800 | image_tag:
+                loading: 'lazy',
+                fetchpriority: 'low',
+                widths: '360, 480, 550, 640, 750, 950, 1200, 1500, 1800',
+                sizes: '(min-width: 990px) 50vw, 100vw',
+                alt: media.alt | default: product.title,
+                class: 'prada-product__gallery-image'
+              }}
+            {%- when 'video' -%}
+              {{ media | video_tag: controls: false, autoplay: true, loop: true, muted: true, playsinline: true, preload: 'metadata', image_size: '1200x' }}
+            {%- when 'external_video' -%}
+              {{ media | external_video_tag: autoplay: true, loop: true, muted: true, loading: 'lazy' }}
+            {%- when 'model' -%}
+              {{ media | model_viewer_tag: image_size: '1200x', reveal: 'interaction', toggleable: true }}
+          {%- endcase -%}
+        </figure>
+      {%- endfor -%}
+    </template>
+  {%- endif -%}
+
   {%- for variant in product.variants -%}
     {%- assign variant_gallery = variant.metafields.custom.variant_images.value -%}
     {%- if variant_gallery == blank -%}
@@ -480,8 +541,9 @@
     const desktopWishlist = gallery?.querySelector(':scope > .prada-product__wishlist');
     const desktopDots = gallery?.querySelector('.prada-product__dots');
     const mediaList = gallery?.querySelector('.prada-product__media-list');
+    const authoredDefaultGallery = root.querySelector('[data-prada-default-gallery]');
     const defaultGalleryTemplate = document.createElement('template');
-    defaultGalleryTemplate.innerHTML = mediaList?.innerHTML || '';
+    defaultGalleryTemplate.innerHTML = authoredDefaultGallery?.innerHTML || mediaList?.innerHTML || '';
     const variantGalleryTemplates = new Map(
       [...root.querySelectorAll('[data-prada-variant-gallery]')]
         .filter((template) => template.content.querySelector('.prada-product__media'))
@@ -494,8 +556,8 @@
       return image?.getAttribute('src') || '';
     };
     const defaultPrimaryImage = defaultGalleryTemplate.content.querySelector('.prada-product__gallery-image');
-    const defaultPrimarySource = defaultPrimaryImage?.currentSrc || defaultPrimaryImage?.src || '';
-    let activeGalleryKey = 'default';
+    const defaultPrimarySource = defaultPrimaryImage?.getAttribute('src') || '';
+    let activeGalleryKey = root.dataset.initialGalleryKey || 'default';
     let wishlistFrame;
 
     const syncDesktopWishlist = () => {
@@ -579,12 +641,57 @@
         .forEach(initializeProductImage);
     };
 
+    const shopifyImageUrlAtWidth = (source, width) => {
+      try {
+        const url = new URL(source, window.location.origin);
+        const isShopifyImage = url.pathname.includes('/cdn/shop/') || url.hostname === 'cdn.shopify.com';
+        if (!isShopifyImage) return source;
+        url.searchParams.set('width', String(width));
+        return url.href;
+      } catch (error) {
+        return source;
+      }
+    };
+
+    const setResponsiveImageSource = (image, source, widths, sizes, fallbackWidth) => {
+      if (!image || !source) return;
+      const candidates = widths.map((width) => shopifyImageUrlAtWidth(source, width));
+      const canUseShopifyCdn = candidates.some((candidate) => candidate !== source);
+
+      if (canUseShopifyCdn) {
+        image.srcset = candidates.map((candidate, index) => `${candidate} ${widths[index]}w`).join(', ');
+        image.sizes = sizes;
+        image.src = shopifyImageUrlAtWidth(source, fallbackWidth);
+      } else {
+        image.removeAttribute('srcset');
+        image.src = source;
+      }
+    };
+
     const replacePrimaryImage = (source) => {
       const primaryImage = mediaList?.querySelector('.prada-product__media--image .prada-product__gallery-image');
       if (!primaryImage || !source || primaryImage.currentSrc === source || primaryImage.src === source) return;
-      primaryImage.removeAttribute('srcset');
-      primaryImage.src = source;
+      setResponsiveImageSource(
+        primaryImage,
+        source,
+        [360, 480, 550, 640, 750, 950, 1200, 1500, 1800],
+        '(min-width: 990px) 50vw, 100vw',
+        1800
+      );
       initializeProductImage(primaryImage);
+    };
+
+    const setSwatchImageSource = (image, source) => {
+      if (!image || !source) return;
+      setResponsiveImageSource(
+        image,
+        source,
+        [84, 112, 168, 224, 252, 336],
+        '(min-width: 990px) 112px, 84px',
+        336
+      );
+      image.loading = 'lazy';
+      image.fetchPriority = 'low';
     };
 
     const findVariantForColor = (colorValue) => variants.find((variant) =>
@@ -623,8 +730,7 @@
           image.height = 105;
           choice.replaceChildren(image);
         }
-        image.removeAttribute('srcset');
-        image.src = source;
+        setSwatchImageSource(image, source);
         choice.dataset.pradaImage = source;
       });
 
@@ -873,8 +979,7 @@
     const syncFallbackColorImage = (source) => {
       const fallbackImage = root.querySelector('.prada-product__option--fallback-color .prada-product__swatch img');
       if (!fallbackImage || !source || fallbackImage.currentSrc === source || fallbackImage.src === source) return;
-      fallbackImage.removeAttribute('srcset');
-      fallbackImage.src = source;
+      setSwatchImageSource(fallbackImage, source);
     };
 
     const commitGalleryContent = (galleryContent, nextGalleryKey) => {
@@ -908,8 +1013,13 @@
           firstImage.loading = 'eager';
           firstImage.fetchPriority = 'high';
           if (!variantTemplate && fallbackSource) {
-            firstImage.removeAttribute('srcset');
-            firstImage.src = fallbackSource;
+            setResponsiveImageSource(
+              firstImage,
+              fallbackSource,
+              [360, 480, 550, 640, 750, 950, 1200, 1500, 1800],
+              '(min-width: 990px) 50vw, 100vw',
+              1800
+            );
           }
         }
         activeGalleryKey = nextGalleryKey;

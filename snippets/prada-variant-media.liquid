@@ -6,7 +6,19 @@
   - section_id: Product section ID
   - variant_id: Product variant ID
   - position: One-based position in the variant gallery
+  - loading: Native image loading mode (optional, defaults to lazy)
+  - fetchpriority: Browser fetch priority (optional, defaults to low)
+  - preload: Send a responsive preload hint for this image (optional)
 {% endcomment %}
+
+{%- liquid
+  assign media_loading = loading | default: 'lazy'
+  assign media_fetch_priority = fetchpriority | default: 'low'
+  assign media_preload = false
+  if preload == true
+    assign media_preload = true
+  endif
+-%}
 
 <figure
   class="prada-product__media prada-product__media--{{ media.media_type }}"
@@ -16,10 +28,12 @@
   {%- case media.media_type -%}
     {%- when 'image' -%}
       {{ media.preview_image | image_url: width: 1800 | image_tag:
-        loading: 'lazy',
-        widths: '550, 750, 950, 1200, 1500, 1800',
+        loading: media_loading,
+        fetchpriority: media_fetch_priority,
+        preload: media_preload,
+        widths: '360, 480, 550, 640, 750, 950, 1200, 1500, 1800',
         sizes: '(min-width: 990px) 50vw, 100vw',
-        alt: media.alt,
+        alt: media.alt | default: product.title,
         class: 'prada-product__gallery-image'
       }}
     {%- when 'video' -%}
