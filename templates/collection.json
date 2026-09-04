@@ -6,8 +6,10 @@
         "card_wUCFgi": {
           "type": "card",
           "settings": {
-            "image": "shopify://shop_images/imgi_3_w.jpg",
-            "title": "Bags",
+            "image": "shopify://shop_images/2-grey-exim-small-crepe-bandana-black-white-polka-dot.jpg",
+            "title": "Scarves",
+            "group_key": "Scarves",
+            "landing_collection": "",
             "subtitle": "",
             "link": "",
             "collection": "women-cotton-scarves",
@@ -16,11 +18,35 @@
             "product_tag": ""
           }
         },
+        "child_collection_HrwhaX": {
+          "type": "child_collection",
+          "settings": {
+            "parent_group": "Scarves",
+            "collection": "women-scarves",
+            "title": "",
+            "tab_handle": "",
+            "subtitle": "",
+            "link": ""
+          }
+        },
+        "child_collection_yqHdRi": {
+          "type": "child_collection",
+          "settings": {
+            "parent_group": "Scarves",
+            "collection": "women-cotton-scarves",
+            "title": "",
+            "tab_handle": "",
+            "subtitle": "",
+            "link": ""
+          }
+        },
         "card_kUc9Gx": {
           "type": "card",
           "settings": {
             "image": "shopify://shop_images/imgi_4_m.jpg",
             "title": "Shoes",
+            "group_key": "",
+            "landing_collection": "",
             "subtitle": "",
             "link": "",
             "collection": "",
@@ -32,6 +58,8 @@
       },
       "block_order": [
         "card_wUCFgi",
+        "child_collection_HrwhaX",
+        "child_collection_yqHdRi",
         "card_kUc9Gx"
       ],
       "name": "Collection showcase",

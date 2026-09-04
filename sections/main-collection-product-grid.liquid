@@ -1011,7 +1011,7 @@
 
           var selectedLinks = Array.from(panel.querySelectorAll('[data-showcase-selected-navigation] a'));
           var childLinks = Array.from(panel.querySelectorAll('[data-showcase-child-card] [data-showcase-navigation-link]'));
-          var navigationLinks = selectedLinks.length ? selectedLinks : childLinks;
+          var navigationLinks = childLinks.concat(selectedLinks);
 
           navigationLinks.forEach(function (childLink) {
             var childHref = childLink.href;

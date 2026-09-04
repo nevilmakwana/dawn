@@ -38,12 +38,10 @@
             if request.page_type == 'collection'
               assign child_collection = child_block.settings.collection
               assign child_custom_path = child_block.settings.link | split: '?' | first | split: '#' | first
-              if block.settings.collection_list == blank and block.settings.collection == blank
-                if child_collection != blank and child_collection.id == collection.id
-                  assign candidate_matches_current = true
-                elsif child_custom_path != blank and child_custom_path == collection.url
-                  assign candidate_matches_current = true
-                endif
+              if child_collection != blank and child_collection.id == collection.id
+                assign candidate_matches_current = true
+              elsif child_custom_path != blank and child_custom_path == collection.url
+                assign candidate_matches_current = true
               endif
             endif
 
@@ -80,11 +78,7 @@
         endunless
       endif
 
-      if candidate_selected_count > 0
-        assign candidate_navigation_count = candidate_selected_count
-      else
-        assign candidate_navigation_count = candidate_child_count
-      endif
+      assign candidate_navigation_count = candidate_selected_count | plus: candidate_child_count
 
       if candidate_matches_current and candidate_navigation_count > 0
         assign active_parent_block_id = block.id
