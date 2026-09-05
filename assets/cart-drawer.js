@@ -267,9 +267,11 @@ class CartDrawer extends HTMLElement {
   }
 
   completeOptimisticAdd() {
+    const completedState = this.optimisticState;
     this.querySelector('.prada-cart-drawer__optimistic')?.remove();
     this.classList.remove('is-optimistic');
     this.optimisticState = null;
+    return completedState;
   }
 
   cancelOptimisticAdd(state, { keepDrawer = false } = {}) {
@@ -406,6 +408,8 @@ class CartDrawer extends HTMLElement {
   close() {
     if (this.classList.contains('is-closing')) return;
 
+    if (this.optimisticState) this.optimisticState.dismissed = true;
+
     if (this.openAnimationFrame) {
       cancelAnimationFrame(this.openAnimationFrame);
       this.openAnimationFrame = null;
@@ -455,7 +459,7 @@ class CartDrawer extends HTMLElement {
   }
 
   renderContents(parsedState, { shouldOpen = true } = {}) {
-    this.completeOptimisticAdd();
+    const optimisticState = this.completeOptimisticAdd();
     const sourceDrawer = parsedState.sections?.['cart-drawer']
       ? this.getSectionDOM(parsedState.sections['cart-drawer'], 'cart-drawer')
       : null;
@@ -493,7 +497,7 @@ class CartDrawer extends HTMLElement {
     this.bindOverlay();
     if (itemCount === null) void refreshPradaCartIcon();
 
-    if (shouldOpen) {
+    if (shouldOpen && !optimisticState?.dismissed) {
       setTimeout(() => this.open());
     }
   }
