@@ -440,7 +440,6 @@ class CartDrawer extends HTMLElement {
     state.removedLineQuantity = removedLineQuantity;
     state.removedLineTotal = unitPrice * removedLineQuantity;
     state.removingAddedLine = removingAddedLine;
-    removedItem.setAttribute('hidden', '');
 
     const nextCount = Math.max(0, state.optimisticCount - removedLineQuantity);
     const nextTotal = Math.max(0, state.optimisticTotal - state.removedLineTotal);
@@ -458,9 +457,48 @@ class CartDrawer extends HTMLElement {
     const subtotal = panel?.querySelector('.totals__total-value');
     if (subtotal) subtotal.textContent = this.formatOptimisticMoney(nextTotal, subtotal.textContent);
 
-    if (nextCount === 0) this.showOptimisticEmptyState(state, panel);
+    if (nextCount === 0) {
+      removedItem.setAttribute('hidden', '');
+      this.showOptimisticEmptyState(state, panel);
+    } else {
+      this.animateOptimisticRowRemoval(state, removedItem);
+    }
     if (event) CartPerformance.measureFromEvent('remove:optimistic-ui', event);
     if (state.confirmed) void this.performOptimisticRemove(state);
+  }
+
+  animateOptimisticRowRemoval(state, row) {
+    const horizontal = Boolean(
+      window.matchMedia('(max-width: 989px)').matches &&
+      row.closest('.prada-cart-drawer__items--multiple'),
+    );
+    if (horizontal) {
+      const width = row.offsetWidth;
+      row.classList.add('is-horizontal-removal');
+      row.style.width = `${width}px`;
+      row.style.maxWidth = `${width}px`;
+      row.style.flexBasis = `${width}px`;
+    } else {
+      row.style.maxHeight = `${row.offsetHeight}px`;
+    }
+    row.style.overflow = 'hidden';
+    row.getBoundingClientRect();
+    state.removeAnimationFrame = window.requestAnimationFrame(() => {
+      state.removeAnimationFrame = null;
+      if (this.optimisticState?.id !== state.id || state.removedItem !== row) return;
+      row.classList.add('is-removing', 'is-collapsing');
+    });
+  }
+
+  restoreOptimisticRow(row) {
+    if (!row) return;
+    row.removeAttribute('hidden');
+    row.classList.remove('is-removing', 'is-collapsing', 'is-horizontal-removal');
+    row.style.maxHeight = '';
+    row.style.maxWidth = '';
+    row.style.width = '';
+    row.style.flexBasis = '';
+    row.style.overflow = '';
   }
 
   showOptimisticEmptyState(state, panel) {
@@ -470,28 +508,52 @@ class CartDrawer extends HTMLElement {
     panel.querySelector(':scope > .prada-cart-drawer__optimistic-items')?.setAttribute('hidden', '');
     panel.querySelector(':scope > .drawer__footer')?.setAttribute('hidden', '');
 
-    const sourceEmpty = this.querySelector('.drawer__inner-empty');
-    const empty = sourceEmpty?.cloneNode(true) || document.createElement('div');
-    empty.classList.add('drawer__inner-empty', 'prada-cart-drawer__optimistic-empty');
-    empty.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
-
-    const closeButton = empty.querySelector('.drawer__close');
-    if (closeButton) {
-      closeButton.removeAttribute('onclick');
-      closeButton.addEventListener('click', () => this.close());
-    }
-
-    if (!empty.hasChildNodes()) {
-      const message = document.createElement('p');
-      message.className = 'cart__empty-text';
-      message.textContent = 'Your shopping bag is empty';
-      empty.append(message);
-    }
+    const empty = document.createElement('div');
+    empty.className = 'drawer__inner-empty prada-cart-drawer__optimistic-empty';
+    const warnings = document.createElement('div');
+    warnings.className = 'cart-drawer__warnings center';
+    const content = document.createElement('div');
+    content.className = 'prada-cart-drawer__empty-content';
+    const sourceClose = panel.querySelector(':scope > .drawer__header .drawer__close');
+    const closeButton = sourceClose?.cloneNode(true) || document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.classList.add('drawer__close');
+    closeButton.removeAttribute('onclick');
+    closeButton.setAttribute('aria-label', 'Close shopping bag');
+    if (!closeButton.hasChildNodes()) closeButton.textContent = '×';
+    closeButton.addEventListener('click', () => this.close());
+    const message = document.createElement('p');
+    message.className = 'prada-cart-drawer__empty-message';
+    message.textContent = 'Your shopping bag is empty';
+    content.append(closeButton, message);
+    warnings.append(content);
+    empty.append(warnings);
 
     panel.append(empty);
-    this.classList.add('is-empty', 'is-optimistic-empty');
+    this.classList.add('is-empty', 'is-optimistic-empty', 'is-empty-entering');
     this.classList.remove('prada-cart-drawer--multiple');
     state.optimisticEmpty = empty;
+    state.emptyAnimationFrame = window.requestAnimationFrame(() => {
+      state.emptyAnimationFrame = window.requestAnimationFrame(() => {
+        state.emptyAnimationFrame = null;
+        if (this.optimisticState?.id !== state.id || !state.optimisticEmpty) return;
+        this.classList.add('is-empty-visible');
+        state.emptyTransitionTimer = window.setTimeout(() => {
+          state.emptyTransitionTimer = null;
+          this.classList.remove('is-empty-entering', 'is-empty-visible');
+        }, 560);
+      });
+    });
+  }
+
+  clearOptimisticEmptyTransition(state) {
+    if (state?.emptyAnimationFrame) window.cancelAnimationFrame(state.emptyAnimationFrame);
+    if (state?.emptyTransitionTimer) window.clearTimeout(state.emptyTransitionTimer);
+    if (state) {
+      state.emptyAnimationFrame = null;
+      state.emptyTransitionTimer = null;
+    }
+    this.classList.remove('is-empty-entering', 'is-empty-visible');
   }
 
   async performOptimisticRemove(state) {
@@ -536,6 +598,8 @@ class CartDrawer extends HTMLElement {
   commitOptimisticRemove(state, parsedState) {
     if (!state || this.optimisticState?.id !== state.id) return;
 
+    if (state.removeAnimationFrame) window.cancelAnimationFrame(state.removeAnimationFrame);
+    state.removeAnimationFrame = null;
     const removedAddedLine = state.removingAddedLine;
     state.removedItem?.remove();
     state.optimisticCount = Number.isFinite(parsedState.item_count) ? parsedState.item_count : state.removedCount;
@@ -577,16 +641,29 @@ class CartDrawer extends HTMLElement {
     items?.classList.toggle('is-multiple', state.optimisticLineCount > 1);
     table?.classList.toggle('prada-cart-drawer__items--multiple', state.optimisticLineCount > 1);
 
+    if (state.optimisticCount > 0 && state.optimisticEmpty) {
+      this.clearOptimisticEmptyTransition(state);
+      state.optimisticEmpty.remove();
+      state.optimisticEmpty = null;
+      panel?.querySelector(':scope > .drawer__header')?.removeAttribute('hidden');
+      items?.removeAttribute('hidden');
+      panel?.querySelector(':scope > .drawer__footer')?.removeAttribute('hidden');
+      this.classList.remove('is-optimistic-empty');
+    }
+
     this.scheduleRefreshAfterOptimisticAdd(state);
   }
 
   restoreOptimisticRemove(state) {
     if (!state || this.optimisticState?.id !== state.id) return;
 
+    this.clearOptimisticEmptyTransition(state);
+    if (state.removeAnimationFrame) window.cancelAnimationFrame(state.removeAnimationFrame);
+    state.removeAnimationFrame = null;
     state.removeQueued = false;
     state.removalPending = false;
     state.removeRequestStarted = false;
-    state.removedItem?.removeAttribute('hidden');
+    this.restoreOptimisticRow(state.removedItem);
     state.optimisticEmpty?.remove();
     state.optimisticEmpty = null;
     const panel = this.querySelector(`.prada-cart-drawer__optimistic[data-optimistic-id="${state.id}"]`);
@@ -680,6 +757,7 @@ class CartDrawer extends HTMLElement {
   completeOptimisticAdd() {
     const completedState = this.optimisticState;
     this.cancelScheduledOptimisticRefresh(completedState);
+    this.clearOptimisticEmptyTransition(completedState);
     const items = this.querySelector('.prada-cart-drawer__optimistic-items');
     const footer = this.querySelector('.prada-cart-drawer__optimistic > .drawer__footer');
     if (items && completedState?.optimisticItemsHandler) {
