@@ -184,7 +184,17 @@ cart-drawer.prada-cart-drawer.is-optimistic .drawer__inner > :not(.prada-cart-dr
   flex: 1 1 auto;
   min-height: 0;
   padding: 0 20px;
-  overflow: hidden;
+  overflow-y: auto;
+}
+
+@media screen and (max-width: 989px) {
+  .prada-cart-drawer__optimistic-items.is-multiple {
+    padding-inline: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-inline: contain;
+  }
 }
 
 .prada-cart-drawer__optimistic .drawer__footer {

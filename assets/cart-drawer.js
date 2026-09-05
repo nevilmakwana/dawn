@@ -88,7 +88,15 @@ class CartDrawer extends HTMLElement {
     let carriedState = null;
     if (this.optimisticState) {
       if (this.optimisticState.confirmed && !this.optimisticState.removalPending) {
+        const confirmedRow = [...this.querySelectorAll('.prada-cart-drawer__optimistic .cart-item')]
+          .find((row) => this.getOptimisticRowVariantId(row) === String(this.optimisticState.item.variantId));
+        if (confirmedRow && this.optimisticState.addedLineKey) {
+          confirmedRow.dataset.pradaOptimisticLineKey = this.optimisticState.addedLineKey;
+        }
+        const carriedRows = [...this.querySelectorAll('.prada-cart-drawer__optimistic .cart-item')]
+          .map((row) => row.cloneNode(true));
         carriedState = this.completeOptimisticAdd();
+        carriedState.optimisticRows = carriedRows;
         this.dataset.cartItemCount = String(carriedState.optimisticCount);
         this.dataset.cartTotalPrice = String(carriedState.optimisticTotal);
         this.classList.remove('is-empty');
@@ -171,7 +179,7 @@ class CartDrawer extends HTMLElement {
 
     const items = document.createElement('div');
     items.className = 'prada-cart-drawer__optimistic-items';
-    items.append(this.createOptimisticCartItem(item, quantity, carriedExistingQuantity));
+    this.populateOptimisticCartItems(items, item, quantity, existingQuantity, optimisticLineCount, carriedState);
     state.optimisticItemsHandler = (event) => {
       const removeButton = event.target.closest('.prada-cart-drawer__remove');
       if (!removeButton || !items.contains(removeButton)) return;
@@ -227,10 +235,46 @@ class CartDrawer extends HTMLElement {
     return state;
   }
 
-  createOptimisticCartItem(item, addedQuantity, carriedExistingQuantity = 0) {
-    const existingQuantityInput = [...this.querySelectorAll('[data-quantity-variant-id]')]
-      .find((input) => String(input.dataset.quantityVariantId) === String(item.variantId));
-    const existingItem = existingQuantityInput?.closest('.cart-item');
+  populateOptimisticCartItems(container, item, addedQuantity, existingQuantity, lineCount, carriedState) {
+    const carriedRows = carriedState?.optimisticRows || [];
+    const renderedRows = [...this.querySelectorAll('.drawer__cart-items-wrapper .cart-item')]
+      .map((row) => row.cloneNode(true));
+    const rows = (carriedRows.length ? carriedRows : renderedRows);
+    const matchesVariant = (row) =>
+      String(
+        row.dataset.pradaOptimisticVariantId ||
+        row.querySelector('[data-quantity-variant-id]')?.dataset.quantityVariantId ||
+        '',
+      ) === String(item.variantId);
+    const existingRow = rows.find(matchesVariant) || null;
+    const updatedRow = this.createOptimisticCartItem(item, addedQuantity, existingQuantity, existingRow);
+    const orderedRows = [updatedRow, ...rows.filter((row) => !matchesVariant(row))];
+
+    orderedRows.forEach((row) => {
+      row.removeAttribute('id');
+      row.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
+    });
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'drawer__cart-items-wrapper';
+    const table = document.createElement('table');
+    table.className = 'cart-items prada-cart-drawer__items';
+    table.setAttribute('role', 'table');
+    const body = document.createElement('tbody');
+    body.setAttribute('role', 'rowgroup');
+    body.append(...orderedRows);
+    table.append(body);
+    wrapper.append(table);
+    container.classList.toggle('is-multiple', lineCount > 1);
+    table.classList.toggle('prada-cart-drawer__items--multiple', lineCount > 1);
+    container.append(wrapper);
+  }
+
+  createOptimisticCartItem(item, addedQuantity, carriedExistingQuantity = 0, sourceItem = null) {
+    const existingQuantityInput = sourceItem?.querySelector('[data-quantity-variant-id]') ||
+      [...this.querySelectorAll('[data-quantity-variant-id]')]
+        .find((input) => String(input.dataset.quantityVariantId) === String(item.variantId));
+    const existingItem = sourceItem || existingQuantityInput?.closest('.cart-item');
     const existingQuantity = Math.max(
       Number.parseInt(existingQuantityInput?.value || '0', 10) || 0,
       carriedExistingQuantity,
@@ -239,6 +283,7 @@ class CartDrawer extends HTMLElement {
 
     if (existingItem) {
       const clonedItem = existingItem.cloneNode(true);
+      clonedItem.dataset.pradaOptimisticVariantId = String(item.variantId);
       clonedItem.removeAttribute('id');
       clonedItem.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
       const quantityLabel = clonedItem.querySelector('.prada-cart-drawer__quantity');
@@ -255,11 +300,14 @@ class CartDrawer extends HTMLElement {
       return clonedItem;
     }
 
-    const product = document.createElement('div');
+    const product = document.createElement('tr');
     product.className = 'cart-item prada-cart-drawer__optimistic-new-item';
+    product.dataset.pradaOptimisticVariantId = String(item.variantId);
+    product.setAttribute('role', 'row');
 
-    const media = document.createElement('div');
+    const media = document.createElement('td');
     media.className = 'cart-item__media';
+    media.setAttribute('role', 'cell');
     if (item.image) {
       const imageLink = document.createElement('a');
       imageLink.className = 'cart-item__link';
@@ -277,8 +325,9 @@ class CartDrawer extends HTMLElement {
       media.append(imageLink);
     }
 
-    const details = document.createElement('div');
+    const details = document.createElement('td');
     details.className = 'cart-item__details';
+    details.setAttribute('role', 'cell');
     const titleWrap = document.createElement('div');
     titleWrap.className = 'cart-item__title';
     const title = document.createElement('a');
@@ -332,18 +381,62 @@ class CartDrawer extends HTMLElement {
     return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(cents / 100);
   }
 
+  parseOptimisticMoney(text = '') {
+    const value = Number.parseFloat(String(text).replace(/[^\d.,-]/g, '').replace(/,/g, ''));
+    return Number.isFinite(value) ? Math.round(value * 100) : 0;
+  }
+
+  getOptimisticRowVariantId(row) {
+    return String(
+      row?.dataset.pradaOptimisticVariantId ||
+      row?.querySelector('[data-quantity-variant-id]')?.dataset.quantityVariantId ||
+      '',
+    );
+  }
+
+  getOptimisticRowLineKey(row) {
+    return row?.dataset.pradaOptimisticLineKey ||
+      row?.querySelector('[data-quantity-line-key]')?.dataset.quantityLineKey ||
+      null;
+  }
+
+  getOptimisticRowQuantity(row) {
+    const inputQuantity = Number.parseInt(row?.querySelector('[data-quantity-variant-id]')?.value || '0', 10) || 0;
+    if (inputQuantity > 0) return inputQuantity;
+
+    const label = row?.querySelector('.prada-cart-drawer__quantity')?.textContent || '';
+    return Number.parseInt(label.match(/\d+/)?.[0] || '1', 10) || 1;
+  }
+
   beginOptimisticRemove(state, removeButton, event) {
     if (!state || this.optimisticState?.id !== state.id || state.removalPending) return;
+
+    const removedItem = removeButton.closest('.cart-item');
+    const removedVariantId = this.getOptimisticRowVariantId(removedItem);
+    const removedLineKey = this.getOptimisticRowLineKey(removedItem);
+    if (!removedItem || (!removedVariantId && !removedLineKey)) return;
+
+    const removedLineQuantity = this.getOptimisticRowQuantity(removedItem);
+    const displayedUnitPrice = this.parseOptimisticMoney(
+      removedItem.querySelector('.prada-cart-drawer__price')?.textContent,
+    );
+    const removingAddedLine = removedVariantId === String(state.item.variantId);
+    const unitPrice = displayedUnitPrice || (removingAddedLine ? state.item.priceCents : 0);
 
     this.cancelScheduledOptimisticRefresh(state);
     state.removeQueued = true;
     state.removalPending = true;
     state.queuedDestination = null;
-    state.removedItem = removeButton.closest('.cart-item');
-    state.removedItem?.setAttribute('hidden', '');
+    state.removedItem = removedItem;
+    state.removedVariantId = removedVariantId;
+    state.removedLineKey = removedLineKey;
+    state.removedLineQuantity = removedLineQuantity;
+    state.removedLineTotal = unitPrice * removedLineQuantity;
+    state.removingAddedLine = removingAddedLine;
+    removedItem.setAttribute('hidden', '');
 
-    const nextCount = Math.max(0, state.optimisticCount - state.optimisticLineQuantity);
-    const nextTotal = Math.max(0, state.optimisticTotal - state.item.priceCents * state.optimisticLineQuantity);
+    const nextCount = Math.max(0, state.optimisticCount - removedLineQuantity);
+    const nextTotal = Math.max(0, state.optimisticTotal - state.removedLineTotal);
     state.removedCount = nextCount;
     state.removedTotal = nextTotal;
     this.dataset.cartItemCount = String(nextCount);
@@ -396,7 +489,9 @@ class CartDrawer extends HTMLElement {
 
   async performOptimisticRemove(state) {
     if (!state || this.optimisticState?.id !== state.id || state.removeRequestStarted) return;
-    const lineIdentifier = state.addedLineKey || state.item.variantId;
+    const lineIdentifier = state.removingAddedLine
+      ? state.addedLineKey || state.removedLineKey || state.removedVariantId
+      : state.removedLineKey || state.removedVariantId;
     if (!lineIdentifier) return;
 
     state.removeRequestStarted = true;
@@ -422,7 +517,7 @@ class CartDrawer extends HTMLElement {
       this.renderContents(parsedState, { shouldOpen: false });
       publish(PUB_SUB_EVENTS.cartUpdate, {
         source: 'cart-items',
-        variantId: state.item.variantId,
+        variantId: state.removedVariantId,
         cartData: parsedState,
       });
     } catch (error) {
@@ -552,6 +647,9 @@ class CartDrawer extends HTMLElement {
 
     state.confirmed = true;
     state.addedLineKey = parsedState?.key || state.addedLineKey || null;
+    const addedRow = [...this.querySelectorAll('.prada-cart-drawer__optimistic .cart-item')]
+      .find((row) => this.getOptimisticRowVariantId(row) === String(state.item.variantId));
+    if (addedRow && state.addedLineKey) addedRow.dataset.pradaOptimisticLineKey = state.addedLineKey;
     if (parsedState?.sections?.['cart-drawer']) state.parsedState = parsedState;
 
     if (state.removeQueued) {
