@@ -92,7 +92,7 @@ if (!customElements.get('product-form')) {
               return;
             }
 
-            if (optimisticState) this.cart.confirmOptimisticAdd?.(optimisticState);
+            if (optimisticState) this.cart.confirmOptimisticAdd?.(optimisticState, response);
             this.resolveCartLinesUpdate(linesUpdateDeferred);
 
             const startMarker = CartPerformance.createStartingMarker('add:wait-for-subscribers');

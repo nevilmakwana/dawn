@@ -5,6 +5,7 @@ class CartRemoveButton extends HTMLElement {
 
     cartItem.closest('cart-drawer')?.classList.remove('is-empty-leaving');
     cartItem.classList.remove('is-removing', 'is-collapsing', 'is-horizontal-removal');
+    cartItem.hidden = false;
     cartItem.style.maxHeight = '';
     cartItem.style.maxWidth = '';
     cartItem.style.width = '';
@@ -40,22 +41,6 @@ class CartRemoveButton extends HTMLElement {
 
       if (cartItem.classList.contains('is-removing')) return;
 
-      const isHorizontalDrawerItem = Boolean(
-        isCartDrawerItem &&
-        window.matchMedia('(max-width: 989px)').matches &&
-        cartItem.closest('.prada-cart-drawer__items--multiple')
-      );
-
-      if (isHorizontalDrawerItem) {
-        cartItem.classList.add('is-horizontal-removal');
-        cartItem.style.width = `${cartItem.offsetWidth}px`;
-        cartItem.style.maxWidth = `${cartItem.offsetWidth}px`;
-        cartItem.style.flexBasis = `${cartItem.offsetWidth}px`;
-      } else {
-        cartItem.style.maxHeight = `${cartItem.offsetHeight}px`;
-      }
-      cartItem.style.overflow = 'hidden';
-      cartItem.getBoundingClientRect();
       this.setAttribute('aria-disabled', 'true');
       this.querySelectorAll('a, button').forEach((control) => {
         control.setAttribute('aria-disabled', 'true');
@@ -66,23 +51,11 @@ class CartRemoveButton extends HTMLElement {
         }
       });
 
-      const removeEvent = { currentTarget: this };
-      const removeDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180;
-      const removeFromCart = () => {
-        cartItem.classList.add('is-collapsing');
-        cartItems.updateQuantity(this.dataset.index, 0, removeEvent);
-      };
-
-      window.requestAnimationFrame(() => {
-        cartItem.classList.add('is-removing');
-
-        if (removeDelay === 0) {
-          removeFromCart();
-          return;
-        }
-
-        window.setTimeout(removeFromCart, removeDelay);
-      });
+      // Remove from the visual layout in the same click frame and start the
+      // Shopify mutation immediately. The row is restored if the request fails.
+      cartItem.classList.add('is-removing', 'is-collapsing');
+      cartItem.hidden = true;
+      cartItems.updateQuantity(this.dataset.index, 0, { currentTarget: this });
     });
   }
 }
