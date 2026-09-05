@@ -47,11 +47,20 @@ if (!customElements.get('product-form')) {
         const variantId = formData.get('id');
         const quantity = parseInt(formData.get('quantity')) || 1;
         const linesUpdateDeferred = this.createCartLinesUpdateEvent(variantId, quantity);
+        const shouldOpenCart =
+          this.dataset.openCart === 'true' || !window.matchMedia('(max-width: 749px)').matches;
+        const quickAddModal = this.closest('quick-add-modal');
+        const optimisticItem = this.getOptimisticCartItem(variantId, quantity);
+        const optimisticState =
+          this.cart && shouldOpenCart && !quickAddModal && optimisticItem
+            ? this.cart.beginOptimisticAdd?.(optimisticItem, this.submitButton)
+            : null;
 
         fetch(`${routes.cart_add_url}`, config)
           .then((response) => response.json())
           .then((response) => {
             if (response.status) {
+              this.cart?.cancelOptimisticAdd?.(optimisticState);
               publish(PUB_SUB_EVENTS.cartError, {
                 source: 'product-form',
                 productVariantId: variantId,
@@ -87,9 +96,6 @@ if (!customElements.get('product-form')) {
                 CartPerformance.measureFromMarker('add:wait-for-subscribers', startMarker);
               });
             this.error = false;
-            const shouldOpenCart =
-              this.dataset.openCart === 'true' || !window.matchMedia('(max-width: 749px)').matches;
-            const quickAddModal = this.closest('quick-add-modal');
             if (quickAddModal) {
               document.body.addEventListener(
                 'modalClosed',
@@ -111,12 +117,12 @@ if (!customElements.get('product-form')) {
           })
           .catch((e) => {
             console.error(e);
+            this.cart?.cancelOptimisticAdd?.(optimisticState);
             this.dispatchCartErrorEvent(e.message || 'Network error', 'SERVICE_UNAVAILABLE');
             linesUpdateDeferred?.reject(e);
           })
           .finally(() => {
             this.submitButton.classList.remove('loading');
-            if (this.cart && this.cart.classList.contains('is-empty')) this.cart.classList.remove('is-empty');
             if (!this.error) this.submitButton.removeAttribute('aria-disabled');
             this.querySelector('.loading__spinner').classList.add('hidden');
 
@@ -147,6 +153,33 @@ if (!customElements.get('product-form')) {
           this.submitButton.removeAttribute('disabled');
           this.submitButtonText.textContent = window.variantStrings.addToCart;
         }
+      }
+
+      getOptimisticCartItem(variantId, quantity) {
+        const product = this.closest('.prada-product');
+        if (!product) return null;
+
+        const title = product.querySelector('.prada-product__heading-row h1')?.textContent?.trim();
+        if (!title) return null;
+
+        const image = product.querySelector('.prada-product__media-list .prada-product__gallery-image');
+        const price = product.querySelector('[data-prada-price] > span.money:last-of-type')?.textContent?.trim() || '';
+        const options = [...product.querySelectorAll('select[data-prada-option]')]
+          .map((select) => ({
+            name: select.dataset.pradaOptionName || '',
+            value: select.value,
+          }))
+          .filter((option) => option.name && option.value && option.value.toLowerCase() !== 'default title');
+
+        return {
+          title,
+          url: `${product.dataset.productUrl}?variant=${variantId}`,
+          image: image?.currentSrc || image?.src || '',
+          imageAlt: image?.alt || title,
+          price,
+          quantity,
+          options,
+        };
       }
 
       createCartLinesUpdateEvent(variantId, quantity) {

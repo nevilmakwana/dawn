@@ -72,7 +72,7 @@ const isPradaCartPage = () => {
   return currentPath === cartPath;
 };
 
-const PRADA_CART_DRAWER_TRANSITION_DURATION = 560;
+const PRADA_CART_DRAWER_TRANSITION_DURATION = 260;
 
 class CartDrawer extends HTMLElement {
   constructor() {
@@ -81,6 +81,128 @@ class CartDrawer extends HTMLElement {
     this.addEventListener('keyup', (evt) => evt.code === 'Escape' && this.close());
     this.bindOverlay();
     this.setHeaderCartIconAccessibility();
+  }
+
+  beginOptimisticAdd(item, triggeredBy) {
+    if (!item) return null;
+    if (this.optimisticState) this.cancelOptimisticAdd(this.optimisticState, { keepDrawer: true });
+
+    const previousCount = Number.parseInt(this.dataset.cartItemCount || '0', 10) || 0;
+    const quantity = Number.parseInt(item.quantity || '1', 10) || 1;
+    const optimisticCount = previousCount + quantity;
+    const state = {
+      id: `${Date.now()}-${Math.random()}`,
+      previousCount,
+      wasEmpty: this.classList.contains('is-empty'),
+      wasMultiple: this.classList.contains('prada-cart-drawer--multiple'),
+      wasOpen: this.classList.contains('active') || this.classList.contains('is-opening'),
+    };
+
+    this.optimisticState = state;
+    this.querySelector('.prada-cart-drawer__optimistic')?.remove();
+    this.dataset.cartItemCount = String(optimisticCount);
+    this.classList.remove('is-empty');
+    this.classList.add('is-optimistic');
+    updatePradaCartIcon(optimisticCount);
+
+    const panel = document.createElement('div');
+    panel.className = 'prada-cart-drawer__optimistic';
+    panel.dataset.optimisticId = state.id;
+
+    const header = document.createElement('div');
+    header.className = 'prada-cart-drawer__optimistic-header';
+    const heading = document.createElement('p');
+    heading.className = 'prada-cart-drawer__optimistic-heading';
+    heading.textContent = `Adding to shopping bag (${optimisticCount})`;
+    const closeButton = document.createElement('button');
+    closeButton.className = 'prada-cart-drawer__optimistic-close';
+    closeButton.type = 'button';
+    closeButton.setAttribute('aria-label', 'Close shopping bag');
+    closeButton.textContent = '×';
+    closeButton.addEventListener('click', () => this.close());
+    header.append(heading, closeButton);
+
+    const product = document.createElement('div');
+    product.className = 'prada-cart-drawer__optimistic-product';
+    if (item.image) {
+      const imageLink = document.createElement('a');
+      imageLink.className = 'prada-cart-drawer__optimistic-image-link';
+      imageLink.href = item.url || '#';
+      imageLink.tabIndex = -1;
+      imageLink.setAttribute('aria-hidden', 'true');
+      const image = document.createElement('img');
+      image.className = 'prada-cart-drawer__optimistic-image';
+      image.src = item.image;
+      image.alt = item.imageAlt || item.title;
+      image.width = 124;
+      image.height = 156;
+      image.decoding = 'async';
+      imageLink.append(image);
+      product.append(imageLink);
+    }
+
+    const details = document.createElement('div');
+    details.className = 'prada-cart-drawer__optimistic-details';
+    const title = document.createElement('a');
+    title.className = 'prada-cart-drawer__optimistic-title';
+    title.href = item.url || '#';
+    title.textContent = item.title;
+    details.append(title);
+
+    item.options?.forEach((option) => {
+      const row = document.createElement('p');
+      row.className = 'prada-cart-drawer__optimistic-meta';
+      row.textContent = `${option.name}: ${option.value}`;
+      details.append(row);
+    });
+
+    const quantityRow = document.createElement('p');
+    quantityRow.className = 'prada-cart-drawer__optimistic-meta prada-cart-drawer__optimistic-quantity';
+    quantityRow.textContent = `Qty: ${quantity}`;
+    details.append(quantityRow);
+    if (item.price) {
+      const price = document.createElement('p');
+      price.className = 'prada-cart-drawer__optimistic-price money';
+      price.textContent = item.price;
+      details.append(price);
+    }
+    product.append(details);
+
+    const status = document.createElement('p');
+    status.className = 'prada-cart-drawer__optimistic-status';
+    status.setAttribute('role', 'status');
+    status.setAttribute('aria-live', 'polite');
+    const statusDot = document.createElement('span');
+    statusDot.setAttribute('aria-hidden', 'true');
+    const statusText = document.createElement('span');
+    statusText.textContent = 'Confirming your selection…';
+    status.append(statusDot, statusText);
+
+    panel.append(header, product, status);
+    this.querySelector('.drawer__inner')?.append(panel);
+    this.setActiveElement(triggeredBy);
+    this.open();
+    return state;
+  }
+
+  completeOptimisticAdd() {
+    this.querySelector('.prada-cart-drawer__optimistic')?.remove();
+    this.classList.remove('is-optimistic');
+    this.optimisticState = null;
+  }
+
+  cancelOptimisticAdd(state, { keepDrawer = false } = {}) {
+    if (!state || this.optimisticState?.id !== state.id) return;
+
+    this.querySelector('.prada-cart-drawer__optimistic')?.remove();
+    this.classList.remove('is-optimistic');
+    this.classList.toggle('is-empty', state.wasEmpty);
+    this.classList.toggle('prada-cart-drawer--multiple', state.wasMultiple);
+    this.dataset.cartItemCount = String(state.previousCount);
+    updatePradaCartIcon(state.previousCount);
+    this.optimisticState = null;
+
+    if (!keepDrawer && !state.wasOpen) this.close();
   }
 
   bindOverlay() {
@@ -251,6 +373,7 @@ class CartDrawer extends HTMLElement {
   }
 
   renderContents(parsedState, { shouldOpen = true } = {}) {
+    this.completeOptimisticAdd();
     const sourceDrawer = parsedState.sections?.['cart-drawer']
       ? this.getSectionDOM(parsedState.sections['cart-drawer'], 'cart-drawer')
       : null;

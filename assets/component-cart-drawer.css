@@ -121,7 +121,7 @@ cart-drawer.prada-cart-drawer.is-empty-entering.is-empty-visible .prada-cart-dra
 }
 
 cart-drawer.prada-cart-drawer {
-  --prada-cart-drawer-slide-duration: 560ms;
+  --prada-cart-drawer-slide-duration: 260ms;
   --prada-cart-drawer-slide-in-ease: cubic-bezier(0.16, 1, 0.3, 1);
   --prada-cart-drawer-slide-out-ease: cubic-bezier(0.4, 0, 0.2, 1);
   visibility: hidden;
@@ -163,6 +163,128 @@ cart-drawer.prada-cart-drawer.active .drawer__inner {
 cart-drawer.prada-cart-drawer.is-closing .drawer__inner {
   transition-duration: var(--prada-cart-drawer-slide-duration);
   transition-timing-function: var(--prada-cart-drawer-slide-out-ease);
+}
+
+cart-drawer.prada-cart-drawer.is-optimistic .drawer__inner > :not(.prada-cart-drawer__optimistic) {
+  visibility: hidden;
+}
+
+.prada-cart-drawer__optimistic {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #ffffff;
+  color: #111111;
+}
+
+.prada-cart-drawer__optimistic-header {
+  display: flex;
+  flex: 0 0 80px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.prada-cart-drawer__optimistic-heading {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.prada-cart-drawer__optimistic-close {
+  display: grid;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #111111;
+  font: inherit;
+  font-size: 34px;
+  font-weight: 200;
+  line-height: 1;
+  place-items: center;
+  cursor: pointer;
+}
+
+.prada-cart-drawer__optimistic-product {
+  display: grid;
+  grid-template-columns: 176px minmax(0, 1fr);
+  gap: 20px;
+  min-height: 220px;
+  padding: 0 20px 34px;
+}
+
+.prada-cart-drawer__optimistic-image-link,
+.prada-cart-drawer__optimistic-image {
+  display: block;
+  width: 176px;
+  height: 220px;
+}
+
+.prada-cart-drawer__optimistic-image {
+  object-fit: cover;
+}
+
+.prada-cart-drawer__optimistic-title {
+  display: block;
+  margin: 0 0 10px;
+  color: #111111;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.prada-cart-drawer__optimistic-meta,
+.prada-cart-drawer__optimistic-price {
+  margin: 0 0 8px;
+  color: #111111;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.prada-cart-drawer__optimistic-quantity,
+.prada-cart-drawer__optimistic-price {
+  margin-top: 10px;
+}
+
+.prada-cart-drawer__optimistic-price {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.prada-cart-drawer__optimistic-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: auto 20px 0;
+  padding: 18px 0;
+  border-top: 1px solid #dcdcdc;
+  color: #555555;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.prada-cart-drawer__optimistic-status > span:first-child {
+  width: 15px;
+  height: 15px;
+  border: 1.5px solid #cfcfcf;
+  border-top-color: #111111;
+  border-radius: 50%;
+  animation: prada-cart-confirming 650ms linear infinite;
+}
+
+@keyframes prada-cart-confirming {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .drawer__inner-empty {
@@ -929,6 +1051,50 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
 
   .prada-cart-drawer__heading-mobile {
     display: inline;
+  }
+
+  .prada-cart-drawer__optimistic-header {
+    flex-basis: 54px;
+    min-height: 54px;
+    padding: 0 15px;
+  }
+
+  .prada-cart-drawer__optimistic-product {
+    grid-template-columns: 124px minmax(0, 1fr);
+    gap: 14px;
+    min-height: 156px;
+    padding: 0 15px 24px;
+  }
+
+  .prada-cart-drawer__optimistic-image-link,
+  .prada-cart-drawer__optimistic-image {
+    width: 124px;
+    height: 156px;
+  }
+
+  .prada-cart-drawer__optimistic-title,
+  .prada-cart-drawer__optimistic-meta {
+    font-size: 12px;
+  }
+
+  .prada-cart-drawer__optimistic-meta {
+    margin-bottom: 2px;
+  }
+
+  .prada-cart-drawer__optimistic-quantity {
+    margin-top: 3px;
+  }
+
+  .prada-cart-drawer__optimistic-price {
+    margin-top: 4px;
+    font-size: 14px;
+  }
+
+  .prada-cart-drawer__optimistic-status {
+    margin-right: 15px;
+    margin-left: 15px;
+    padding: 14px 0;
+    font-size: 12px;
   }
 
   cart-drawer.prada-cart-drawer:not(.is-empty) .drawer__inner {
