@@ -1,49 +1,10 @@
 class CartRemoveButton extends HTMLElement {
-  showImmediateShoppingBagEmpty(cartItems) {
-    if (!cartItems?.matches('cart-items') || this.optimisticEmptyPageState) return;
-
-    const countElement = document.querySelector('[data-prada-shopping-bag-count]');
-    const previousCount = Number.parseInt(countElement?.textContent || '0', 10) || 0;
-    const cartFooter = document.getElementById('main-cart-footer');
-    this.optimisticEmptyPageState = {
-      cartItems,
-      cartFooter,
-      previousCount,
-      cartItemsWasEmpty: cartItems.classList.contains('is-empty'),
-      cartFooterWasEmpty: cartFooter?.classList.contains('is-empty') || false,
-    };
-
-    cartItems.classList.add('is-empty');
-    cartFooter?.classList.add('is-empty');
-    document.querySelectorAll('[data-prada-shopping-bag-count]').forEach((count) => {
-      count.textContent = '0';
-    });
-    window.PradaCartHeader?.update?.(0);
-  }
-
-  restoreImmediateShoppingBagEmpty() {
-    const state = this.optimisticEmptyPageState;
-    if (!state) return;
-
-    state.cartItems.classList.toggle('is-empty', state.cartItemsWasEmpty);
-    state.cartFooter?.classList.toggle('is-empty', state.cartFooterWasEmpty);
-    document.querySelectorAll('[data-prada-shopping-bag-count]').forEach((count) => {
-      count.textContent = String(state.previousCount);
-    });
-    window.PradaCartHeader?.update?.(state.previousCount);
-    this.optimisticEmptyPageState = null;
-  }
-
   restoreRemovingState() {
     const cartItem = this.closest('.cart-item');
     if (!cartItem) return;
 
-    const cartDrawer = this.immediateDrawerRemovalState?.drawer || cartItem.closest('cart-drawer');
-    cartDrawer?.classList.remove('is-empty-leaving');
-    cartDrawer?.restoreImmediateLineRemoval?.(this.immediateDrawerRemovalState);
-    this.immediateDrawerRemovalState = null;
+    cartItem.closest('cart-drawer')?.classList.remove('is-empty-leaving');
     cartItem.classList.remove('is-removing', 'is-collapsing', 'is-horizontal-removal');
-    cartItem.hidden = false;
     cartItem.style.maxHeight = '';
     cartItem.style.maxWidth = '';
     cartItem.style.width = '';
@@ -58,7 +19,6 @@ class CartRemoveButton extends HTMLElement {
         control.removeAttribute('tabindex');
       }
     });
-    this.restoreImmediateShoppingBagEmpty();
   }
 
   constructor() {
@@ -70,8 +30,6 @@ class CartRemoveButton extends HTMLElement {
       const cartItem = this.closest('.cart-item');
       const isShoppingBagItem = cartItems?.matches('cart-items') && cartItem?.closest('.prada-shopping-bag-page');
       const isCartDrawerItem = cartItems?.matches('cart-drawer-items') && cartItem?.closest('cart-drawer');
-      const isLastShoppingBagItem =
-        isShoppingBagItem && cartItems.querySelectorAll('.cart-item:not([hidden])').length === 1;
 
       if (!cartItems) return;
 
@@ -81,9 +39,23 @@ class CartRemoveButton extends HTMLElement {
       }
 
       if (cartItem.classList.contains('is-removing')) return;
-      const cartDrawer = isCartDrawerItem ? cartItem.closest('cart-drawer') : null;
-      if (cartDrawer?.immediateLineRemovalState) return;
 
+      const isHorizontalDrawerItem = Boolean(
+        isCartDrawerItem &&
+        window.matchMedia('(max-width: 989px)').matches &&
+        cartItem.closest('.prada-cart-drawer__items--multiple')
+      );
+
+      if (isHorizontalDrawerItem) {
+        cartItem.classList.add('is-horizontal-removal');
+        cartItem.style.width = `${cartItem.offsetWidth}px`;
+        cartItem.style.maxWidth = `${cartItem.offsetWidth}px`;
+        cartItem.style.flexBasis = `${cartItem.offsetWidth}px`;
+      } else {
+        cartItem.style.maxHeight = `${cartItem.offsetHeight}px`;
+      }
+      cartItem.style.overflow = 'hidden';
+      cartItem.getBoundingClientRect();
       this.setAttribute('aria-disabled', 'true');
       this.querySelectorAll('a, button').forEach((control) => {
         control.setAttribute('aria-disabled', 'true');
@@ -94,15 +66,23 @@ class CartRemoveButton extends HTMLElement {
         }
       });
 
-      // Remove from the visual layout in the same click frame and start the
-      // Shopify mutation immediately. The row is restored if the request fails.
-      cartItem.classList.add('is-removing', 'is-collapsing');
-      cartItem.hidden = true;
-      if (isCartDrawerItem) {
-        this.immediateDrawerRemovalState = cartDrawer?.beginImmediateLineRemoval?.(cartItem);
-      }
-      if (isLastShoppingBagItem) this.showImmediateShoppingBagEmpty(cartItems);
-      cartItems.updateQuantity(this.dataset.index, 0, { currentTarget: this });
+      const removeEvent = { currentTarget: this };
+      const removeDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180;
+      const removeFromCart = () => {
+        cartItem.classList.add('is-collapsing');
+        cartItems.updateQuantity(this.dataset.index, 0, removeEvent);
+      };
+
+      window.requestAnimationFrame(() => {
+        cartItem.classList.add('is-removing');
+
+        if (removeDelay === 0) {
+          removeFromCart();
+          return;
+        }
+
+        window.setTimeout(removeFromCart, removeDelay);
+      });
     });
   }
 }
@@ -208,11 +188,6 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
 
   onCartUpdate() {
     if (this.tagName === 'CART-DRAWER-ITEMS') {
-      // An optimistic add/remove owns the drawer until its mutation settles.
-      // Skipping this redundant refresh prevents an older add response from
-      // repainting a line after the customer has already removed it.
-      if (document.querySelector('cart-drawer')?.optimisticState) return Promise.resolve();
-
       return fetch(`${routes.cart_url}?section_id=cart-drawer`)
         .then((response) => response.text())
         .then((responseText) => {
@@ -277,29 +252,18 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
     const action = quantity === 0 ? 'remove' : 'update';
     const quantityInput = this.querySelector(`#Quantity-${line}`) || this.querySelector(`#Drawer-quantity-${line}`);
     const lineVariantId = variantId || quantityInput?.dataset.quantityVariantId;
-    const lineKey =
-      quantityInput?.dataset.quantityLineKey || event.currentTarget.closest('.cart-item')?.dataset.lineKey;
+    const lineKey = quantityInput?.dataset.quantityLineKey;
     const linesUpdateDeferred = this.createCartLinesUpdateEvent(action, lineVariantId, quantity, lineKey);
 
     // Cache sections before the fetch so we read dataset.id while elements still exist in the DOM
     const sectionsToRender = this.getSectionsToRender();
 
-    const mutation = {
+    const body = JSON.stringify({
+      line,
       quantity,
       sections: sectionsToRender.map((section) => section.section),
       sections_url: window.location.pathname,
-    };
-
-    // A line key remains stable while indexes can change during rapid AJAX
-    // add/remove operations. Prefer it for removal so Shopify mutates exactly
-    // the line the customer clicked.
-    if (quantity === 0 && lineKey) {
-      mutation.id = lineKey;
-    } else {
-      mutation.line = line;
-    }
-
-    const body = JSON.stringify(mutation);
+    });
 
     fetch(`${routes.cart_change_url}`, { ...fetchConfig(), ...{ body } })
       .then((response) => {
@@ -418,15 +382,6 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
             trapFocus(cartDrawerWrapper, document.querySelector('.cart-item__name'));
           }
         });
-
-        if (quantity === 0 && event.currentTarget instanceof CartRemoveButton) {
-          const immediateState = event.currentTarget.immediateDrawerRemovalState;
-          if (immediateState?.drawer?.immediateLineRemovalState === immediateState) {
-            immediateState.drawer.immediateLineRemovalState = null;
-          }
-          event.currentTarget.immediateDrawerRemovalState = null;
-          event.currentTarget.optimisticEmptyPageState = null;
-        }
 
         publish(PUB_SUB_EVENTS.cartUpdate, { source: 'cart-items', cartData: parsedState, variantId: variantId });
       })

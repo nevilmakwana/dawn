@@ -24,7 +24,6 @@
 <cart-drawer
   class="drawer prada-cart-drawer{% if cart == empty %} is-empty{% endif %}{% if cart.items.size > 1 %} prada-cart-drawer--multiple{% endif %}"
   data-cart-item-count="{{ cart.item_count }}"
-  data-cart-total-price="{{ cart.total_price }}"
 >
   <div id="CartDrawer" class="cart-drawer">
     <div id="CartDrawer-Overlay" class="cart-drawer__overlay"></div>
@@ -144,9 +143,6 @@
                         id="CartDrawer-Item-{{ item.index | plus: 1 }}"
                         class="cart-item{% if item.parent_relationship.parent != null %} cart-item__nested-line{% endif %}"
                         role="row"
-                        data-line-key="{{ item.key | escape }}"
-                        data-line-quantity="{{ item.quantity }}"
-                        data-line-final-price="{{ item.final_line_price }}"
                         {% if item.parent_relationship.parent != null %}
                           aria-label="{{- 'products.product.nested_label' | t: title: item.product.title, parent_title: item.parent_relationship.parent.title | escape -}}"
                         {% endif %}

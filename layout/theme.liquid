@@ -83,17 +83,9 @@
     <script src="{{ 'constants.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'pubsub.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
-    <script src="{{ 'prada-product-prefetch.js' | asset_url }}" defer="defer"></script>
-    <script type="speculationrules">
-      {
-        "prefetch": [
-          {
-            "where": { "selector_matches": "a[data-instant-navigation]" },
-            "eagerness": "moderate"
-          }
-        ]
-      }
-    </script>
+    {%- if request.page_type == 'index' or request.page_type == 'collection' or request.page_type == 'search' or request.page_type == 'product' -%}
+      <script src="{{ 'prada-product-prefetch.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
     <script src="{{ 'cart-disclosure-modal.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'cart-disclosure-tooltip.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'details-disclosure.js' | asset_url }}" defer="defer"></script>
