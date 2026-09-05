@@ -501,20 +501,27 @@ class CartDrawer extends HTMLElement {
     row.style.overflow = '';
   }
 
-  showOptimisticEmptyState(state, panel) {
-    if (!panel || panel.querySelector('.prada-cart-drawer__optimistic-empty')) return;
-
-    panel.querySelector(':scope > .drawer__header')?.setAttribute('hidden', '');
-    panel.querySelector(':scope > .prada-cart-drawer__optimistic-items')?.setAttribute('hidden', '');
-    panel.querySelector(':scope > .drawer__footer')?.setAttribute('hidden', '');
+  createEmptyStateElement() {
+    const sourceEmpty = this.querySelector('.drawer__inner > .drawer__inner-empty');
+    if (sourceEmpty) {
+      const empty = sourceEmpty.cloneNode(true);
+      empty.removeAttribute('hidden');
+      empty.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
+      const closeButton = empty.querySelector('.drawer__close');
+      if (closeButton) {
+        closeButton.removeAttribute('onclick');
+        closeButton.addEventListener('click', () => this.close());
+      }
+      return empty;
+    }
 
     const empty = document.createElement('div');
-    empty.className = 'drawer__inner-empty prada-cart-drawer__optimistic-empty';
+    empty.className = 'drawer__inner-empty';
     const warnings = document.createElement('div');
     warnings.className = 'cart-drawer__warnings center';
     const content = document.createElement('div');
     content.className = 'prada-cart-drawer__empty-content';
-    const sourceClose = panel.querySelector(':scope > .drawer__header .drawer__close');
+    const sourceClose = this.querySelector('.drawer__header .drawer__close');
     const closeButton = sourceClose?.cloneNode(true) || document.createElement('button');
     closeButton.type = 'button';
     closeButton.classList.add('drawer__close');
@@ -528,6 +535,33 @@ class CartDrawer extends HTMLElement {
     content.append(closeButton, message);
     warnings.append(content);
     empty.append(warnings);
+    return empty;
+  }
+
+  ensureImmediateEmptyState() {
+    const drawerInner = this.querySelector('.drawer__inner');
+    if (!drawerInner) return null;
+
+    let empty = drawerInner.querySelector(':scope > .drawer__inner-empty');
+    const created = !empty;
+    if (!empty) {
+      empty = this.createEmptyStateElement();
+      drawerInner.prepend(empty);
+    }
+    const wasHidden = empty.hasAttribute('hidden');
+    empty.removeAttribute('hidden');
+    return { element: empty, created, wasHidden };
+  }
+
+  showOptimisticEmptyState(state, panel) {
+    if (!panel || panel.querySelector('.prada-cart-drawer__optimistic-empty')) return;
+
+    panel.querySelector(':scope > .drawer__header')?.setAttribute('hidden', '');
+    panel.querySelector(':scope > .prada-cart-drawer__optimistic-items')?.setAttribute('hidden', '');
+    panel.querySelector(':scope > .drawer__footer')?.setAttribute('hidden', '');
+
+    const empty = this.createEmptyStateElement();
+    empty.classList.add('prada-cart-drawer__optimistic-empty');
 
     panel.append(empty);
     this.classList.add('is-empty', 'is-optimistic-empty', 'is-empty-entering');
@@ -566,9 +600,16 @@ class CartDrawer extends HTMLElement {
     state.removeRequestStarted = true;
     const mutationMarker = CartPerformance.createStartingMarker('remove:mutation');
     try {
+      const isLastLineRemoval = state.removedCount === 0;
       const body = JSON.stringify({
         id: lineIdentifier,
         quantity: 0,
+        ...(isLastLineRemoval
+          ? {
+              sections: this.getSectionsToRender().map((section) => section.id),
+              sections_url: window.location.pathname,
+            }
+          : {}),
       });
       const removeRequest = () =>
         fetch(`${routes.cart_change_url}`, { ...fetchConfig(), body }).then(async (response) => ({
@@ -581,7 +622,12 @@ class CartDrawer extends HTMLElement {
       if (!response.ok || parsedState.status) throw new Error(parsedState.description || 'Unable to remove item');
 
       const removedVariantId = state.removedVariantId;
-      this.commitOptimisticRemove(state, parsedState);
+      if (parsedState.item_count === 0 && parsedState.sections?.['cart-drawer']) {
+        this.completeOptimisticAdd();
+        this.renderContents(parsedState, { shouldOpen: false });
+      } else {
+        this.commitOptimisticRemove(state, parsedState);
+      }
       publish(PUB_SUB_EVENTS.cartUpdate, {
         source: 'cart-items',
         variantId: removedVariantId,

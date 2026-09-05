@@ -11,6 +11,13 @@ class CartRemoveButton extends HTMLElement {
       if (optimisticEmptyState.cartDrawer) {
         optimisticEmptyState.cartDrawer.dataset.cartItemCount = String(optimisticEmptyState.previousCount);
       }
+      if (optimisticEmptyState.emptyState?.element?.isConnected) {
+        if (optimisticEmptyState.emptyState.created) {
+          optimisticEmptyState.emptyState.element.remove();
+        } else if (optimisticEmptyState.emptyState.wasHidden) {
+          optimisticEmptyState.emptyState.element.setAttribute('hidden', '');
+        }
+      }
       document.querySelectorAll('[data-prada-shopping-bag-count]').forEach((count) => {
         count.textContent = String(optimisticEmptyState.previousCount);
       });
@@ -115,8 +122,9 @@ class CartRemoveButton extends HTMLElement {
       document.querySelector('[data-prada-shopping-bag-count]')?.textContent ||
       '1';
     const previousCount = Number.parseInt(displayedCount, 10) || 1;
+    const emptyState = cartDrawer?.ensureImmediateEmptyState?.() || null;
 
-    this.optimisticEmptyState = { cartItems, cartDrawer, cartFooter, previousCount };
+    this.optimisticEmptyState = { cartItems, cartDrawer, cartFooter, previousCount, emptyState };
     cartItems.classList.add('is-empty');
     cartFooter?.classList.add('is-empty');
     if (cartDrawer) {

@@ -35,8 +35,7 @@
       aria-label="{{ 'sections.cart.title' | t }}"
       tabindex="-1"
     >
-      {%- if cart == empty -%}
-        <div class="drawer__inner-empty">
+        <div class="drawer__inner-empty"{% unless cart == empty %} hidden{% endunless %}>
           <div class="cart-drawer__warnings center">
             <div class="prada-cart-drawer__empty-content">
               <button
@@ -58,7 +57,6 @@
             </div>
           </div>
         </div>
-      {%- endif -%}
       <div class="drawer__header">
         <h2 class="drawer__heading">
           <span class="prada-cart-drawer__heading-desktop">Your selection ({{ cart.item_count }})</span>
