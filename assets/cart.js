@@ -1,4 +1,39 @@
 class CartRemoveButton extends HTMLElement {
+  showImmediateShoppingBagEmpty(cartItems) {
+    if (!cartItems?.matches('cart-items') || this.optimisticEmptyPageState) return;
+
+    const countElement = document.querySelector('[data-prada-shopping-bag-count]');
+    const previousCount = Number.parseInt(countElement?.textContent || '0', 10) || 0;
+    const cartFooter = document.getElementById('main-cart-footer');
+    this.optimisticEmptyPageState = {
+      cartItems,
+      cartFooter,
+      previousCount,
+      cartItemsWasEmpty: cartItems.classList.contains('is-empty'),
+      cartFooterWasEmpty: cartFooter?.classList.contains('is-empty') || false,
+    };
+
+    cartItems.classList.add('is-empty');
+    cartFooter?.classList.add('is-empty');
+    document.querySelectorAll('[data-prada-shopping-bag-count]').forEach((count) => {
+      count.textContent = '0';
+    });
+    window.PradaCartHeader?.update?.(0);
+  }
+
+  restoreImmediateShoppingBagEmpty() {
+    const state = this.optimisticEmptyPageState;
+    if (!state) return;
+
+    state.cartItems.classList.toggle('is-empty', state.cartItemsWasEmpty);
+    state.cartFooter?.classList.toggle('is-empty', state.cartFooterWasEmpty);
+    document.querySelectorAll('[data-prada-shopping-bag-count]').forEach((count) => {
+      count.textContent = String(state.previousCount);
+    });
+    window.PradaCartHeader?.update?.(state.previousCount);
+    this.optimisticEmptyPageState = null;
+  }
+
   restoreRemovingState() {
     const cartItem = this.closest('.cart-item');
     if (!cartItem) return;
@@ -20,6 +55,7 @@ class CartRemoveButton extends HTMLElement {
         control.removeAttribute('tabindex');
       }
     });
+    this.restoreImmediateShoppingBagEmpty();
   }
 
   constructor() {
@@ -31,6 +67,8 @@ class CartRemoveButton extends HTMLElement {
       const cartItem = this.closest('.cart-item');
       const isShoppingBagItem = cartItems?.matches('cart-items') && cartItem?.closest('.prada-shopping-bag-page');
       const isCartDrawerItem = cartItems?.matches('cart-drawer-items') && cartItem?.closest('cart-drawer');
+      const isLastShoppingBagItem =
+        isShoppingBagItem && cartItems.querySelectorAll('.cart-item:not([hidden])').length === 1;
 
       if (!cartItems) return;
 
@@ -55,6 +93,7 @@ class CartRemoveButton extends HTMLElement {
       // Shopify mutation immediately. The row is restored if the request fails.
       cartItem.classList.add('is-removing', 'is-collapsing');
       cartItem.hidden = true;
+      if (isLastShoppingBagItem) this.showImmediateShoppingBagEmpty(cartItems);
       cartItems.updateQuantity(this.dataset.index, 0, { currentTarget: this });
     });
   }
