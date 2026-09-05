@@ -107,6 +107,7 @@ class CartDrawer extends HTMLElement {
       optimisticCount,
       optimisticTotal: previousTotal + item.priceCents * quantity,
       optimisticLineQuantity: existingVariantQuantity + quantity,
+      optimisticLineCount,
     };
 
     this.optimisticState = state;
@@ -312,7 +313,7 @@ class CartDrawer extends HTMLElement {
       footer.removeEventListener('click', completedState.pendingActionHandler, true);
     }
     this.querySelector('.prada-cart-drawer__optimistic')?.remove();
-    this.classList.remove('is-optimistic');
+    this.classList.remove('is-optimistic', 'is-optimistic-empty');
     this.optimisticState = null;
     return completedState;
   }
@@ -363,8 +364,47 @@ class CartDrawer extends HTMLElement {
     if (desktopHeading) desktopHeading.textContent = `Your selection (${nextCount})`;
     if (mobileHeading) mobileHeading.textContent = `Added to shopping bag (${nextCount})`;
     if (total) total.textContent = this.formatOptimisticMoney(nextTotal, total.textContent);
+    if (nextCount === 0) this.showOptimisticEmptyState(state, overlay);
 
     if (state.confirmed) this.performOptimisticRemove(state);
+  }
+
+  showOptimisticEmptyState(state, overlay) {
+    if (!state || !overlay || state.optimisticEmptyElement) return;
+
+    let emptyState = this.querySelector('.drawer__inner > .drawer__inner-empty')?.cloneNode(true);
+    if (!emptyState) {
+      emptyState = document.createElement('div');
+      emptyState.className = 'drawer__inner-empty';
+
+      const warnings = document.createElement('div');
+      warnings.className = 'cart-drawer__warnings center';
+      const content = document.createElement('div');
+      content.className = 'prada-cart-drawer__empty-content';
+      const closeButton = overlay.querySelector('.drawer__close')?.cloneNode(true) || document.createElement('button');
+      closeButton.classList.add('drawer__close');
+      closeButton.type = 'button';
+      closeButton.setAttribute('aria-label', 'Close shopping bag');
+      const message = document.createElement('p');
+      message.className = 'prada-cart-drawer__empty-message';
+      message.textContent = 'Your shopping bag is empty';
+      content.append(closeButton, message);
+      warnings.append(content);
+      emptyState.append(warnings);
+    }
+
+    emptyState.classList.add('prada-cart-drawer__optimistic-empty');
+    const closeButton = emptyState.querySelector('.drawer__close');
+    closeButton?.removeAttribute('onclick');
+    closeButton?.addEventListener('click', () => this.close());
+    overlay.querySelectorAll(':scope > .drawer__header, :scope > .prada-cart-drawer__optimistic-items, :scope > .drawer__footer')
+      .forEach((element) => {
+        element.hidden = true;
+      });
+    overlay.append(emptyState);
+    state.optimisticEmptyElement = emptyState;
+    this.classList.add('is-empty', 'is-optimistic-empty');
+    this.classList.remove('prada-cart-drawer--multiple');
   }
 
   performOptimisticRemove(state) {
@@ -413,11 +453,19 @@ class CartDrawer extends HTMLElement {
     state.removeQueued = false;
     state.removalRequestStarted = false;
     if (state.removedItem) state.removedItem.hidden = false;
+    state.optimisticEmptyElement?.remove();
+    state.optimisticEmptyElement = null;
+    const overlay = this.querySelector('.prada-cart-drawer__optimistic');
+    overlay?.querySelectorAll(':scope > .drawer__header, :scope > .prada-cart-drawer__optimistic-items, :scope > .drawer__footer')
+      .forEach((element) => {
+        element.hidden = false;
+      });
+    this.classList.remove('is-empty', 'is-optimistic-empty');
+    this.classList.toggle('prada-cart-drawer--multiple', state.optimisticLineCount > 1);
     this.dataset.cartItemCount = String(state.optimisticCount);
     this.dataset.cartTotalPrice = String(state.optimisticTotal);
     updatePradaCartIcon(state.optimisticCount);
 
-    const overlay = this.querySelector('.prada-cart-drawer__optimistic');
     const desktopHeading = overlay?.querySelector('.prada-cart-drawer__heading-desktop');
     const mobileHeading = overlay?.querySelector('.prada-cart-drawer__heading-mobile');
     const total = overlay?.querySelector('.totals__total-value');
@@ -448,7 +496,7 @@ class CartDrawer extends HTMLElement {
     if (!state || this.optimisticState?.id !== state.id) return;
 
     this.querySelector('.prada-cart-drawer__optimistic')?.remove();
-    this.classList.remove('is-optimistic');
+    this.classList.remove('is-optimistic', 'is-optimistic-empty');
     this.classList.toggle('is-empty', state.wasEmpty);
     this.classList.toggle('prada-cart-drawer--multiple', state.wasMultiple);
     this.dataset.cartItemCount = String(state.previousCount);

@@ -191,6 +191,19 @@ cart-drawer.prada-cart-drawer.is-optimistic .drawer__inner > :not(.prada-cart-dr
   flex: 0 0 auto;
 }
 
+cart-drawer.prada-cart-drawer.is-optimistic-empty .drawer__inner {
+  transition: none !important;
+}
+
+.prada-cart-drawer__optimistic-empty {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.prada-cart-drawer__optimistic > [hidden] {
+  display: none !important;
+}
+
 .drawer__inner-empty {
   height: 100%;
   padding: 0 1.5rem;
