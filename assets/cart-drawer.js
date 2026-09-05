@@ -110,15 +110,22 @@ class CartDrawer extends HTMLElement {
     const previousTotal = Number.parseInt(this.dataset.cartTotalPrice || '0', 10) || 0;
     const quantity = Number.parseInt(item.quantity || '1', 10) || 1;
     const optimisticCount = previousCount + quantity;
-    const existingVariantInput = [...this.querySelectorAll('[data-quantity-variant-id]')]
-      .find((input) => String(input.dataset.quantityVariantId) === String(item.variantId));
-    const renderedExistingQuantity = Number.parseInt(existingVariantInput?.value || '0', 10) || 0;
+    const carriedVariantRow = carriedState?.optimisticRows
+      ?.find((row) => this.getOptimisticRowVariantId(row) === String(item.variantId));
+    const existingVariantInput = carriedVariantRow?.querySelector('[data-quantity-variant-id]') ||
+      (!carriedState
+        ? [...this.querySelectorAll('[data-quantity-variant-id]')]
+          .find((input) => String(input.dataset.quantityVariantId) === String(item.variantId))
+        : null);
+    const renderedExistingQuantity = carriedVariantRow
+      ? this.getOptimisticRowQuantity(carriedVariantRow)
+      : Number.parseInt(existingVariantInput?.value || '0', 10) || 0;
     const carriedExistingQuantity =
       String(carriedState?.item?.variantId) === String(item.variantId)
         ? carriedState.optimisticLineQuantity
         : 0;
     const existingQuantity = Math.max(renderedExistingQuantity, carriedExistingQuantity);
-    const hasExistingVariant = Boolean(existingVariantInput || carriedExistingQuantity);
+    const hasExistingVariant = Boolean(carriedVariantRow || existingVariantInput || carriedExistingQuantity);
     const renderedLineCount = carriedState?.optimisticLineCount ?? this.querySelectorAll('.cart-item').length;
     const optimisticLineCount = renderedLineCount + (hasExistingVariant ? 0 : 1);
     const optimisticTotal = previousTotal + item.priceCents * quantity;
@@ -500,8 +507,6 @@ class CartDrawer extends HTMLElement {
       const body = JSON.stringify({
         id: lineIdentifier,
         quantity: 0,
-        sections: this.getSectionsToRender().map((section) => section.id),
-        sections_url: window.location.pathname,
       });
       const removeRequest = () =>
         fetch(`${routes.cart_change_url}`, { ...fetchConfig(), body }).then(async (response) => ({
@@ -513,11 +518,11 @@ class CartDrawer extends HTMLElement {
         : await removeRequest();
       if (!response.ok || parsedState.status) throw new Error(parsedState.description || 'Unable to remove item');
 
-      this.completeOptimisticAdd();
-      this.renderContents(parsedState, { shouldOpen: false });
+      const removedVariantId = state.removedVariantId;
+      this.commitOptimisticRemove(state, parsedState);
       publish(PUB_SUB_EVENTS.cartUpdate, {
         source: 'cart-items',
-        variantId: state.removedVariantId,
+        variantId: removedVariantId,
         cartData: parsedState,
       });
     } catch (error) {
@@ -526,6 +531,53 @@ class CartDrawer extends HTMLElement {
     } finally {
       CartPerformance.measureFromMarker('remove:mutation', mutationMarker);
     }
+  }
+
+  commitOptimisticRemove(state, parsedState) {
+    if (!state || this.optimisticState?.id !== state.id) return;
+
+    const removedAddedLine = state.removingAddedLine;
+    state.removedItem?.remove();
+    state.optimisticCount = Number.isFinite(parsedState.item_count) ? parsedState.item_count : state.removedCount;
+    state.optimisticTotal = Number.isFinite(parsedState.total_price) ? parsedState.total_price : state.removedTotal;
+    state.optimisticLineCount = Array.isArray(parsedState.items)
+      ? parsedState.items.length
+      : Math.max(0, state.optimisticLineCount - 1);
+    if (removedAddedLine) {
+      state.optimisticLineQuantity = 0;
+      state.addedLineKey = null;
+    }
+    state.removeQueued = false;
+    state.removalPending = false;
+    state.removeRequestStarted = false;
+    state.removedItem = null;
+    state.removedVariantId = null;
+    state.removedLineKey = null;
+    state.removedLineQuantity = null;
+    state.removedLineTotal = null;
+    state.removingAddedLine = false;
+    state.parsedState = null;
+
+    this.dataset.cartItemCount = String(state.optimisticCount);
+    this.dataset.cartTotalPrice = String(state.optimisticTotal);
+    this.classList.toggle('is-empty', state.optimisticCount === 0);
+    this.classList.toggle('prada-cart-drawer--multiple', state.optimisticLineCount > 1);
+    updatePradaCartIcon(state.optimisticCount);
+
+    const panel = this.querySelector(`.prada-cart-drawer__optimistic[data-optimistic-id="${state.id}"]`);
+    const desktop = panel?.querySelector('.prada-cart-drawer__heading-desktop');
+    const mobile = panel?.querySelector('.prada-cart-drawer__heading-mobile');
+    if (desktop) desktop.textContent = `Your selection (${state.optimisticCount})`;
+    if (mobile) mobile.textContent = `Added to shopping bag (${state.optimisticCount})`;
+    const subtotal = panel?.querySelector('.totals__total-value');
+    if (subtotal) subtotal.textContent = this.formatOptimisticMoney(state.optimisticTotal, subtotal.textContent);
+
+    const items = panel?.querySelector('.prada-cart-drawer__optimistic-items');
+    const table = items?.querySelector('.prada-cart-drawer__items');
+    items?.classList.toggle('is-multiple', state.optimisticLineCount > 1);
+    table?.classList.toggle('prada-cart-drawer__items--multiple', state.optimisticLineCount > 1);
+
+    this.scheduleRefreshAfterOptimisticAdd(state);
   }
 
   restoreOptimisticRemove(state) {
