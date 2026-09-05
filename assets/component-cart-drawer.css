@@ -191,6 +191,12 @@ cart-drawer.prada-cart-drawer.is-optimistic .drawer__inner > :not(.prada-cart-dr
   flex: 0 0 auto;
 }
 
+.prada-cart-drawer__optimistic-empty {
+  width: 100%;
+  min-height: 100%;
+  background: #ffffff;
+}
+
 .drawer__inner-empty {
   height: 100%;
   padding: 0 1.5rem;

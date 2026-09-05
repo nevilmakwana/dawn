@@ -188,6 +188,10 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
 
   onCartUpdate() {
     if (this.tagName === 'CART-DRAWER-ITEMS') {
+      // The optimistic drawer owns the visible state until add/remove settles.
+      // Avoid a competing section fetch repainting it with stale cart HTML.
+      if (document.querySelector('cart-drawer')?.optimisticState) return Promise.resolve();
+
       return fetch(`${routes.cart_url}?section_id=cart-drawer`)
         .then((response) => response.text())
         .then((responseText) => {

@@ -56,6 +56,13 @@ if (!customElements.get('product-form')) {
             ? this.cart.beginOptimisticAdd?.(optimisticItem, this.submitButton)
             : null;
 
+        // The optimistic drawer already contains the first visible state.
+        // Keep the critical add request small; sync full Liquid markup afterward.
+        if (optimisticState) {
+          formData.delete('sections');
+          formData.delete('sections_url');
+        }
+
         fetch(`${routes.cart_add_url}`, config)
           .then((response) => response.json())
           .then((response) => {
@@ -84,7 +91,7 @@ if (!customElements.get('product-form')) {
               return;
             }
 
-            if (optimisticState) this.cart.confirmOptimisticAdd?.(optimisticState);
+            if (optimisticState) this.cart.confirmOptimisticAdd?.(optimisticState, response);
             this.resolveCartLinesUpdate(linesUpdateDeferred);
 
             const startMarker = CartPerformance.createStartingMarker('add:wait-for-subscribers');
@@ -111,9 +118,13 @@ if (!customElements.get('product-form')) {
               );
               quickAddModal.hide(true);
             } else {
-              CartPerformance.measure("add:paint-updated-sections", () => {
-                this.cart.renderContents(response, { shouldOpen: shouldOpenCart });
-              });
+              if (optimisticState) {
+                this.cart.refreshAfterOptimisticAdd?.(optimisticState);
+              } else {
+                CartPerformance.measure("add:paint-updated-sections", () => {
+                  this.cart.renderContents(response, { shouldOpen: shouldOpenCart });
+                });
+              }
             }
           })
           .catch((e) => {
