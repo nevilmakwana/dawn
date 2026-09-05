@@ -3,6 +3,21 @@ class CartRemoveButton extends HTMLElement {
     const cartItem = this.closest('.cart-item');
     if (!cartItem) return;
 
+    const optimisticEmptyState = this.optimisticEmptyState;
+    if (optimisticEmptyState) {
+      optimisticEmptyState.cartItems?.classList.remove('is-empty');
+      optimisticEmptyState.cartFooter?.classList.remove('is-empty');
+      optimisticEmptyState.cartDrawer?.classList.remove('is-empty');
+      if (optimisticEmptyState.cartDrawer) {
+        optimisticEmptyState.cartDrawer.dataset.cartItemCount = String(optimisticEmptyState.previousCount);
+      }
+      document.querySelectorAll('[data-prada-shopping-bag-count]').forEach((count) => {
+        count.textContent = String(optimisticEmptyState.previousCount);
+      });
+      window.PradaCartHeader?.update?.(optimisticEmptyState.previousCount);
+      this.optimisticEmptyState = null;
+    }
+
     cartItem.closest('cart-drawer')?.classList.remove('is-empty-leaving');
     cartItem.classList.remove('is-removing', 'is-collapsing', 'is-horizontal-removal');
     cartItem.style.maxHeight = '';
@@ -39,6 +54,7 @@ class CartRemoveButton extends HTMLElement {
       }
 
       if (cartItem.classList.contains('is-removing')) return;
+      const isLastLine = cartItems.querySelectorAll('.cart-item').length === 1;
 
       const isHorizontalDrawerItem = Boolean(
         isCartDrawerItem &&
@@ -67,7 +83,9 @@ class CartRemoveButton extends HTMLElement {
       });
 
       const removeEvent = { currentTarget: this };
-      const removeDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180;
+      // Start the AJAX removal on the very next frame. The CSS transition can
+      // continue visually without holding the network request for 180ms.
+      const removeDelay = 0;
       const removeFromCart = () => {
         cartItem.classList.add('is-collapsing');
         cartItems.updateQuantity(this.dataset.index, 0, removeEvent);
@@ -75,6 +93,8 @@ class CartRemoveButton extends HTMLElement {
 
       window.requestAnimationFrame(() => {
         cartItem.classList.add('is-removing');
+        if (isLastLine) this.showOptimisticEmptyState(cartItems);
+        CartPerformance.measureFromEvent('remove:optimistic-ui', event);
 
         if (removeDelay === 0) {
           removeFromCart();
@@ -84,6 +104,30 @@ class CartRemoveButton extends HTMLElement {
         window.setTimeout(removeFromCart, removeDelay);
       });
     });
+  }
+
+  showOptimisticEmptyState(cartItems) {
+    if (this.optimisticEmptyState) return;
+
+    const cartDrawer = cartItems.closest('cart-drawer');
+    const cartFooter = document.getElementById('main-cart-footer');
+    const displayedCount = cartDrawer?.dataset.cartItemCount ||
+      document.querySelector('[data-prada-shopping-bag-count]')?.textContent ||
+      '1';
+    const previousCount = Number.parseInt(displayedCount, 10) || 1;
+
+    this.optimisticEmptyState = { cartItems, cartDrawer, cartFooter, previousCount };
+    cartItems.classList.add('is-empty');
+    cartFooter?.classList.add('is-empty');
+    if (cartDrawer) {
+      cartDrawer.dataset.cartItemCount = '0';
+      cartDrawer.classList.add('is-empty');
+      cartDrawer.classList.remove('prada-cart-drawer--multiple');
+    }
+    document.querySelectorAll('[data-prada-shopping-bag-count]').forEach((count) => {
+      count.textContent = '0';
+    });
+    window.PradaCartHeader?.update?.(0);
   }
 }
 
@@ -263,17 +307,22 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
     const sectionsToRender = this.getSectionsToRender();
 
     const body = JSON.stringify({
-      line,
+      ...(lineKey ? { id: lineKey } : { line }),
       quantity,
       sections: sectionsToRender.map((section) => section.section),
       sections_url: window.location.pathname,
     });
 
-    fetch(`${routes.cart_change_url}`, { ...fetchConfig(), ...{ body } })
+    const changeRequest = () => fetch(`${routes.cart_change_url}`, { ...fetchConfig(), body });
+    const changePromise = window.PradaCartMutations?.enqueue
+      ? window.PradaCartMutations.enqueue(changeRequest)
+      : changeRequest();
+
+    changePromise
       .then((response) => {
         return response.text();
       })
-      .then(async (state) => {
+      .then((state) => {
         const parsedState = JSON.parse(state);
 
         if (parsedState.errors) {
@@ -291,13 +340,10 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
           cartDrawerWrapper?.classList.contains('active') &&
           !cartDrawerWrapper.classList.contains('is-empty')
         );
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        if (shouldRevealEmptyDrawer && !prefersReducedMotion) {
+        if (shouldRevealEmptyDrawer) {
           window.clearTimeout(cartDrawerWrapper.emptyTransitionTimer);
           cartDrawerWrapper.classList.remove('is-empty-entering', 'is-empty-visible');
           cartDrawerWrapper.classList.add('is-empty-leaving');
-          await new Promise((resolve) => window.setTimeout(resolve, 180));
         }
 
         CartPerformance.measure(`${eventTarget}:paint-updated-sections`, () => {
@@ -500,7 +546,11 @@ if (!customElements.get('cart-note')) {
             const noteDeferred = this.dispatchNoteUpdateEvent(newNote);
 
             const body = JSON.stringify({ note: newNote });
-            fetch(`${routes.cart_update_url}`, { ...fetchConfig(), ...{ body } })
+            const noteRequest = () => fetch(`${routes.cart_update_url}`, { ...fetchConfig(), body });
+            const notePromise = window.PradaCartMutations?.enqueue
+              ? window.PradaCartMutations.enqueue(noteRequest)
+              : noteRequest();
+            notePromise
               .then((r) => r.json())
               .then((cart) => {
                 if (!cart || cart.errors) {

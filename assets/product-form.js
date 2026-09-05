@@ -55,6 +55,7 @@ if (!customElements.get('product-form')) {
           this.cart && shouldOpenCart && !quickAddModal && optimisticItem
             ? this.cart.beginOptimisticAdd?.(optimisticItem, this.submitButton)
             : null;
+        if (optimisticState) CartPerformance.measureFromEvent('add:optimistic-ui', evt);
 
         // The optimistic drawer already contains the first visible state.
         // Keep the critical add request small; sync full Liquid markup afterward.
@@ -63,8 +64,13 @@ if (!customElements.get('product-form')) {
           formData.delete('sections_url');
         }
 
-        fetch(`${routes.cart_add_url}`, config)
-          .then((response) => response.json())
+        const mutationMarker = CartPerformance.createStartingMarker('add:mutation');
+        const addRequest = () => fetch(`${routes.cart_add_url}`, config).then((response) => response.json());
+        const addPromise = window.PradaCartMutations?.enqueue
+          ? window.PradaCartMutations.enqueue(addRequest)
+          : addRequest();
+
+        addPromise
           .then((response) => {
             if (response.status) {
               this.cart?.cancelOptimisticAdd?.(optimisticState);
@@ -92,7 +98,9 @@ if (!customElements.get('product-form')) {
             }
 
             if (optimisticState) this.cart.confirmOptimisticAdd?.(optimisticState, response);
-            this.resolveCartLinesUpdate(linesUpdateDeferred);
+            const cartDataPromise = this.resolveCartLinesUpdate(linesUpdateDeferred, {
+              defer: Boolean(optimisticState),
+            });
 
             const startMarker = CartPerformance.createStartingMarker('add:wait-for-subscribers');
             if (!this.error)
@@ -119,7 +127,7 @@ if (!customElements.get('product-form')) {
               quickAddModal.hide(true);
             } else {
               if (optimisticState) {
-                this.cart.refreshAfterOptimisticAdd?.(optimisticState);
+                this.cart.scheduleRefreshAfterOptimisticAdd?.(optimisticState, { after: cartDataPromise });
               } else {
                 CartPerformance.measure("add:paint-updated-sections", () => {
                   this.cart.renderContents(response, { shouldOpen: shouldOpenCart });
@@ -138,6 +146,7 @@ if (!customElements.get('product-form')) {
             if (!this.error) this.submitButton.removeAttribute('aria-disabled');
             this.querySelector('.loading__spinner').classList.add('hidden');
 
+            CartPerformance.measureFromMarker('add:mutation', mutationMarker);
             CartPerformance.measureFromEvent("add:user-action", evt);
           });
       }
@@ -220,16 +229,27 @@ if (!customElements.get('product-form')) {
         return deferred;
       }
 
-      resolveCartLinesUpdate(deferred) {
+      resolveCartLinesUpdate(deferred, { defer = false } = {}) {
         if (!deferred) return;
         const { CartLinesUpdateEvent } = window.StandardEvents || {};
         if (!CartLinesUpdateEvent) return;
 
-        const pendingCartDataPromise = typeof CartItems !== 'undefined'
-          ? CartItems.fetchCartData()
-          : fetch(`${routes.cart_url}.json`).then((response) => response.json());
+        const fetchCartData = () =>
+          typeof CartItems !== 'undefined'
+            ? CartItems.fetchCartData()
+            : fetch(`${routes.cart_url}.json`).then((response) => response.json());
+        const pendingCartDataPromise = defer
+          ? new Promise((resolve) => {
+              const loadCartData = () => resolve(fetchCartData());
+              if ('requestIdleCallback' in window) {
+                window.requestIdleCallback(loadCartData, { timeout: 1200 });
+              } else {
+                window.setTimeout(loadCartData, 200);
+              }
+            })
+          : fetchCartData();
 
-        pendingCartDataPromise
+        return pendingCartDataPromise
           .then((cart) => {
             if (!cart?.currency) return deferred.reject(new Error('Missing currency in cart response'));
             deferred.resolve({ cart: CartLinesUpdateEvent.createCartFromAjaxResponse(cart) });

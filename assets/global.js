@@ -307,6 +307,29 @@ function fetchConfig(type = 'json') {
   };
 }
 
+// Shopify cart endpoints are stateful. Run mutations in order so a fast
+// add/remove/quantity sequence cannot finish out of order and repaint stale UI.
+window.PradaCartMutations = window.PradaCartMutations || (() => {
+  let tail = Promise.resolve();
+  let pending = 0;
+
+  return {
+    enqueue(task) {
+      pending += 1;
+      const result = tail.catch(() => undefined).then(task);
+      tail = result
+        .catch(() => undefined)
+        .finally(() => {
+          pending = Math.max(0, pending - 1);
+        });
+      return result;
+    },
+    get pending() {
+      return pending;
+    },
+  };
+})();
+
 /*
  * Shopify Common JS
  *

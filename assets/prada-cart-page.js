@@ -579,10 +579,14 @@
 
           if (data.sellingPlan) itemToAdd.selling_plan = data.sellingPlan;
 
-          const addResponse = await fetch(`${routes.cart_add_url}`, {
-            ...fetchConfig(),
-            body: JSON.stringify({ items: [itemToAdd] }),
-          });
+          const addRequest = () =>
+            fetch(`${routes.cart_add_url}`, {
+              ...fetchConfig(),
+              body: JSON.stringify({ items: [itemToAdd] }),
+            });
+          const addResponse = window.PradaCartMutations?.enqueue
+            ? await window.PradaCartMutations.enqueue(addRequest)
+            : await addRequest();
           const addData = await addResponse.json();
 
           if (!addResponse.ok || addData.status) {
@@ -590,15 +594,19 @@
           }
         }
 
-        const changeResponse = await fetch(`${routes.cart_change_url}`, {
-          ...fetchConfig(),
-          body: JSON.stringify({
-            id: data.key,
-            quantity: isVariantChange ? 0 : selectedQuantity,
-            sections: sectionsToRender.map((section) => section.section),
-            sections_url: window.location.pathname,
-          }),
-        });
+        const changeRequest = () =>
+          fetch(`${routes.cart_change_url}`, {
+            ...fetchConfig(),
+            body: JSON.stringify({
+              id: data.key,
+              quantity: isVariantChange ? 0 : selectedQuantity,
+              sections: sectionsToRender.map((section) => section.section),
+              sections_url: window.location.pathname,
+            }),
+          });
+        const changeResponse = window.PradaCartMutations?.enqueue
+          ? await window.PradaCartMutations.enqueue(changeRequest)
+          : await changeRequest();
         const changeData = await changeResponse.json();
 
         if (!changeResponse.ok || changeData.status) {

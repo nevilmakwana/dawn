@@ -85,7 +85,18 @@ class CartDrawer extends HTMLElement {
 
   beginOptimisticAdd(item, triggeredBy) {
     if (!item) return null;
-    if (this.optimisticState) this.cancelOptimisticAdd(this.optimisticState, { keepDrawer: true });
+    let carriedState = null;
+    if (this.optimisticState) {
+      if (this.optimisticState.confirmed && !this.optimisticState.removalPending) {
+        carriedState = this.completeOptimisticAdd();
+        this.dataset.cartItemCount = String(carriedState.optimisticCount);
+        this.dataset.cartTotalPrice = String(carriedState.optimisticTotal);
+        this.classList.remove('is-empty');
+        this.classList.toggle('prada-cart-drawer--multiple', carriedState.optimisticLineCount > 1);
+      } else {
+        this.cancelOptimisticAdd(this.optimisticState, { keepDrawer: true });
+      }
+    }
 
     const previousCount = Number.parseInt(this.dataset.cartItemCount || '0', 10) || 0;
     const previousTotal = Number.parseInt(this.dataset.cartTotalPrice || '0', 10) || 0;
@@ -93,9 +104,15 @@ class CartDrawer extends HTMLElement {
     const optimisticCount = previousCount + quantity;
     const existingVariantInput = [...this.querySelectorAll('[data-quantity-variant-id]')]
       .find((input) => String(input.dataset.quantityVariantId) === String(item.variantId));
-    const existingQuantity = Number.parseInt(existingVariantInput?.value || '0', 10) || 0;
-    const hasExistingVariant = Boolean(existingVariantInput);
-    const optimisticLineCount = this.querySelectorAll('.cart-item').length + (hasExistingVariant ? 0 : 1);
+    const renderedExistingQuantity = Number.parseInt(existingVariantInput?.value || '0', 10) || 0;
+    const carriedExistingQuantity =
+      String(carriedState?.item?.variantId) === String(item.variantId)
+        ? carriedState.optimisticLineQuantity
+        : 0;
+    const existingQuantity = Math.max(renderedExistingQuantity, carriedExistingQuantity);
+    const hasExistingVariant = Boolean(existingVariantInput || carriedExistingQuantity);
+    const renderedLineCount = carriedState?.optimisticLineCount ?? this.querySelectorAll('.cart-item').length;
+    const optimisticLineCount = renderedLineCount + (hasExistingVariant ? 0 : 1);
     const optimisticTotal = previousTotal + item.priceCents * quantity;
     const state = {
       id: `${Date.now()}-${Math.random()}`,
@@ -154,14 +171,14 @@ class CartDrawer extends HTMLElement {
 
     const items = document.createElement('div');
     items.className = 'prada-cart-drawer__optimistic-items';
-    items.append(this.createOptimisticCartItem(item, quantity));
+    items.append(this.createOptimisticCartItem(item, quantity, carriedExistingQuantity));
     state.optimisticItemsHandler = (event) => {
       const removeButton = event.target.closest('.prada-cart-drawer__remove');
       if (!removeButton || !items.contains(removeButton)) return;
 
       event.preventDefault();
       event.stopPropagation();
-      this.beginOptimisticRemove(state, removeButton);
+      this.beginOptimisticRemove(state, removeButton, event);
     };
     items.addEventListener('click', state.optimisticItemsHandler, true);
 
@@ -171,6 +188,12 @@ class CartDrawer extends HTMLElement {
       const total = footer.querySelector('.totals__total-value');
       if (total && item.priceCents) {
         total.textContent = this.formatOptimisticMoney(optimisticTotal, total.textContent);
+      }
+      const checkoutButton = footer.querySelector('[data-prada-fast-checkout]');
+      if (checkoutButton) {
+        checkoutButton.disabled = false;
+        checkoutButton.removeAttribute('disabled');
+        checkoutButton.removeAttribute('aria-disabled');
       }
       state.pendingActionHandler = (event) => {
         const action = event.target.closest('.prada-cart-drawer__view-cart, [data-prada-fast-checkout]');
@@ -204,11 +227,14 @@ class CartDrawer extends HTMLElement {
     return state;
   }
 
-  createOptimisticCartItem(item, addedQuantity) {
+  createOptimisticCartItem(item, addedQuantity, carriedExistingQuantity = 0) {
     const existingQuantityInput = [...this.querySelectorAll('[data-quantity-variant-id]')]
       .find((input) => String(input.dataset.quantityVariantId) === String(item.variantId));
     const existingItem = existingQuantityInput?.closest('.cart-item');
-    const existingQuantity = Number.parseInt(existingQuantityInput?.value || '0', 10) || 0;
+    const existingQuantity = Math.max(
+      Number.parseInt(existingQuantityInput?.value || '0', 10) || 0,
+      carriedExistingQuantity,
+    );
     const optimisticQuantity = existingQuantity + addedQuantity;
 
     if (existingItem) {
@@ -306,9 +332,10 @@ class CartDrawer extends HTMLElement {
     return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(cents / 100);
   }
 
-  beginOptimisticRemove(state, removeButton) {
+  beginOptimisticRemove(state, removeButton, event) {
     if (!state || this.optimisticState?.id !== state.id || state.removalPending) return;
 
+    this.cancelScheduledOptimisticRefresh(state);
     state.removeQueued = true;
     state.removalPending = true;
     state.queuedDestination = null;
@@ -332,6 +359,7 @@ class CartDrawer extends HTMLElement {
     if (subtotal) subtotal.textContent = this.formatOptimisticMoney(nextTotal, subtotal.textContent);
 
     if (nextCount === 0) this.showOptimisticEmptyState(state, panel);
+    if (event) CartPerformance.measureFromEvent('remove:optimistic-ui', event);
     if (state.confirmed) void this.performOptimisticRemove(state);
   }
 
@@ -372,6 +400,7 @@ class CartDrawer extends HTMLElement {
     if (!lineIdentifier) return;
 
     state.removeRequestStarted = true;
+    const mutationMarker = CartPerformance.createStartingMarker('remove:mutation');
     try {
       const body = JSON.stringify({
         id: lineIdentifier,
@@ -379,8 +408,14 @@ class CartDrawer extends HTMLElement {
         sections: this.getSectionsToRender().map((section) => section.id),
         sections_url: window.location.pathname,
       });
-      const response = await fetch(`${routes.cart_change_url}`, { ...fetchConfig(), body });
-      const parsedState = await response.json();
+      const removeRequest = () =>
+        fetch(`${routes.cart_change_url}`, { ...fetchConfig(), body }).then(async (response) => ({
+          response,
+          parsedState: await response.json(),
+        }));
+      const { response, parsedState } = window.PradaCartMutations?.enqueue
+        ? await window.PradaCartMutations.enqueue(removeRequest)
+        : await removeRequest();
       if (!response.ok || parsedState.status) throw new Error(parsedState.description || 'Unable to remove item');
 
       this.completeOptimisticAdd();
@@ -393,6 +428,8 @@ class CartDrawer extends HTMLElement {
     } catch (error) {
       console.error(error);
       this.restoreOptimisticRemove(state);
+    } finally {
+      CartPerformance.measureFromMarker('remove:mutation', mutationMarker);
     }
   }
 
@@ -423,8 +460,57 @@ class CartDrawer extends HTMLElement {
     updatePradaCartIcon(state.optimisticCount);
   }
 
-  refreshAfterOptimisticAdd(state) {
+  scheduleRefreshAfterOptimisticAdd(state, { after } = {}) {
+    if (!state || this.optimisticState?.id !== state.id || state.removalPending || state.refreshScheduled) return;
+
+    state.refreshScheduled = true;
+    state.refreshDependency = after || null;
+    const runRefresh = () => {
+      state.refreshScheduled = false;
+      state.idleRefreshId = null;
+      Promise.resolve(state.refreshDependency)
+        .catch(() => undefined)
+        .then(() => this.refreshAfterOptimisticAdd(state));
+    };
+    if ('requestIdleCallback' in window) {
+      state.idleRefreshType = 'idle';
+      state.idleRefreshId = window.requestIdleCallback(runRefresh, { timeout: 2000 });
+    } else {
+      state.idleRefreshType = 'timeout';
+      state.idleRefreshId = window.setTimeout(runRefresh, 500);
+    }
+  }
+
+  cancelScheduledOptimisticRefresh(state) {
+    if (!state?.idleRefreshId) return;
+    if (state.idleRefreshType === 'idle' && 'cancelIdleCallback' in window) {
+      window.cancelIdleCallback(state.idleRefreshId);
+    } else {
+      window.clearTimeout(state.idleRefreshId);
+    }
+    state.idleRefreshId = null;
+    state.refreshScheduled = false;
+  }
+
+  flushScheduledOptimisticRefresh(state) {
     if (!state || this.optimisticState?.id !== state.id || state.removalPending) return;
+    this.cancelScheduledOptimisticRefresh(state);
+    const dependency = state.refreshDependency;
+    Promise.resolve(dependency)
+      .catch(() => undefined)
+      .then(() => this.refreshAfterOptimisticAdd(state));
+  }
+
+  refreshAfterOptimisticAdd(state) {
+    if (
+      !state ||
+      this.optimisticState?.id !== state.id ||
+      state.removalPending ||
+      state.refreshInFlight ||
+      state.parsedState
+    ) return;
+
+    state.refreshInFlight = true;
 
     const cartUrl = new URL(window.routes?.cart_url || '/cart', window.location.origin);
     cartUrl.searchParams.set('section_id', 'cart-drawer');
@@ -438,11 +524,15 @@ class CartDrawer extends HTMLElement {
         if (this.optimisticState?.id !== state.id || state.removalPending) return;
         this.renderContents({ sections: { 'cart-drawer': html } }, { shouldOpen: false });
       })
-      .catch((error) => console.error(error));
+      .catch((error) => console.error(error))
+      .finally(() => {
+        state.refreshInFlight = false;
+      });
   }
 
   completeOptimisticAdd() {
     const completedState = this.optimisticState;
+    this.cancelScheduledOptimisticRefresh(completedState);
     const items = this.querySelector('.prada-cart-drawer__optimistic-items');
     const footer = this.querySelector('.prada-cart-drawer__optimistic > .drawer__footer');
     if (items && completedState?.optimisticItemsHandler) {
@@ -633,9 +723,13 @@ class CartDrawer extends HTMLElement {
       }
 
       const optimisticState = this.optimisticState;
-      if (optimisticState?.confirmed && !optimisticState.removalPending && optimisticState.parsedState) {
-        this.completeOptimisticAdd();
-        this.renderContents(optimisticState.parsedState, { shouldOpen: false });
+      if (optimisticState?.confirmed && !optimisticState.removalPending) {
+        if (optimisticState.parsedState) {
+          this.completeOptimisticAdd();
+          this.renderContents(optimisticState.parsedState, { shouldOpen: false });
+        } else {
+          this.flushScheduledOptimisticRefresh(optimisticState);
+        }
       }
     };
 

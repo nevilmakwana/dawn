@@ -122,7 +122,11 @@ if (!customElements.get('quick-add-bulk')) {
           sections_url: this.getSectionsUrl(),
         });
 
-        fetch(`${routes.cart_update_url}`, { ...fetchConfig(), ...{ body } })
+        const updateRequest = () => fetch(`${routes.cart_update_url}`, { ...fetchConfig(), body });
+        const updatePromise = window.PradaCartMutations?.enqueue
+          ? window.PradaCartMutations.enqueue(updateRequest)
+          : updateRequest();
+        updatePromise
           .then((response) => response.json())
           .then((parsedState) => {
             if (parsedState.errors) {
