@@ -56,6 +56,14 @@ if (!customElements.get('product-form')) {
             ? this.cart.beginOptimisticAdd?.(optimisticItem, this.submitButton)
             : null;
 
+        // The optimistic drawer already has everything needed for the first
+        // paint. Let Shopify confirm the cart mutation without also rendering
+        // the full drawer in the critical request; refresh that markup after.
+        if (optimisticState) {
+          formData.delete('sections');
+          formData.delete('sections_url');
+        }
+
         fetch(`${routes.cart_add_url}`, config)
           .then((response) => response.json())
           .then((response) => {
@@ -84,6 +92,7 @@ if (!customElements.get('product-form')) {
               return;
             }
 
+            if (optimisticState) this.cart.confirmOptimisticAdd?.(optimisticState);
             this.resolveCartLinesUpdate(linesUpdateDeferred);
 
             const startMarker = CartPerformance.createStartingMarker('add:wait-for-subscribers');
@@ -110,9 +119,13 @@ if (!customElements.get('product-form')) {
               );
               quickAddModal.hide(true);
             } else {
-              CartPerformance.measure("add:paint-updated-sections", () => {
-                this.cart.renderContents(response, { shouldOpen: shouldOpenCart });
-              });
+              if (optimisticState) {
+                this.cart.refreshAfterOptimisticAdd?.(optimisticState);
+              } else {
+                CartPerformance.measure("add:paint-updated-sections", () => {
+                  this.cart.renderContents(response, { shouldOpen: shouldOpenCart });
+                });
+              }
             }
           })
           .catch((e) => {

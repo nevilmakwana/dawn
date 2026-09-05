@@ -150,10 +150,29 @@ class CartDrawer extends HTMLElement {
       if (total && item.priceCents) {
         total.textContent = this.formatOptimisticMoney(previousTotal + item.priceCents * quantity, total.textContent);
       }
-      footer.addEventListener('click', (event) => event.preventDefault(), true);
-      footer.querySelectorAll('[data-prada-fast-checkout]').forEach((button) => {
-        button.removeAttribute('data-prada-fast-checkout');
-      });
+
+      const checkoutButton = footer.querySelector('[data-prada-fast-checkout]');
+      checkoutButton?.removeAttribute('disabled');
+      checkoutButton?.removeAttribute('aria-disabled');
+
+      state.pendingActionHandler = (event) => {
+        const action = event.target.closest('.prada-cart-drawer__view-cart, [data-prada-fast-checkout]');
+        if (!action || !footer.contains(action)) return;
+
+        const destination = action.matches('.prada-cart-drawer__view-cart')
+          ? action.href
+          : action.dataset.pradaFastCheckout;
+        if (!destination) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        state.queuedDestination = destination;
+        action.setAttribute('aria-busy', 'true');
+        action.textContent = action.matches('.prada-cart-drawer__view-cart')
+          ? 'Opening shopping bag…'
+          : 'Opening checkout…';
+      };
+      footer.addEventListener('click', state.pendingActionHandler, true);
     }
 
     panel.append(header, items);
@@ -268,10 +287,50 @@ class CartDrawer extends HTMLElement {
 
   completeOptimisticAdd() {
     const completedState = this.optimisticState;
+    const footer = this.querySelector('.prada-cart-drawer__optimistic > .drawer__footer');
+    if (footer && completedState?.pendingActionHandler) {
+      footer.removeEventListener('click', completedState.pendingActionHandler, true);
+    }
     this.querySelector('.prada-cart-drawer__optimistic')?.remove();
     this.classList.remove('is-optimistic');
     this.optimisticState = null;
     return completedState;
+  }
+
+  confirmOptimisticAdd(state, parsedState) {
+    if (!state || this.optimisticState?.id !== state.id) return;
+
+    state.confirmed = true;
+    if (parsedState?.sections?.['cart-drawer']) state.parsedState = parsedState;
+
+    const footer = this.querySelector('.prada-cart-drawer__optimistic > .drawer__footer');
+    if (footer && state.pendingActionHandler) {
+      footer.removeEventListener('click', state.pendingActionHandler, true);
+      state.pendingActionHandler = null;
+    }
+
+    if (state.queuedDestination && !state.navigationStarted) {
+      state.navigationStarted = true;
+      window.location.assign(state.queuedDestination);
+    }
+  }
+
+  refreshAfterOptimisticAdd(state) {
+    if (!state || this.optimisticState?.id !== state.id) return;
+
+    const cartUrl = new URL(window.routes?.cart_url || '/cart', window.location.origin);
+    cartUrl.searchParams.set('section_id', 'cart-drawer');
+
+    fetch(cartUrl.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Cart drawer refresh failed: ${response.status}`);
+        return response.text();
+      })
+      .then((html) => {
+        if (this.optimisticState?.id !== state.id) return;
+        this.renderContents({ sections: { 'cart-drawer': html } }, { shouldOpen: false });
+      })
+      .catch((error) => console.error(error));
   }
 
   cancelOptimisticAdd(state, { keepDrawer = false } = {}) {
@@ -430,6 +489,13 @@ class CartDrawer extends HTMLElement {
       } else {
         document.body.classList.remove('overflow-hidden');
       }
+
+      const confirmedState = this.optimisticState?.confirmed ? this.optimisticState : null;
+      if (confirmedState?.parsedState) {
+        const parsedState = confirmedState.parsedState;
+        this.completeOptimisticAdd();
+        this.renderContents(parsedState, { shouldOpen: false });
+      }
     };
 
     if (!this.classList.contains('active') && !this.classList.contains('animate')) {
@@ -459,7 +525,7 @@ class CartDrawer extends HTMLElement {
   }
 
   renderContents(parsedState, { shouldOpen = true } = {}) {
-    const optimisticState = this.completeOptimisticAdd();
+    const optimisticState = this.optimisticState;
     const sourceDrawer = parsedState.sections?.['cart-drawer']
       ? this.getSectionDOM(parsedState.sections['cart-drawer'], 'cart-drawer')
       : null;
@@ -485,6 +551,21 @@ class CartDrawer extends HTMLElement {
       );
     }
     this.productId = parsedState.id;
+
+    if (optimisticState) {
+      this.confirmOptimisticAdd(optimisticState, parsedState);
+      const drawerIsVisible =
+        this.classList.contains('active') ||
+        this.classList.contains('animate') ||
+        this.classList.contains('is-opening') ||
+        this.classList.contains('is-closing');
+
+      // Keep the already-visible optimistic markup in place. Replacing it with
+      // identical server markup here causes the product image to blink.
+      if (!optimisticState.dismissed || drawerIsVisible) return;
+      this.completeOptimisticAdd();
+    }
+
     this.getSectionsToRender().forEach((section) => {
       const sectionElement = section.selector
         ? document.querySelector(section.selector)
