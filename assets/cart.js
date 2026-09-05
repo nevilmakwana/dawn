@@ -38,7 +38,10 @@ class CartRemoveButton extends HTMLElement {
     const cartItem = this.closest('.cart-item');
     if (!cartItem) return;
 
-    cartItem.closest('cart-drawer')?.classList.remove('is-empty-leaving');
+    const cartDrawer = this.immediateDrawerRemovalState?.drawer || cartItem.closest('cart-drawer');
+    cartDrawer?.classList.remove('is-empty-leaving');
+    cartDrawer?.restoreImmediateLineRemoval?.(this.immediateDrawerRemovalState);
+    this.immediateDrawerRemovalState = null;
     cartItem.classList.remove('is-removing', 'is-collapsing', 'is-horizontal-removal');
     cartItem.hidden = false;
     cartItem.style.maxHeight = '';
@@ -78,6 +81,8 @@ class CartRemoveButton extends HTMLElement {
       }
 
       if (cartItem.classList.contains('is-removing')) return;
+      const cartDrawer = isCartDrawerItem ? cartItem.closest('cart-drawer') : null;
+      if (cartDrawer?.immediateLineRemovalState) return;
 
       this.setAttribute('aria-disabled', 'true');
       this.querySelectorAll('a, button').forEach((control) => {
@@ -93,6 +98,9 @@ class CartRemoveButton extends HTMLElement {
       // Shopify mutation immediately. The row is restored if the request fails.
       cartItem.classList.add('is-removing', 'is-collapsing');
       cartItem.hidden = true;
+      if (isCartDrawerItem) {
+        this.immediateDrawerRemovalState = cartDrawer?.beginImmediateLineRemoval?.(cartItem);
+      }
       if (isLastShoppingBagItem) this.showImmediateShoppingBagEmpty(cartItems);
       cartItems.updateQuantity(this.dataset.index, 0, { currentTarget: this });
     });
@@ -200,6 +208,11 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
 
   onCartUpdate() {
     if (this.tagName === 'CART-DRAWER-ITEMS') {
+      // An optimistic add/remove owns the drawer until its mutation settles.
+      // Skipping this redundant refresh prevents an older add response from
+      // repainting a line after the customer has already removed it.
+      if (document.querySelector('cart-drawer')?.optimisticState) return Promise.resolve();
+
       return fetch(`${routes.cart_url}?section_id=cart-drawer`)
         .then((response) => response.text())
         .then((responseText) => {
@@ -264,18 +277,29 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
     const action = quantity === 0 ? 'remove' : 'update';
     const quantityInput = this.querySelector(`#Quantity-${line}`) || this.querySelector(`#Drawer-quantity-${line}`);
     const lineVariantId = variantId || quantityInput?.dataset.quantityVariantId;
-    const lineKey = quantityInput?.dataset.quantityLineKey;
+    const lineKey =
+      quantityInput?.dataset.quantityLineKey || event.currentTarget.closest('.cart-item')?.dataset.lineKey;
     const linesUpdateDeferred = this.createCartLinesUpdateEvent(action, lineVariantId, quantity, lineKey);
 
     // Cache sections before the fetch so we read dataset.id while elements still exist in the DOM
     const sectionsToRender = this.getSectionsToRender();
 
-    const body = JSON.stringify({
-      line,
+    const mutation = {
       quantity,
       sections: sectionsToRender.map((section) => section.section),
       sections_url: window.location.pathname,
-    });
+    };
+
+    // A line key remains stable while indexes can change during rapid AJAX
+    // add/remove operations. Prefer it for removal so Shopify mutates exactly
+    // the line the customer clicked.
+    if (quantity === 0 && lineKey) {
+      mutation.id = lineKey;
+    } else {
+      mutation.line = line;
+    }
+
+    const body = JSON.stringify(mutation);
 
     fetch(`${routes.cart_change_url}`, { ...fetchConfig(), ...{ body } })
       .then((response) => {
@@ -394,6 +418,15 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
             trapFocus(cartDrawerWrapper, document.querySelector('.cart-item__name'));
           }
         });
+
+        if (quantity === 0 && event.currentTarget instanceof CartRemoveButton) {
+          const immediateState = event.currentTarget.immediateDrawerRemovalState;
+          if (immediateState?.drawer?.immediateLineRemovalState === immediateState) {
+            immediateState.drawer.immediateLineRemovalState = null;
+          }
+          event.currentTarget.immediateDrawerRemovalState = null;
+          event.currentTarget.optimisticEmptyPageState = null;
+        }
 
         publish(PUB_SUB_EVENTS.cartUpdate, { source: 'cart-items', cartData: parsedState, variantId: variantId });
       })

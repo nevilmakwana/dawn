@@ -306,6 +306,102 @@ class CartDrawer extends HTMLElement {
     return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(cents / 100);
   }
 
+  beginImmediateLineRemoval(cartItem) {
+    if (!cartItem || this.immediateLineRemovalState) return this.immediateLineRemovalState || null;
+
+    const previousCount = Number.parseInt(this.dataset.cartItemCount || '0', 10) || 0;
+    const previousTotal = Number.parseInt(this.dataset.cartTotalPrice || '0', 10) || 0;
+    const lineQuantity = Number.parseInt(cartItem.dataset.lineQuantity || '1', 10) || 1;
+    const linePrice = Number.parseInt(cartItem.dataset.lineFinalPrice || '0', 10) || 0;
+    const nextCount = Math.max(0, previousCount - lineQuantity);
+    const nextTotal = Math.max(0, previousTotal - linePrice);
+    const headingDesktop = this.querySelector('.drawer__inner > .drawer__header .prada-cart-drawer__heading-desktop');
+    const headingMobile = this.querySelector('.drawer__inner > .drawer__header .prada-cart-drawer__heading-mobile');
+    const total = this.querySelector('.drawer__inner > .drawer__footer .totals__total-value');
+    const state = {
+      drawer: this,
+      previousCount,
+      previousTotal,
+      wasEmpty: this.classList.contains('is-empty'),
+      wasMultiple: this.classList.contains('prada-cart-drawer--multiple'),
+      desktopHeading: headingDesktop?.textContent || '',
+      mobileHeading: headingMobile?.textContent || '',
+      totalText: total?.textContent || '',
+      hiddenElements: [],
+      emptyElement: null,
+    };
+
+    this.immediateLineRemovalState = state;
+    this.dataset.cartItemCount = String(nextCount);
+    this.dataset.cartTotalPrice = String(nextTotal);
+    updatePradaCartIcon(nextCount);
+    if (headingDesktop) headingDesktop.textContent = `Your selection (${nextCount})`;
+    if (headingMobile) headingMobile.textContent = `Added to shopping bag (${nextCount})`;
+    if (total) total.textContent = this.formatOptimisticMoney(nextTotal, total.textContent);
+
+    const visibleLines = this.querySelectorAll('.drawer__inner .cart-item:not([hidden])').length;
+    this.classList.toggle('prada-cart-drawer--multiple', visibleLines > 1);
+
+    if (nextCount > 0) return state;
+
+    const drawerInner = this.querySelector('.drawer__inner');
+    if (!drawerInner) return state;
+
+    const emptyState = document.createElement('div');
+    emptyState.className = 'drawer__inner-empty prada-cart-drawer__immediate-empty';
+    const warnings = document.createElement('div');
+    warnings.className = 'cart-drawer__warnings center';
+    const content = document.createElement('div');
+    content.className = 'prada-cart-drawer__empty-content';
+    const sourceClose = drawerInner.querySelector(':scope > .drawer__header .drawer__close');
+    const closeButton = sourceClose?.cloneNode(true) || document.createElement('button');
+    closeButton.classList.add('drawer__close');
+    closeButton.type = 'button';
+    closeButton.removeAttribute('onclick');
+    closeButton.setAttribute('aria-label', 'Close shopping bag');
+    if (!closeButton.hasChildNodes()) closeButton.textContent = '×';
+    closeButton.addEventListener('click', () => this.close());
+    const message = document.createElement('p');
+    message.className = 'prada-cart-drawer__empty-message';
+    message.textContent = 'Your shopping bag is empty';
+    content.append(closeButton, message);
+    warnings.append(content);
+    emptyState.append(warnings);
+
+    drawerInner
+      .querySelectorAll(':scope > .drawer__header, :scope > cart-drawer-items, :scope > .drawer__footer')
+      .forEach((element) => {
+        state.hiddenElements.push({ element, wasHidden: element.hidden });
+        element.hidden = true;
+      });
+    drawerInner.append(emptyState);
+    state.emptyElement = emptyState;
+    this.classList.add('is-empty');
+    return state;
+  }
+
+  restoreImmediateLineRemoval(state) {
+    if (!state || this.immediateLineRemovalState !== state) return;
+
+    state.emptyElement?.remove();
+    state.hiddenElements.forEach(({ element, wasHidden }) => {
+      element.hidden = wasHidden;
+    });
+    this.classList.toggle('is-empty', state.wasEmpty);
+    this.classList.toggle('prada-cart-drawer--multiple', state.wasMultiple);
+    this.dataset.cartItemCount = String(state.previousCount);
+    this.dataset.cartTotalPrice = String(state.previousTotal);
+    updatePradaCartIcon(state.previousCount);
+
+    const headingDesktop = this.querySelector('.drawer__inner > .drawer__header .prada-cart-drawer__heading-desktop');
+    const headingMobile = this.querySelector('.drawer__inner > .drawer__header .prada-cart-drawer__heading-mobile');
+    const total = this.querySelector('.drawer__inner > .drawer__footer .totals__total-value');
+    if (headingDesktop) headingDesktop.textContent = state.desktopHeading;
+    if (headingMobile) headingMobile.textContent = state.mobileHeading;
+    if (total) total.textContent = state.totalText;
+    this.immediateLineRemovalState = null;
+  }
+
   completeOptimisticAdd() {
     const completedState = this.optimisticState;
     const footer = this.querySelector('.prada-cart-drawer__optimistic > .drawer__footer');

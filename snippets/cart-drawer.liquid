@@ -144,6 +144,9 @@
                         id="CartDrawer-Item-{{ item.index | plus: 1 }}"
                         class="cart-item{% if item.parent_relationship.parent != null %} cart-item__nested-line{% endif %}"
                         role="row"
+                        data-line-key="{{ item.key | escape }}"
+                        data-line-quantity="{{ item.quantity }}"
+                        data-line-final-price="{{ item.final_line_price }}"
                         {% if item.parent_relationship.parent != null %}
                           aria-label="{{- 'products.product.nested_label' | t: title: item.product.title, parent_title: item.parent_relationship.parent.title | escape -}}"
                         {% endif %}
