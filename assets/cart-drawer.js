@@ -88,11 +88,16 @@ class CartDrawer extends HTMLElement {
     if (this.optimisticState) this.cancelOptimisticAdd(this.optimisticState, { keepDrawer: true });
 
     const previousCount = Number.parseInt(this.dataset.cartItemCount || '0', 10) || 0;
+    const previousTotal = Number.parseInt(this.dataset.cartTotalPrice || '0', 10) || 0;
     const quantity = Number.parseInt(item.quantity || '1', 10) || 1;
     const optimisticCount = previousCount + quantity;
+    const hasExistingVariant = [...this.querySelectorAll('[data-quantity-variant-id]')]
+      .some((input) => String(input.dataset.quantityVariantId) === String(item.variantId));
+    const optimisticLineCount = this.querySelectorAll('.cart-item').length + (hasExistingVariant ? 0 : 1);
     const state = {
       id: `${Date.now()}-${Math.random()}`,
       previousCount,
+      previousTotal,
       wasEmpty: this.classList.contains('is-empty'),
       wasMultiple: this.classList.contains('prada-cart-drawer--multiple'),
       wasOpen: this.classList.contains('active') || this.classList.contains('is-opening'),
@@ -101,8 +106,10 @@ class CartDrawer extends HTMLElement {
     this.optimisticState = state;
     this.querySelector('.prada-cart-drawer__optimistic')?.remove();
     this.dataset.cartItemCount = String(optimisticCount);
+    this.dataset.cartTotalPrice = String(previousTotal + item.priceCents * quantity);
     this.classList.remove('is-empty');
     this.classList.add('is-optimistic');
+    this.classList.toggle('prada-cart-drawer--multiple', optimisticLineCount > 1);
     updatePradaCartIcon(optimisticCount);
 
     const panel = document.createElement('div');
@@ -110,79 +117,153 @@ class CartDrawer extends HTMLElement {
     panel.dataset.optimisticId = state.id;
 
     const header = document.createElement('div');
-    header.className = 'prada-cart-drawer__optimistic-header';
-    const heading = document.createElement('p');
-    heading.className = 'prada-cart-drawer__optimistic-heading';
-    heading.textContent = `Adding to shopping bag (${optimisticCount})`;
-    const closeButton = document.createElement('button');
-    closeButton.className = 'prada-cart-drawer__optimistic-close';
+    header.className = 'drawer__header';
+    const heading = document.createElement('h2');
+    heading.className = 'drawer__heading';
+    const desktopHeading = document.createElement('span');
+    desktopHeading.className = 'prada-cart-drawer__heading-desktop';
+    desktopHeading.textContent = `Your selection (${optimisticCount})`;
+    const mobileHeading = document.createElement('span');
+    mobileHeading.className = 'prada-cart-drawer__heading-mobile';
+    mobileHeading.textContent = `Added to shopping bag (${optimisticCount})`;
+    heading.append(desktopHeading, mobileHeading);
+
+    const sourceClose = this.querySelector('.drawer__header .drawer__close, .drawer__inner-empty .drawer__close');
+    const closeButton = sourceClose?.cloneNode(true) || document.createElement('button');
     closeButton.type = 'button';
+    closeButton.classList.add('drawer__close');
+    closeButton.removeAttribute('onclick');
     closeButton.setAttribute('aria-label', 'Close shopping bag');
-    closeButton.textContent = '×';
+    if (!closeButton.hasChildNodes()) closeButton.textContent = '×';
     closeButton.addEventListener('click', () => this.close());
     header.append(heading, closeButton);
 
-    const product = document.createElement('div');
-    product.className = 'prada-cart-drawer__optimistic-product';
-    if (item.image) {
-      const imageLink = document.createElement('a');
-      imageLink.className = 'prada-cart-drawer__optimistic-image-link';
-      imageLink.href = item.url || '#';
-      imageLink.tabIndex = -1;
-      imageLink.setAttribute('aria-hidden', 'true');
-      const image = document.createElement('img');
-      image.className = 'prada-cart-drawer__optimistic-image';
-      image.src = item.image;
-      image.alt = item.imageAlt || item.title;
-      image.width = 124;
-      image.height = 156;
-      image.decoding = 'async';
-      imageLink.append(image);
-      product.append(imageLink);
+    const items = document.createElement('div');
+    items.className = 'prada-cart-drawer__optimistic-items';
+    items.inert = true;
+    items.append(this.createOptimisticCartItem(item, quantity));
+
+    const footer = this.querySelector('.drawer__inner > .drawer__footer')?.cloneNode(true);
+    if (footer) {
+      footer.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
+      const total = footer.querySelector('.totals__total-value');
+      if (total && item.priceCents) {
+        total.textContent = this.formatOptimisticMoney(previousTotal + item.priceCents * quantity, total.textContent);
+      }
+      footer.addEventListener('click', (event) => event.preventDefault(), true);
+      footer.querySelectorAll('[data-prada-fast-checkout]').forEach((button) => {
+        button.removeAttribute('data-prada-fast-checkout');
+      });
     }
 
-    const details = document.createElement('div');
-    details.className = 'prada-cart-drawer__optimistic-details';
-    const title = document.createElement('a');
-    title.className = 'prada-cart-drawer__optimistic-title';
-    title.href = item.url || '#';
-    title.textContent = item.title;
-    details.append(title);
-
-    item.options?.forEach((option) => {
-      const row = document.createElement('p');
-      row.className = 'prada-cart-drawer__optimistic-meta';
-      row.textContent = `${option.name}: ${option.value}`;
-      details.append(row);
-    });
-
-    const quantityRow = document.createElement('p');
-    quantityRow.className = 'prada-cart-drawer__optimistic-meta prada-cart-drawer__optimistic-quantity';
-    quantityRow.textContent = `Qty: ${quantity}`;
-    details.append(quantityRow);
-    if (item.price) {
-      const price = document.createElement('p');
-      price.className = 'prada-cart-drawer__optimistic-price money';
-      price.textContent = item.price;
-      details.append(price);
-    }
-    product.append(details);
-
-    const status = document.createElement('p');
-    status.className = 'prada-cart-drawer__optimistic-status';
-    status.setAttribute('role', 'status');
-    status.setAttribute('aria-live', 'polite');
-    const statusDot = document.createElement('span');
-    statusDot.setAttribute('aria-hidden', 'true');
-    const statusText = document.createElement('span');
-    statusText.textContent = 'Confirming your selection…';
-    status.append(statusDot, statusText);
-
-    panel.append(header, product, status);
+    panel.append(header, items);
+    if (footer) panel.append(footer);
     this.querySelector('.drawer__inner')?.append(panel);
     this.setActiveElement(triggeredBy);
     this.open();
     return state;
+  }
+
+  createOptimisticCartItem(item, addedQuantity) {
+    const existingQuantityInput = [...this.querySelectorAll('[data-quantity-variant-id]')]
+      .find((input) => String(input.dataset.quantityVariantId) === String(item.variantId));
+    const existingItem = existingQuantityInput?.closest('.cart-item');
+    const existingQuantity = Number.parseInt(existingQuantityInput?.value || '0', 10) || 0;
+    const optimisticQuantity = existingQuantity + addedQuantity;
+
+    if (existingItem) {
+      const clonedItem = existingItem.cloneNode(true);
+      clonedItem.removeAttribute('id');
+      clonedItem.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
+      const quantityLabel = clonedItem.querySelector('.prada-cart-drawer__quantity');
+      if (quantityLabel) quantityLabel.textContent = `Qty: ${optimisticQuantity}`;
+      const clonedImage = clonedItem.querySelector('.cart-item__image');
+      if (clonedImage && item.image) {
+        clonedImage.src = item.image;
+        clonedImage.alt = item.imageAlt || item.title;
+      }
+      clonedItem.querySelectorAll('.quantity__input').forEach((input) => {
+        input.value = String(optimisticQuantity);
+        input.setAttribute('value', String(optimisticQuantity));
+      });
+      return clonedItem;
+    }
+
+    const product = document.createElement('div');
+    product.className = 'cart-item prada-cart-drawer__optimistic-new-item';
+
+    const media = document.createElement('div');
+    media.className = 'cart-item__media';
+    if (item.image) {
+      const imageLink = document.createElement('a');
+      imageLink.className = 'cart-item__link';
+      imageLink.href = item.url || '#';
+      imageLink.tabIndex = -1;
+      imageLink.setAttribute('aria-hidden', 'true');
+      const image = document.createElement('img');
+      image.className = 'cart-item__image';
+      image.src = item.image;
+      image.alt = item.imageAlt || item.title;
+      image.width = 150;
+      image.height = 188;
+      image.decoding = 'async';
+      imageLink.append(image);
+      media.append(imageLink);
+    }
+
+    const details = document.createElement('div');
+    details.className = 'cart-item__details';
+    const titleWrap = document.createElement('div');
+    titleWrap.className = 'cart-item__title';
+    const title = document.createElement('a');
+    title.className = 'cart-item__name h4 break';
+    title.href = item.url || '#';
+    title.textContent = item.title;
+    titleWrap.append(title);
+    details.append(titleWrap);
+
+    const itemInfo = document.createElement('div');
+    itemInfo.className = 'prada-cart-drawer__item-info';
+    item.options?.forEach((option) => {
+      const row = document.createElement('p');
+      row.className = 'prada-cart-drawer__option';
+      row.textContent = `${option.name}: ${option.value}`;
+      itemInfo.append(row);
+    });
+    const quantity = document.createElement('p');
+    quantity.className = 'prada-cart-drawer__quantity';
+    quantity.textContent = `Qty: ${optimisticQuantity}`;
+    itemInfo.append(quantity);
+    if (item.price) {
+      const price = document.createElement('p');
+      price.className = 'prada-cart-drawer__price money';
+      price.textContent = item.price;
+      itemInfo.append(price);
+    }
+    const removeWrap = document.createElement('span');
+    removeWrap.className = 'prada-cart-drawer__remove-wrap';
+    const remove = document.createElement('button');
+    remove.className = 'prada-cart-drawer__remove';
+    remove.type = 'button';
+    remove.textContent = 'Remove';
+    removeWrap.append(remove);
+    itemInfo.append(removeWrap);
+    details.append(itemInfo);
+    product.append(media, details);
+    return product;
+  }
+
+  formatOptimisticMoney(cents, referenceText = '') {
+    const locale = document.documentElement.lang || 'en-IN';
+    const currency = window.Shopify?.currency?.active || 'INR';
+    const formattedNumber = new Intl.NumberFormat(locale, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(cents / 100);
+    const prefix = referenceText.trim().match(/^[^\d-]+/)?.[0]?.trim();
+
+    if (prefix) return `${prefix} ${formattedNumber}`;
+    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(cents / 100);
   }
 
   completeOptimisticAdd() {
@@ -199,6 +280,7 @@ class CartDrawer extends HTMLElement {
     this.classList.toggle('is-empty', state.wasEmpty);
     this.classList.toggle('prada-cart-drawer--multiple', state.wasMultiple);
     this.dataset.cartItemCount = String(state.previousCount);
+    this.dataset.cartTotalPrice = String(state.previousTotal);
     updatePradaCartIcon(state.previousCount);
     this.optimisticState = null;
 
@@ -378,6 +460,7 @@ class CartDrawer extends HTMLElement {
       ? this.getSectionDOM(parsedState.sections['cart-drawer'], 'cart-drawer')
       : null;
     const sectionItemCount = Number.parseInt(sourceDrawer?.dataset.cartItemCount || '', 10);
+    const sectionTotalPrice = Number.parseInt(sourceDrawer?.dataset.cartTotalPrice || '', 10);
     const itemCount =
       typeof parsedState.item_count === 'number'
         ? parsedState.item_count
@@ -390,6 +473,7 @@ class CartDrawer extends HTMLElement {
       this.classList.toggle('is-empty', itemCount === 0);
       updatePradaCartIcon(itemCount);
     }
+    if (Number.isFinite(sectionTotalPrice)) this.dataset.cartTotalPrice = String(sectionTotalPrice);
     if (sourceDrawer) {
       this.classList.toggle(
         'prada-cart-drawer--multiple',

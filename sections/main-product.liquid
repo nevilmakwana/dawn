@@ -213,7 +213,7 @@
         </button>
       </div>
 
-      <div class="prada-product__price" data-prada-price data-currency-price>
+      <div class="prada-product__price" data-prada-price data-prada-price-cents="{{ current_variant.price }}" data-currency-price>
         {%- if current_variant.compare_at_price > current_variant.price -%}
           <s class="money">{{ current_variant.compare_at_price | money }}</s>
         {%- endif -%}
@@ -757,6 +757,7 @@
 
       idInput.value = variant.id;
       price.innerHTML = `${variant.compare_at_price > variant.price ? `<s class="money">${formatMoney(variant.compare_at_price)}</s>` : ''}<span class="money">${formatMoney(variant.price)}</span>`;
+      price.dataset.pradaPriceCents = String(variant.price);
       selectors.forEach((selector, index) => {
         const selectedValue = root.querySelector(`[data-prada-selected-value="${index}"]`);
         if (selectedValue) selectedValue.textContent = selector.value;
