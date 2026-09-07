@@ -73,6 +73,7 @@ const isPradaCartPage = () => {
 };
 
 const PRADA_CART_DRAWER_TRANSITION_DURATION = 260;
+const PRADA_CART_EMPTY_TRANSITION_DURATION = 320;
 
 class CartDrawer extends HTMLElement {
   constructor() {
@@ -465,7 +466,6 @@ class CartDrawer extends HTMLElement {
     if (subtotal) subtotal.textContent = this.formatOptimisticMoney(nextTotal, subtotal.textContent);
 
     if (nextCount === 0) {
-      removedItem.setAttribute('hidden', '');
       this.showOptimisticEmptyState(state, panel);
     } else {
       this.animateOptimisticRowRemoval(state, removedItem);
@@ -511,7 +511,6 @@ class CartDrawer extends HTMLElement {
     if (subtotal) subtotal.textContent = this.formatOptimisticMoney(nextTotal, subtotal.textContent);
 
     if (nextCount === 0) {
-      removedItem.setAttribute('hidden', '');
       this.showOptimisticEmptyState(state, panel);
     } else {
       removedItem.classList.add('is-removing');
@@ -610,18 +609,35 @@ class CartDrawer extends HTMLElement {
   showOptimisticEmptyState(state, panel) {
     if (!panel || panel.querySelector('.prada-cart-drawer__optimistic-empty')) return;
 
-    panel.querySelector(':scope > .drawer__header')?.setAttribute('hidden', '');
-    panel.querySelector(':scope > .prada-cart-drawer__optimistic-items')?.setAttribute('hidden', '');
-    panel.querySelector(':scope > .drawer__footer')?.setAttribute('hidden', '');
-
     const empty = this.createEmptyStateElement();
     empty.classList.add('prada-cart-drawer__optimistic-empty');
 
     panel.append(empty);
     this.clearOptimisticEmptyTransition(state);
-    this.classList.add('is-empty', 'is-optimistic-empty', 'is-empty-stable');
-    this.classList.remove('prada-cart-drawer--multiple', 'is-empty-entering', 'is-empty-visible');
+    this.classList.add('is-empty', 'is-optimistic-empty', 'is-empty-transitioning');
+    this.classList.remove(
+      'prada-cart-drawer--multiple',
+      'is-empty-entering',
+      'is-empty-visible',
+      'is-empty-stable',
+    );
     state.optimisticEmpty = empty;
+    state.emptyAnimationFrame = window.requestAnimationFrame(() => {
+      state.emptyAnimationFrame = null;
+      if (this.optimisticState?.id !== state.id || !state.optimisticEmpty) return;
+
+      this.classList.add('is-empty-revealed');
+      state.emptyTransitionTimer = window.setTimeout(() => {
+        state.emptyTransitionTimer = null;
+        if (this.optimisticState?.id !== state.id || !state.optimisticEmpty) return;
+
+        panel.querySelector(':scope > .drawer__header')?.setAttribute('hidden', '');
+        panel.querySelector(':scope > .prada-cart-drawer__optimistic-items')?.setAttribute('hidden', '');
+        panel.querySelector(':scope > .drawer__footer')?.setAttribute('hidden', '');
+        this.classList.remove('is-empty-transitioning', 'is-empty-revealed');
+        this.classList.add('is-empty-stable');
+      }, PRADA_CART_EMPTY_TRANSITION_DURATION);
+    });
   }
 
   clearOptimisticEmptyTransition(state) {
@@ -631,7 +647,7 @@ class CartDrawer extends HTMLElement {
       state.emptyAnimationFrame = null;
       state.emptyTransitionTimer = null;
     }
-    this.classList.remove('is-empty-entering', 'is-empty-visible');
+    this.classList.remove('is-empty-entering', 'is-empty-visible', 'is-empty-transitioning', 'is-empty-revealed');
   }
 
   async performOptimisticRemove(state) {

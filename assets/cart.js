@@ -5,9 +5,22 @@ class CartRemoveButton extends HTMLElement {
 
     const optimisticEmptyState = this.optimisticEmptyState;
     if (optimisticEmptyState) {
+      if (optimisticEmptyState.cartDrawer?.emptyMorphFrame) {
+        window.cancelAnimationFrame(optimisticEmptyState.cartDrawer.emptyMorphFrame);
+        optimisticEmptyState.cartDrawer.emptyMorphFrame = null;
+      }
+      if (optimisticEmptyState.cartDrawer?.emptyMorphTimer) {
+        window.clearTimeout(optimisticEmptyState.cartDrawer.emptyMorphTimer);
+        optimisticEmptyState.cartDrawer.emptyMorphTimer = null;
+      }
       optimisticEmptyState.cartItems?.classList.remove('is-empty');
       optimisticEmptyState.cartFooter?.classList.remove('is-empty');
-      optimisticEmptyState.cartDrawer?.classList.remove('is-empty', 'is-empty-stable');
+      optimisticEmptyState.cartDrawer?.classList.remove(
+        'is-empty',
+        'is-empty-stable',
+        'is-empty-transitioning',
+        'is-empty-revealed'
+      );
       if (optimisticEmptyState.cartDrawer) {
         optimisticEmptyState.cartDrawer.dataset.cartItemCount = String(optimisticEmptyState.previousCount);
       }
@@ -128,9 +141,23 @@ class CartRemoveButton extends HTMLElement {
     cartItems.classList.add('is-empty');
     cartFooter?.classList.add('is-empty');
     if (cartDrawer) {
+      if (cartDrawer.emptyMorphFrame) window.cancelAnimationFrame(cartDrawer.emptyMorphFrame);
+      if (cartDrawer.emptyMorphTimer) window.clearTimeout(cartDrawer.emptyMorphTimer);
       cartDrawer.dataset.cartItemCount = '0';
-      cartDrawer.classList.add('is-empty', 'is-empty-stable');
-      cartDrawer.classList.remove('prada-cart-drawer--multiple');
+      cartDrawer.classList.add('is-empty', 'is-empty-transitioning');
+      cartDrawer.classList.remove('prada-cart-drawer--multiple', 'is-empty-stable', 'is-empty-revealed');
+      cartDrawer.emptyMorphFrame = window.requestAnimationFrame(() => {
+        cartDrawer.emptyMorphFrame = null;
+        if (!cartDrawer.classList.contains('is-empty')) return;
+
+        cartDrawer.classList.add('is-empty-revealed');
+        cartDrawer.emptyMorphTimer = window.setTimeout(() => {
+          cartDrawer.emptyMorphTimer = null;
+          if (!cartDrawer.classList.contains('is-empty')) return;
+          cartDrawer.classList.remove('is-empty-transitioning', 'is-empty-revealed');
+          cartDrawer.classList.add('is-empty-stable');
+        }, 320);
+      });
     }
     document.querySelectorAll('[data-prada-shopping-bag-count]').forEach((count) => {
       count.textContent = '0';
@@ -386,7 +413,10 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
             cartDrawerWrapper.classList.remove('is-empty-entering', 'is-empty-visible');
             if (shouldRevealEmptyDrawer) cartDrawerWrapper.classList.add('is-empty-entering');
             cartDrawerWrapper.classList.toggle('is-empty', parsedState.item_count === 0);
-            cartDrawerWrapper.classList.toggle('is-empty-stable', parsedState.item_count === 0);
+            cartDrawerWrapper.classList.toggle(
+              'is-empty-stable',
+              parsedState.item_count === 0 && !cartDrawerWrapper.classList.contains('is-empty-transitioning')
+            );
             cartDrawerWrapper.classList.remove('is-empty-leaving');
             cartDrawerWrapper.classList.toggle('prada-cart-drawer--multiple', parsedState.items.length > 1);
             window.PradaCartHeader?.update?.(parsedState.item_count);
