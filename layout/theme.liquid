@@ -84,6 +84,16 @@
     <script src="{{ 'pubsub.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
     {%- if request.page_type == 'index' or request.page_type == 'collection' or request.page_type == 'search' or request.page_type == 'product' -%}
+      <script type="speculationrules">
+        {
+          "prefetch": [
+            {
+              "where": { "selector_matches": ".product-card-wrapper a.full-unstyled-link[href*='/products/']" },
+              "eagerness": "eager"
+            }
+          ]
+        }
+      </script>
       <script src="{{ 'prada-product-prefetch.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
     <script src="{{ 'cart-disclosure-modal.js' | asset_url }}" defer="defer"></script>
