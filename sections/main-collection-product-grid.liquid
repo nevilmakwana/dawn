@@ -1073,8 +1073,6 @@
           headerDrawer.addEventListener('click', headerDrawer.pradaNestedNavigationHandler);
         }
 
-        match = getShowcaseNavigationMatch();
-
         desktopMenu?.querySelectorAll('.prada-desktop-menu__item').forEach(function (parentItem) {
           if (match) return;
 
@@ -1150,6 +1148,8 @@
             };
           }
         });
+
+        if (!match) match = getShowcaseNavigationMatch();
 
         if (!match || !match.tabs || match.tabs.length < 2) {
           tabs.dataset.pradaNavigationState = 'ready';
