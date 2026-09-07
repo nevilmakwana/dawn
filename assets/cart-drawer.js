@@ -622,12 +622,8 @@ class CartDrawer extends HTMLElement {
       if (!response.ok || parsedState.status) throw new Error(parsedState.description || 'Unable to remove item');
 
       const removedVariantId = state.removedVariantId;
-      if (parsedState.item_count === 0 && parsedState.sections?.['cart-drawer']) {
-        this.completeOptimisticAdd();
-        this.renderContents(parsedState, { shouldOpen: false });
-      } else {
-        this.commitOptimisticRemove(state, parsedState);
-      }
+      this.commitOptimisticRemove(state, parsedState);
+      void this.refreshDrawerAfterOptimisticRemove(state, parsedState.sections?.['cart-drawer']);
       publish(PUB_SUB_EVENTS.cartUpdate, {
         source: 'cart-items',
         variantId: removedVariantId,
@@ -697,7 +693,52 @@ class CartDrawer extends HTMLElement {
       this.classList.remove('is-optimistic-empty');
     }
 
-    this.scheduleRefreshAfterOptimisticAdd(state);
+  }
+
+  async refreshDrawerAfterOptimisticRemove(state, sectionHtml = null) {
+    if (!state || this.optimisticState?.id !== state.id || state.removalPending) return;
+
+    const refreshVersion = (state.removalRefreshVersion || 0) + 1;
+    state.removalRefreshVersion = refreshVersion;
+
+    const applyCanonicalDrawer = (html) => {
+      if (
+        !html ||
+        this.optimisticState?.id !== state.id ||
+        state.removalPending ||
+        state.removalRefreshVersion !== refreshVersion
+      ) return false;
+
+      const sourceDrawer = this.getSectionDOM(html, 'cart-drawer');
+      if (!sourceDrawer?.querySelector('#CartDrawer')) return false;
+
+      this.completeOptimisticAdd();
+      this.renderContents({ sections: { 'cart-drawer': html } }, { shouldOpen: false });
+      return true;
+    };
+
+    if (applyCanonicalDrawer(sectionHtml)) return;
+
+    const cartUrl = new URL(window.routes?.cart_url || '/cart', window.location.origin);
+    cartUrl.searchParams.set('section_id', 'cart-drawer');
+    cartUrl.searchParams.set('_prada_cart_sync', String(Date.now()));
+
+    try {
+      const response = await fetch(cartUrl.toString(), {
+        cache: 'no-store',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      });
+      if (!response.ok) throw new Error(`Cart drawer refresh failed: ${response.status}`);
+      const html = await response.text();
+      if (!applyCanonicalDrawer(html) && this.optimisticState?.id === state.id) {
+        this.scheduleRefreshAfterOptimisticAdd(state);
+      }
+    } catch (error) {
+      console.error(error);
+      if (this.optimisticState?.id === state.id && !state.removalPending) {
+        this.scheduleRefreshAfterOptimisticAdd(state);
+      }
+    }
   }
 
   restoreOptimisticRemove(state) {
