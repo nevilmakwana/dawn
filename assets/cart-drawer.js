@@ -147,6 +147,7 @@ class CartDrawer extends HTMLElement {
       parsedState: null,
       removeQueued: false,
       removalPending: false,
+      queuedRemove: null,
     };
 
     this.optimisticState = state;
@@ -416,7 +417,12 @@ class CartDrawer extends HTMLElement {
   }
 
   beginOptimisticRemove(state, removeButton, event) {
-    if (!state || this.optimisticState?.id !== state.id || state.removalPending) return;
+    if (!state || this.optimisticState?.id !== state.id) return;
+
+    if (state.removalPending) {
+      this.queueOptimisticRemove(state, removeButton, event);
+      return;
+    }
 
     const removedItem = removeButton.closest('.cart-item');
     const removedVariantId = this.getOptimisticRowVariantId(removedItem);
@@ -465,6 +471,53 @@ class CartDrawer extends HTMLElement {
     }
     if (event) CartPerformance.measureFromEvent('remove:optimistic-ui', event);
     if (state.confirmed) void this.performOptimisticRemove(state);
+  }
+
+  queueOptimisticRemove(state, removeButton, event) {
+    const removedItem = removeButton?.closest('.cart-item');
+    if (
+      !removedItem ||
+      removedItem === state.removedItem ||
+      state.queuedRemove ||
+      removedItem.dataset.pradaRemoveQueued === 'true'
+    ) return;
+
+    const removedVariantId = this.getOptimisticRowVariantId(removedItem);
+    const removedLineKey = this.getOptimisticRowLineKey(removedItem);
+    if (!removedVariantId && !removedLineKey) return;
+
+    const removedLineQuantity = this.getOptimisticRowQuantity(removedItem);
+    const displayedUnitPrice = this.parseOptimisticMoney(
+      removedItem.querySelector('.prada-cart-drawer__price')?.textContent,
+    );
+    const removingAddedLine = removedVariantId === String(state.item.variantId);
+    const unitPrice = displayedUnitPrice || (removingAddedLine ? state.item.priceCents : 0);
+    const nextCount = Math.max(0, state.removedCount - removedLineQuantity);
+    const nextTotal = Math.max(0, state.removedTotal - unitPrice * removedLineQuantity);
+
+    removedItem.dataset.pradaRemoveQueued = 'true';
+    state.queuedRemove = { removeButton, removedItem };
+    this.dataset.cartItemCount = String(nextCount);
+    this.dataset.cartTotalPrice = String(nextTotal);
+    updatePradaCartIcon(nextCount);
+
+    const panel = this.querySelector(`.prada-cart-drawer__optimistic[data-optimistic-id="${state.id}"]`);
+    const desktop = panel?.querySelector('.prada-cart-drawer__heading-desktop');
+    const mobile = panel?.querySelector('.prada-cart-drawer__heading-mobile');
+    if (desktop) desktop.textContent = `Your selection (${nextCount})`;
+    if (mobile) mobile.textContent = `Shopping bag (${nextCount})`;
+    const subtotal = panel?.querySelector('.totals__total-value');
+    if (subtotal) subtotal.textContent = this.formatOptimisticMoney(nextTotal, subtotal.textContent);
+
+    if (nextCount === 0) {
+      removedItem.setAttribute('hidden', '');
+      this.showOptimisticEmptyState(state, panel);
+    } else {
+      removedItem.classList.add('is-removing');
+      removedItem.style.pointerEvents = 'none';
+    }
+
+    if (event) CartPerformance.measureFromEvent('remove:queued-optimistic-ui', event);
   }
 
   animateOptimisticRowRemoval(state, row) {
@@ -640,6 +693,7 @@ class CartDrawer extends HTMLElement {
   commitOptimisticRemove(state, parsedState) {
     if (!state || this.optimisticState?.id !== state.id) return;
 
+    const queuedRemove = state.queuedRemove;
     if (state.removeAnimationFrame) window.cancelAnimationFrame(state.removeAnimationFrame);
     state.removeAnimationFrame = null;
     const removedAddedLine = state.removingAddedLine;
@@ -662,6 +716,7 @@ class CartDrawer extends HTMLElement {
     state.removedLineQuantity = null;
     state.removedLineTotal = null;
     state.removingAddedLine = false;
+    state.queuedRemove = null;
     state.parsedState = null;
 
     this.dataset.cartItemCount = String(state.optimisticCount);
@@ -705,6 +760,18 @@ class CartDrawer extends HTMLElement {
       items?.removeAttribute('hidden');
       panel?.querySelector(':scope > .drawer__footer')?.removeAttribute('hidden');
       this.classList.remove('is-optimistic-empty');
+    }
+
+    if (queuedRemove?.removeButton?.isConnected) {
+      queuedRemove.removedItem?.removeAttribute('data-prada-remove-queued');
+      this.beginOptimisticRemove(state, queuedRemove.removeButton);
+      return;
+    }
+
+    if (state.queuedDestination) {
+      const destination = state.queuedDestination;
+      state.queuedDestination = null;
+      window.location.assign(destination);
     }
 
   }
@@ -782,6 +849,12 @@ class CartDrawer extends HTMLElement {
     state.removalPending = false;
     state.removeRequestStarted = false;
     this.restoreOptimisticRow(state.removedItem);
+    if (state.queuedRemove?.removedItem) {
+      state.queuedRemove.removedItem.removeAttribute('data-prada-remove-queued');
+      state.queuedRemove.removedItem.style.pointerEvents = '';
+      this.restoreOptimisticRow(state.queuedRemove.removedItem);
+    }
+    state.queuedRemove = null;
     state.optimisticEmpty?.remove();
     state.optimisticEmpty = null;
     const panel = this.querySelector(`.prada-cart-drawer__optimistic[data-optimistic-id="${state.id}"]`);
