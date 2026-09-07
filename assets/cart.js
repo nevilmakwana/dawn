@@ -348,6 +348,15 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
           cartDrawerWrapper?.classList.contains('active') &&
           !cartDrawerWrapper.classList.contains('is-empty')
         );
+        const keepImmediateEmptyDrawer = Boolean(
+          !parsedState.errors &&
+          parsedState.item_count === 0 &&
+          eventTarget === 'clear' &&
+          this.matches('cart-drawer-items') &&
+          cartDrawerWrapper?.classList.contains('active') &&
+          event.currentTarget instanceof CartRemoveButton &&
+          event.currentTarget.optimisticEmptyState
+        );
         if (shouldRevealEmptyDrawer) {
           window.clearTimeout(cartDrawerWrapper.emptyTransitionTimer);
           cartDrawerWrapper.classList.remove('is-empty-entering', 'is-empty-visible');
@@ -398,6 +407,20 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
               sectionElement?.querySelector(section.selector) ||
               sectionElement;
             if (!elementToReplace) return;
+
+            // The last row was already replaced by the local empty state at
+            // click time. Replacing the whole open drawer again when Shopify's
+            // response arrives causes the empty UI to paint twice and leaves a
+            // short non-interactive gap. Clear the now-stale hidden rows but
+            // keep the visible empty shell stable; the next add or page load
+            // will reconcile the remaining server-rendered markup normally.
+            if (section.id === 'CartDrawer' && keepImmediateEmptyDrawer) {
+              const drawerItems = elementToReplace.querySelector('cart-drawer-items');
+              drawerItems?.querySelectorAll('.cart-item').forEach((item) => item.remove());
+              drawerItems?.classList.add('is-empty');
+              return;
+            }
+
             elementToReplace.innerHTML = this.getSectionInnerHTML(
               parsedState.sections[section.section],
               section.selector

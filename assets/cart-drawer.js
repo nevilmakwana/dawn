@@ -680,8 +680,22 @@ class CartDrawer extends HTMLElement {
 
     const items = panel?.querySelector('.prada-cart-drawer__optimistic-items');
     const table = items?.querySelector('.prada-cart-drawer__items');
-    items?.classList.toggle('is-multiple', state.optimisticLineCount > 1);
-    table?.classList.toggle('prada-cart-drawer__items--multiple', state.optimisticLineCount > 1);
+    const hasMultipleLines = state.optimisticLineCount > 1;
+
+    // A mobile multi-line drawer is a horizontal scroller. When it becomes a
+    // single-line drawer, retaining the previous slide's scrollLeft places the
+    // remaining item outside the viewport and briefly shows a blank drawer.
+    // Reset before and after the layout class change so the remaining row is
+    // visible in the same paint on Safari as well as Chromium.
+    if (items && !hasMultipleLines) items.scrollLeft = 0;
+    items?.classList.toggle('is-multiple', hasMultipleLines);
+    table?.classList.toggle('prada-cart-drawer__items--multiple', hasMultipleLines);
+    if (items && !hasMultipleLines) {
+      items.scrollLeft = 0;
+      window.requestAnimationFrame(() => {
+        if (this.optimisticState?.id === state.id && state.optimisticLineCount <= 1) items.scrollLeft = 0;
+      });
+    }
 
     if (state.optimisticCount > 0 && state.optimisticEmpty) {
       this.clearOptimisticEmptyTransition(state);
@@ -712,8 +726,25 @@ class CartDrawer extends HTMLElement {
       const sourceDrawer = this.getSectionDOM(html, 'cart-drawer');
       if (!sourceDrawer?.querySelector('#CartDrawer')) return false;
 
+      const canonicalState = { sections: { 'cart-drawer': html } };
+      state.parsedState = canonicalState;
+
+      const drawerIsVisible =
+        this.classList.contains('active') ||
+        this.classList.contains('animate') ||
+        this.classList.contains('is-opening') ||
+        this.classList.contains('is-closing');
+
+      // The optimistic DOM already reflects the confirmed cart transaction.
+      // Replacing it while the drawer is open creates a second visual paint,
+      // image blink, and a short interval in which the new controls are not
+      // interactive. Keep the visible state stable and apply this canonical
+      // server section after the drawer closes. If it is already closed, sync
+      // immediately so the next open starts from canonical markup.
+      if (drawerIsVisible) return true;
+
       this.completeOptimisticAdd();
-      this.renderContents({ sections: { 'cart-drawer': html } }, { shouldOpen: false });
+      this.renderContents(canonicalState, { shouldOpen: false });
       return true;
     };
 
