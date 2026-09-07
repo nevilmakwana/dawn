@@ -1386,6 +1386,13 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
       height 300ms var(--prada-cart-drawer-slide-out-ease) !important;
   }
 
+  /* A last-item removal swaps to the already-rendered empty shell in one
+     paint. Do not interpolate its height: centering content inside a changing
+     height makes the message jump before it reaches the final position. */
+  cart-drawer.prada-cart-drawer.is-empty.is-empty-stable:not(.is-closing) .drawer__inner {
+    transition: transform var(--prada-cart-drawer-slide-duration) var(--prada-cart-drawer-slide-in-ease) !important;
+  }
+
   cart-drawer.prada-cart-drawer.is-empty .drawer__inner-empty {
     height: 100%;
     padding: 0;

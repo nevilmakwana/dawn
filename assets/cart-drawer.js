@@ -139,6 +139,7 @@ class CartDrawer extends HTMLElement {
       optimisticLineCount,
       optimisticLineQuantity: existingQuantity + quantity,
       wasEmpty: this.classList.contains('is-empty'),
+      wasEmptyStable: this.classList.contains('is-empty-stable'),
       wasMultiple: this.classList.contains('prada-cart-drawer--multiple'),
       wasOpen: this.classList.contains('active') || this.classList.contains('is-opening'),
       queuedDestination: null,
@@ -154,7 +155,7 @@ class CartDrawer extends HTMLElement {
     this.querySelector('.prada-cart-drawer__optimistic')?.remove();
     this.dataset.cartItemCount = String(optimisticCount);
     this.dataset.cartTotalPrice = String(optimisticTotal);
-    this.classList.remove('is-empty');
+    this.classList.remove('is-empty', 'is-empty-stable');
     this.classList.add('is-optimistic');
     this.classList.toggle('prada-cart-drawer--multiple', optimisticLineCount > 1);
     updatePradaCartIcon(optimisticCount);
@@ -617,20 +618,10 @@ class CartDrawer extends HTMLElement {
     empty.classList.add('prada-cart-drawer__optimistic-empty');
 
     panel.append(empty);
-    this.classList.add('is-empty', 'is-optimistic-empty', 'is-empty-entering');
-    this.classList.remove('prada-cart-drawer--multiple');
+    this.clearOptimisticEmptyTransition(state);
+    this.classList.add('is-empty', 'is-optimistic-empty', 'is-empty-stable');
+    this.classList.remove('prada-cart-drawer--multiple', 'is-empty-entering', 'is-empty-visible');
     state.optimisticEmpty = empty;
-    state.emptyAnimationFrame = window.requestAnimationFrame(() => {
-      state.emptyAnimationFrame = window.requestAnimationFrame(() => {
-        state.emptyAnimationFrame = null;
-        if (this.optimisticState?.id !== state.id || !state.optimisticEmpty) return;
-        this.classList.add('is-empty-visible');
-        state.emptyTransitionTimer = window.setTimeout(() => {
-          state.emptyTransitionTimer = null;
-          this.classList.remove('is-empty-entering', 'is-empty-visible');
-        }, 560);
-      });
-    });
   }
 
   clearOptimisticEmptyTransition(state) {
@@ -722,6 +713,7 @@ class CartDrawer extends HTMLElement {
     this.dataset.cartItemCount = String(state.optimisticCount);
     this.dataset.cartTotalPrice = String(state.optimisticTotal);
     this.classList.toggle('is-empty', state.optimisticCount === 0);
+    this.classList.toggle('is-empty-stable', state.optimisticCount === 0);
     this.classList.toggle('prada-cart-drawer--multiple', state.optimisticLineCount > 1);
     updatePradaCartIcon(state.optimisticCount);
 
@@ -870,7 +862,7 @@ class CartDrawer extends HTMLElement {
 
     this.dataset.cartItemCount = String(state.optimisticCount);
     this.dataset.cartTotalPrice = String(state.optimisticTotal);
-    this.classList.remove('is-empty', 'is-optimistic-empty');
+    this.classList.remove('is-empty', 'is-optimistic-empty', 'is-empty-stable');
     this.classList.toggle('prada-cart-drawer--multiple', state.optimisticLineCount > 1);
     updatePradaCartIcon(state.optimisticCount);
   }
@@ -990,6 +982,7 @@ class CartDrawer extends HTMLElement {
 
     this.completeOptimisticAdd();
     this.classList.toggle('is-empty', state.wasEmpty);
+    this.classList.toggle('is-empty-stable', state.wasEmptyStable);
     this.classList.toggle('prada-cart-drawer--multiple', state.wasMultiple);
     this.dataset.cartItemCount = String(state.previousCount);
     this.dataset.cartTotalPrice = String(state.previousTotal);
@@ -1211,6 +1204,7 @@ class CartDrawer extends HTMLElement {
     if (itemCount !== null) {
       this.dataset.cartItemCount = String(itemCount);
       this.classList.toggle('is-empty', itemCount === 0);
+      this.classList.toggle('is-empty-stable', itemCount === 0);
       updatePradaCartIcon(itemCount);
     }
     if (Number.isFinite(sectionTotalPrice)) this.dataset.cartTotalPrice = String(sectionTotalPrice);
