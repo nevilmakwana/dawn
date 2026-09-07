@@ -13,6 +13,7 @@ class CartRemoveButton extends HTMLElement {
         window.clearTimeout(optimisticEmptyState.cartDrawer.emptyMorphTimer);
         optimisticEmptyState.cartDrawer.emptyMorphTimer = null;
       }
+      if (optimisticEmptyState.cartDrawer) optimisticEmptyState.cartDrawer.emptyMorphCleanup = null;
       optimisticEmptyState.cartItems?.classList.remove('is-empty');
       optimisticEmptyState.cartFooter?.classList.remove('is-empty');
       optimisticEmptyState.cartDrawer?.classList.remove(
@@ -143,6 +144,7 @@ class CartRemoveButton extends HTMLElement {
     if (cartDrawer) {
       if (cartDrawer.emptyMorphFrame) window.cancelAnimationFrame(cartDrawer.emptyMorphFrame);
       if (cartDrawer.emptyMorphTimer) window.clearTimeout(cartDrawer.emptyMorphTimer);
+      cartDrawer.emptyMorphCleanup = null;
       cartDrawer.dataset.cartItemCount = '0';
       cartDrawer.classList.add('is-empty', 'is-empty-transitioning');
       cartDrawer.classList.remove('prada-cart-drawer--multiple', 'is-empty-stable', 'is-empty-revealed');
@@ -154,6 +156,8 @@ class CartRemoveButton extends HTMLElement {
         cartDrawer.emptyMorphTimer = window.setTimeout(() => {
           cartDrawer.emptyMorphTimer = null;
           if (!cartDrawer.classList.contains('is-empty')) return;
+          cartDrawer.emptyMorphCleanup?.();
+          cartDrawer.emptyMorphCleanup = null;
           cartDrawer.classList.remove('is-empty-transitioning', 'is-empty-revealed');
           cartDrawer.classList.add('is-empty-stable');
         }, 320);
@@ -330,7 +334,10 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
     const eventTarget = event.currentTarget instanceof CartRemoveButton ? 'clear' : 'change';
     const cartPerformanceUpdateMarker = CartPerformance.createStartingMarker(`${eventTarget}:user-action`);
 
-    this.enableLoading(line);
+    // Removal already has immediate row-level feedback. Disabling the entire
+    // cart until Shopify responds makes the interaction look like a refresh
+    // and drops taps on other rows; the mutation queue provides ordering.
+    if (quantity !== 0) this.enableLoading(line);
 
     const action = quantity === 0 ? 'remove' : 'update';
     const quantityInput = this.querySelector(`#Quantity-${line}`) || this.querySelector(`#Drawer-quantity-${line}`);
@@ -447,8 +454,15 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
             // will reconcile the remaining server-rendered markup normally.
             if (section.id === 'CartDrawer' && keepImmediateEmptyDrawer) {
               const drawerItems = elementToReplace.querySelector('cart-drawer-items');
-              drawerItems?.querySelectorAll('.cart-item').forEach((item) => item.remove());
-              drawerItems?.classList.add('is-empty');
+              const clearStaleDrawerRows = () => {
+                drawerItems?.querySelectorAll('.cart-item').forEach((item) => item.remove());
+                drawerItems?.classList.add('is-empty');
+              };
+              if (cartDrawerWrapper.classList.contains('is-empty-transitioning')) {
+                cartDrawerWrapper.emptyMorphCleanup = clearStaleDrawerRows;
+              } else {
+                clearStaleDrawerRows();
+              }
               return;
             }
 

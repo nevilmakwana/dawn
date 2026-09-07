@@ -634,6 +634,8 @@ class CartDrawer extends HTMLElement {
         panel.querySelector(':scope > .drawer__header')?.setAttribute('hidden', '');
         panel.querySelector(':scope > .prada-cart-drawer__optimistic-items')?.setAttribute('hidden', '');
         panel.querySelector(':scope > .drawer__footer')?.setAttribute('hidden', '');
+        state.confirmedEmptyOutgoingItem?.remove();
+        state.confirmedEmptyOutgoingItem = null;
         this.classList.remove('is-empty-transitioning', 'is-empty-revealed');
         this.classList.add('is-empty-stable');
       }, PRADA_CART_EMPTY_TRANSITION_DURATION);
@@ -704,7 +706,17 @@ class CartDrawer extends HTMLElement {
     if (state.removeAnimationFrame) window.cancelAnimationFrame(state.removeAnimationFrame);
     state.removeAnimationFrame = null;
     const removedAddedLine = state.removingAddedLine;
-    state.removedItem?.remove();
+    const removedItem = state.removedItem;
+    const keepOutgoingItemDuringTransition = Boolean(
+      parsedState.item_count === 0 &&
+      state.optimisticEmpty &&
+      this.classList.contains('is-empty-transitioning'),
+    );
+    if (keepOutgoingItemDuringTransition) {
+      state.confirmedEmptyOutgoingItem = removedItem;
+    } else {
+      removedItem?.remove();
+    }
     state.optimisticCount = Number.isFinite(parsedState.item_count) ? parsedState.item_count : state.removedCount;
     state.optimisticTotal = Number.isFinite(parsedState.total_price) ? parsedState.total_price : state.removedTotal;
     state.optimisticLineCount = Array.isArray(parsedState.items)
@@ -729,7 +741,10 @@ class CartDrawer extends HTMLElement {
     this.dataset.cartItemCount = String(state.optimisticCount);
     this.dataset.cartTotalPrice = String(state.optimisticTotal);
     this.classList.toggle('is-empty', state.optimisticCount === 0);
-    this.classList.toggle('is-empty-stable', state.optimisticCount === 0);
+    this.classList.toggle(
+      'is-empty-stable',
+      state.optimisticCount === 0 && !this.classList.contains('is-empty-transitioning'),
+    );
     this.classList.toggle('prada-cart-drawer--multiple', state.optimisticLineCount > 1);
     updatePradaCartIcon(state.optimisticCount);
 
