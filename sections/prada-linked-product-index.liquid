@@ -20,6 +20,15 @@
           | append: '|'
         -%}
       {%- endfor -%}
+      {%- for indexed_native_collection in indexed_product.collections -%}
+        <template
+          data-prada-native-product
+          data-product-id="{{ indexed_product.id }}"
+          data-collection-id="{{ indexed_native_collection.id }}"
+        >
+          {% render 'prada-nested-collection-product-card', product: indexed_product, collection_context: indexed_native_collection %}
+        </template>
+      {%- endfor -%}
       {%- assign indexed_collection_ids = '|' -%}
       {%- for indexed_variant in indexed_product.variants -%}
         {%- liquid

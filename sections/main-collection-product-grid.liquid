@@ -637,7 +637,7 @@
           window.pradaCollectionNavigationState.cache.set(currentCacheKey, collectionRoot.outerHTML);
         }
 
-        function makeTab(label, href, active, productTemplateId, aggregateProducts) {
+        function makeTab(label, href, active, productTemplateId, aggregateProducts, aggregateCollectionIds) {
           var tab = document.createElement('a');
           var labelText = document.createElement('span');
 
@@ -648,6 +648,7 @@
           tab.appendChild(labelText);
           if (productTemplateId) tab.dataset.pradaProductTemplate = productTemplateId;
           if (aggregateProducts) tab.dataset.pradaAggregateProducts = 'true';
+          if (aggregateCollectionIds) tab.dataset.pradaAggregateCollectionIds = aggregateCollectionIds;
           if (active) tab.setAttribute('aria-current', 'page');
           return tab;
         }
@@ -761,6 +762,8 @@
           if (sourceCount && targetCount) targetCount.replaceWith(sourceCount);
           if (sourceControls && targetControls) targetControls.replaceWith(sourceControls);
           if (sourceCollection && targetCollection) {
+            delete targetCollection.dataset.pradaAggregateCollectionIds;
+            delete targetCollection.dataset.pradaNestedActive;
             targetCollection.dataset.collectionId = sourceCollection.dataset.collectionId || targetCollection.dataset.collectionId;
             targetCollection.dataset.linkedIndexUrl = sourceCollection.dataset.linkedIndexUrl || targetCollection.dataset.linkedIndexUrl;
             targetCollection.dataset.allProductsCount = sourceCollection.dataset.allProductsCount || targetCollection.dataset.allProductsCount;
@@ -810,10 +813,12 @@
           var currentGridContainer = document.querySelector('#ProductGridContainer');
           if (!productTemplate || !currentGridContainer) return false;
 
+          var aggregateCollectionIds =
+            tab.dataset.pradaAggregateCollectionIds || productTemplate.dataset.pradaAggregateCollectionIds || '';
           var productItems = Array.from(productTemplate.content.children).filter(function (item) {
             return item.matches('.prada-collection__item');
           });
-          if (!productItems.length) return false;
+          if (!productItems.length && !aggregateCollectionIds) return false;
 
           captureViewAllSnapshot();
 
@@ -831,8 +836,19 @@
           replacementContainer.appendChild(replacementGrid);
           currentGridContainer.replaceWith(replacementContainer);
 
+          if (tab.dataset.pradaAggregateProducts === 'true' && aggregateCollectionIds) {
+            collectionRoot.dataset.pradaAggregateCollectionIds = aggregateCollectionIds;
+          } else {
+            delete collectionRoot.dataset.pradaAggregateCollectionIds;
+          }
+
           var count = document.querySelector('.prada-collection__count');
-          if (count) count.textContent = productItems.length + (productItems.length === 1 ? ' product' : ' products');
+          var renderedProductIds = new Set();
+          replacementGrid.querySelectorAll('[data-prada-product-id]').forEach(function (item) {
+            if (item.dataset.pradaProductId) renderedProductIds.add(item.dataset.pradaProductId);
+          });
+          var renderedProductCount = renderedProductIds.size || productItems.length;
+          if (count) count.textContent = renderedProductCount + (renderedProductCount === 1 ? ' product' : ' products');
 
           collectionRoot.dataset.pradaNestedActive = 'true';
           setActiveTab(tabs, tab);
@@ -841,7 +857,6 @@
           if (updateHistory) {
             if (tab.dataset.pradaAggregateProducts === 'true') {
               var aggregateUrl = new URL(tab.href, window.location.origin);
-              aggregateUrl.hash = '';
               window.history.pushState({ pradaAggregateCollection: true }, '', aggregateUrl.href);
             } else {
               var nestedUrl = new URL(window.location.href);
@@ -870,6 +885,7 @@
           }
 
           delete collectionRoot.dataset.pradaNestedActive;
+          delete collectionRoot.dataset.pradaAggregateCollectionIds;
           setActiveTab(tabs, tab);
           window.history.pushState({ pradaCollectionUrl: targetUrl.href }, '', targetUrl.href);
           refreshCollectionCarousel();
@@ -955,7 +971,15 @@
         var currentTitle = textFrom(title).toLowerCase();
         var match = null;
 
-        function addUniqueTab(tabList, label, href, path, productTemplateId, aggregateProducts) {
+        function addUniqueTab(
+          tabList,
+          label,
+          href,
+          path,
+          productTemplateId,
+          aggregateProducts,
+          aggregateCollectionIds
+        ) {
           var normalizedLabel = (label || '').trim();
           var normalizedHref = (href || '').trim();
           var normalizedPath = path || '';
@@ -977,6 +1001,7 @@
             path: normalizedPath,
             productTemplateId: productTemplateId || '',
             aggregateProducts: Boolean(aggregateProducts),
+            aggregateCollectionIds: aggregateCollectionIds || '',
           });
         }
 
@@ -1125,19 +1150,46 @@
                 childViewAll.href,
                 childPath,
                 childViewAllTemplateId,
-                childViewAll.dataset.pradaAggregateProducts === 'true'
+                childViewAll.dataset.pradaAggregateProducts === 'true',
+                childViewAll.dataset.pradaAggregateCollectionIds || ''
               );
               collectGrandchildTabs(grandchildPanel, childTabs, childViewAll.href);
 
-              var activeChildTab = childTabs.find(function (tab) {
-                return tab.path && tab.path === currentPath;
-              });
+              var requestedNestedHandle =
+                window.location.hash.indexOf('#nested-') === 0
+                  ? decodeURIComponent(window.location.hash.slice(8))
+                  : '';
+              var activeChildTab = null;
+
+              if (requestedNestedHandle) {
+                activeChildTab = childTabs.find(function (tab) {
+                  return (
+                    (tab.label || '')
+                      .toLowerCase()
+                      .replace(/[^a-z0-9]+/g, '-')
+                      .replace(/^-|-$/g, '') === requestedNestedHandle
+                  );
+                });
+              }
+
+              if (!activeChildTab) {
+                activeChildTab = childTabs.find(function (tab) {
+                  return !tab.aggregateProducts && tab.path && tab.path === currentPath;
+                });
+              }
+
+              if (!activeChildTab) {
+                activeChildTab = childTabs.find(function (tab) {
+                  return tab.path && tab.path === currentPath;
+                });
+              }
 
               if ((activeChildTab || childTitleMatchesCurrentCollection) && childTabs.length > 1) {
                 match = {
                   title: childTitle,
                   tabs: childTabs,
                   activePath: activeChildTab ? currentPath : childPath,
+                  activeTab: activeChildTab,
                 };
               }
             } else if (childPath === currentPath && parentTabs.length > 1) {
@@ -1183,7 +1235,14 @@
 
         match.tabs.forEach(function (tab) {
           tabs.appendChild(
-            makeTab(tab.label, tab.href, tab.path === match.activePath, tab.productTemplateId, tab.aggregateProducts)
+            makeTab(
+              tab.label,
+              tab.href,
+              match.activeTab ? tab === match.activeTab : tab.path === match.activePath,
+              tab.productTemplateId,
+              tab.aggregateProducts,
+              tab.aggregateCollectionIds
+            )
           );
         });
 

@@ -174,6 +174,7 @@
 
                                   assign child_aggregate_template_id = 'PradaNestedViewAll-' | append: section.id | append: '-' | append: child_block.id
                                   assign has_child_aggregate_products = false
+                                  assign child_aggregate_collection_ids = '|'
                                   assign scan_child_aggregate = false
                                   for aggregate_check_block in section.blocks
                                     if aggregate_check_block.id == child_block.id
@@ -183,6 +184,7 @@
                                     elsif scan_child_aggregate and aggregate_check_block.type == 'drawer_child'
                                       break
                                     elsif scan_child_aggregate and aggregate_check_block.type == 'drawer_grandchild' and aggregate_check_block.settings.title != blank
+                                      assign aggregate_collection = blank
                                       if aggregate_check_block.settings.products != blank
                                         assign has_child_aggregate_products = true
                                       else
@@ -190,19 +192,31 @@
                                         if aggregate_collection_path contains 'shopify://collections/'
                                           assign aggregate_collection_handle = aggregate_collection_path | split: 'shopify://collections/' | last | split: '/' | first
                                           assign aggregate_collection = collections[aggregate_collection_handle]
-                                          if aggregate_collection != blank and aggregate_collection.products_count > 0
+                                          if aggregate_collection != blank
                                             assign has_child_aggregate_products = true
                                           endif
                                         elsif aggregate_collection_path contains '/collections/'
                                           assign aggregate_collection_handle = aggregate_collection_path | split: '/collections/' | last | split: '/' | first
                                           assign aggregate_collection = collections[aggregate_collection_handle]
-                                          if aggregate_collection != blank and aggregate_collection.products_count > 0
+                                          if aggregate_collection != blank
                                             assign has_child_aggregate_products = true
                                           endif
                                         endif
                                       endif
+
+                                      if aggregate_collection != blank
+                                        assign aggregate_collection_key = '|' | append: aggregate_collection.id | append: '|'
+                                        unless child_aggregate_collection_ids contains aggregate_collection_key
+                                          assign child_aggregate_collection_ids = child_aggregate_collection_ids | append: aggregate_collection.id | append: '|'
+                                        endunless
+                                      endif
                                     endif
                                   endfor
+
+                                  assign child_view_all_url = child_url
+                                  if has_child_aggregate_products and child_view_all_url != '#'
+                                    assign child_view_all_url = child_view_all_url | split: '#' | first | append: '#nested-view-all'
+                                  endif
                                 -%}
                                 <li class="prada-desktop-menu__submenu-item{% if has_grandchild_blocks %} has-grandchildren{% endif %}" {{ child_block.shopify_attributes }}>
                                   {%- if has_grandchild_blocks -%}
@@ -231,10 +245,11 @@
                                     >
                                       <a
                                         class="prada-desktop-menu__view-all"
-                                        href="{{ child_url }}"
+                                        href="{{ child_view_all_url }}"
                                         {% if has_child_aggregate_products and request.page_type == 'collection' %}
                                           data-prada-product-template="{{ child_aggregate_template_id }}"
                                           data-prada-aggregate-products="true"
+                                          data-prada-aggregate-collection-ids="{{ child_aggregate_collection_ids }}"
                                         {% endif %}
                                       >
                                         View all
@@ -285,7 +300,10 @@
                                         {%- endfor -%}
                                       </ul>
                                       {%- if has_child_aggregate_products and request.page_type == 'collection' -%}
-                                        <template id="{{ child_aggregate_template_id }}">
+                                        <template
+                                          id="{{ child_aggregate_template_id }}"
+                                          data-prada-aggregate-collection-ids="{{ child_aggregate_collection_ids }}"
+                                        >
                                           {%- liquid
                                             assign aggregate_product_ids = '|'
                                             assign scan_child_aggregate = false
@@ -323,7 +341,7 @@
                                                     {%- assign aggregate_product_key = '|' | append: aggregate_product.id | append: '|' -%}
                                                     {%- unless aggregate_product_ids contains aggregate_product_key -%}
                                                       {%- assign aggregate_product_ids = aggregate_product_ids | append: aggregate_product.id | append: '|' -%}
-                                                      {% render 'prada-nested-collection-product-card', product: aggregate_product, collection_context: collection %}
+                                                      {% render 'prada-nested-collection-product-card', product: aggregate_product, collection_context: aggregate_collection %}
                                                     {%- endunless -%}
                                                   {%- endfor -%}
                                                 {%- endif -%}
