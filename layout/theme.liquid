@@ -96,6 +96,9 @@
       </script>
       <script src="{{ 'prada-product-prefetch.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
+    {%- if request.page_type == 'collection' -%}
+      <script src="{{ 'prada-linked-collection-loader.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
     <script src="{{ 'cart-disclosure-modal.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'cart-disclosure-tooltip.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'details-disclosure.js' | asset_url }}" defer="defer"></script>

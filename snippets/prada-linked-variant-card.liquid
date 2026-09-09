@@ -29,7 +29,12 @@
   assign variant_url = product.url | append: '?variant=' | append: display_variant.id
 -%}
 
-<li class="prada-collection__item">
+<li
+  class="prada-collection__item"
+  data-prada-product-id="{{ product.id }}"
+  data-prada-variant-id="{{ display_variant.id }}"
+  data-prada-linked-card
+>
   <product-component view-event-payload="{{ product | standard_event_data: 'view', context: 'collection' | escape }}">
     <article class="prada-product-tile">
       <div class="prada-product-tile__media">

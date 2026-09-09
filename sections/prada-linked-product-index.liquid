@@ -1,0 +1,61 @@
+{%- comment -%}
+  Internal paginated index for variant-level collection references.
+  Product collection membership is product-level in Shopify, so the collection
+  grid uses this inert markup to discover linked variants beyond Liquid's
+  unpaginated 50-product limit. Images inside template elements are not fetched.
+{%- endcomment -%}
+
+{%- paginate collection.products by 50 -%}
+  <div
+    data-prada-linked-product-index
+    data-page="{{ paginate.current_page }}"
+    data-pages="{{ paginate.pages }}"
+    hidden
+  >
+    {%- for indexed_product in collection.products -%}
+      {%- assign indexed_native_collection_ids = '|' -%}
+      {%- for indexed_native_collection in indexed_product.collections -%}
+        {%- assign indexed_native_collection_ids = indexed_native_collection_ids
+          | append: indexed_native_collection.id
+          | append: '|'
+        -%}
+      {%- endfor -%}
+      {%- assign indexed_collection_ids = '|' -%}
+      {%- for indexed_variant in indexed_product.variants -%}
+        {%- liquid
+          assign indexed_collection_refs = indexed_variant.metafields.custom.linked_collections.value
+          if indexed_collection_refs == blank
+            assign indexed_collection_refs = indexed_variant.metafields.custom.custom_linked_collections.value
+          endif
+        -%}
+        {%- for indexed_collection in indexed_collection_refs -%}
+          {%- assign indexed_collection_key = '|' | append: indexed_collection.id | append: '|' -%}
+          {%- unless indexed_collection_ids contains indexed_collection_key -%}
+            {%- assign indexed_collection_ids = indexed_collection_ids | append: indexed_collection.id | append: '|' -%}
+            <template
+              data-prada-linked-product
+              data-collection-id="{{ indexed_collection.id }}"
+              data-product-id="{{ indexed_product.id }}"
+              data-variant-id="{{ indexed_variant.id }}"
+              data-native-collection-ids="{{ indexed_native_collection_ids }}"
+            >
+              {% render 'prada-linked-variant-card', product: indexed_product, variant: indexed_variant, lazy_load: true %}
+            </template>
+          {%- endunless -%}
+        {%- endfor -%}
+      {%- endfor -%}
+    {%- endfor -%}
+  </div>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Linked product index",
+  "tag": "section",
+  "class": "prada-linked-product-index-section",
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": []
+}
+{% endschema %}

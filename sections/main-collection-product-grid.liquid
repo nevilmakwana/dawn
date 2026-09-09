@@ -5,6 +5,9 @@
   view-event-payload="{{ collection | standard_event_data: 'view' | escape }}"
   data-collection-id="{{ collection.id }}"
   data-section-id="{{ section.id }}"
+  data-linked-index-url="{{ collections.all.url }}"
+  data-all-products-count="{{ collections.all.products_count }}"
+  data-native-product-count="{{ collection.products_count }}"
 >
   {%- paginate collection.products by section.settings.products_per_page -%}
     {%- liquid
@@ -176,7 +179,7 @@
             {%- if secondary_media and secondary_media.media_type == 'image' -%}
               {%- assign has_secondary_image = true -%}
             {%- endif -%}
-            <li class="prada-collection__item">
+            <li class="prada-collection__item" data-prada-product-id="{{ product.id }}">
               <product-component view-event-payload="{{ product | standard_event_data: 'view', context: 'collection' | escape }}">
                 <article class="prada-product-tile">
                   <div class="prada-product-tile__media">
@@ -290,7 +293,10 @@
                 endunless
               -%}
               {%- if candidate_featured and candidate_position == rendered_normal_count -%}
-                <li class="prada-collection__item prada-collection__item--featured prada-collection__item--featured-{{ candidate_size }}">
+                <li
+                  class="prada-collection__item prada-collection__item--featured prada-collection__item--featured-{{ candidate_size }}"
+                  data-prada-product-id="{{ featured_product.id }}"
+                >
                   {% render 'prada-featured-product-tile', product: featured_product %}
                 </li>
               {%- endif -%}
@@ -756,6 +762,9 @@
           if (sourceControls && targetControls) targetControls.replaceWith(sourceControls);
           if (sourceCollection && targetCollection) {
             targetCollection.dataset.collectionId = sourceCollection.dataset.collectionId || targetCollection.dataset.collectionId;
+            targetCollection.dataset.linkedIndexUrl = sourceCollection.dataset.linkedIndexUrl || targetCollection.dataset.linkedIndexUrl;
+            targetCollection.dataset.allProductsCount = sourceCollection.dataset.allProductsCount || targetCollection.dataset.allProductsCount;
+            targetCollection.dataset.nativeProductCount = sourceCollection.dataset.nativeProductCount || targetCollection.dataset.nativeProductCount;
             targetCollection.setAttribute('view-event-payload', sourceCollection.getAttribute('view-event-payload') || '');
           }
 
