@@ -215,6 +215,12 @@ cart-drawer.prada-cart-drawer.is-optimistic .drawer__inner > :not(.prada-cart-dr
   flex-direction: column;
 }
 
+/* The empty-state markup stays mounted so optimistic removals can reuse it.
+   Keep it completely out of the flex layout while the cart has items. */
+.drawer__inner-empty[hidden] {
+  display: none !important;
+}
+
 .cart-drawer__warnings {
   display: flex;
   flex-direction: column;
