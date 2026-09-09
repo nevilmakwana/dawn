@@ -1,6 +1,5 @@
 (() => {
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  const slowConnection = connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType || '');
   const supportsLinkPrefetch = document.createElement('link').relList?.supports?.('prefetch') === true;
 
   const preparedUrls = new Set();
@@ -8,18 +7,31 @@
   const queuedUrls = new Set();
   const observedLinks = new WeakSet();
   const queue = [];
-  const maxAutomaticPrefetches = 4;
+  const maxAutomaticPrefetches = 6;
+  const maxMenuPrefetches = 8;
   let automaticPrefetches = 0;
+  let menuPrefetches = 0;
   let queueScheduled = false;
 
-  const getProductUrl = (link) => {
+  const shouldAvoidPrefetch = () => {
+    const effectiveType = connection?.effectiveType || '';
+    return Boolean(connection?.saveData || /(^|-)2g$/.test(effectiveType));
+  };
+
+  const isSafeContentPath = (pathname) =>
+    /^\/(products|collections|pages|blogs)(\/|$)/.test(pathname) &&
+    !/^\/(cart|checkout|account|search|challenge|apps|password)(\/|$)/.test(pathname);
+
+  const getContentUrl = (link) => {
     if (!(link instanceof HTMLAnchorElement)) return null;
+    if (link.target && link.target !== '_self') return null;
+    if (link.hasAttribute('download') || /(^|\s)(nofollow|external)(\s|$)/i.test(link.rel || '')) return null;
 
     try {
       const url = new URL(link.href, window.location.href);
       url.hash = '';
 
-      if (url.origin !== window.location.origin || !url.pathname.includes('/products/')) return null;
+      if (url.origin !== window.location.origin || !isSafeContentPath(url.pathname)) return null;
       if (url.href === window.location.href.split('#')[0]) return null;
 
       return url.href;
@@ -39,14 +51,14 @@
     })
       // Consuming the response lets WebKit retain the complete document in its HTTP cache.
       .then((response) => {
-        if (!response.ok) throw new Error('Product prefetch failed');
+        if (!response.ok) throw new Error('Navigation prefetch failed');
         return response.arrayBuffer();
       })
       .catch(() => fetchedUrls.delete(url));
   };
 
-  const prepareProduct = (url, urgent = false) => {
-    if (!url || slowConnection || document.visibilityState === 'hidden') return;
+  const prepareContent = (url, urgent = false) => {
+    if (!url || shouldAvoidPrefetch() || document.visibilityState === 'hidden') return;
 
     queuedUrls.delete(url);
 
@@ -61,31 +73,31 @@
         document.head.appendChild(hint);
       } else {
         // Safari/iOS does not reliably support rel=prefetch. A low-priority GET
-        // warms Shopify's document cache without rendering or executing the page.
+        // still warms Shopify and the browser's HTTP caches without executing it.
         fetchDocument(url);
       }
     }
 
     // A real tap should not wait behind a speculative low-priority request.
     // The browser coalesces/reuses the request when it is already in flight/cached.
-    if (urgent) fetchDocument(url, 'high');
+    if (urgent && !supportsLinkPrefetch) fetchDocument(url, 'high');
   };
 
   const drainQueue = () => {
     queueScheduled = false;
     const url = queue.shift();
 
-    if (url) prepareProduct(url);
+    if (url) prepareContent(url);
     if (queue.length > 0) {
       queueScheduled = true;
       window.setTimeout(drainQueue, 350);
     }
   };
 
-  const queueProduct = (url) => {
+  const queueContent = (url) => {
     if (
       !url ||
-      slowConnection ||
+      shouldAvoidPrefetch() ||
       preparedUrls.has(url) ||
       queuedUrls.has(url) ||
       automaticPrefetches >= maxAutomaticPrefetches
@@ -107,24 +119,26 @@
     }
   };
 
-  const observer = !slowConnection && 'IntersectionObserver' in window
+  const observer = !shouldAvoidPrefetch() && 'IntersectionObserver' in window
     ? new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             if (!entry.isIntersecting) return;
 
             observer.unobserve(entry.target);
-            queueProduct(getProductUrl(entry.target));
+            queueContent(getContentUrl(entry.target));
           });
         },
         { rootMargin: '600px 0px' }
       )
     : null;
 
-  const observeProductLinks = (root = document) => {
+  const observePriorityLinks = (root = document) => {
     if (!observer) return;
 
-    root.querySelectorAll?.('a[href*="/products/"]').forEach((link) => {
+    root.querySelectorAll?.(
+      '.product-card-wrapper a[href*="/products/"], .prada-collection__item a[href*="/products/"]'
+    ).forEach((link) => {
       if (observedLinks.has(link)) return;
 
       observedLinks.add(link);
@@ -133,8 +147,64 @@
   };
 
   const prepareFromEvent = (event) => {
-    const link = event.target.closest?.('a[href*="/products/"]');
-    prepareProduct(getProductUrl(link), event.type === 'pointerdown' || event.type === 'touchstart');
+    const link = event.target.closest?.('a[href]');
+    const url = getContentUrl(link);
+    const urgent = event.type === 'pointerdown' || event.type === 'touchstart';
+
+    if (urgent && url) {
+      try {
+        sessionStorage.setItem('greyexim-navigation-start', String(performance.timeOrigin + performance.now()));
+        sessionStorage.setItem('greyexim-navigation-url', url);
+      } catch (_error) {
+        // Storage can be unavailable in private browsing; navigation must continue.
+      }
+    }
+
+    prepareContent(url, urgent);
+  };
+
+  const warmVisibleMenuLinks = () => {
+    if (shouldAvoidPrefetch() || menuPrefetches >= maxMenuPrefetches) return;
+
+    const drawer = document.querySelector('details.menu-drawer-container[open], .prada-desktop-menu[aria-hidden="false"]');
+    if (!drawer) return;
+
+    const links = Array.from(drawer.querySelectorAll('a[href]')).filter((link) => {
+      if (!getContentUrl(link)) return false;
+      const rect = link.getBoundingClientRect();
+      return (
+        rect.width > 0 &&
+        rect.height > 0 &&
+        rect.right > 0 &&
+        rect.bottom > 0 &&
+        rect.left < window.innerWidth &&
+        rect.top < window.innerHeight
+      );
+    });
+
+    for (const link of links) {
+      if (menuPrefetches >= maxMenuPrefetches) break;
+      const url = getContentUrl(link);
+      if (!url || preparedUrls.has(url)) continue;
+      menuPrefetches += 1;
+      prepareContent(url);
+    }
+  };
+
+  const publishNavigationTiming = () => {
+    try {
+      const startedAt = Number(sessionStorage.getItem('greyexim-navigation-start'));
+      const expectedUrl = sessionStorage.getItem('greyexim-navigation-url');
+      if (!startedAt || !expectedUrl || new URL(expectedUrl).pathname !== window.location.pathname) return;
+
+      const duration = Math.max(0, Math.round(performance.timeOrigin + performance.now() - startedAt));
+      window.greyEximNavigationTiming = { duration, url: window.location.href };
+      document.dispatchEvent(new CustomEvent('greyexim:navigation-timing', { detail: { duration } }));
+      sessionStorage.removeItem('greyexim-navigation-start');
+      sessionStorage.removeItem('greyexim-navigation-url');
+    } catch (_error) {
+      // Navigation telemetry is diagnostic only.
+    }
   };
 
   document.addEventListener('pointerover', prepareFromEvent, { passive: true, capture: true });
@@ -142,8 +212,16 @@
   document.addEventListener('focusin', prepareFromEvent, true);
   // Retain touchstart for older iOS versions that do not emit Pointer Events.
   document.addEventListener('touchstart', prepareFromEvent, { passive: true, capture: true });
-  document.addEventListener('shopify:section:load', (event) => observeProductLinks(event.target));
-  document.addEventListener('prada:collection:updated', () => observeProductLinks());
+  document.addEventListener('shopify:section:load', (event) => observePriorityLinks(event.target));
+  document.addEventListener('prada:collection:updated', () => {
+    observePriorityLinks();
+    publishNavigationTiming();
+  });
+  document.addEventListener('click', () => window.setTimeout(warmVisibleMenuLinks, 0), true);
+  document.addEventListener('change', () => window.setTimeout(warmVisibleMenuLinks, 0), true);
+  document.addEventListener('focusin', () => window.setTimeout(warmVisibleMenuLinks, 0), true);
+  window.addEventListener('pageshow', publishNavigationTiming);
 
-  observeProductLinks();
+  observePriorityLinks();
+  publishNavigationTiming();
 })();
