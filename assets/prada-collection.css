@@ -82,6 +82,10 @@ body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
   visibility: hidden;
 }
 
+.prada-collection__tabs[data-prada-navigation-state='resolving']::after {
+  transition: none;
+}
+
 .prada-collection__tabs::after {
   position: absolute;
   bottom: 0;

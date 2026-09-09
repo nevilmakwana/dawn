@@ -46,6 +46,16 @@
       endfor
 
       assign displayed_product_count = collection.products_count | plus: linked_extra_count
+
+      assign subcategory_current_found = false
+      if section.settings.subcategory_menu != blank
+        for subcategory_link in section.settings.subcategory_menu.links
+          if subcategory_link.current or subcategory_link.url == collection.url
+            assign subcategory_current_found = true
+            break
+          endif
+        endfor
+      endif
     -%}
     <header class="prada-collection__header">
       <div class="prada-collection__navigation">
@@ -57,7 +67,11 @@
           data-prada-collection-tabs
           data-prada-navigation-state="resolving"
         >
-          <a class="prada-collection__tab is-active" href="{{ collection.url }}" aria-current="page">
+          <a
+            class="prada-collection__tab{% unless subcategory_current_found %} is-active{% endunless %}"
+            href="{{ collection.url }}"
+            {% unless subcategory_current_found %}aria-current="page"{% endunless %}
+          >
             <span class="prada-collection__tab-text">View all</span>
           </a>
           {%- if section.settings.subcategory_menu != blank -%}
@@ -1213,9 +1227,12 @@
         if (!match) match = getShowcaseNavigationMatch();
 
         if (!match || !match.tabs || match.tabs.length < 2) {
+          updateTabIndicator(tabs, tabs.querySelector('.prada-collection__tab.is-active'));
+          // Resolve the initial indicator position while the navigation is
+          // still hidden. This prevents it animating from View all on load.
+          void tabs.offsetWidth;
           tabs.dataset.pradaNavigationState = 'ready';
           tabs.dataset.pradaNavigationReady = 'true';
-          updateTabIndicator(tabs, tabs.querySelector('.prada-collection__tab.is-active'));
           queueTabIndicatorUpdate(tabs);
           document.fonts?.ready?.then(function () {
             queueTabIndicatorUpdate(tabs);
@@ -1246,9 +1263,12 @@
           );
         });
 
+        updateTabIndicator(tabs, tabs.querySelector('.prada-collection__tab.is-active'));
+        // The rebuilt tabs already know the current URL. Commit that position
+        // before revealing the navigation so only the selected tab is shown.
+        void tabs.offsetWidth;
         tabs.dataset.pradaNavigationState = 'ready';
         tabs.dataset.pradaNavigationReady = 'true';
-        updateTabIndicator(tabs, tabs.querySelector('.prada-collection__tab.is-active'));
         queueTabIndicatorUpdate(tabs);
         document.fonts?.ready?.then(function () {
           queueTabIndicatorUpdate(tabs);
