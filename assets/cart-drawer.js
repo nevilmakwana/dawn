@@ -73,7 +73,8 @@ const isPradaCartPage = () => {
 };
 
 const PRADA_CART_DRAWER_TRANSITION_DURATION = 260;
-const PRADA_CART_EMPTY_TRANSITION_DURATION = 320;
+const PRADA_CART_EMPTY_REVEAL_DELAY = 300;
+const PRADA_CART_EMPTY_TRANSITION_DURATION = 500;
 
 class CartDrawer extends HTMLElement {
   constructor() {
@@ -626,7 +627,12 @@ class CartDrawer extends HTMLElement {
       state.emptyAnimationFrame = null;
       if (this.optimisticState?.id !== state.id || !state.optimisticEmpty) return;
 
-      this.classList.add('is-empty-revealed');
+      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      state.emptyRevealTimer = window.setTimeout(() => {
+        state.emptyRevealTimer = null;
+        if (this.optimisticState?.id !== state.id || !state.optimisticEmpty) return;
+        this.classList.add('is-empty-revealed');
+      }, reduceMotion ? 0 : PRADA_CART_EMPTY_REVEAL_DELAY);
       state.emptyTransitionTimer = window.setTimeout(() => {
         state.emptyTransitionTimer = null;
         if (this.optimisticState?.id !== state.id || !state.optimisticEmpty) return;
@@ -638,15 +644,17 @@ class CartDrawer extends HTMLElement {
         state.confirmedEmptyOutgoingItem = null;
         this.classList.remove('is-empty-transitioning', 'is-empty-revealed');
         this.classList.add('is-empty-stable');
-      }, PRADA_CART_EMPTY_TRANSITION_DURATION);
+      }, reduceMotion ? 0 : PRADA_CART_EMPTY_TRANSITION_DURATION);
     });
   }
 
   clearOptimisticEmptyTransition(state) {
     if (state?.emptyAnimationFrame) window.cancelAnimationFrame(state.emptyAnimationFrame);
+    if (state?.emptyRevealTimer) window.clearTimeout(state.emptyRevealTimer);
     if (state?.emptyTransitionTimer) window.clearTimeout(state.emptyTransitionTimer);
     if (state) {
       state.emptyAnimationFrame = null;
+      state.emptyRevealTimer = null;
       state.emptyTransitionTimer = null;
     }
     this.classList.remove('is-empty-entering', 'is-empty-visible', 'is-empty-transitioning', 'is-empty-revealed');

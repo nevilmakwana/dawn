@@ -13,6 +13,10 @@ class CartRemoveButton extends HTMLElement {
         window.clearTimeout(optimisticEmptyState.cartDrawer.emptyMorphTimer);
         optimisticEmptyState.cartDrawer.emptyMorphTimer = null;
       }
+      if (optimisticEmptyState.cartDrawer?.emptyMorphRevealTimer) {
+        window.clearTimeout(optimisticEmptyState.cartDrawer.emptyMorphRevealTimer);
+        optimisticEmptyState.cartDrawer.emptyMorphRevealTimer = null;
+      }
       if (optimisticEmptyState.cartDrawer) optimisticEmptyState.cartDrawer.emptyMorphCleanup = null;
       optimisticEmptyState.cartItems?.classList.remove('is-empty');
       optimisticEmptyState.cartFooter?.classList.remove('is-empty');
@@ -144,6 +148,7 @@ class CartRemoveButton extends HTMLElement {
     if (cartDrawer) {
       if (cartDrawer.emptyMorphFrame) window.cancelAnimationFrame(cartDrawer.emptyMorphFrame);
       if (cartDrawer.emptyMorphTimer) window.clearTimeout(cartDrawer.emptyMorphTimer);
+      if (cartDrawer.emptyMorphRevealTimer) window.clearTimeout(cartDrawer.emptyMorphRevealTimer);
       cartDrawer.emptyMorphCleanup = null;
       cartDrawer.dataset.cartItemCount = '0';
       cartDrawer.classList.add('is-empty', 'is-empty-transitioning');
@@ -152,7 +157,12 @@ class CartRemoveButton extends HTMLElement {
         cartDrawer.emptyMorphFrame = null;
         if (!cartDrawer.classList.contains('is-empty')) return;
 
-        cartDrawer.classList.add('is-empty-revealed');
+        const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+        cartDrawer.emptyMorphRevealTimer = window.setTimeout(() => {
+          cartDrawer.emptyMorphRevealTimer = null;
+          if (!cartDrawer.classList.contains('is-empty')) return;
+          cartDrawer.classList.add('is-empty-revealed');
+        }, reduceMotion ? 0 : 300);
         cartDrawer.emptyMorphTimer = window.setTimeout(() => {
           cartDrawer.emptyMorphTimer = null;
           if (!cartDrawer.classList.contains('is-empty')) return;
@@ -160,7 +170,7 @@ class CartRemoveButton extends HTMLElement {
           cartDrawer.emptyMorphCleanup = null;
           cartDrawer.classList.remove('is-empty-transitioning', 'is-empty-revealed');
           cartDrawer.classList.add('is-empty-stable');
-        }, 320);
+        }, reduceMotion ? 0 : 500);
       });
     }
     document.querySelectorAll('[data-prada-shopping-bag-count]').forEach((count) => {
