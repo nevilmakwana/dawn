@@ -29,6 +29,7 @@ class CartRemoveButton extends HTMLElement {
       if (optimisticEmptyState.cartDrawer) {
         optimisticEmptyState.cartDrawer.dataset.cartItemCount = String(optimisticEmptyState.previousCount);
       }
+      optimisticEmptyState.cartItems?.removeAttribute('data-prada-projected-empty');
       if (optimisticEmptyState.emptyState?.element?.isConnected) {
         if (optimisticEmptyState.emptyState.created) {
           optimisticEmptyState.emptyState.element.remove();
@@ -149,6 +150,7 @@ class CartRemoveButton extends HTMLElement {
     const emptyState = cartDrawer?.ensureImmediateEmptyState?.() || null;
 
     this.optimisticEmptyState = { cartItems, cartDrawer, cartFooter, previousCount, emptyState };
+    cartItems.dataset.pradaProjectedEmpty = 'true';
     cartItems.classList.add('is-empty');
     cartFooter?.classList.add('is-empty');
     if (cartDrawer) {
@@ -392,6 +394,12 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
         }
 
         const cartDrawerWrapper = document.querySelector('cart-drawer');
+        const preserveProjectedEmpty = Boolean(
+          !parsedState.errors &&
+          parsedState.item_count > 0 &&
+          quantity === 0 &&
+          this.dataset.pradaProjectedEmpty === 'true'
+        );
         const shouldRevealEmptyDrawer = Boolean(
           !parsedState.errors &&
           parsedState.item_count === 0 &&
@@ -436,11 +444,15 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
             return;
           }
 
-          this.classList.toggle('is-empty', parsedState.item_count === 0);
+          if (parsedState.item_count === 0) this.removeAttribute('data-prada-projected-empty');
+
+          if (!preserveProjectedEmpty) this.classList.toggle('is-empty', parsedState.item_count === 0);
           const cartFooter = document.getElementById('main-cart-footer');
 
-          if (cartFooter) cartFooter.classList.toggle('is-empty', parsedState.item_count === 0);
-          if (cartDrawerWrapper) {
+          if (cartFooter && !preserveProjectedEmpty) {
+            cartFooter.classList.toggle('is-empty', parsedState.item_count === 0);
+          }
+          if (cartDrawerWrapper && !preserveProjectedEmpty) {
             window.clearTimeout(cartDrawerWrapper.emptyTransitionTimer);
             cartDrawerWrapper.classList.remove('is-empty-entering', 'is-empty-visible');
             if (shouldRevealEmptyDrawer) cartDrawerWrapper.classList.add('is-empty-entering');
@@ -453,16 +465,18 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
             cartDrawerWrapper.classList.toggle('prada-cart-drawer--multiple', parsedState.items.length > 1);
             window.PradaCartHeader?.update?.(parsedState.item_count);
           }
-          document.querySelectorAll('[data-prada-shopping-bag-count]').forEach((count) => {
-            count.textContent = String(parsedState.item_count);
-          });
+          if (!preserveProjectedEmpty) {
+            document.querySelectorAll('[data-prada-shopping-bag-count]').forEach((count) => {
+              count.textContent = String(parsedState.item_count);
+            });
+          }
 
           sectionsToRender.forEach((section) => {
             const sectionElement = document.getElementById(section.id);
 
             // Keep the custom header cart button intact when cart page sections refresh.
             if (section.id === 'cart-icon-bubble' && sectionElement?.classList.contains('prada-header-btn--cart')) {
-              window.PradaCartHeader?.update?.(parsedState.item_count);
+              if (!preserveProjectedEmpty) window.PradaCartHeader?.update?.(parsedState.item_count);
               return;
             }
 
@@ -471,6 +485,23 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
               sectionElement;
             if (!elementToReplace) return;
 
+            // A later queued remove has already projected this cart to empty.
+            // Ignore intermediate section HTML (for example the first of two
+            // rapid removals returning one remaining item), otherwise it
+            // resurrects the row and makes the empty state blink. The final
+            // queued response owns canonical reconciliation.
+            if (preserveProjectedEmpty) {
+              if (section.id === 'CartDrawer') {
+                cartDrawerWrapper.commitVisibleCanonicalRemove?.(
+                  event.currentTarget,
+                  parsedState,
+                  parsedState.sections[section.section],
+                  { preserveProjectedEmpty: true }
+                );
+              }
+              return;
+            }
+
             // The last row was already replaced by the local empty state at
             // click time. Replacing the whole open drawer again when Shopify's
             // response arrives causes the empty UI to paint twice and leaves a
@@ -478,6 +509,7 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
             // keep the visible empty shell stable; the next add or page load
             // will reconcile the remaining server-rendered markup normally.
             if (section.id === 'CartDrawer' && keepImmediateEmptyDrawer) {
+              this.removeAttribute('data-prada-projected-empty');
               const canonicalSaved = cartDrawerWrapper.deferCanonicalSection?.(parsedState.sections[section.section]);
               if (!canonicalSaved) cartDrawerWrapper.refreshDeferredCanonicalSection?.();
               const drawerItems = elementToReplace.querySelector('cart-drawer-items');

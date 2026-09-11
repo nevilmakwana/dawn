@@ -158,7 +158,9 @@ class CartDrawer extends HTMLElement {
       parsedState: null,
       removeQueued: false,
       removalPending: false,
-      queuedRemove: null,
+      queuedRemoves: [],
+      projectedCount: optimisticCount,
+      projectedTotal: optimisticTotal,
     };
 
     this.optimisticState = state;
@@ -427,7 +429,7 @@ class CartDrawer extends HTMLElement {
     return Number.parseInt(label.match(/\d+/)?.[0] || '1', 10) || 1;
   }
 
-  beginOptimisticRemove(state, removeButton, event) {
+  beginOptimisticRemove(state, removeButton, event, { preserveProjection = false } = {}) {
     if (!state || this.optimisticState?.id !== state.id) return;
 
     if (state.removalPending) {
@@ -462,19 +464,25 @@ class CartDrawer extends HTMLElement {
     const nextTotal = Math.max(0, state.optimisticTotal - state.removedLineTotal);
     state.removedCount = nextCount;
     state.removedTotal = nextTotal;
-    this.dataset.cartItemCount = String(nextCount);
-    this.dataset.cartTotalPrice = String(nextTotal);
-    updatePradaCartIcon(nextCount);
+    if (!preserveProjection) {
+      state.projectedCount = nextCount;
+      state.projectedTotal = nextTotal;
+    }
+    const displayedCount = Number.isFinite(state.projectedCount) ? state.projectedCount : nextCount;
+    const displayedTotal = Number.isFinite(state.projectedTotal) ? state.projectedTotal : nextTotal;
+    this.dataset.cartItemCount = String(displayedCount);
+    this.dataset.cartTotalPrice = String(displayedTotal);
+    updatePradaCartIcon(displayedCount);
 
     const panel = this.querySelector(`.prada-cart-drawer__optimistic[data-optimistic-id="${state.id}"]`);
     const desktop = panel?.querySelector('.prada-cart-drawer__heading-desktop');
     const mobile = panel?.querySelector('.prada-cart-drawer__heading-mobile');
-    if (desktop) desktop.textContent = `Your selection (${nextCount})`;
-    if (mobile) mobile.textContent = `Shopping bag (${nextCount})`;
+    if (desktop) desktop.textContent = `Your selection (${displayedCount})`;
+    if (mobile) mobile.textContent = `Shopping bag (${displayedCount})`;
     const subtotal = panel?.querySelector('.totals__total-value');
-    if (subtotal) subtotal.textContent = this.formatOptimisticMoney(nextTotal, subtotal.textContent);
+    if (subtotal) subtotal.textContent = this.formatOptimisticMoney(displayedTotal, subtotal.textContent);
 
-    if (nextCount === 0) {
+    if (displayedCount === 0) {
       this.showOptimisticEmptyState(state, panel);
     } else {
       this.animateOptimisticRowRemoval(state, removedItem);
@@ -488,7 +496,7 @@ class CartDrawer extends HTMLElement {
     if (
       !removedItem ||
       removedItem === state.removedItem ||
-      state.queuedRemove ||
+      state.queuedRemoves?.some((queued) => queued.removedItem === removedItem) ||
       removedItem.dataset.pradaRemoveQueued === 'true'
     ) return;
 
@@ -502,11 +510,24 @@ class CartDrawer extends HTMLElement {
     );
     const removingAddedLine = removedVariantId === String(state.item.variantId);
     const unitPrice = displayedUnitPrice || (removingAddedLine ? state.item.priceCents : 0);
-    const nextCount = Math.max(0, state.removedCount - removedLineQuantity);
-    const nextTotal = Math.max(0, state.removedTotal - unitPrice * removedLineQuantity);
+    const projectedCount = Number.isFinite(state.projectedCount) ? state.projectedCount : state.removedCount;
+    const projectedTotal = Number.isFinite(state.projectedTotal) ? state.projectedTotal : state.removedTotal;
+    const nextCount = Math.max(0, projectedCount - removedLineQuantity);
+    const removedLineTotal = unitPrice * removedLineQuantity;
+    const nextTotal = Math.max(0, projectedTotal - removedLineTotal);
 
     removedItem.dataset.pradaRemoveQueued = 'true';
-    state.queuedRemove = { removeButton, removedItem };
+    state.queuedRemoves ||= [];
+    state.queuedRemoves.push({
+      removeButton,
+      removedItem,
+      removedLineQuantity,
+      removedLineTotal,
+      projectedCount: nextCount,
+      projectedTotal: nextTotal,
+    });
+    state.projectedCount = nextCount;
+    state.projectedTotal = nextTotal;
     this.dataset.cartItemCount = String(nextCount);
     this.dataset.cartTotalPrice = String(nextTotal);
     updatePradaCartIcon(nextCount);
@@ -561,6 +582,7 @@ class CartDrawer extends HTMLElement {
     row.style.width = '';
     row.style.flexBasis = '';
     row.style.overflow = '';
+    row.style.pointerEvents = '';
   }
 
   createEmptyStateElement() {
@@ -716,7 +738,7 @@ class CartDrawer extends HTMLElement {
   commitOptimisticRemove(state, parsedState) {
     if (!state || this.optimisticState?.id !== state.id) return;
 
-    const queuedRemove = state.queuedRemove;
+    const queuedRemove = state.queuedRemoves?.shift() || null;
     if (state.removeAnimationFrame) window.cancelAnimationFrame(state.removeAnimationFrame);
     state.removeAnimationFrame = null;
     const removedAddedLine = state.removingAddedLine;
@@ -749,26 +771,36 @@ class CartDrawer extends HTMLElement {
     state.removedLineQuantity = null;
     state.removedLineTotal = null;
     state.removingAddedLine = false;
-    state.queuedRemove = null;
     state.parsedState = null;
 
-    this.dataset.cartItemCount = String(state.optimisticCount);
-    this.dataset.cartTotalPrice = String(state.optimisticTotal);
-    this.classList.toggle('is-empty', state.optimisticCount === 0);
+    if (!queuedRemove) {
+      state.projectedCount = state.optimisticCount;
+      state.projectedTotal = state.optimisticTotal;
+    }
+    const displayedCount = Number.isFinite(state.projectedCount)
+      ? state.projectedCount
+      : state.optimisticCount;
+    const displayedTotal = Number.isFinite(state.projectedTotal)
+      ? state.projectedTotal
+      : state.optimisticTotal;
+
+    this.dataset.cartItemCount = String(displayedCount);
+    this.dataset.cartTotalPrice = String(displayedTotal);
+    this.classList.toggle('is-empty', displayedCount === 0);
     this.classList.toggle(
       'is-empty-stable',
-      state.optimisticCount === 0 && !this.classList.contains('is-empty-transitioning'),
+      displayedCount === 0 && !this.classList.contains('is-empty-transitioning'),
     );
-    this.classList.toggle('prada-cart-drawer--multiple', state.optimisticLineCount > 1);
-    updatePradaCartIcon(state.optimisticCount);
+    this.classList.toggle('prada-cart-drawer--multiple', displayedCount > 0 && state.optimisticLineCount > 1);
+    updatePradaCartIcon(displayedCount);
 
     const panel = this.querySelector(`.prada-cart-drawer__optimistic[data-optimistic-id="${state.id}"]`);
     const desktop = panel?.querySelector('.prada-cart-drawer__heading-desktop');
     const mobile = panel?.querySelector('.prada-cart-drawer__heading-mobile');
-    if (desktop) desktop.textContent = `Your selection (${state.optimisticCount})`;
-    if (mobile) mobile.textContent = `Added to shopping bag (${state.optimisticCount})`;
+    if (desktop) desktop.textContent = `Your selection (${displayedCount})`;
+    if (mobile) mobile.textContent = `Added to shopping bag (${displayedCount})`;
     const subtotal = panel?.querySelector('.totals__total-value');
-    if (subtotal) subtotal.textContent = this.formatOptimisticMoney(state.optimisticTotal, subtotal.textContent);
+    if (subtotal) subtotal.textContent = this.formatOptimisticMoney(displayedTotal, subtotal.textContent);
 
     const items = panel?.querySelector('.prada-cart-drawer__optimistic-items');
     const table = items?.querySelector('.prada-cart-drawer__items');
@@ -789,7 +821,7 @@ class CartDrawer extends HTMLElement {
       });
     }
 
-    if (state.optimisticCount > 0 && state.optimisticEmpty) {
+    if (displayedCount > 0 && state.optimisticEmpty) {
       this.clearOptimisticEmptyTransition(state);
       state.optimisticEmpty.remove();
       state.optimisticEmpty = null;
@@ -801,7 +833,7 @@ class CartDrawer extends HTMLElement {
 
     if (queuedRemove?.removeButton?.isConnected) {
       queuedRemove.removedItem?.removeAttribute('data-prada-remove-queued');
-      this.beginOptimisticRemove(state, queuedRemove.removeButton);
+      this.beginOptimisticRemove(state, queuedRemove.removeButton, null, { preserveProjection: true });
       return;
     }
 
@@ -886,12 +918,13 @@ class CartDrawer extends HTMLElement {
     state.removalPending = false;
     state.removeRequestStarted = false;
     this.restoreOptimisticRow(state.removedItem);
-    if (state.queuedRemove?.removedItem) {
-      state.queuedRemove.removedItem.removeAttribute('data-prada-remove-queued');
-      state.queuedRemove.removedItem.style.pointerEvents = '';
-      this.restoreOptimisticRow(state.queuedRemove.removedItem);
-    }
-    state.queuedRemove = null;
+    state.queuedRemoves?.forEach((queuedRemove) => {
+      queuedRemove.removedItem?.removeAttribute('data-prada-remove-queued');
+      this.restoreOptimisticRow(queuedRemove.removedItem);
+    });
+    state.queuedRemoves = [];
+    state.projectedCount = state.optimisticCount;
+    state.projectedTotal = state.optimisticTotal;
     state.optimisticEmpty?.remove();
     state.optimisticEmpty = null;
     const panel = this.querySelector(`.prada-cart-drawer__optimistic[data-optimistic-id="${state.id}"]`);
@@ -1062,7 +1095,12 @@ class CartDrawer extends HTMLElement {
     return true;
   }
 
-  commitVisibleCanonicalRemove(removeButton, parsedState, sectionHtml) {
+  commitVisibleCanonicalRemove(
+    removeButton,
+    parsedState,
+    sectionHtml,
+    { preserveProjectedEmpty = false } = {},
+  ) {
     const removedRow = removeButton?.closest('.cart-item');
     if (!removedRow) return false;
 
@@ -1075,23 +1113,27 @@ class CartDrawer extends HTMLElement {
       ? parsedState.total_price
       : Number.parseInt(sourceDrawer?.dataset.cartTotalPrice || '0', 10) || 0;
 
-    this.dataset.cartItemCount = String(itemCount);
-    this.dataset.cartTotalPrice = String(totalPrice);
-    this.classList.toggle('prada-cart-drawer--multiple', parsedState.items.length > 1);
+    if (!preserveProjectedEmpty) {
+      this.dataset.cartItemCount = String(itemCount);
+      this.dataset.cartTotalPrice = String(totalPrice);
+      this.classList.toggle('prada-cart-drawer--multiple', parsedState.items.length > 1);
+    }
 
     const headingSelectors = [
       '.prada-cart-drawer__heading-desktop',
       '.prada-cart-drawer__heading-mobile',
     ];
-    headingSelectors.forEach((selector) => {
-      const target = this.querySelector(`.drawer__inner > .drawer__header ${selector}`);
-      const source = sourceDrawer?.querySelector(`.drawer__inner > .drawer__header ${selector}`);
-      if (target && source) target.textContent = source.textContent;
-    });
+    if (!preserveProjectedEmpty) {
+      headingSelectors.forEach((selector) => {
+        const target = this.querySelector(`.drawer__inner > .drawer__header ${selector}`);
+        const source = sourceDrawer?.querySelector(`.drawer__inner > .drawer__header ${selector}`);
+        if (target && source) target.textContent = source.textContent;
+      });
+    }
 
     const targetTotal = this.querySelector('.drawer__inner > .drawer__footer .totals__total-value');
     const sourceTotal = sourceDrawer?.querySelector('.drawer__inner > .drawer__footer .totals__total-value');
-    if (targetTotal && sourceTotal) targetTotal.textContent = sourceTotal.textContent;
+    if (!preserveProjectedEmpty && targetTotal && sourceTotal) targetTotal.textContent = sourceTotal.textContent;
 
     const finishRowRemoval = () => {
       if (!removedRow.isConnected) return;
@@ -1223,6 +1265,9 @@ class CartDrawer extends HTMLElement {
 
   open(triggeredBy) {
     if (this.classList.contains('active') && !this.classList.contains('is-closing')) return;
+    if (!this.optimisticState && !this.classList.contains('animate')) {
+      this.flushDeferredCanonicalSection();
+    }
     if (triggeredBy) {
       this.setActiveElement(triggeredBy);
       triggeredBy.setAttribute('aria-expanded', 'true');
