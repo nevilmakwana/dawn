@@ -61,7 +61,12 @@ if (!window.pradaFastCheckoutBound) {
       button.setAttribute('aria-disabled', 'true');
       if ('disabled' in button) button.disabled = true;
     });
-    window.location.assign(checkoutUrl);
+    const navigate = () => window.location.assign(checkoutUrl);
+    if (window.PradaCartMutations?.pending) {
+      window.PradaCartMutations.whenIdle().then(navigate);
+    } else {
+      navigate();
+    }
   });
 }
 
@@ -81,12 +86,15 @@ class CartDrawer extends HTMLElement {
     super();
 
     this.addEventListener('keyup', (evt) => evt.code === 'Escape' && this.close());
+    this.addEventListener('click', (event) => this.handlePendingDestination(event), true);
     this.bindOverlay();
     this.setHeaderCartIconAccessibility();
   }
 
   beginOptimisticAdd(item, triggeredBy) {
     if (!item) return null;
+    // A newer add makes any previously deferred remove snapshot obsolete.
+    this.deferredCanonicalState = null;
     let carriedState = null;
     if (this.optimisticState) {
       if (this.optimisticState.confirmed && !this.optimisticState.removalPending) {
@@ -670,16 +678,14 @@ class CartDrawer extends HTMLElement {
     state.removeRequestStarted = true;
     const mutationMarker = CartPerformance.createStartingMarker('remove:mutation');
     try {
-      const isLastLineRemoval = state.removedCount === 0;
       const body = JSON.stringify({
         id: lineIdentifier,
         quantity: 0,
-        ...(isLastLineRemoval
-          ? {
-              sections: this.getSectionsToRender().map((section) => section.id),
-              sections_url: window.location.pathname,
-            }
-          : {}),
+        // Ask Shopify for the canonical drawer in the same mutation response.
+        // This avoids a second request and lets the visible optimistic DOM stay
+        // untouched while the confirmed markup is kept ready for the next open.
+        sections: this.getSectionsToRender().map((section) => section.id),
+        sections_url: window.location.pathname,
       });
       const removeRequest = () =>
         fetch(`${routes.cart_change_url}`, { ...fetchConfig(), body }).then(async (response) => ({
@@ -1031,6 +1037,134 @@ class CartDrawer extends HTMLElement {
     if (!keepDrawer && !state.wasOpen) this.close();
   }
 
+  handlePendingDestination(event) {
+    if (this.optimisticState || !window.PradaCartMutations?.pending) return;
+
+    const link = event.target.closest('.prada-cart-drawer__view-cart');
+    if (!link || !this.contains(link) || !link.href) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    if (link.getAttribute('aria-busy') === 'true') return;
+
+    link.setAttribute('aria-busy', 'true');
+    link.setAttribute('aria-disabled', 'true');
+    window.PradaCartMutations.whenIdle().then(() => window.location.assign(link.href));
+  }
+
+  deferCanonicalSection(sectionHtml) {
+    if (!sectionHtml) return false;
+
+    const sourceDrawer = this.getSectionDOM(sectionHtml, 'cart-drawer');
+    if (!sourceDrawer?.querySelector('#CartDrawer')) return false;
+
+    this.deferredCanonicalState = { sections: { 'cart-drawer': sectionHtml } };
+    return true;
+  }
+
+  commitVisibleCanonicalRemove(removeButton, parsedState, sectionHtml) {
+    const removedRow = removeButton?.closest('.cart-item');
+    if (!removedRow) return false;
+
+    const hasCanonicalSection = this.deferCanonicalSection(sectionHtml);
+    const sourceDrawer = hasCanonicalSection ? this.getSectionDOM(sectionHtml, 'cart-drawer') : null;
+    const itemCount = Number.isFinite(parsedState.item_count)
+      ? parsedState.item_count
+      : Number.parseInt(sourceDrawer?.dataset.cartItemCount || '0', 10) || 0;
+    const totalPrice = Number.isFinite(parsedState.total_price)
+      ? parsedState.total_price
+      : Number.parseInt(sourceDrawer?.dataset.cartTotalPrice || '0', 10) || 0;
+
+    this.dataset.cartItemCount = String(itemCount);
+    this.dataset.cartTotalPrice = String(totalPrice);
+    this.classList.toggle('prada-cart-drawer--multiple', parsedState.items.length > 1);
+
+    const headingSelectors = [
+      '.prada-cart-drawer__heading-desktop',
+      '.prada-cart-drawer__heading-mobile',
+    ];
+    headingSelectors.forEach((selector) => {
+      const target = this.querySelector(`.drawer__inner > .drawer__header ${selector}`);
+      const source = sourceDrawer?.querySelector(`.drawer__inner > .drawer__header ${selector}`);
+      if (target && source) target.textContent = source.textContent;
+    });
+
+    const targetTotal = this.querySelector('.drawer__inner > .drawer__footer .totals__total-value');
+    const sourceTotal = sourceDrawer?.querySelector('.drawer__inner > .drawer__footer .totals__total-value');
+    if (targetTotal && sourceTotal) targetTotal.textContent = sourceTotal.textContent;
+
+    const finishRowRemoval = () => {
+      if (!removedRow.isConnected) return;
+      const itemsViewport = removedRow.closest('cart-drawer-items');
+      const table = removedRow.closest('.prada-cart-drawer__items');
+      removedRow.remove();
+      itemsViewport?.classList.toggle('is-multiple', parsedState.items.length > 1);
+      table?.classList.toggle('prada-cart-drawer__items--multiple', parsedState.items.length > 1);
+      if (parsedState.items.length <= 1 && itemsViewport) {
+        itemsViewport.scrollLeft = 0;
+        window.requestAnimationFrame(() => {
+          if (itemsViewport.isConnected) itemsViewport.scrollLeft = 0;
+        });
+      }
+    };
+
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const startedAt = Number.parseFloat(removedRow.dataset.pradaRemoveStartedAt || '0');
+    const elapsed = startedAt && window.performance ? window.performance.now() - startedAt : 180;
+    const remaining = reduceMotion ? 0 : Math.max(0, 180 - elapsed);
+    if (remaining > 0) {
+      window.setTimeout(finishRowRemoval, remaining);
+    } else {
+      finishRowRemoval();
+    }
+
+    if (!hasCanonicalSection) this.refreshDeferredCanonicalSection();
+
+    return true;
+  }
+
+  refreshDeferredCanonicalSection() {
+    if (this.canonicalRefreshPromise) return this.canonicalRefreshPromise;
+
+    const cartUrl = new URL(window.routes?.cart_url || '/cart', window.location.origin);
+    cartUrl.searchParams.set('section_id', 'cart-drawer');
+    const waitForMutations = window.PradaCartMutations?.whenIdle?.() || Promise.resolve();
+    const refreshPromise = waitForMutations
+      .then(() => fetch(cartUrl.toString(), {
+        cache: 'no-store',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      }))
+      .then((response) => {
+        if (!response.ok) throw new Error(`Cart drawer refresh failed: ${response.status}`);
+        return response.text();
+      })
+      .then((html) => {
+        this.deferCanonicalSection(html);
+        const drawerIsVisible =
+          this.classList.contains('active') ||
+          this.classList.contains('animate') ||
+          this.classList.contains('is-opening') ||
+          this.classList.contains('is-closing');
+        if (!drawerIsVisible) this.flushDeferredCanonicalSection();
+      })
+      .catch((error) => console.error(error))
+      .finally(() => {
+        if (this.canonicalRefreshPromise === refreshPromise) this.canonicalRefreshPromise = null;
+      });
+
+    this.canonicalRefreshPromise = refreshPromise;
+    return refreshPromise;
+  }
+
+  flushDeferredCanonicalSection() {
+    if (!this.deferredCanonicalState || this.optimisticState) return false;
+
+    const canonicalState = this.deferredCanonicalState;
+    this.deferredCanonicalState = null;
+    this.renderContents(canonicalState, { shouldOpen: false });
+    return true;
+  }
+
   bindOverlay() {
     const overlay = this.querySelector('#CartDrawer-Overlay');
     if (!overlay || overlay.dataset.cartDrawerBound) return;
@@ -1181,6 +1315,8 @@ class CartDrawer extends HTMLElement {
         } else {
           this.flushScheduledOptimisticRefresh(optimisticState);
         }
+      } else if (!optimisticState) {
+        this.flushDeferredCanonicalSection();
       }
     };
 
@@ -1239,6 +1375,8 @@ class CartDrawer extends HTMLElement {
 
       this.completeOptimisticAdd();
     }
+
+    this.deferredCanonicalState = null;
 
     if (itemCount !== null) {
       this.dataset.cartItemCount = String(itemCount);

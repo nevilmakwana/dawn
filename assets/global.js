@@ -327,6 +327,9 @@ window.PradaCartMutations = window.PradaCartMutations || (() => {
     get pending() {
       return pending;
     },
+    whenIdle() {
+      return tail.catch(() => undefined);
+    },
   };
 })();
 

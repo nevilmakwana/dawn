@@ -50,6 +50,8 @@ class CartRemoveButton extends HTMLElement {
     cartItem.style.width = '';
     cartItem.style.flexBasis = '';
     cartItem.style.overflow = '';
+    delete cartItem.dataset.pradaRemoveStartedAt;
+    delete cartItem.dataset.pradaRemovePending;
     this.removeAttribute('aria-disabled');
     this.querySelectorAll('a, button').forEach((control) => {
       control.removeAttribute('aria-disabled');
@@ -78,8 +80,11 @@ class CartRemoveButton extends HTMLElement {
         return;
       }
 
-      if (cartItem.classList.contains('is-removing')) return;
-      const isLastLine = cartItems.querySelectorAll('.cart-item').length === 1;
+      if (cartItem.classList.contains('is-removing') || cartItem.dataset.pradaRemovePending === 'true') return;
+      const isLastLine = cartItems.querySelectorAll(
+        '.cart-item:not(.is-removing):not([data-prada-remove-pending="true"])'
+      ).length === 1;
+      cartItem.dataset.pradaRemovePending = 'true';
 
       const isHorizontalDrawerItem = Boolean(
         isCartDrawerItem &&
@@ -96,6 +101,7 @@ class CartRemoveButton extends HTMLElement {
         cartItem.style.maxHeight = `${cartItem.offsetHeight}px`;
       }
       cartItem.style.overflow = 'hidden';
+      cartItem.dataset.pradaRemoveStartedAt = String(window.performance?.now?.() || 0);
       cartItem.getBoundingClientRect();
       this.setAttribute('aria-disabled', 'true');
       this.querySelectorAll('a, button').forEach((control) => {
@@ -283,7 +289,8 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
     if (this.tagName === 'CART-DRAWER-ITEMS') {
       // The optimistic drawer owns the visible state until add/remove settles.
       // Avoid a competing section fetch repainting it with stale cart HTML.
-      if (document.querySelector('cart-drawer')?.optimisticState) return Promise.resolve();
+      const cartDrawer = document.querySelector('cart-drawer');
+      if (cartDrawer?.optimisticState || cartDrawer?.deferredCanonicalState) return Promise.resolve();
 
       return fetch(`${routes.cart_url}?section_id=cart-drawer`)
         .then((response) => response.text())
@@ -401,6 +408,14 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
           event.currentTarget instanceof CartRemoveButton &&
           event.currentTarget.optimisticEmptyState
         );
+        const keepStableOpenDrawer = Boolean(
+          !parsedState.errors &&
+          parsedState.item_count > 0 &&
+          eventTarget === 'clear' &&
+          this.matches('cart-drawer-items') &&
+          cartDrawerWrapper?.classList.contains('active') &&
+          event.currentTarget instanceof CartRemoveButton
+        );
         if (shouldRevealEmptyDrawer) {
           window.clearTimeout(cartDrawerWrapper.emptyTransitionTimer);
           cartDrawerWrapper.classList.remove('is-empty-entering', 'is-empty-visible');
@@ -463,6 +478,8 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
             // keep the visible empty shell stable; the next add or page load
             // will reconcile the remaining server-rendered markup normally.
             if (section.id === 'CartDrawer' && keepImmediateEmptyDrawer) {
+              const canonicalSaved = cartDrawerWrapper.deferCanonicalSection?.(parsedState.sections[section.section]);
+              if (!canonicalSaved) cartDrawerWrapper.refreshDeferredCanonicalSection?.();
               const drawerItems = elementToReplace.querySelector('cart-drawer-items');
               const clearStaleDrawerRows = () => {
                 drawerItems?.querySelectorAll('.cart-item').forEach((item) => item.remove());
@@ -475,6 +492,21 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
               }
               return;
             }
+
+            // The selected row is already fading/collapsing. Keep the open
+            // drawer mounted and patch only confirmed text/count values; a
+            // complete canonical section is saved and applied after close.
+            // This prevents image reloads, layout flashes, and dead controls.
+            if (section.id === 'CartDrawer' && keepStableOpenDrawer) {
+              const keptStable = cartDrawerWrapper.commitVisibleCanonicalRemove?.(
+                event.currentTarget,
+                parsedState,
+                parsedState.sections[section.section]
+              );
+              if (keptStable) return;
+            }
+
+            if (!parsedState.sections?.[section.section]) return;
 
             elementToReplace.innerHTML = this.getSectionInnerHTML(
               parsedState.sections[section.section],
@@ -514,8 +546,9 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
               : lineItem.querySelector(`[name="${name}"]`).focus();
           } else if (parsedState.item_count === 0 && cartDrawerWrapper?.querySelector('.drawer__inner-empty')) {
             trapFocus(cartDrawerWrapper.querySelector('.drawer__inner-empty'), cartDrawerWrapper.querySelector('a'));
-          } else if (document.querySelector('.cart-item') && cartDrawerWrapper) {
-            trapFocus(cartDrawerWrapper, document.querySelector('.cart-item__name'));
+          } else if (cartDrawerWrapper) {
+            const nextCartItem = cartDrawerWrapper.querySelector('.cart-item:not(.is-removing) .cart-item__name');
+            if (nextCartItem) trapFocus(cartDrawerWrapper, nextCartItem);
           }
         });
 
