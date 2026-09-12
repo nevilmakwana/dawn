@@ -50,13 +50,30 @@ if (!customElements.get('product-form')) {
         const shouldOpenCart =
           this.dataset.openCart === 'true' || !window.matchMedia('(max-width: 749px)').matches;
         const quickAddModal = this.closest('quick-add-modal');
+        const optimisticItem = this.getOptimisticCartItem(variantId, quantity);
+        const optimisticState =
+          this.cart && shouldOpenCart && !quickAddModal && optimisticItem
+            ? this.cart.beginOptimisticAdd?.(optimisticItem, this.submitButton)
+            : null;
+        if (optimisticState) CartPerformance.measureFromEvent('add:optimistic-ui', evt);
 
+        // The optimistic drawer already contains the first visible state.
+        // Keep the critical add request small; sync full Liquid markup afterward.
+        if (optimisticState) {
+          formData.delete('sections');
+          formData.delete('sections_url');
+        }
+
+        const mutationMarker = CartPerformance.createStartingMarker('add:mutation');
         const addRequest = () => fetch(`${routes.cart_add_url}`, config).then((response) => response.json());
-        const addPromise = addRequest();
+        const addPromise = window.PradaCartMutations?.enqueue
+          ? window.PradaCartMutations.enqueue(addRequest)
+          : addRequest();
 
         addPromise
           .then((response) => {
             if (response.status) {
+              this.cart?.cancelOptimisticAdd?.(optimisticState);
               publish(PUB_SUB_EVENTS.cartError, {
                 source: 'product-form',
                 productVariantId: variantId,
@@ -80,32 +97,47 @@ if (!customElements.get('product-form')) {
               return;
             }
 
-            this.resolveCartLinesUpdate(linesUpdateDeferred);
+            if (optimisticState) this.cart.confirmOptimisticAdd?.(optimisticState, response);
+            const cartDataPromise = this.resolveCartLinesUpdate(linesUpdateDeferred, {
+              defer: Boolean(optimisticState),
+            });
 
-            if (!this.error) {
+            const startMarker = CartPerformance.createStartingMarker('add:wait-for-subscribers');
+            if (!this.error)
               publish(PUB_SUB_EVENTS.cartUpdate, {
                 source: 'product-form',
                 productVariantId: variantId,
                 cartData: response,
+              }).then(() => {
+                CartPerformance.measureFromMarker('add:wait-for-subscribers', startMarker);
               });
-            }
             this.error = false;
-
             if (quickAddModal) {
               document.body.addEventListener(
                 'modalClosed',
                 () => {
-                  this.cart.renderContents(response, { shouldOpen: shouldOpenCart });
+                  setTimeout(() => {
+                    CartPerformance.measure("add:paint-updated-sections", () => {
+                      this.cart.renderContents(response, { shouldOpen: shouldOpenCart });
+                    });
+                  });
                 },
                 { once: true }
               );
               quickAddModal.hide(true);
             } else {
-              this.cart.renderContents(response, { shouldOpen: shouldOpenCart });
+              if (optimisticState) {
+                this.cart.scheduleRefreshAfterOptimisticAdd?.(optimisticState, { after: cartDataPromise });
+              } else {
+                CartPerformance.measure("add:paint-updated-sections", () => {
+                  this.cart.renderContents(response, { shouldOpen: shouldOpenCart });
+                });
+              }
             }
           })
           .catch((e) => {
             console.error(e);
+            this.cart?.cancelOptimisticAdd?.(optimisticState);
             this.dispatchCartErrorEvent(e.message || 'Network error', 'SERVICE_UNAVAILABLE');
             linesUpdateDeferred?.reject(e);
           })
