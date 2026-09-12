@@ -1,44 +1,48 @@
+const PRADA_CART_DRAWER_TRANSITION_DURATION = 260;
+const PRADA_CART_ROW_TRANSITION_DURATION = 180;
+
 const updatePradaCartIcon = (itemCount) => {
+  const safeCount = Math.max(0, Number.parseInt(itemCount || '0', 10) || 0);
   const cartLink = document.querySelector('.prada-header-btn--cart#cart-icon-bubble');
-  if (!cartLink) return;
 
-  // The cart button owns the Prada SVG. Only manage its numeric badge here.
-  // Replacing or removing child markup makes Dawn's default cart SVG appear.
-  let badge = cartLink.querySelector(':scope > .prada-cart-badge');
+  if (cartLink) {
+    let badge = cartLink.querySelector(':scope > .prada-cart-badge');
 
-  if (itemCount > 0) {
-    if (!badge) {
-      badge = document.createElement('span');
-      badge.className = 'prada-cart-badge';
-      badge.setAttribute('aria-hidden', 'true');
-      cartLink.append(badge);
+    if (safeCount > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'prada-cart-badge';
+        badge.setAttribute('aria-hidden', 'true');
+        cartLink.append(badge);
+      }
+      badge.textContent = String(safeCount);
+    } else {
+      badge?.remove();
     }
-    badge.textContent = String(itemCount);
-  } else {
-    badge?.remove();
+
+    cartLink.querySelector(':scope > .cart-count-bubble')?.remove();
+    cartLink.setAttribute('aria-label', safeCount > 0 ? `Cart (${safeCount})` : 'Cart');
   }
 
-  cartLink.querySelector(':scope > .cart-count-bubble')?.remove();
-  cartLink.setAttribute('aria-label', itemCount > 0 ? `Cart (${itemCount})` : 'Cart');
-
   document.querySelectorAll('[data-prada-drawer-cart-count]').forEach((count) => {
-    count.classList.toggle('is-hidden', itemCount === 0);
-    count.lastChild.textContent = String(itemCount);
-    count.setAttribute('aria-label', `${itemCount} items in shopping bag`);
+    count.classList.toggle('is-hidden', safeCount === 0);
+    if (count.lastChild) count.lastChild.textContent = String(safeCount);
+    count.setAttribute('aria-label', `${safeCount} items in shopping bag`);
   });
 };
 
 const refreshPradaCartIcon = async () => {
   try {
     const cartUrl = window.routes?.cart_url || '/cart';
-    const cart = typeof CartItems !== 'undefined'
-      ? await CartItems.fetchCartData()
-      : await fetch(`${cartUrl}.js`, { headers: { Accept: 'application/json' } }).then((response) =>
-          response.ok ? response.json() : null
-        );
+    const response = await fetch(`${cartUrl}.js`, {
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    });
+    if (!response.ok) return;
+    const cart = await response.json();
     if (typeof cart?.item_count === 'number') updatePradaCartIcon(cart.item_count);
   } catch (_error) {
-    // A badge refresh must never interrupt a successful add-to-cart action.
+    // Header synchronization must never interrupt a cart interaction.
   }
 };
 
@@ -46,295 +50,469 @@ window.PradaCartHeader = window.PradaCartHeader || {};
 window.PradaCartHeader.update = updatePradaCartIcon;
 window.PradaCartHeader.refresh = refreshPradaCartIcon;
 
-if (!window.pradaFastCheckoutBound) {
-  window.pradaFastCheckoutBound = true;
-  document.addEventListener('click', (event) => {
-    const checkoutButton = event.target.closest('[data-prada-fast-checkout]');
-    if (!checkoutButton || checkoutButton.disabled || checkoutButton.getAttribute('aria-disabled') === 'true') return;
+const isPradaCartPage = () => {
+  const cartPath = new URL(window.routes?.cart_url || '/cart', window.location.origin).pathname.replace(/\/+$/, '') || '/';
+  const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+  return currentPath === cartPath;
+};
 
-    const checkoutUrl = checkoutButton.dataset.pradaFastCheckout;
-    if (!checkoutUrl) return;
+class CartDrawer extends HTMLElement {
+  constructor() {
+    super();
+    this.revision = 0;
+    this.pendingAdds = new Set();
+    this.deferredCanonicalState = null;
+    this.refreshTimer = null;
+    this.refreshPromise = null;
+
+    this.addEventListener('keyup', (event) => event.code === 'Escape' && this.close());
+    this.addEventListener('click', (event) => this.handleDrawerClick(event), true);
+    this.setHeaderCartIconAccessibility();
+  }
+
+  ownsCartState() {
+    return true;
+  }
+
+  handleDrawerClick(event) {
+    if (event.target.closest('#CartDrawer-Overlay')) {
+      event.preventDefault();
+      this.close();
+      return;
+    }
+
+    const destination = event.target.closest('.prada-cart-drawer__view-cart, [data-prada-fast-checkout]');
+    if (!destination || !this.contains(destination)) return;
+
+    const url = destination.matches('.prada-cart-drawer__view-cart')
+      ? destination.href
+      : destination.dataset.pradaFastCheckout;
+    if (!url) return;
 
     event.preventDefault();
-    document.querySelectorAll('[data-prada-fast-checkout]').forEach((button) => {
-      button.setAttribute('aria-busy', 'true');
-      button.setAttribute('aria-disabled', 'true');
-      if ('disabled' in button) button.disabled = true;
-    });
-    const navigate = () => window.location.assign(checkoutUrl);
+    event.stopPropagation();
+    if (destination.getAttribute('aria-busy') === 'true') return;
+
+    destination.setAttribute('aria-busy', 'true');
+    destination.setAttribute('aria-disabled', 'true');
+    if ('disabled' in destination) destination.disabled = true;
+
+    const navigate = () => window.location.assign(url);
     if (window.PradaCartMutations?.pending) {
       window.PradaCartMutations.whenIdle().then(navigate);
     } else {
       navigate();
     }
-  });
-}
+  }
 
-const isPradaCartPage = () => {
-  const cartPath = new URL(window.routes?.cart_url || '/cart', window.location.origin).pathname.replace(/\/+$/, '') || '/';
-  const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+  setHeaderCartIconAccessibility() {
+    const getCartLink = (target) => {
+      if (!(target instanceof Element)) return null;
+      return target.closest('#cart-icon-bubble.prada-header-btn--cart');
+    };
 
-  return currentPath === cartPath;
-};
+    const openFromHeader = (event) => {
+      const cartLink = getCartLink(event.target);
+      if (!cartLink) return;
+      if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
 
-const PRADA_CART_DRAWER_TRANSITION_DURATION = 260;
-const PRADA_CART_EMPTY_REVEAL_DELAY = 300;
-const PRADA_CART_EMPTY_TRANSITION_DURATION = 500;
+      if (isPradaCartPage() || cartLink.dataset.pradaCartDisabled === 'true') {
+        event.preventDefault();
+        return;
+      }
 
-class CartDrawer extends HTMLElement {
-  constructor() {
-    super();
+      event.preventDefault();
+      this.open(cartLink);
+    };
 
-    this.addEventListener('keyup', (evt) => evt.code === 'Escape' && this.close());
-    this.addEventListener('click', (event) => this.handlePendingDestination(event), true);
-    this.bindOverlay();
-    this.setHeaderCartIconAccessibility();
+    document.addEventListener('click', openFromHeader);
+    document.addEventListener('keydown', openFromHeader);
+
+    const cartLink = document.querySelector('#cart-icon-bubble.prada-header-btn--cart');
+    if (!cartLink) return;
+
+    if (isPradaCartPage()) {
+      cartLink.setAttribute('aria-disabled', 'true');
+      cartLink.dataset.pradaCartDisabled = 'true';
+      cartLink.setAttribute('tabindex', '-1');
+      return;
+    }
+
+    cartLink.setAttribute('role', 'button');
+    cartLink.setAttribute('aria-haspopup', 'dialog');
+  }
+
+  open(triggeredBy) {
+    if (this.classList.contains('active') && !this.classList.contains('is-closing')) return;
+    if (!window.PradaCartMutations?.pending) this.flushDeferredCanonicalSection();
+
+    if (triggeredBy) {
+      this.setActiveElement(triggeredBy);
+      triggeredBy.setAttribute('aria-expanded', 'true');
+    }
+
+    window.clearTimeout(this.closeTimer);
+    window.clearTimeout(this.openFocusTimer);
+    if (this.openAnimationFrame) window.cancelAnimationFrame(this.openAnimationFrame);
+
+    this.classList.remove('is-closing');
+    this.classList.add('animate', 'is-opening');
+    this.classList.remove('active');
+
+    this.openAnimationFrame = window.requestAnimationFrame(() => {
+      this.openAnimationFrame = window.requestAnimationFrame(() => {
+        this.openAnimationFrame = null;
+        if (!this.classList.contains('is-closing')) this.classList.add('active');
+      });
+    });
+
+    this.openFocusTimer = window.setTimeout(() => {
+      this.openFocusTimer = null;
+      this.classList.remove('is-opening');
+      if (!this.classList.contains('active')) return;
+
+      const focusContainer = this.classList.contains('is-empty')
+        ? this.querySelector('.drawer__inner-empty')
+        : this.querySelector('#CartDrawer');
+      const focusElement = this.querySelector('.drawer__inner') || this.querySelector('.drawer__close');
+      if (focusContainer && focusElement) trapFocus(focusContainer, focusElement);
+    }, PRADA_CART_DRAWER_TRANSITION_DURATION);
+
+    if (window.pradaDrawerScrollLock) {
+      window.pradaDrawerScrollLock.lock();
+    } else {
+      document.body.classList.add('overflow-hidden');
+    }
+
+    this.querySelector('cart-drawer-items')?.dispatchViewEvent?.();
+  }
+
+  close() {
+    if (this.classList.contains('is-closing')) return;
+
+    if (this.openAnimationFrame) {
+      window.cancelAnimationFrame(this.openAnimationFrame);
+      this.openAnimationFrame = null;
+    }
+    window.clearTimeout(this.openFocusTimer);
+    window.clearTimeout(this.closeTimer);
+
+    const finishClose = () => {
+      this.closeTimer = null;
+      this.classList.remove('active', 'animate', 'is-closing', 'is-opening');
+      removeTrapFocus(this.activeElement);
+      this.activeElement?.setAttribute?.('aria-expanded', 'false');
+
+      if (window.pradaDrawerScrollLock) {
+        window.pradaDrawerScrollLock.unlock();
+      } else {
+        document.body.classList.remove('overflow-hidden');
+      }
+
+      if (!window.PradaCartMutations?.pending) this.flushDeferredCanonicalSection();
+    };
+
+    if (!this.classList.contains('active') && !this.classList.contains('animate')) {
+      finishClose();
+      return;
+    }
+
+    this.classList.remove('is-opening', 'active');
+    this.classList.add('is-closing');
+    this.closeTimer = window.setTimeout(finishClose, PRADA_CART_DRAWER_TRANSITION_DURATION);
   }
 
   beginOptimisticAdd(item, triggeredBy) {
     if (!item) return null;
-    // A newer add makes any previously deferred remove snapshot obsolete.
-    this.deferredCanonicalState = null;
-    let carriedState = null;
-    if (this.optimisticState) {
-      if (this.optimisticState.confirmed && !this.optimisticState.removalPending) {
-        const confirmedRow = [...this.querySelectorAll('.prada-cart-drawer__optimistic .cart-item')]
-          .find((row) => this.getOptimisticRowVariantId(row) === String(this.optimisticState.item.variantId));
-        if (confirmedRow && this.optimisticState.addedLineKey) {
-          confirmedRow.dataset.pradaOptimisticLineKey = this.optimisticState.addedLineKey;
-        }
-        const carriedRows = [...this.querySelectorAll('.prada-cart-drawer__optimistic .cart-item')]
-          .map((row) => row.cloneNode(true));
-        carriedState = this.completeOptimisticAdd();
-        carriedState.optimisticRows = carriedRows;
-        this.dataset.cartItemCount = String(carriedState.optimisticCount);
-        this.dataset.cartTotalPrice = String(carriedState.optimisticTotal);
-        this.classList.remove('is-empty');
-        this.classList.toggle('prada-cart-drawer--multiple', carriedState.optimisticLineCount > 1);
-      } else {
-        this.cancelOptimisticAdd(this.optimisticState, { keepDrawer: true });
+
+    const quantity = Math.max(1, Number.parseInt(item.quantity || '1', 10) || 1);
+    const previousCount = this.getDisplayedItemCount();
+    const previousTotal = this.getDisplayedTotal();
+    const row = this.findRowByVariant(item.variantId);
+    const created = !row;
+    const targetRow = row || this.createCartRow(item, quantity);
+    const previousQuantity = created ? 0 : this.getRowQuantity(targetRow);
+    const lineReference = targetRow._pradaLineReference || this.createLineReference(targetRow, item.variantId);
+    targetRow._pradaLineReference = lineReference;
+    targetRow.dataset.cartVariantId = String(item.variantId);
+    targetRow.dataset.cartQuantity = String(previousQuantity + quantity);
+    if (item.priceCents) targetRow.dataset.cartUnitPrice = String(item.priceCents);
+
+    if (created) {
+      this.ensureCartRowsContainer().prepend(targetRow);
+    } else {
+      this.updateRowQuantity(targetRow, previousQuantity + quantity);
+      const body = targetRow.parentElement;
+      if (body?.firstElementChild !== targetRow) body?.prepend(targetRow);
+      const image = targetRow.querySelector('.cart-item__image');
+      if (image && item.image) {
+        image.src = item.image;
+        image.removeAttribute('srcset');
       }
     }
 
-    const previousCount = Number.parseInt(this.dataset.cartItemCount || '0', 10) || 0;
-    const previousTotal = Number.parseInt(this.dataset.cartTotalPrice || '0', 10) || 0;
-    const quantity = Number.parseInt(item.quantity || '1', 10) || 1;
-    const optimisticCount = previousCount + quantity;
-    const carriedVariantRow = carriedState?.optimisticRows
-      ?.find((row) => this.getOptimisticRowVariantId(row) === String(item.variantId));
-    const existingVariantInput = carriedVariantRow?.querySelector('[data-quantity-variant-id]') ||
-      (!carriedState
-        ? [...this.querySelectorAll('[data-quantity-variant-id]')]
-          .find((input) => String(input.dataset.quantityVariantId) === String(item.variantId))
-        : null);
-    const renderedExistingQuantity = carriedVariantRow
-      ? this.getOptimisticRowQuantity(carriedVariantRow)
-      : Number.parseInt(existingVariantInput?.value || '0', 10) || 0;
-    const carriedExistingQuantity =
-      String(carriedState?.item?.variantId) === String(item.variantId)
-        ? carriedState.optimisticLineQuantity
-        : 0;
-    const existingQuantity = Math.max(renderedExistingQuantity, carriedExistingQuantity);
-    const hasExistingVariant = Boolean(carriedVariantRow || existingVariantInput || carriedExistingQuantity);
-    const renderedLineCount = carriedState?.optimisticLineCount ?? this.querySelectorAll('.cart-item').length;
-    const optimisticLineCount = renderedLineCount + (hasExistingVariant ? 0 : 1);
-    const optimisticTotal = previousTotal + item.priceCents * quantity;
     const state = {
       id: `${Date.now()}-${Math.random()}`,
+      revision: ++this.revision,
       item,
+      row: targetRow,
+      created,
+      quantity,
+      previousQuantity,
       previousCount,
       previousTotal,
-      optimisticCount,
-      optimisticTotal,
-      optimisticLineCount,
-      optimisticLineQuantity: existingQuantity + quantity,
-      wasEmpty: this.classList.contains('is-empty'),
-      wasEmptyStable: this.classList.contains('is-empty-stable'),
-      wasMultiple: this.classList.contains('prada-cart-drawer--multiple'),
-      wasOpen: this.classList.contains('active') || this.classList.contains('is-opening'),
-      queuedDestination: null,
-      confirmed: false,
-      addedLineKey: null,
-      parsedState: null,
-      removeQueued: false,
-      removalPending: false,
-      queuedRemoves: [],
-      projectedCount: optimisticCount,
-      projectedTotal: optimisticTotal,
+      lineReference,
+      settled: false,
     };
 
-    this.optimisticState = state;
-    this.querySelector('.prada-cart-drawer__optimistic')?.remove();
-    this.dataset.cartItemCount = String(optimisticCount);
-    this.dataset.cartTotalPrice = String(optimisticTotal);
-    this.classList.remove('is-empty', 'is-empty-stable');
-    this.classList.add('is-optimistic');
-    this.classList.toggle('prada-cart-drawer--multiple', optimisticLineCount > 1);
-    updatePradaCartIcon(optimisticCount);
-
-    const panel = document.createElement('div');
-    panel.className = 'prada-cart-drawer__optimistic';
-    panel.dataset.optimisticId = state.id;
-
-    const header = document.createElement('div');
-    header.className = 'drawer__header';
-    const heading = document.createElement('h2');
-    heading.className = 'drawer__heading';
-    const desktopHeading = document.createElement('span');
-    desktopHeading.className = 'prada-cart-drawer__heading-desktop';
-    desktopHeading.textContent = `Your selection (${optimisticCount})`;
-    const mobileHeading = document.createElement('span');
-    mobileHeading.className = 'prada-cart-drawer__heading-mobile';
-    mobileHeading.textContent = `Added to shopping bag (${optimisticCount})`;
-    heading.append(desktopHeading, mobileHeading);
-
-    const sourceClose = this.querySelector('.drawer__header .drawer__close, .drawer__inner-empty .drawer__close');
-    const closeButton = sourceClose?.cloneNode(true) || document.createElement('button');
-    closeButton.type = 'button';
-    closeButton.classList.add('drawer__close');
-    closeButton.removeAttribute('onclick');
-    closeButton.setAttribute('aria-label', 'Close shopping bag');
-    if (!closeButton.hasChildNodes()) closeButton.textContent = '×';
-    closeButton.addEventListener('click', () => this.close());
-    header.append(heading, closeButton);
-
-    const items = document.createElement('div');
-    items.className = 'prada-cart-drawer__optimistic-items';
-    this.populateOptimisticCartItems(items, item, quantity, existingQuantity, optimisticLineCount, carriedState);
-    state.optimisticItemsHandler = (event) => {
-      const removeButton = event.target.closest('.prada-cart-drawer__remove');
-      if (!removeButton || !items.contains(removeButton)) return;
-
-      event.preventDefault();
-      event.stopPropagation();
-      this.beginOptimisticRemove(state, removeButton, event);
-    };
-    items.addEventListener('click', state.optimisticItemsHandler, true);
-
-    const footer = this.querySelector('.drawer__inner > .drawer__footer')?.cloneNode(true);
-    if (footer) {
-      footer.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
-      const total = footer.querySelector('.totals__total-value');
-      if (total && item.priceCents) {
-        total.textContent = this.formatOptimisticMoney(optimisticTotal, total.textContent);
-      }
-      const checkoutButton = footer.querySelector('[data-prada-fast-checkout]');
-      if (checkoutButton) {
-        checkoutButton.disabled = false;
-        checkoutButton.removeAttribute('disabled');
-        checkoutButton.removeAttribute('aria-disabled');
-      }
-      state.pendingActionHandler = (event) => {
-        const action = event.target.closest('.prada-cart-drawer__view-cart, [data-prada-fast-checkout]');
-        if (!action || !footer.contains(action)) return;
-
-        const destination = action.matches('.prada-cart-drawer__view-cart')
-          ? action.href
-          : action.dataset.pradaFastCheckout;
-        if (!destination) return;
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (state.confirmed && !state.removalPending) {
-          state.queuedDestination = null;
-          window.location.assign(destination);
-          return;
-        }
-
-        state.queuedDestination = destination;
-        action.setAttribute('aria-busy', 'true');
-      };
-      footer.addEventListener('click', state.pendingActionHandler, true);
-    }
-
-    panel.append(header, items);
-    if (footer) panel.append(footer);
-    this.querySelector('.drawer__inner')?.append(panel);
+    this.pendingAdds.add(state);
+    this.showPopulatedState(previousCount + quantity, previousTotal + (item.priceCents || 0) * quantity);
+    this.updateMultipleLayout();
     this.setActiveElement(triggeredBy);
-    this.open();
+    this.open(triggeredBy);
     return state;
   }
 
-  populateOptimisticCartItems(container, item, addedQuantity, existingQuantity, lineCount, carriedState) {
-    const carriedRows = carriedState?.optimisticRows || [];
-    const renderedRows = [...this.querySelectorAll('.drawer__cart-items-wrapper .cart-item')]
-      .map((row) => row.cloneNode(true));
-    const rows = (carriedRows.length ? carriedRows : renderedRows);
-    const matchesVariant = (row) =>
-      String(
-        row.dataset.pradaOptimisticVariantId ||
-        row.querySelector('[data-quantity-variant-id]')?.dataset.quantityVariantId ||
-        '',
-      ) === String(item.variantId);
-    const existingRow = rows.find(matchesVariant) || null;
-    const updatedRow = this.createOptimisticCartItem(item, addedQuantity, existingQuantity, existingRow);
-    const orderedRows = [updatedRow, ...rows.filter((row) => !matchesVariant(row))];
+  confirmOptimisticAdd(state, response) {
+    if (!state || state.settled) return;
+    state.settled = true;
+    this.pendingAdds.delete(state);
 
-    orderedRows.forEach((row) => {
-      row.removeAttribute('id');
-      row.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
+    const lineKey = response?.key || response?.id;
+    if (lineKey) {
+      state.lineReference.key = String(lineKey);
+      state.lineReference.resolveKey?.(String(lineKey));
+      if (state.row?.isConnected) {
+        state.row.dataset.cartLineKey = String(lineKey);
+        state.row.querySelectorAll('cart-remove-button').forEach((button) => {
+          button.dataset.lineKey = String(lineKey);
+        });
+      }
+    }
+
+    if (Number.isFinite(response?.quantity) && state.row?.isConnected) {
+      this.updateRowQuantity(state.row, response.quantity);
+    }
+
+    this.scheduleRefreshAfterOptimisticAdd(state);
+  }
+
+  cancelOptimisticAdd(state) {
+    if (!state || state.settled) return;
+    state.settled = true;
+    state.lineReference.failed = true;
+    state.lineReference.rejectKey?.(new Error('Add to cart failed'));
+    this.pendingAdds.delete(state);
+
+    if (state.row?.isConnected && state.row.dataset.cartRemovePending !== 'true') {
+      if (state.created) {
+        state.row.remove();
+      } else {
+        this.updateRowQuantity(state.row, state.previousQuantity);
+      }
+      this.setDisplayedTotals(state.previousCount, state.previousTotal);
+      if (state.previousCount === 0) this.showEmptyState({ animate: false });
+      this.updateMultipleLayout();
+    }
+  }
+
+  scheduleRefreshAfterOptimisticAdd(_state, { after } = {}) {
+    Promise.resolve(after).catch(() => undefined).finally(() => this.requestCanonicalRefresh());
+  }
+
+  removeItem(removeButton, event) {
+    const row = removeButton?.closest('.cart-item');
+    if (!row || row.dataset.cartRemovePending === 'true') return;
+
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+
+    const lineReference = row._pradaLineReference || this.createLineReference(row);
+    row._pradaLineReference = lineReference;
+    const quantity = this.getRowQuantity(row);
+    const unitPrice = Number.parseInt(row.dataset.cartUnitPrice || '0', 10) || 0;
+    const previousCount = this.getDisplayedItemCount();
+    const previousTotal = this.getDisplayedTotal();
+    const actionRevision = ++this.revision;
+    const parent = row.parentElement;
+    const nextSibling = row.nextElementSibling;
+
+    row.dataset.cartRemovePending = 'true';
+    row.querySelectorAll('button, a').forEach((control) => {
+      control.setAttribute('aria-disabled', 'true');
+      if ('disabled' in control) control.disabled = true;
     });
+
+    const nextCount = Math.max(0, previousCount - quantity);
+    const nextTotal = Math.max(0, previousTotal - unitPrice * quantity);
+    this.setDisplayedTotals(nextCount, nextTotal);
+    this.animateRowRemoval(row, nextCount === 0);
+    if (event) CartPerformance.measureFromEvent('remove:optimistic-ui', event);
+
+    const removeRequest = async () => {
+      let lineKey = lineReference.key;
+      if (!lineKey && lineReference.keyPromise) lineKey = await lineReference.keyPromise;
+      if (!lineKey) throw new Error('Cart line is not ready');
+
+      const response = await fetch(`${routes.cart_change_url}`, {
+        ...fetchConfig(),
+        body: JSON.stringify({ id: lineKey, quantity: 0 }),
+      });
+      const cart = await response.json();
+      if (!response.ok || cart?.errors) throw new Error(cart?.errors || window.cartStrings?.error || 'Cart update failed');
+      return cart;
+    };
+
+    const promise = window.PradaCartMutations?.enqueue
+      ? window.PradaCartMutations.enqueue(removeRequest)
+      : removeRequest();
+
+    promise
+      .then((cart) => {
+        if (actionRevision === this.revision) {
+          this.setDisplayedTotals(cart.item_count, cart.total_price);
+          if (cart.item_count === 0 && !this.classList.contains('is-empty')) {
+            this.showEmptyState({ animate: false });
+          }
+        }
+        publish(PUB_SUB_EVENTS.cartUpdate, { source: 'cart-drawer', cartData: cart });
+        this.requestCanonicalRefresh();
+      })
+      .catch((error) => {
+        if (!lineReference.failed) {
+          this.restoreRemovedRow({ row, parent, nextSibling, previousCount, previousTotal });
+        }
+        this.showCartError(error?.message || window.cartStrings?.error || 'Cart update failed');
+        this.requestCanonicalRefresh();
+      });
+  }
+
+  animateRowRemoval(row, isLastItem) {
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const duration = reducedMotion ? 0 : PRADA_CART_ROW_TRANSITION_DURATION;
+    const isHorizontal = Boolean(
+      window.matchMedia('(max-width: 989px)').matches && row.closest('.prada-cart-drawer__items--multiple'),
+    );
+
+    if (isHorizontal) {
+      row.classList.add('is-horizontal-removal');
+      row.style.width = `${row.offsetWidth}px`;
+      row.style.maxWidth = `${row.offsetWidth}px`;
+      row.style.flexBasis = `${row.offsetWidth}px`;
+    } else {
+      row.style.maxHeight = `${row.offsetHeight}px`;
+    }
+    row.style.overflow = 'hidden';
+    row.getBoundingClientRect();
+
+    window.requestAnimationFrame(() => row.classList.add('is-removing', 'is-collapsing'));
+    if (isLastItem) this.showEmptyState({ animate: true });
+
+    window.setTimeout(() => {
+      row.remove();
+      this.updateMultipleLayout();
+    }, duration);
+  }
+
+  restoreRemovedRow({ row, parent, nextSibling, previousCount, previousTotal }) {
+    if (!row.isConnected && parent?.isConnected) parent.insertBefore(row, nextSibling?.isConnected ? nextSibling : null);
+    delete row.dataset.cartRemovePending;
+    row.classList.remove('is-removing', 'is-collapsing', 'is-horizontal-removal');
+    row.style.maxHeight = '';
+    row.style.maxWidth = '';
+    row.style.width = '';
+    row.style.flexBasis = '';
+    row.style.overflow = '';
+    row.querySelectorAll('button, a').forEach((control) => {
+      control.removeAttribute('aria-disabled');
+      if ('disabled' in control) control.disabled = false;
+    });
+    this.showPopulatedState(previousCount, previousTotal);
+    this.updateMultipleLayout();
+  }
+
+  createLineReference(row, fallbackVariantId) {
+    const existingKey = row?.dataset.cartLineKey || row?.querySelector('[data-quantity-line-key]')?.dataset.quantityLineKey;
+    let resolveKey;
+    let rejectKey;
+    const keyPromise = existingKey
+      ? Promise.resolve(existingKey)
+      : new Promise((resolve, reject) => {
+          resolveKey = resolve;
+          rejectKey = reject;
+        });
+    keyPromise.catch(() => undefined);
+
+    return {
+      key: existingKey || null,
+      variantId: row?.dataset.cartVariantId || fallbackVariantId || null,
+      keyPromise,
+      resolveKey,
+      rejectKey,
+      failed: false,
+    };
+  }
+
+  findRowByVariant(variantId) {
+    return [...this.querySelectorAll('#CartDrawer-CartItems .cart-item:not([data-cart-remove-pending="true"])')].find(
+      (row) => String(row.dataset.cartVariantId || row.querySelector('[data-quantity-variant-id]')?.dataset.quantityVariantId || '') === String(variantId),
+    );
+  }
+
+  getRowQuantity(row) {
+    const explicit = Number.parseInt(row?.dataset.cartQuantity || '', 10);
+    if (Number.isFinite(explicit) && explicit > 0) return explicit;
+    const input = Number.parseInt(row?.querySelector('[data-quantity-variant-id]')?.value || '', 10);
+    if (Number.isFinite(input) && input > 0) return input;
+    const label = row?.querySelector('.prada-cart-drawer__quantity')?.textContent || '';
+    return Number.parseInt(label.match(/\d+/)?.[0] || '1', 10) || 1;
+  }
+
+  updateRowQuantity(row, quantity) {
+    row.dataset.cartQuantity = String(quantity);
+    const label = row.querySelector('.prada-cart-drawer__quantity');
+    if (label) label.textContent = `Qty: ${quantity}`;
+    row.querySelectorAll('.quantity__input').forEach((input) => {
+      input.value = String(quantity);
+      input.setAttribute('value', String(quantity));
+    });
+  }
+
+  ensureCartRowsContainer() {
+    const contents = this.querySelector('#CartDrawer-CartItems');
+    let body = contents?.querySelector('.prada-cart-drawer__items tbody');
+    if (body) return body;
 
     const wrapper = document.createElement('div');
     wrapper.className = 'drawer__cart-items-wrapper';
     const table = document.createElement('table');
     table.className = 'cart-items prada-cart-drawer__items';
     table.setAttribute('role', 'table');
-    const body = document.createElement('tbody');
+    body = document.createElement('tbody');
     body.setAttribute('role', 'rowgroup');
-    body.append(...orderedRows);
     table.append(body);
     wrapper.append(table);
-    container.classList.toggle('is-multiple', lineCount > 1);
-    table.classList.toggle('prada-cart-drawer__items--multiple', lineCount > 1);
-    container.append(wrapper);
+    contents?.prepend(wrapper);
+    return body;
   }
 
-  createOptimisticCartItem(item, addedQuantity, carriedExistingQuantity = 0, sourceItem = null) {
-    const existingQuantityInput = sourceItem?.querySelector('[data-quantity-variant-id]') ||
-      [...this.querySelectorAll('[data-quantity-variant-id]')]
-        .find((input) => String(input.dataset.quantityVariantId) === String(item.variantId));
-    const existingItem = sourceItem || existingQuantityInput?.closest('.cart-item');
-    const existingQuantity = Math.max(
-      Number.parseInt(existingQuantityInput?.value || '0', 10) || 0,
-      carriedExistingQuantity,
-    );
-    const optimisticQuantity = existingQuantity + addedQuantity;
-
-    if (existingItem) {
-      const clonedItem = existingItem.cloneNode(true);
-      clonedItem.dataset.pradaOptimisticVariantId = String(item.variantId);
-      clonedItem.removeAttribute('id');
-      clonedItem.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
-      const quantityLabel = clonedItem.querySelector('.prada-cart-drawer__quantity');
-      if (quantityLabel) quantityLabel.textContent = `Qty: ${optimisticQuantity}`;
-      const clonedImage = clonedItem.querySelector('.cart-item__image');
-      if (clonedImage && item.image) {
-        clonedImage.src = item.image;
-        clonedImage.alt = item.imageAlt || item.title;
-      }
-      clonedItem.querySelectorAll('.quantity__input').forEach((input) => {
-        input.value = String(optimisticQuantity);
-        input.setAttribute('value', String(optimisticQuantity));
-      });
-      return clonedItem;
-    }
-
-    const product = document.createElement('tr');
-    product.className = 'cart-item prada-cart-drawer__optimistic-new-item';
-    product.dataset.pradaOptimisticVariantId = String(item.variantId);
-    product.setAttribute('role', 'row');
+  createCartRow(item, quantity) {
+    const row = document.createElement('tr');
+    row.className = 'cart-item prada-cart-drawer__optimistic-new-item';
+    row.dataset.cartVariantId = String(item.variantId);
+    row.dataset.cartQuantity = String(quantity);
+    row.dataset.cartUnitPrice = String(item.priceCents || 0);
+    row.setAttribute('role', 'row');
 
     const media = document.createElement('td');
     media.className = 'cart-item__media';
     media.setAttribute('role', 'cell');
     if (item.image) {
-      const imageLink = document.createElement('a');
-      imageLink.className = 'cart-item__link';
-      imageLink.href = item.url || '#';
-      imageLink.tabIndex = -1;
-      imageLink.setAttribute('aria-hidden', 'true');
+      const link = document.createElement('a');
+      link.className = 'cart-item__link';
+      link.href = item.url || '#';
+      link.tabIndex = -1;
+      link.setAttribute('aria-hidden', 'true');
       const image = document.createElement('img');
       image.className = 'cart-item__image';
       image.src = item.image;
@@ -342,8 +520,8 @@ class CartDrawer extends HTMLElement {
       image.width = 150;
       image.height = 188;
       image.decoding = 'async';
-      imageLink.append(image);
-      media.append(imageLink);
+      link.append(image);
+      media.append(link);
     }
 
     const details = document.createElement('td');
@@ -358,1131 +536,235 @@ class CartDrawer extends HTMLElement {
     titleWrap.append(title);
     details.append(titleWrap);
 
-    const itemInfo = document.createElement('div');
-    itemInfo.className = 'prada-cart-drawer__item-info';
+    const info = document.createElement('div');
+    info.className = 'prada-cart-drawer__item-info';
     item.options?.forEach((option) => {
-      const row = document.createElement('p');
-      row.className = 'prada-cart-drawer__option';
-      row.textContent = `${option.name}: ${option.value}`;
-      itemInfo.append(row);
+      const optionRow = document.createElement('p');
+      optionRow.className = 'prada-cart-drawer__option';
+      optionRow.textContent = `${option.name}: ${option.value}`;
+      info.append(optionRow);
     });
-    const quantity = document.createElement('p');
-    quantity.className = 'prada-cart-drawer__quantity';
-    quantity.textContent = `Qty: ${optimisticQuantity}`;
-    itemInfo.append(quantity);
+    const quantityRow = document.createElement('p');
+    quantityRow.className = 'prada-cart-drawer__quantity';
+    quantityRow.textContent = `Qty: ${quantity}`;
+    info.append(quantityRow);
     if (item.price) {
       const price = document.createElement('p');
       price.className = 'prada-cart-drawer__price money';
       price.textContent = item.price;
-      itemInfo.append(price);
+      info.append(price);
     }
-    const removeWrap = document.createElement('span');
+    const removeWrap = document.createElement('cart-remove-button');
     removeWrap.className = 'prada-cart-drawer__remove-wrap';
     const remove = document.createElement('button');
-    remove.className = 'prada-cart-drawer__remove';
     remove.type = 'button';
+    remove.className = 'prada-cart-drawer__remove';
     remove.textContent = 'Remove';
+    remove.setAttribute('aria-label', `Remove ${item.title}`);
     removeWrap.append(remove);
-    itemInfo.append(removeWrap);
-    details.append(itemInfo);
-    product.append(media, details);
-    return product;
+    info.append(removeWrap);
+    details.append(info);
+    row.append(media, details);
+    return row;
   }
 
-  formatOptimisticMoney(cents, referenceText = '') {
+  getDisplayedItemCount() {
+    return Math.max(0, Number.parseInt(this.dataset.cartItemCount || '0', 10) || 0);
+  }
+
+  getDisplayedTotal() {
+    return Math.max(0, Number.parseInt(this.dataset.cartTotalPrice || '0', 10) || 0);
+  }
+
+  setDisplayedTotals(itemCount, totalPrice) {
+    const count = Math.max(0, Number.parseInt(itemCount || '0', 10) || 0);
+    const total = Math.max(0, Number.parseInt(totalPrice || '0', 10) || 0);
+    this.dataset.cartItemCount = String(count);
+    this.dataset.cartTotalPrice = String(total);
+    updatePradaCartIcon(count);
+
+    const desktopHeading = this.querySelector('.drawer__inner > .drawer__header .prada-cart-drawer__heading-desktop');
+    const mobileHeading = this.querySelector('.drawer__inner > .drawer__header .prada-cart-drawer__heading-mobile');
+    if (desktopHeading) desktopHeading.textContent = `Your selection (${count})`;
+    if (mobileHeading) mobileHeading.textContent = `Added to shopping bag (${count})`;
+
+    const subtotal = this.querySelector('.drawer__inner > .drawer__footer .totals__total-value');
+    if (subtotal) subtotal.textContent = this.formatMoney(total, subtotal.textContent);
+  }
+
+  showPopulatedState(itemCount, totalPrice) {
+    window.clearTimeout(this.emptyTimer);
+    this.classList.remove(
+      'is-empty',
+      'is-empty-stable',
+      'is-empty-transitioning',
+      'is-empty-revealed',
+      'is-empty-entering',
+      'is-empty-visible',
+      'is-empty-leaving',
+    );
+    this.querySelector('.drawer__inner-empty')?.setAttribute('hidden', '');
+    this.querySelector('cart-drawer-items')?.classList.remove('is-empty');
+    const checkout = this.querySelector('#CartDrawer-Checkout');
+    if (checkout) checkout.disabled = false;
+    this.setDisplayedTotals(itemCount, totalPrice);
+  }
+
+  showEmptyState({ animate = true } = {}) {
+    window.clearTimeout(this.emptyTimer);
+    const empty = this.querySelector('.drawer__inner-empty');
+    empty?.removeAttribute('hidden');
+    this.querySelector('cart-drawer-items')?.classList.add('is-empty');
+    const checkout = this.querySelector('#CartDrawer-Checkout');
+    if (checkout) checkout.disabled = true;
+    this.classList.remove('prada-cart-drawer--multiple', 'is-empty-stable', 'is-empty-revealed');
+    this.classList.add('is-empty');
+
+    if (!animate || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      this.classList.remove('is-empty-transitioning', 'is-empty-revealed');
+      this.classList.add('is-empty-stable');
+      return;
+    }
+
+    this.classList.add('is-empty-transitioning');
+    window.requestAnimationFrame(() => {
+      if (this.classList.contains('is-empty')) this.classList.add('is-empty-revealed');
+    });
+    this.emptyTimer = window.setTimeout(() => {
+      this.classList.remove('is-empty-transitioning', 'is-empty-revealed');
+      this.classList.add('is-empty-stable');
+    }, 320);
+  }
+
+  updateMultipleLayout() {
+    const visibleRows = [...this.querySelectorAll('#CartDrawer-CartItems .cart-item')].filter(
+      (row) => row.dataset.cartRemovePending !== 'true',
+    );
+    const multiple = visibleRows.length > 1;
+    this.classList.toggle('prada-cart-drawer--multiple', multiple);
+    this.querySelector('.prada-cart-drawer__items')?.classList.toggle('prada-cart-drawer__items--multiple', multiple);
+  }
+
+  formatMoney(cents, referenceText = '') {
     const locale = document.documentElement.lang || 'en-IN';
     const currency = window.Shopify?.currency?.active || 'INR';
-    const formattedNumber = new Intl.NumberFormat(locale, {
+    const number = new Intl.NumberFormat(locale, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(cents / 100);
     const prefix = referenceText.trim().match(/^[^\d-]+/)?.[0]?.trim();
-
-    if (prefix) return `${prefix} ${formattedNumber}`;
-    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(cents / 100);
+    return prefix ? `${prefix} ${number}` : new Intl.NumberFormat(locale, { style: 'currency', currency }).format(cents / 100);
   }
 
-  parseOptimisticMoney(text = '') {
-    const value = Number.parseFloat(String(text).replace(/[^\d.,-]/g, '').replace(/,/g, ''));
-    return Number.isFinite(value) ? Math.round(value * 100) : 0;
+  showCartError(message) {
+    const errors = this.querySelector('#CartDrawer-CartErrors');
+    if (!errors) return;
+    errors.textContent = message;
+    window.setTimeout(() => {
+      if (errors.textContent === message) errors.textContent = '';
+    }, 5000);
   }
 
-  getOptimisticRowVariantId(row) {
-    return String(
-      row?.dataset.pradaOptimisticVariantId ||
-      row?.querySelector('[data-quantity-variant-id]')?.dataset.quantityVariantId ||
-      '',
-    );
+  requestCanonicalRefresh() {
+    window.clearTimeout(this.refreshTimer);
+    this.refreshTimer = window.setTimeout(() => this.refreshCanonicalWhenIdle(), 60);
   }
 
-  getOptimisticRowLineKey(row) {
-    return row?.dataset.pradaOptimisticLineKey ||
-      row?.querySelector('[data-quantity-line-key]')?.dataset.quantityLineKey ||
-      null;
-  }
-
-  getOptimisticRowQuantity(row) {
-    const inputQuantity = Number.parseInt(row?.querySelector('[data-quantity-variant-id]')?.value || '0', 10) || 0;
-    if (inputQuantity > 0) return inputQuantity;
-
-    const label = row?.querySelector('.prada-cart-drawer__quantity')?.textContent || '';
-    return Number.parseInt(label.match(/\d+/)?.[0] || '1', 10) || 1;
-  }
-
-  beginOptimisticRemove(state, removeButton, event, { preserveProjection = false } = {}) {
-    if (!state || this.optimisticState?.id !== state.id) return;
-
-    if (state.removalPending) {
-      this.queueOptimisticRemove(state, removeButton, event);
+  refreshCanonicalWhenIdle() {
+    if (window.PradaCartMutations?.pending) {
+      window.PradaCartMutations.whenIdle().then(() => this.requestCanonicalRefresh());
       return;
     }
+    if (this.refreshPromise) return;
 
-    const removedItem = removeButton.closest('.cart-item');
-    const removedVariantId = this.getOptimisticRowVariantId(removedItem);
-    const removedLineKey = this.getOptimisticRowLineKey(removedItem);
-    if (!removedItem || (!removedVariantId && !removedLineKey)) return;
-
-    const removedLineQuantity = this.getOptimisticRowQuantity(removedItem);
-    const displayedUnitPrice = this.parseOptimisticMoney(
-      removedItem.querySelector('.prada-cart-drawer__price')?.textContent,
-    );
-    const removingAddedLine = removedVariantId === String(state.item.variantId);
-    const unitPrice = displayedUnitPrice || (removingAddedLine ? state.item.priceCents : 0);
-
-    this.cancelScheduledOptimisticRefresh(state);
-    state.removeQueued = true;
-    state.removalPending = true;
-    state.queuedDestination = null;
-    state.removedItem = removedItem;
-    state.removedVariantId = removedVariantId;
-    state.removedLineKey = removedLineKey;
-    state.removedLineQuantity = removedLineQuantity;
-    state.removedLineTotal = unitPrice * removedLineQuantity;
-    state.removingAddedLine = removingAddedLine;
-
-    const nextCount = Math.max(0, state.optimisticCount - removedLineQuantity);
-    const nextTotal = Math.max(0, state.optimisticTotal - state.removedLineTotal);
-    state.removedCount = nextCount;
-    state.removedTotal = nextTotal;
-    if (!preserveProjection) {
-      state.projectedCount = nextCount;
-      state.projectedTotal = nextTotal;
-    }
-    const displayedCount = Number.isFinite(state.projectedCount) ? state.projectedCount : nextCount;
-    const displayedTotal = Number.isFinite(state.projectedTotal) ? state.projectedTotal : nextTotal;
-    this.dataset.cartItemCount = String(displayedCount);
-    this.dataset.cartTotalPrice = String(displayedTotal);
-    updatePradaCartIcon(displayedCount);
-
-    const panel = this.querySelector(`.prada-cart-drawer__optimistic[data-optimistic-id="${state.id}"]`);
-    const desktop = panel?.querySelector('.prada-cart-drawer__heading-desktop');
-    const mobile = panel?.querySelector('.prada-cart-drawer__heading-mobile');
-    if (desktop) desktop.textContent = `Your selection (${displayedCount})`;
-    if (mobile) mobile.textContent = `Shopping bag (${displayedCount})`;
-    const subtotal = panel?.querySelector('.totals__total-value');
-    if (subtotal) subtotal.textContent = this.formatOptimisticMoney(displayedTotal, subtotal.textContent);
-
-    if (displayedCount === 0) {
-      this.showOptimisticEmptyState(state, panel);
-    } else {
-      this.animateOptimisticRowRemoval(state, removedItem);
-    }
-    if (event) CartPerformance.measureFromEvent('remove:optimistic-ui', event);
-    if (state.confirmed) void this.performOptimisticRemove(state);
-  }
-
-  queueOptimisticRemove(state, removeButton, event) {
-    const removedItem = removeButton?.closest('.cart-item');
-    if (
-      !removedItem ||
-      removedItem === state.removedItem ||
-      state.queuedRemoves?.some((queued) => queued.removedItem === removedItem) ||
-      removedItem.dataset.pradaRemoveQueued === 'true'
-    ) return;
-
-    const removedVariantId = this.getOptimisticRowVariantId(removedItem);
-    const removedLineKey = this.getOptimisticRowLineKey(removedItem);
-    if (!removedVariantId && !removedLineKey) return;
-
-    const removedLineQuantity = this.getOptimisticRowQuantity(removedItem);
-    const displayedUnitPrice = this.parseOptimisticMoney(
-      removedItem.querySelector('.prada-cart-drawer__price')?.textContent,
-    );
-    const removingAddedLine = removedVariantId === String(state.item.variantId);
-    const unitPrice = displayedUnitPrice || (removingAddedLine ? state.item.priceCents : 0);
-    const projectedCount = Number.isFinite(state.projectedCount) ? state.projectedCount : state.removedCount;
-    const projectedTotal = Number.isFinite(state.projectedTotal) ? state.projectedTotal : state.removedTotal;
-    const nextCount = Math.max(0, projectedCount - removedLineQuantity);
-    const removedLineTotal = unitPrice * removedLineQuantity;
-    const nextTotal = Math.max(0, projectedTotal - removedLineTotal);
-
-    removedItem.dataset.pradaRemoveQueued = 'true';
-    state.queuedRemoves ||= [];
-    state.queuedRemoves.push({
-      removeButton,
-      removedItem,
-      removedLineQuantity,
-      removedLineTotal,
-      projectedCount: nextCount,
-      projectedTotal: nextTotal,
-    });
-    state.projectedCount = nextCount;
-    state.projectedTotal = nextTotal;
-    this.dataset.cartItemCount = String(nextCount);
-    this.dataset.cartTotalPrice = String(nextTotal);
-    updatePradaCartIcon(nextCount);
-
-    const panel = this.querySelector(`.prada-cart-drawer__optimistic[data-optimistic-id="${state.id}"]`);
-    const desktop = panel?.querySelector('.prada-cart-drawer__heading-desktop');
-    const mobile = panel?.querySelector('.prada-cart-drawer__heading-mobile');
-    if (desktop) desktop.textContent = `Your selection (${nextCount})`;
-    if (mobile) mobile.textContent = `Shopping bag (${nextCount})`;
-    const subtotal = panel?.querySelector('.totals__total-value');
-    if (subtotal) subtotal.textContent = this.formatOptimisticMoney(nextTotal, subtotal.textContent);
-
-    if (nextCount === 0) {
-      this.showOptimisticEmptyState(state, panel);
-    } else {
-      removedItem.classList.add('is-removing');
-      removedItem.style.pointerEvents = 'none';
-    }
-
-    if (event) CartPerformance.measureFromEvent('remove:queued-optimistic-ui', event);
-  }
-
-  animateOptimisticRowRemoval(state, row) {
-    const horizontal = Boolean(
-      window.matchMedia('(max-width: 989px)').matches &&
-      row.closest('.prada-cart-drawer__items--multiple'),
-    );
-    if (horizontal) {
-      const width = row.offsetWidth;
-      row.classList.add('is-horizontal-removal');
-      row.style.width = `${width}px`;
-      row.style.maxWidth = `${width}px`;
-      row.style.flexBasis = `${width}px`;
-    } else {
-      row.style.maxHeight = `${row.offsetHeight}px`;
-    }
-    row.style.overflow = 'hidden';
-    row.getBoundingClientRect();
-    state.removeAnimationFrame = window.requestAnimationFrame(() => {
-      state.removeAnimationFrame = null;
-      if (this.optimisticState?.id !== state.id || state.removedItem !== row) return;
-      row.classList.add('is-removing', 'is-collapsing');
-    });
-  }
-
-  restoreOptimisticRow(row) {
-    if (!row) return;
-    row.removeAttribute('hidden');
-    row.classList.remove('is-removing', 'is-collapsing', 'is-horizontal-removal');
-    row.style.maxHeight = '';
-    row.style.maxWidth = '';
-    row.style.width = '';
-    row.style.flexBasis = '';
-    row.style.overflow = '';
-    row.style.pointerEvents = '';
-  }
-
-  createEmptyStateElement() {
-    const sourceEmpty = this.querySelector('.drawer__inner > .drawer__inner-empty');
-    if (sourceEmpty) {
-      const empty = sourceEmpty.cloneNode(true);
-      empty.removeAttribute('hidden');
-      empty.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
-      const closeButton = empty.querySelector('.drawer__close');
-      if (closeButton) {
-        closeButton.removeAttribute('onclick');
-        closeButton.addEventListener('click', () => this.close());
-      }
-      return empty;
-    }
-
-    const empty = document.createElement('div');
-    empty.className = 'drawer__inner-empty';
-    const warnings = document.createElement('div');
-    warnings.className = 'cart-drawer__warnings center';
-    const content = document.createElement('div');
-    content.className = 'prada-cart-drawer__empty-content';
-    const sourceClose = this.querySelector('.drawer__header .drawer__close');
-    const closeButton = sourceClose?.cloneNode(true) || document.createElement('button');
-    closeButton.type = 'button';
-    closeButton.classList.add('drawer__close');
-    closeButton.removeAttribute('onclick');
-    closeButton.setAttribute('aria-label', 'Close shopping bag');
-    if (!closeButton.hasChildNodes()) closeButton.textContent = '×';
-    closeButton.addEventListener('click', () => this.close());
-    const message = document.createElement('p');
-    message.className = 'prada-cart-drawer__empty-message';
-    message.textContent = 'Your shopping bag is empty';
-    content.append(closeButton, message);
-    warnings.append(content);
-    empty.append(warnings);
-    return empty;
-  }
-
-  ensureImmediateEmptyState() {
-    const drawerInner = this.querySelector('.drawer__inner');
-    if (!drawerInner) return null;
-
-    let empty = drawerInner.querySelector(':scope > .drawer__inner-empty');
-    const created = !empty;
-    if (!empty) {
-      empty = this.createEmptyStateElement();
-      drawerInner.prepend(empty);
-    }
-    const wasHidden = empty.hasAttribute('hidden');
-    empty.removeAttribute('hidden');
-    return { element: empty, created, wasHidden };
-  }
-
-  showOptimisticEmptyState(state, panel) {
-    if (!panel || panel.querySelector('.prada-cart-drawer__optimistic-empty')) return;
-
-    const empty = this.createEmptyStateElement();
-    empty.classList.add('prada-cart-drawer__optimistic-empty');
-
-    panel.append(empty);
-    this.clearOptimisticEmptyTransition(state);
-    this.classList.add('is-empty', 'is-optimistic-empty', 'is-empty-transitioning');
-    this.classList.remove(
-      'prada-cart-drawer--multiple',
-      'is-empty-entering',
-      'is-empty-visible',
-      'is-empty-stable',
-    );
-    state.optimisticEmpty = empty;
-    state.emptyAnimationFrame = window.requestAnimationFrame(() => {
-      state.emptyAnimationFrame = null;
-      if (this.optimisticState?.id !== state.id || !state.optimisticEmpty) return;
-
-      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-      state.emptyRevealTimer = window.setTimeout(() => {
-        state.emptyRevealTimer = null;
-        if (this.optimisticState?.id !== state.id || !state.optimisticEmpty) return;
-        this.classList.add('is-empty-revealed');
-      }, reduceMotion ? 0 : PRADA_CART_EMPTY_REVEAL_DELAY);
-      state.emptyTransitionTimer = window.setTimeout(() => {
-        state.emptyTransitionTimer = null;
-        if (this.optimisticState?.id !== state.id || !state.optimisticEmpty) return;
-
-        panel.querySelector(':scope > .drawer__header')?.setAttribute('hidden', '');
-        panel.querySelector(':scope > .prada-cart-drawer__optimistic-items')?.setAttribute('hidden', '');
-        panel.querySelector(':scope > .drawer__footer')?.setAttribute('hidden', '');
-        state.confirmedEmptyOutgoingItem?.remove();
-        state.confirmedEmptyOutgoingItem = null;
-        this.classList.remove('is-empty-transitioning', 'is-empty-revealed');
-        this.classList.add('is-empty-stable');
-      }, reduceMotion ? 0 : PRADA_CART_EMPTY_TRANSITION_DURATION);
-    });
-  }
-
-  clearOptimisticEmptyTransition(state) {
-    if (state?.emptyAnimationFrame) window.cancelAnimationFrame(state.emptyAnimationFrame);
-    if (state?.emptyRevealTimer) window.clearTimeout(state.emptyRevealTimer);
-    if (state?.emptyTransitionTimer) window.clearTimeout(state.emptyTransitionTimer);
-    if (state) {
-      state.emptyAnimationFrame = null;
-      state.emptyRevealTimer = null;
-      state.emptyTransitionTimer = null;
-    }
-    this.classList.remove('is-empty-entering', 'is-empty-visible', 'is-empty-transitioning', 'is-empty-revealed');
-  }
-
-  async performOptimisticRemove(state) {
-    if (!state || this.optimisticState?.id !== state.id || state.removeRequestStarted) return;
-    const lineIdentifier = state.removingAddedLine
-      ? state.addedLineKey || state.removedLineKey || state.removedVariantId
-      : state.removedLineKey || state.removedVariantId;
-    if (!lineIdentifier) return;
-
-    state.removeRequestStarted = true;
-    const mutationMarker = CartPerformance.createStartingMarker('remove:mutation');
-    try {
-      const body = JSON.stringify({
-        id: lineIdentifier,
-        quantity: 0,
-        // Ask Shopify for the canonical drawer in the same mutation response.
-        // This avoids a second request and lets the visible optimistic DOM stay
-        // untouched while the confirmed markup is kept ready for the next open.
-        sections: this.getSectionsToRender().map((section) => section.id),
-        sections_url: window.location.pathname,
-      });
-      const removeRequest = () =>
-        fetch(`${routes.cart_change_url}`, { ...fetchConfig(), body }).then(async (response) => ({
-          response,
-          parsedState: await response.json(),
-        }));
-      const { response, parsedState } = window.PradaCartMutations?.enqueue
-        ? await window.PradaCartMutations.enqueue(removeRequest)
-        : await removeRequest();
-      if (!response.ok || parsedState.status) throw new Error(parsedState.description || 'Unable to remove item');
-
-      const removedVariantId = state.removedVariantId;
-      this.commitOptimisticRemove(state, parsedState);
-      void this.refreshDrawerAfterOptimisticRemove(state, parsedState.sections?.['cart-drawer']);
-      publish(PUB_SUB_EVENTS.cartUpdate, {
-        source: 'cart-items',
-        variantId: removedVariantId,
-        cartData: parsedState,
-      });
-    } catch (error) {
-      console.error(error);
-      this.restoreOptimisticRemove(state);
-    } finally {
-      CartPerformance.measureFromMarker('remove:mutation', mutationMarker);
-    }
-  }
-
-  commitOptimisticRemove(state, parsedState) {
-    if (!state || this.optimisticState?.id !== state.id) return;
-
-    const queuedRemove = state.queuedRemoves?.shift() || null;
-    if (state.removeAnimationFrame) window.cancelAnimationFrame(state.removeAnimationFrame);
-    state.removeAnimationFrame = null;
-    const removedAddedLine = state.removingAddedLine;
-    const removedItem = state.removedItem;
-    const keepOutgoingItemDuringTransition = Boolean(
-      parsedState.item_count === 0 &&
-      state.optimisticEmpty &&
-      this.classList.contains('is-empty-transitioning'),
-    );
-    if (keepOutgoingItemDuringTransition) {
-      state.confirmedEmptyOutgoingItem = removedItem;
-    } else {
-      removedItem?.remove();
-    }
-    state.optimisticCount = Number.isFinite(parsedState.item_count) ? parsedState.item_count : state.removedCount;
-    state.optimisticTotal = Number.isFinite(parsedState.total_price) ? parsedState.total_price : state.removedTotal;
-    state.optimisticLineCount = Array.isArray(parsedState.items)
-      ? parsedState.items.length
-      : Math.max(0, state.optimisticLineCount - 1);
-    if (removedAddedLine) {
-      state.optimisticLineQuantity = 0;
-      state.addedLineKey = null;
-    }
-    state.removeQueued = false;
-    state.removalPending = false;
-    state.removeRequestStarted = false;
-    state.removedItem = null;
-    state.removedVariantId = null;
-    state.removedLineKey = null;
-    state.removedLineQuantity = null;
-    state.removedLineTotal = null;
-    state.removingAddedLine = false;
-    state.parsedState = null;
-
-    if (!queuedRemove) {
-      state.projectedCount = state.optimisticCount;
-      state.projectedTotal = state.optimisticTotal;
-    }
-    const displayedCount = Number.isFinite(state.projectedCount)
-      ? state.projectedCount
-      : state.optimisticCount;
-    const displayedTotal = Number.isFinite(state.projectedTotal)
-      ? state.projectedTotal
-      : state.optimisticTotal;
-
-    this.dataset.cartItemCount = String(displayedCount);
-    this.dataset.cartTotalPrice = String(displayedTotal);
-    this.classList.toggle('is-empty', displayedCount === 0);
-    this.classList.toggle(
-      'is-empty-stable',
-      displayedCount === 0 && !this.classList.contains('is-empty-transitioning'),
-    );
-    this.classList.toggle('prada-cart-drawer--multiple', displayedCount > 0 && state.optimisticLineCount > 1);
-    updatePradaCartIcon(displayedCount);
-
-    const panel = this.querySelector(`.prada-cart-drawer__optimistic[data-optimistic-id="${state.id}"]`);
-    const desktop = panel?.querySelector('.prada-cart-drawer__heading-desktop');
-    const mobile = panel?.querySelector('.prada-cart-drawer__heading-mobile');
-    if (desktop) desktop.textContent = `Your selection (${displayedCount})`;
-    if (mobile) mobile.textContent = `Added to shopping bag (${displayedCount})`;
-    const subtotal = panel?.querySelector('.totals__total-value');
-    if (subtotal) subtotal.textContent = this.formatOptimisticMoney(displayedTotal, subtotal.textContent);
-
-    const items = panel?.querySelector('.prada-cart-drawer__optimistic-items');
-    const table = items?.querySelector('.prada-cart-drawer__items');
-    const hasMultipleLines = state.optimisticLineCount > 1;
-
-    // A mobile multi-line drawer is a horizontal scroller. When it becomes a
-    // single-line drawer, retaining the previous slide's scrollLeft places the
-    // remaining item outside the viewport and briefly shows a blank drawer.
-    // Reset before and after the layout class change so the remaining row is
-    // visible in the same paint on Safari as well as Chromium.
-    if (items && !hasMultipleLines) items.scrollLeft = 0;
-    items?.classList.toggle('is-multiple', hasMultipleLines);
-    table?.classList.toggle('prada-cart-drawer__items--multiple', hasMultipleLines);
-    if (items && !hasMultipleLines) {
-      items.scrollLeft = 0;
-      window.requestAnimationFrame(() => {
-        if (this.optimisticState?.id === state.id && state.optimisticLineCount <= 1) items.scrollLeft = 0;
-      });
-    }
-
-    if (displayedCount > 0 && state.optimisticEmpty) {
-      this.clearOptimisticEmptyTransition(state);
-      state.optimisticEmpty.remove();
-      state.optimisticEmpty = null;
-      panel?.querySelector(':scope > .drawer__header')?.removeAttribute('hidden');
-      items?.removeAttribute('hidden');
-      panel?.querySelector(':scope > .drawer__footer')?.removeAttribute('hidden');
-      this.classList.remove('is-optimistic-empty');
-    }
-
-    if (queuedRemove?.removeButton?.isConnected) {
-      queuedRemove.removedItem?.removeAttribute('data-prada-remove-queued');
-      this.beginOptimisticRemove(state, queuedRemove.removeButton, null, { preserveProjection: true });
-      return;
-    }
-
-    if (state.queuedDestination) {
-      const destination = state.queuedDestination;
-      state.queuedDestination = null;
-      window.location.assign(destination);
-    }
-
-  }
-
-  async refreshDrawerAfterOptimisticRemove(state, sectionHtml = null) {
-    if (!state || this.optimisticState?.id !== state.id || state.removalPending) return;
-
-    const refreshVersion = (state.removalRefreshVersion || 0) + 1;
-    state.removalRefreshVersion = refreshVersion;
-
-    const applyCanonicalDrawer = (html) => {
-      if (
-        !html ||
-        this.optimisticState?.id !== state.id ||
-        state.removalPending ||
-        state.removalRefreshVersion !== refreshVersion
-      ) return false;
-
-      const sourceDrawer = this.getSectionDOM(html, 'cart-drawer');
-      if (!sourceDrawer?.querySelector('#CartDrawer')) return false;
-
-      const canonicalState = { sections: { 'cart-drawer': html } };
-      state.parsedState = canonicalState;
-
-      const drawerIsVisible =
-        this.classList.contains('active') ||
-        this.classList.contains('animate') ||
-        this.classList.contains('is-opening') ||
-        this.classList.contains('is-closing');
-
-      // The optimistic DOM already reflects the confirmed cart transaction.
-      // Replacing it while the drawer is open creates a second visual paint,
-      // image blink, and a short interval in which the new controls are not
-      // interactive. Keep the visible state stable and apply this canonical
-      // server section after the drawer closes. If it is already closed, sync
-      // immediately so the next open starts from canonical markup.
-      if (drawerIsVisible) return true;
-
-      this.completeOptimisticAdd();
-      this.renderContents(canonicalState, { shouldOpen: false });
-      return true;
-    };
-
-    if (applyCanonicalDrawer(sectionHtml)) return;
-
+    const requestedRevision = this.revision;
     const cartUrl = new URL(window.routes?.cart_url || '/cart', window.location.origin);
     cartUrl.searchParams.set('section_id', 'cart-drawer');
-    cartUrl.searchParams.set('_prada_cart_sync', String(Date.now()));
-
-    try {
-      const response = await fetch(cartUrl.toString(), {
-        cache: 'no-store',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-      });
-      if (!response.ok) throw new Error(`Cart drawer refresh failed: ${response.status}`);
-      const html = await response.text();
-      if (!applyCanonicalDrawer(html) && this.optimisticState?.id === state.id) {
-        this.scheduleRefreshAfterOptimisticAdd(state);
-      }
-    } catch (error) {
-      console.error(error);
-      if (this.optimisticState?.id === state.id && !state.removalPending) {
-        this.scheduleRefreshAfterOptimisticAdd(state);
-      }
-    }
-  }
-
-  restoreOptimisticRemove(state) {
-    if (!state || this.optimisticState?.id !== state.id) return;
-
-    this.clearOptimisticEmptyTransition(state);
-    if (state.removeAnimationFrame) window.cancelAnimationFrame(state.removeAnimationFrame);
-    state.removeAnimationFrame = null;
-    state.removeQueued = false;
-    state.removalPending = false;
-    state.removeRequestStarted = false;
-    this.restoreOptimisticRow(state.removedItem);
-    state.queuedRemoves?.forEach((queuedRemove) => {
-      queuedRemove.removedItem?.removeAttribute('data-prada-remove-queued');
-      this.restoreOptimisticRow(queuedRemove.removedItem);
-    });
-    state.queuedRemoves = [];
-    state.projectedCount = state.optimisticCount;
-    state.projectedTotal = state.optimisticTotal;
-    state.optimisticEmpty?.remove();
-    state.optimisticEmpty = null;
-    const panel = this.querySelector(`.prada-cart-drawer__optimistic[data-optimistic-id="${state.id}"]`);
-    panel?.querySelector(':scope > .drawer__header')?.removeAttribute('hidden');
-    panel?.querySelector(':scope > .prada-cart-drawer__optimistic-items')?.removeAttribute('hidden');
-    panel?.querySelector(':scope > .drawer__footer')?.removeAttribute('hidden');
-    const desktop = panel?.querySelector('.prada-cart-drawer__heading-desktop');
-    const mobile = panel?.querySelector('.prada-cart-drawer__heading-mobile');
-    if (desktop) desktop.textContent = `Your selection (${state.optimisticCount})`;
-    if (mobile) mobile.textContent = `Added to shopping bag (${state.optimisticCount})`;
-    const subtotal = panel?.querySelector('.totals__total-value');
-    if (subtotal) subtotal.textContent = this.formatOptimisticMoney(state.optimisticTotal, subtotal.textContent);
-
-    this.dataset.cartItemCount = String(state.optimisticCount);
-    this.dataset.cartTotalPrice = String(state.optimisticTotal);
-    this.classList.remove('is-empty', 'is-optimistic-empty', 'is-empty-stable');
-    this.classList.toggle('prada-cart-drawer--multiple', state.optimisticLineCount > 1);
-    updatePradaCartIcon(state.optimisticCount);
-  }
-
-  scheduleRefreshAfterOptimisticAdd(state, { after } = {}) {
-    if (!state || this.optimisticState?.id !== state.id || state.removalPending || state.refreshScheduled) return;
-
-    state.refreshScheduled = true;
-    state.refreshDependency = after || null;
-    const runRefresh = () => {
-      state.refreshScheduled = false;
-      state.idleRefreshId = null;
-      Promise.resolve(state.refreshDependency)
-        .catch(() => undefined)
-        .then(() => this.refreshAfterOptimisticAdd(state));
-    };
-    if ('requestIdleCallback' in window) {
-      state.idleRefreshType = 'idle';
-      state.idleRefreshId = window.requestIdleCallback(runRefresh, { timeout: 2000 });
-    } else {
-      state.idleRefreshType = 'timeout';
-      state.idleRefreshId = window.setTimeout(runRefresh, 500);
-    }
-  }
-
-  cancelScheduledOptimisticRefresh(state) {
-    if (!state?.idleRefreshId) return;
-    if (state.idleRefreshType === 'idle' && 'cancelIdleCallback' in window) {
-      window.cancelIdleCallback(state.idleRefreshId);
-    } else {
-      window.clearTimeout(state.idleRefreshId);
-    }
-    state.idleRefreshId = null;
-    state.refreshScheduled = false;
-  }
-
-  flushScheduledOptimisticRefresh(state) {
-    if (!state || this.optimisticState?.id !== state.id || state.removalPending) return;
-    this.cancelScheduledOptimisticRefresh(state);
-    const dependency = state.refreshDependency;
-    Promise.resolve(dependency)
-      .catch(() => undefined)
-      .then(() => this.refreshAfterOptimisticAdd(state));
-  }
-
-  refreshAfterOptimisticAdd(state) {
-    if (
-      !state ||
-      this.optimisticState?.id !== state.id ||
-      state.removalPending ||
-      state.refreshInFlight ||
-      state.parsedState
-    ) return;
-
-    state.refreshInFlight = true;
-
-    const cartUrl = new URL(window.routes?.cart_url || '/cart', window.location.origin);
-    cartUrl.searchParams.set('section_id', 'cart-drawer');
-
-    fetch(cartUrl.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+    const refreshPromise = fetch(cartUrl.toString(), {
+      cache: 'no-store',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    })
       .then((response) => {
         if (!response.ok) throw new Error(`Cart drawer refresh failed: ${response.status}`);
         return response.text();
       })
       .then((html) => {
-        if (this.optimisticState?.id !== state.id || state.removalPending) return;
-        this.renderContents({ sections: { 'cart-drawer': html } }, { shouldOpen: false });
+        if (requestedRevision !== this.revision || window.PradaCartMutations?.pending) {
+          this.requestCanonicalRefresh();
+          return;
+        }
+        this.deferredCanonicalState = { sections: { 'cart-drawer': html } };
+        if (!this.isVisible()) this.flushDeferredCanonicalSection();
       })
       .catch((error) => console.error(error))
       .finally(() => {
-        state.refreshInFlight = false;
+        if (this.refreshPromise === refreshPromise) this.refreshPromise = null;
       });
+    this.refreshPromise = refreshPromise;
   }
 
-  completeOptimisticAdd() {
-    const completedState = this.optimisticState;
-    this.cancelScheduledOptimisticRefresh(completedState);
-    this.clearOptimisticEmptyTransition(completedState);
-    const items = this.querySelector('.prada-cart-drawer__optimistic-items');
-    const footer = this.querySelector('.prada-cart-drawer__optimistic > .drawer__footer');
-    if (items && completedState?.optimisticItemsHandler) {
-      items.removeEventListener('click', completedState.optimisticItemsHandler, true);
-    }
-    if (footer && completedState?.pendingActionHandler) {
-      footer.removeEventListener('click', completedState.pendingActionHandler, true);
-    }
-    this.querySelector('.prada-cart-drawer__optimistic')?.remove();
-    this.classList.remove('is-optimistic', 'is-optimistic-empty');
-    this.optimisticState = null;
-    return completedState;
-  }
-
-  confirmOptimisticAdd(state, parsedState) {
-    if (!state || this.optimisticState?.id !== state.id) return;
-
-    state.confirmed = true;
-    state.addedLineKey = parsedState?.key || state.addedLineKey || null;
-    const addedRow = [...this.querySelectorAll('.prada-cart-drawer__optimistic .cart-item')]
-      .find((row) => this.getOptimisticRowVariantId(row) === String(state.item.variantId));
-    if (addedRow && state.addedLineKey) addedRow.dataset.pradaOptimisticLineKey = state.addedLineKey;
-    if (parsedState?.sections?.['cart-drawer']) state.parsedState = parsedState;
-
-    if (state.removeQueued) {
-      void this.performOptimisticRemove(state);
-      return;
-    }
-
-    if (state.queuedDestination) {
-      const destination = state.queuedDestination;
-      state.queuedDestination = null;
-      window.location.assign(destination);
-    }
-  }
-
-  cancelOptimisticAdd(state, { keepDrawer = false } = {}) {
-    if (!state || this.optimisticState?.id !== state.id) return;
-
-    this.completeOptimisticAdd();
-    this.classList.toggle('is-empty', state.wasEmpty);
-    this.classList.toggle('is-empty-stable', state.wasEmptyStable);
-    this.classList.toggle('prada-cart-drawer--multiple', state.wasMultiple);
-    this.dataset.cartItemCount = String(state.previousCount);
-    this.dataset.cartTotalPrice = String(state.previousTotal);
-    updatePradaCartIcon(state.previousCount);
-    this.optimisticState = null;
-
-    if (!keepDrawer && !state.wasOpen) this.close();
-  }
-
-  handlePendingDestination(event) {
-    if (this.optimisticState || !window.PradaCartMutations?.pending) return;
-
-    const link = event.target.closest('.prada-cart-drawer__view-cart');
-    if (!link || !this.contains(link) || !link.href) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-    if (link.getAttribute('aria-busy') === 'true') return;
-
-    link.setAttribute('aria-busy', 'true');
-    link.setAttribute('aria-disabled', 'true');
-    window.PradaCartMutations.whenIdle().then(() => window.location.assign(link.href));
-  }
-
-  deferCanonicalSection(sectionHtml) {
-    if (!sectionHtml) return false;
-
-    const sourceDrawer = this.getSectionDOM(sectionHtml, 'cart-drawer');
-    if (!sourceDrawer?.querySelector('#CartDrawer')) return false;
-
-    this.deferredCanonicalState = { sections: { 'cart-drawer': sectionHtml } };
-    return true;
-  }
-
-  commitVisibleCanonicalRemove(
-    removeButton,
-    parsedState,
-    sectionHtml,
-    { preserveProjectedEmpty = false } = {},
-  ) {
-    const removedRow = removeButton?.closest('.cart-item');
-    if (!removedRow) return false;
-
-    const hasCanonicalSection = this.deferCanonicalSection(sectionHtml);
-    const sourceDrawer = hasCanonicalSection ? this.getSectionDOM(sectionHtml, 'cart-drawer') : null;
-    const itemCount = Number.isFinite(parsedState.item_count)
-      ? parsedState.item_count
-      : Number.parseInt(sourceDrawer?.dataset.cartItemCount || '0', 10) || 0;
-    const totalPrice = Number.isFinite(parsedState.total_price)
-      ? parsedState.total_price
-      : Number.parseInt(sourceDrawer?.dataset.cartTotalPrice || '0', 10) || 0;
-
-    if (!preserveProjectedEmpty) {
-      this.dataset.cartItemCount = String(itemCount);
-      this.dataset.cartTotalPrice = String(totalPrice);
-      this.classList.toggle('prada-cart-drawer--multiple', parsedState.items.length > 1);
-    }
-
-    const headingSelectors = [
-      '.prada-cart-drawer__heading-desktop',
-      '.prada-cart-drawer__heading-mobile',
-    ];
-    if (!preserveProjectedEmpty) {
-      headingSelectors.forEach((selector) => {
-        const target = this.querySelector(`.drawer__inner > .drawer__header ${selector}`);
-        const source = sourceDrawer?.querySelector(`.drawer__inner > .drawer__header ${selector}`);
-        if (target && source) target.textContent = source.textContent;
-      });
-    }
-
-    const targetTotal = this.querySelector('.drawer__inner > .drawer__footer .totals__total-value');
-    const sourceTotal = sourceDrawer?.querySelector('.drawer__inner > .drawer__footer .totals__total-value');
-    if (!preserveProjectedEmpty && targetTotal && sourceTotal) targetTotal.textContent = sourceTotal.textContent;
-
-    const finishRowRemoval = () => {
-      if (!removedRow.isConnected) return;
-      const itemsViewport = removedRow.closest('cart-drawer-items');
-      const table = removedRow.closest('.prada-cart-drawer__items');
-      removedRow.remove();
-      itemsViewport?.classList.toggle('is-multiple', parsedState.items.length > 1);
-      table?.classList.toggle('prada-cart-drawer__items--multiple', parsedState.items.length > 1);
-      if (parsedState.items.length <= 1 && itemsViewport) {
-        itemsViewport.scrollLeft = 0;
-        window.requestAnimationFrame(() => {
-          if (itemsViewport.isConnected) itemsViewport.scrollLeft = 0;
-        });
-      }
-    };
-
-    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    const startedAt = Number.parseFloat(removedRow.dataset.pradaRemoveStartedAt || '0');
-    const elapsed = startedAt && window.performance ? window.performance.now() - startedAt : 180;
-    const remaining = reduceMotion ? 0 : Math.max(0, 180 - elapsed);
-    if (remaining > 0) {
-      window.setTimeout(finishRowRemoval, remaining);
-    } else {
-      finishRowRemoval();
-    }
-
-    if (!hasCanonicalSection) this.refreshDeferredCanonicalSection();
-
-    return true;
-  }
-
-  refreshDeferredCanonicalSection() {
-    if (this.canonicalRefreshPromise) return this.canonicalRefreshPromise;
-
-    const cartUrl = new URL(window.routes?.cart_url || '/cart', window.location.origin);
-    cartUrl.searchParams.set('section_id', 'cart-drawer');
-    const waitForMutations = window.PradaCartMutations?.whenIdle?.() || Promise.resolve();
-    const refreshPromise = waitForMutations
-      .then(() => fetch(cartUrl.toString(), {
-        cache: 'no-store',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-      }))
-      .then((response) => {
-        if (!response.ok) throw new Error(`Cart drawer refresh failed: ${response.status}`);
-        return response.text();
-      })
-      .then((html) => {
-        this.deferCanonicalSection(html);
-        const drawerIsVisible =
-          this.classList.contains('active') ||
-          this.classList.contains('animate') ||
-          this.classList.contains('is-opening') ||
-          this.classList.contains('is-closing');
-        if (!drawerIsVisible) this.flushDeferredCanonicalSection();
-      })
-      .catch((error) => console.error(error))
-      .finally(() => {
-        if (this.canonicalRefreshPromise === refreshPromise) this.canonicalRefreshPromise = null;
-      });
-
-    this.canonicalRefreshPromise = refreshPromise;
-    return refreshPromise;
+  isVisible() {
+    return this.classList.contains('active') || this.classList.contains('animate') || this.classList.contains('is-closing');
   }
 
   flushDeferredCanonicalSection() {
-    if (!this.deferredCanonicalState || this.optimisticState) return false;
-
-    const canonicalState = this.deferredCanonicalState;
+    if (!this.deferredCanonicalState || window.PradaCartMutations?.pending) return false;
+    const state = this.deferredCanonicalState;
     this.deferredCanonicalState = null;
-    this.renderContents(canonicalState, { shouldOpen: false });
+    this.applyCanonicalSection(state.sections['cart-drawer']);
     return true;
   }
 
-  bindOverlay() {
-    const overlay = this.querySelector('#CartDrawer-Overlay');
-    if (!overlay || overlay.dataset.cartDrawerBound) return;
+  applyCanonicalSection(html) {
+    const sourceDrawer = this.getSectionDOM(html, 'cart-drawer');
+    const sourceContents = sourceDrawer?.querySelector('#CartDrawer');
+    const targetContents = this.querySelector('#CartDrawer');
+    if (!sourceDrawer || !sourceContents || !targetContents) return false;
 
-    overlay.dataset.cartDrawerBound = 'true';
-    overlay.addEventListener('click', this.close.bind(this));
-  }
-
-  setHeaderCartIconAccessibility() {
-    if (this.headerCartControlBound) return;
-
-    this.headerCartControlBound = true;
-
-    const getCartLink = (target) => {
-      if (!(target instanceof Element)) return null;
-      return target.closest('#cart-icon-bubble.prada-header-btn--cart');
-    };
-
-    const openFromHeader = (event) => {
-      const cartLink = getCartLink(event.target);
-      if (!cartLink) return;
-
-      if (isPradaCartPage() || cartLink.dataset.pradaCartDisabled === 'true' || cartLink.getAttribute('aria-disabled') === 'true') {
-        event.preventDefault();
-        return;
-      }
-
-      event.preventDefault();
-      cartLink.setAttribute('role', 'button');
-      cartLink.setAttribute('aria-haspopup', 'dialog');
-
-      if (this.classList.contains('active') || this.classList.contains('is-opening')) return;
-
-      this.open(cartLink);
-    };
-
-    document.addEventListener('click', openFromHeader);
-    document.addEventListener('keydown', (event) => {
-      if (event.key !== 'Enter' && event.key !== ' ') return;
-      openFromHeader(event);
-    });
-
-    const cartLink = document.querySelector('#cart-icon-bubble.prada-header-btn--cart');
-    if (cartLink) {
-      if (isPradaCartPage()) {
-        cartLink.setAttribute('aria-disabled', 'true');
-        cartLink.setAttribute('data-prada-cart-disabled', 'true');
-        cartLink.setAttribute('tabindex', '-1');
-        return;
-      }
-
-      cartLink.setAttribute('role', 'button');
-      cartLink.setAttribute('aria-haspopup', 'dialog');
-    }
-  }
-
-  open(triggeredBy) {
-    if (this.classList.contains('active') && !this.classList.contains('is-closing')) return;
-    if (!this.optimisticState && !this.classList.contains('animate')) {
-      this.flushDeferredCanonicalSection();
-    }
-    if (triggeredBy) {
-      this.setActiveElement(triggeredBy);
-      triggeredBy.setAttribute('aria-expanded', 'true');
-    }
-    const cartDrawerNote = this.querySelector('[id^="Details-"] summary');
-    if (cartDrawerNote && !cartDrawerNote.hasAttribute('role')) this.setSummaryAccessibility(cartDrawerNote);
-
-    if (this.openAnimationFrame) {
-      cancelAnimationFrame(this.openAnimationFrame);
-      this.openAnimationFrame = null;
-    }
-    if (this.openFocusTimer) {
-      clearTimeout(this.openFocusTimer);
-      this.openFocusTimer = null;
-    }
-    if (this.closeTimer) {
-      clearTimeout(this.closeTimer);
-      this.closeTimer = null;
-    }
-
-    const focusOnOpen = () => {
-      const containerToTrapFocusOn = this.classList.contains('is-empty')
-        ? this.querySelector('.drawer__inner-empty')
-        : document.getElementById('CartDrawer');
-      const focusElement = this.querySelector('.drawer__inner') || this.querySelector('.drawer__close');
-      trapFocus(containerToTrapFocusOn, focusElement);
-    };
-
-    this.classList.remove('is-closing');
-    this.classList.add('animate', 'is-opening');
-    this.classList.remove('active');
-    this.openAnimationFrame = requestAnimationFrame(() => {
-      this.openAnimationFrame = requestAnimationFrame(() => {
-        this.openAnimationFrame = null;
-        if (this.classList.contains('is-closing')) return;
-
-        this.classList.add('active');
-      });
-    });
-
-    this.openFocusTimer = setTimeout(() => {
-      this.openFocusTimer = null;
-      this.classList.remove('is-opening');
-      if (this.classList.contains('active')) focusOnOpen();
-    }, PRADA_CART_DRAWER_TRANSITION_DURATION);
-
-    if (window.pradaDrawerScrollLock) {
-      window.pradaDrawerScrollLock.lock();
-    } else {
-      document.body.classList.add('overflow-hidden');
-    }
-
-    // cart-drawer-items is a CartItems subclass that extends createViewEventElement.
-    // Its `view-event-trigger="manual"` skips auto-dispatch on connect; we fire
-    // it here when the drawer opens, with `context: 'dialog'` from the payload attribute.
-    this.querySelector('cart-drawer-items')?.dispatchViewEvent();
-  }
-
-  close() {
-    if (this.classList.contains('is-closing')) return;
-
-    if (this.optimisticState) this.optimisticState.dismissed = true;
-
-    if (this.openAnimationFrame) {
-      cancelAnimationFrame(this.openAnimationFrame);
-      this.openAnimationFrame = null;
-    }
-    if (this.openFocusTimer) {
-      clearTimeout(this.openFocusTimer);
-      this.openFocusTimer = null;
-    }
-
-    const finishClose = () => {
-      this.closeTimer = null;
-      this.classList.remove('active', 'animate', 'is-closing', 'is-opening');
-      removeTrapFocus(this.activeElement);
-      this.activeElement?.setAttribute?.('aria-expanded', 'false');
-
-      if (window.pradaDrawerScrollLock) {
-        window.pradaDrawerScrollLock.unlock();
-      } else {
-        document.body.classList.remove('overflow-hidden');
-      }
-
-      const optimisticState = this.optimisticState;
-      if (optimisticState?.confirmed && !optimisticState.removalPending) {
-        if (optimisticState.parsedState) {
-          this.completeOptimisticAdd();
-          this.renderContents(optimisticState.parsedState, { shouldOpen: false });
-        } else {
-          this.flushScheduledOptimisticRefresh(optimisticState);
-        }
-      } else if (!optimisticState) {
-        this.flushDeferredCanonicalSection();
-      }
-    };
-
-    if (!this.classList.contains('active') && !this.classList.contains('animate')) {
-      finishClose();
-      return;
-    }
-
-    this.classList.remove('is-opening');
-    this.classList.add('is-closing');
-    this.classList.remove('active');
-    this.closeTimer = setTimeout(finishClose, PRADA_CART_DRAWER_TRANSITION_DURATION);
-  }
-
-  setSummaryAccessibility(cartDrawerNote) {
-    cartDrawerNote.setAttribute('role', 'button');
-    cartDrawerNote.setAttribute('aria-expanded', 'false');
-
-    if (cartDrawerNote.nextElementSibling.getAttribute('id')) {
-      cartDrawerNote.setAttribute('aria-controls', cartDrawerNote.nextElementSibling.id);
-    }
-
-    cartDrawerNote.addEventListener('click', (event) => {
-      event.currentTarget.setAttribute('aria-expanded', !event.currentTarget.closest('details').hasAttribute('open'));
-    });
-
-    cartDrawerNote.parentElement.addEventListener('keyup', onKeyUpEscape);
+    targetContents.innerHTML = sourceContents.innerHTML;
+    this.dataset.cartItemCount = sourceDrawer.dataset.cartItemCount || '0';
+    this.dataset.cartTotalPrice = sourceDrawer.dataset.cartTotalPrice || '0';
+    this.classList.remove(
+      'is-empty-transitioning',
+      'is-empty-revealed',
+      'is-empty-entering',
+      'is-empty-visible',
+      'is-empty-leaving',
+    );
+    this.classList.toggle('is-empty', sourceDrawer.classList.contains('is-empty'));
+    this.classList.toggle('is-empty-stable', sourceDrawer.classList.contains('is-empty'));
+    this.classList.toggle('prada-cart-drawer--multiple', sourceDrawer.classList.contains('prada-cart-drawer--multiple'));
+    updatePradaCartIcon(this.dataset.cartItemCount);
+    return true;
   }
 
   renderContents(parsedState, { shouldOpen = true } = {}) {
-    const optimisticImage = this.querySelector('.prada-cart-drawer__optimistic .cart-item__image');
-    const optimisticImageSrc = optimisticImage?.currentSrc || optimisticImage?.src || '';
-    const optimisticState = this.optimisticState;
-    const sourceDrawer = parsedState.sections?.['cart-drawer']
-      ? this.getSectionDOM(parsedState.sections['cart-drawer'], 'cart-drawer')
-      : null;
-    const sectionItemCount = Number.parseInt(sourceDrawer?.dataset.cartItemCount || '', 10);
-    const sectionTotalPrice = Number.parseInt(sourceDrawer?.dataset.cartTotalPrice || '', 10);
-    const itemCount =
-      typeof parsedState.item_count === 'number'
-        ? parsedState.item_count
-        : Number.isFinite(sectionItemCount)
-          ? sectionItemCount
-          : null;
-
-    if (optimisticState) {
-      this.confirmOptimisticAdd(optimisticState, parsedState);
-      if (optimisticState.removalPending) return;
-
-      const drawerIsVisible =
-        this.classList.contains('active') ||
-        this.classList.contains('animate') ||
-        this.classList.contains('is-opening') ||
-        this.classList.contains('is-closing');
-      if (!optimisticState.dismissed || drawerIsVisible) return;
-
-      this.completeOptimisticAdd();
-    }
-
-    this.deferredCanonicalState = null;
-
-    if (itemCount !== null) {
-      this.dataset.cartItemCount = String(itemCount);
-      this.classList.toggle('is-empty', itemCount === 0);
-      this.classList.toggle('is-empty-stable', itemCount === 0);
-      updatePradaCartIcon(itemCount);
-    }
-    if (Number.isFinite(sectionTotalPrice)) this.dataset.cartTotalPrice = String(sectionTotalPrice);
-    if (sourceDrawer) {
-      this.classList.toggle(
-        'prada-cart-drawer--multiple',
-        sourceDrawer.classList.contains('prada-cart-drawer--multiple'),
-      );
-    }
-    this.productId = parsedState.id;
-
-    this.getSectionsToRender().forEach((section) => {
-      const sectionElement = section.selector
-        ? document.querySelector(section.selector)
-        : document.getElementById(section.id);
-
-      if (!sectionElement) return;
-      const sourceSection = sourceDrawer?.querySelector(section.selector);
-      if (sourceSection && optimisticImageSrc) {
-        const variantInput = [...sourceSection.querySelectorAll('[data-quantity-variant-id]')].find(
-          (input) => String(input.dataset.quantityVariantId) === String(parsedState.id),
-        );
-        const serverImage = variantInput?.closest('.cart-item')?.querySelector('.cart-item__image');
-        if (serverImage) {
-          serverImage.src = optimisticImageSrc;
-          serverImage.removeAttribute('srcset');
-        }
+    const sectionHtml = parsedState?.sections?.['cart-drawer'];
+    if (sectionHtml) {
+      if (this.isVisible() || window.PradaCartMutations?.pending) {
+        this.deferredCanonicalState = { sections: { 'cart-drawer': sectionHtml } };
+      } else {
+        this.applyCanonicalSection(sectionHtml);
       }
-      sectionElement.innerHTML = sourceSection
-        ? sourceSection.innerHTML
-        : this.getSectionInnerHTML(parsedState.sections[section.id], section.selector);
-    });
-
-    this.bindOverlay();
-    if (itemCount === null) void refreshPradaCartIcon();
-
-    if (shouldOpen && !optimisticState?.dismissed) {
-      setTimeout(() => this.open());
+    } else {
+      this.requestCanonicalRefresh();
     }
-  }
 
-  getSectionInnerHTML(html, selector = '.shopify-section') {
-    return new DOMParser().parseFromString(html, 'text/html').querySelector(selector).innerHTML;
-  }
-
-  getSectionsToRender() {
-    return [
-      {
-        id: 'cart-drawer',
-        selector: '#CartDrawer',
-      },
-    ];
+    if (typeof parsedState?.item_count === 'number') updatePradaCartIcon(parsedState.item_count);
+    if (shouldOpen) this.open();
   }
 
   getSectionDOM(html, selector = '.shopify-section') {
+    if (!html) return null;
     return new DOMParser().parseFromString(html, 'text/html').querySelector(selector);
+  }
+
+  getSectionInnerHTML(html, selector = '.shopify-section') {
+    return this.getSectionDOM(html, selector)?.innerHTML || '';
+  }
+
+  getSectionsToRender() {
+    return [{ id: 'cart-drawer', selector: '#CartDrawer' }];
   }
 
   setActiveElement(element) {
@@ -1494,13 +776,15 @@ customElements.define('cart-drawer', CartDrawer);
 
 class CartDrawerItems extends CartItems {
   getSectionsToRender() {
-    return [
-      {
-        id: 'CartDrawer',
-        section: 'cart-drawer',
-        selector: '.drawer__inner',
-      },
-    ];
+    return [{ id: 'CartDrawer', section: 'cart-drawer', selector: '.drawer__inner' }];
+  }
+
+  updateQuantity(line, quantity, event, name, variantId) {
+    if (quantity === 0 && event?.currentTarget instanceof CartRemoveButton) {
+      this.closest('cart-drawer')?.removeItem(event.currentTarget, event);
+      return;
+    }
+    super.updateQuantity(line, quantity, event, name, variantId);
   }
 }
 

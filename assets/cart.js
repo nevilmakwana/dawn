@@ -76,6 +76,13 @@ class CartRemoveButton extends HTMLElement {
 
       if (!cartItems) return;
 
+      // The drawer has one state owner. Delegating here prevents CartItems and
+      // CartDrawer from both sending/remounting the same removal.
+      if (isCartDrawerItem) {
+        cartItem.closest('cart-drawer')?.removeItem(this, event);
+        return;
+      }
+
       if (!isShoppingBagItem && !isCartDrawerItem) {
         cartItems.updateQuantity(this.dataset.index, 0, event);
         return;
@@ -289,27 +296,11 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
 
   onCartUpdate() {
     if (this.tagName === 'CART-DRAWER-ITEMS') {
-      // The optimistic drawer owns the visible state until add/remove settles.
-      // Avoid a competing section fetch repainting it with stale cart HTML.
       const cartDrawer = document.querySelector('cart-drawer');
-      if (cartDrawer?.optimisticState || cartDrawer?.deferredCanonicalState) return Promise.resolve();
-
-      return fetch(`${routes.cart_url}?section_id=cart-drawer`)
-        .then((response) => response.text())
-        .then((responseText) => {
-          const html = new DOMParser().parseFromString(responseText, 'text/html');
-          const selectors = ['cart-drawer-items', '.cart-drawer__footer'];
-          for (const selector of selectors) {
-            const targetElement = document.querySelector(selector);
-            const sourceElement = html.querySelector(selector);
-            if (targetElement && sourceElement) {
-              targetElement.replaceWith(sourceElement);
-            }
-          }
-        })
-        .catch((e) => {
-          console.error(e);
-        });
+      if (cartDrawer?.ownsCartState?.()) {
+        cartDrawer.requestCanonicalRefresh?.();
+        return Promise.resolve();
+      }
     } else {
       return fetch(`${routes.cart_url}?section_id=main-cart-items`)
         .then((response) => response.text())
