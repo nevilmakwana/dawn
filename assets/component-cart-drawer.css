@@ -14,6 +14,7 @@
 cart-drawer.prada-cart-drawer .cart-item {
   transition:
     opacity 180ms ease,
+    transform 180ms ease,
     max-height 180ms ease,
     min-height 180ms ease,
     padding-top 180ms ease,
@@ -24,66 +25,14 @@ cart-drawer.prada-cart-drawer .cart-item {
     flex-basis 180ms ease,
     padding-left 180ms ease,
     padding-right 180ms ease;
+  transform-origin: center;
+  will-change: opacity, transform;
 }
 
 cart-drawer.prada-cart-drawer .cart-item.is-removing {
   opacity: 0;
+  transform: scale(0.98);
   pointer-events: none;
-}
-
-cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-label {
-  flex: 0 0 auto;
-}
-
-cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-control {
-  display: inline-flex;
-  align-items: center;
-  min-height: 36px;
-}
-
-cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-button {
-  display: grid;
-  width: 36px;
-  min-width: 36px;
-  height: 36px;
-  min-height: 36px;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: #111111;
-  font: inherit;
-  font-size: 17px;
-  line-height: 1;
-  cursor: pointer;
-  place-items: center;
-}
-
-cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-button:focus-visible {
-  outline: 1px solid currentColor;
-  outline-offset: -3px;
-}
-
-cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-button:disabled {
-  cursor: default;
-  opacity: 0.32;
-}
-
-cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-value {
-  min-width: 22px;
-  color: #111111;
-  font: inherit;
-  text-align: center;
-}
-
-cart-drawer.prada-cart-drawer .cart-item.is-quantity-updating .prada-cart-drawer__quantity-value {
-  opacity: 0.58;
 }
 
 cart-drawer.prada-cart-drawer .cart-item.is-collapsing:not(.is-horizontal-removal) {
@@ -621,11 +570,11 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
   }
 
   cart-drawer.prada-cart-drawer .cart-drawer__overlay {
-    background: rgba(0, 0, 0, 0.48);
+    background: rgba(0, 0, 0, 0.68);
     opacity: 0;
     visibility: hidden;
     transition:
-      opacity 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 360ms cubic-bezier(0.22, 1, 0.36, 1),
       visibility 0s linear var(--prada-cart-drawer-slide-duration);
   }
 
@@ -633,7 +582,7 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     opacity: 1;
     visibility: visible;
     transition:
-      opacity 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 360ms cubic-bezier(0.22, 1, 0.36, 1) 100ms,
       visibility 0s linear 0s;
   }
 
@@ -641,7 +590,7 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     opacity: 0;
     visibility: visible;
     transition:
-      opacity 260ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 320ms cubic-bezier(0.4, 0, 0.2, 1),
       visibility 0s linear var(--prada-cart-drawer-slide-duration);
   }
 
@@ -931,7 +880,8 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     margin-top: 20px;
   }
 
-  cart-drawer.prada-cart-drawer .prada-cart-drawer__view-cart {
+  cart-drawer.prada-cart-drawer .prada-cart-drawer__view-cart,
+  cart-drawer.prada-cart-drawer .cart__checkout-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -948,10 +898,14 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
   }
 
   cart-drawer.prada-cart-drawer .prada-cart-drawer__view-cart {
+    background: #ffffff;
+    color: #111111;
+  }
+
+  cart-drawer.prada-cart-drawer .cart__checkout-button {
     background: #111111;
     color: #ffffff;
   }
-
 }
 
 @media screen and (max-width: 989px) {
@@ -961,7 +915,7 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
   }
 
   cart-drawer.prada-cart-drawer .cart-drawer__overlay {
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(0, 0, 0, 0.66);
     opacity: 0;
     transition: opacity var(--prada-cart-drawer-slide-duration) ease;
   }
@@ -1233,7 +1187,8 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     margin-top: 0;
   }
 
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__view-cart {
+  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__view-cart,
+  cart-drawer.prada-cart-drawer:not(.is-empty) .cart__checkout-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1250,21 +1205,14 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
   }
 
   cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__view-cart {
+    background: #ffffff;
+    color: #111111;
+  }
+
+  cart-drawer.prada-cart-drawer:not(.is-empty) .cart__checkout-button {
     background: #111111;
     color: #ffffff;
   }
-
-  cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-control {
-    min-height: 40px;
-  }
-
-  cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-button {
-    width: 40px;
-    min-width: 40px;
-    height: 40px;
-    min-height: 40px;
-  }
-
 
   cart-drawer.prada-cart-drawer:not(.is-empty).prada-cart-drawer--multiple .drawer__inner {
     height: clamp(429px, 45.65dvh, 462px);
@@ -1419,8 +1367,11 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
   cart-drawer.prada-cart-drawer.is-empty-transitioning .drawer__inner > .drawer__footer {
     display: block !important;
     opacity: 0;
+    transform: translate3d(0, -6px, 0);
     pointer-events: none;
-    transition: opacity 140ms ease;
+    transition:
+      opacity 140ms ease,
+      transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   cart-drawer.prada-cart-drawer.is-empty-transitioning .drawer__inner > .drawer__header {
@@ -1525,16 +1476,5 @@ cart-drawer.prada-cart-drawer.is-empty .drawer__inner-empty {
   width: 100%;
   height: 100%;
   min-height: 0;
-  opacity: 1;
   contain: layout paint;
-}
-
-/* Keep the mobile empty shell at its final size while the outer drawer
-   changes height. Anchoring this layer to the bottom prevents the centered
-   copy from moving or being re-rasterized during the last-item transition. */
-@media screen and (max-width: 989px) {
-  cart-drawer.prada-cart-drawer.is-empty .drawer__inner-empty {
-    top: auto;
-    height: clamp(220px, 30dvh, 280px);
-  }
 }
