@@ -1,0 +1,78 @@
+/* Desktop product layout: exact viewport halves without horizontal overflow. */
+/* Product-only overflow guard. */
+@media screen and (min-width: 990px) {
+  html,
+  body,
+  #MainContent {
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-x: clip;
+  }
+
+  product-info[id^='MainProduct-'] {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-x: clip;
+  }
+
+  product-info[id^='MainProduct-'] > .page-width {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  product-info[id^='MainProduct-'] .product {
+    display: grid !important;
+    grid-template-columns: minmax(0, 50%) minmax(0, 50%);
+    column-gap: 0 !important;
+    row-gap: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  product-info[id^='MainProduct-'] .product__media-wrapper,
+  product-info[id^='MainProduct-'] .product__info-wrapper {
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    flex: initial !important;
+  }
+
+  product-info[id^='MainProduct-'] .product__media-wrapper {
+    grid-column: 1;
+    overflow: hidden;
+  }
+
+  product-info[id^='MainProduct-'] .product__info-wrapper {
+    grid-column: 2;
+  }
+
+  product-info[id^='MainProduct-'] media-gallery,
+  product-info[id^='MainProduct-'] slider-component,
+  product-info[id^='MainProduct-'] .slider-mobile-gutter,
+  product-info[id^='MainProduct-'] .product__media-list,
+  product-info[id^='MainProduct-'] .product__media-item,
+  product-info[id^='MainProduct-'] .product-media-container,
+  product-info[id^='MainProduct-'] .product__media {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: 0 !important;
+  }
+
+  product-info[id^='MainProduct-'] .slider-mobile-gutter,
+  product-info[id^='MainProduct-'] .product__media-list {
+    overflow-x: hidden !important;
+  }
+
+  product-info[id^='MainProduct-'] .product__media img {
+    display: block;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}

@@ -1,0 +1,83 @@
+/* Desktop product layout: media and product information each own half the viewport. */
+@media screen and (min-width: 990px) {
+  [id^='MainProduct-'] > .page-width,
+  [id^='MainProduct-'] .page-width {
+    width: 100vw !important;
+    max-width: none !important;
+    margin-inline: 0 !important;
+    padding-inline: 0 !important;
+  }
+
+  [id^='MainProduct-'] .page-width > .product,
+  [id^='MainProduct-'] .product {
+    display: grid !important;
+    grid-template-columns: minmax(0, 50vw) minmax(0, 50vw) !important;
+    gap: 0 !important;
+    width: 100vw !important;
+    max-width: none !important;
+    margin: 0 !important;
+    align-items: start !important;
+  }
+
+  [id^='MainProduct-'] .product__media-wrapper,
+  [id^='MainProduct-'] .product__info-wrapper {
+    width: 50vw !important;
+    max-width: 50vw !important;
+    flex: 0 0 50vw !important;
+    margin: 0 !important;
+  }
+
+  [id^='MainProduct-'] .product__media-wrapper {
+    padding: 0 !important;
+  }
+
+  [id^='MainProduct-'] .product__media-list {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    width: 50vw !important;
+    max-width: 50vw !important;
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  [id^='MainProduct-'] .product__media-item,
+  [id^='MainProduct-'] .product-media-container {
+    width: 50vw !important;
+    max-width: 50vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  [id^='MainProduct-'] .product__media,
+  [id^='MainProduct-'] .product__media .global-media-settings,
+  [id^='MainProduct-'] .product__media .media {
+    width: 100% !important;
+    height: calc(100svh - 72px) !important;
+    min-height: 0 !important;
+    padding-bottom: 0 !important;
+    background: #f2f2f2 !important;
+  }
+
+  [id^='MainProduct-'] .product__media img,
+  [id^='MainProduct-'] .product__media .media > img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+
+  [id^='MainProduct-'] .product__info-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    min-height: calc(100svh - 72px) !important;
+    padding: 48px 7.3vw !important;
+  }
+
+  [id^='MainProduct-'] .product__info-container {
+    width: 100% !important;
+    max-width: 672px !important;
+    margin-inline: auto !important;
+  }
+}

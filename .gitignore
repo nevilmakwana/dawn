@@ -1,6 +1,12 @@
 node_modules
-server.js
-temp*.html
-hm.html
-check.log
-.DS_Store
+.cart-transition-audit*
+.cart-transition-test-profile/
+.chrome-prada-audit/
+.history/
+.lighthouse-utility-audit/
+.shopify-remote-debug/
+.shopify-verify/
+.tmp-*
+.typography-audit/
+*.report.html
+demo.html

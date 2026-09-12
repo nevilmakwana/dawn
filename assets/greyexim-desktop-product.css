@@ -1,0 +1,228 @@
+/*
+ * Desktop product presentation. Kept separate from Dawn's mobile styles so
+ * storefront merchandising changes do not affect the established mobile PDP.
+ */
+@media screen and (min-width: 990px) {
+  body.template-product [id^='MainProduct-'] {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  body.template-product [id^='MainProduct-'] .product {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0;
+    max-width: none;
+    margin: 0;
+  }
+
+  body.template-product [id^='MainProduct-'] .product__media-wrapper,
+  body.template-product [id^='MainProduct-'] .product__info-wrapper {
+    width: 100%;
+    max-width: none;
+  }
+
+  body.template-product [id^='MainProduct-'] .product__media-wrapper {
+    grid-column: 1;
+    background: #f3f3f3;
+  }
+
+  body.template-product [id^='MainProduct-'] .product__info-wrapper {
+    grid-column: 2;
+    padding: clamp(5.6rem, 8vw, 12rem) clamp(4.8rem, 8vw, 12rem) 7rem;
+    background: #fff;
+  }
+
+  body.template-product [id^='MainProduct-'] .product__info-container {
+    position: sticky;
+    top: 5.6rem;
+    max-width: 45rem;
+    margin: 0 auto;
+  }
+
+  body.template-product [id^='MainProduct-'] .product__media-list {
+    display: block;
+    margin: 0;
+    padding: 0;
+    background: #f3f3f3;
+  }
+
+  body.template-product [id^='MainProduct-'] .product__media-item {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #f3f3f3;
+  }
+
+  body.template-product [id^='MainProduct-'] .product__media-item + .product__media-item {
+    border-top: 1px solid #fff;
+  }
+
+  body.template-product [id^='MainProduct-'] .product__media-item .product-media-container,
+  body.template-product [id^='MainProduct-'] .product__media-item .product__modal-opener {
+    width: 100% !important;
+    max-width: none !important;
+    height: min(74vw, 96rem);
+    margin: 0 !important;
+    background: #f3f3f3;
+  }
+
+  body.template-product [id^='MainProduct-'] .product__media,
+  body.template-product [id^='MainProduct-'] .product__media img,
+  body.template-product [id^='MainProduct-'] .product__media video,
+  body.template-product [id^='MainProduct-'] .product__media iframe {
+    width: 100%;
+    height: 100%;
+  }
+
+  body.template-product [id^='MainProduct-'] .product__media img,
+  body.template-product [id^='MainProduct-'] .product__media video {
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+
+  body.template-product [id^='MainProduct-'] .thumbnail-list {
+    position: fixed;
+    z-index: 2;
+    top: 50%;
+    left: 2rem;
+    display: grid;
+    width: 4.6rem;
+    max-height: 58vh;
+    gap: .8rem;
+    overflow-y: auto;
+    padding: .4rem;
+    transform: translateY(-50%);
+  }
+
+  body.template-product [id^='MainProduct-'] .thumbnail-list__item {
+    width: 100%;
+  }
+
+  body.template-product [id^='MainProduct-'] .thumbnail {
+    border: 1px solid transparent;
+    background: #f3f3f3;
+    transition: border-color 180ms ease, opacity 180ms ease;
+  }
+
+  body.template-product [id^='MainProduct-'] .thumbnail[aria-current],
+  body.template-product [id^='MainProduct-'] .thumbnail:hover {
+    border-color: #111;
+    opacity: 1;
+  }
+
+  body.template-product [id^='MainProduct-'] .product__title {
+    margin: 0 0 1.2rem;
+  }
+
+  body.template-product [id^='MainProduct-'] .product__title h1,
+  body.template-product [id^='MainProduct-'] .product__title {
+    font-size: clamp(2.5rem, 2vw, 3.2rem);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: 0;
+  }
+
+  body.template-product [id^='MainProduct-'] .product__text,
+  body.template-product [id^='MainProduct-'] .caption-with-letter-spacing {
+    margin-bottom: 1.4rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  body.template-product [id^='MainProduct-'] .price {
+    margin: 0 0 3.4rem;
+  }
+
+  body.template-product [id^='MainProduct-'] .price-item {
+    font-size: 1.55rem;
+    font-weight: 500;
+  }
+
+  body.template-product [id^='MainProduct-'] .product-form__input,
+  body.template-product [id^='MainProduct-'] .product-form__quantity,
+  body.template-product [id^='MainProduct-'] variant-radios {
+    margin: 0 0 2.2rem;
+  }
+
+  body.template-product [id^='MainProduct-'] .product-form__input legend {
+    margin-bottom: 1.1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  body.template-product [id^='MainProduct-'] .product-form__input input[type='radio'] + label {
+    min-width: 2.3rem;
+    min-height: 2.3rem;
+    border-radius: 50%;
+    transition: box-shadow 180ms ease, transform 180ms ease;
+  }
+
+  body.template-product [id^='MainProduct-'] .product-form__input input[type='radio']:checked + label {
+    box-shadow: 0 0 0 1px #111, 0 0 0 4px #fff, 0 0 0 5px #111;
+  }
+
+  body.template-product [id^='MainProduct-'] .select,
+  body.template-product [id^='MainProduct-'] .product-form__input .select {
+    width: 100%;
+  }
+
+  body.template-product [id^='MainProduct-'] .select__select {
+    min-height: 5.4rem;
+    border: 1px solid #d9d9d9;
+    box-shadow: none;
+    font-size: 1.3rem;
+  }
+
+  body.template-product [id^='MainProduct-'] .product-form__buttons {
+    max-width: none;
+  }
+
+  body.template-product [id^='MainProduct-'] .product-form__submit {
+    min-height: 5.4rem;
+    border: 1px solid #111;
+    background: #111;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    transition: background-color 180ms ease, color 180ms ease;
+  }
+
+  body.template-product [id^='MainProduct-'] .product-form__submit:hover {
+    background: #fff;
+    color: #111;
+  }
+
+  body.template-product [id^='MainProduct-'] .accordion {
+    margin-top: 0;
+    border-top: 1px solid #d9d9d9;
+  }
+
+  body.template-product [id^='MainProduct-'] .accordion summary {
+    min-height: 5.8rem;
+    padding: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  body.template-product [id^='MainProduct-'] .accordion summary:hover {
+    opacity: .62;
+  }
+
+  body.template-product [id^='MainProduct-'] .accordion .accordion__content {
+    padding: 0 0 2rem;
+    font-size: 1.3rem;
+    line-height: 1.55;
+  }
+
+  body.template-product [id^='MainProduct-'] .product-popup-modal__button,
+  body.template-product [id^='MainProduct-'] .product__inventory,
+  body.template-product [id^='MainProduct-'] .product__tax {
+    font-size: 1.2rem;
+  }
+}

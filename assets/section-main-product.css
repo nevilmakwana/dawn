@@ -1492,3 +1492,72 @@ a.product__text {
     border: none;
   }
 }
+/* Grey Exim desktop product page: balanced luxury split layout. */
+@media screen and (min-width: 990px) {
+  [id^='MainProduct-'] {
+    max-width: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  [id^='MainProduct-'] > .product {
+    display: grid !important;
+    grid-template-columns: minmax(0, 50%) minmax(0, 50%) !important;
+    column-gap: 0 !important;
+    align-items: start !important;
+    width: 100%;
+    margin: 0;
+  }
+
+  [id^='MainProduct-'] .product__media-wrapper {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+    background: #f2f2f2;
+  }
+
+  [id^='MainProduct-'] .product__media-list {
+    margin: 0 !important;
+  }
+
+  [id^='MainProduct-'] .product__media-item {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: calc(100svh - 76px);
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    background: #f2f2f2;
+  }
+
+  [id^='MainProduct-'] .product-media-container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 auto;
+  }
+
+  [id^='MainProduct-'] .product__media img {
+    object-fit: contain !important;
+  }
+
+  [id^='MainProduct-'] .product__info-wrapper {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: calc(100svh - 76px);
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+  }
+
+  [id^='MainProduct-'] .product__info-container {
+    position: sticky;
+    top: 96px;
+    width: min(calc(100% - 96px), 672px) !important;
+    max-width: 672px !important;
+    margin: 0 auto !important;
+    padding: 56px 0;
+  }
+}
