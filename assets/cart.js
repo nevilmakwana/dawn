@@ -76,10 +76,8 @@ class CartRemoveButton extends HTMLElement {
 
       if (!cartItems) return;
 
-      // The drawer has one state owner. Delegating here prevents CartItems and
-      // CartDrawer from both sending/remounting the same removal.
+      // Drawer item removal is handled directly by CartDrawerItems
       if (isCartDrawerItem) {
-        cartItem.closest('cart-drawer')?.removeItem(this, event);
         return;
       }
 
