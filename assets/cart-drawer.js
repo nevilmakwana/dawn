@@ -81,12 +81,16 @@ class CartDrawer extends HTMLElement {
       return;
     }
 
-    const destination = event.target.closest('.prada-cart-drawer__view-cart, [data-prada-fast-checkout]');
+    const quantityButton = event.target.closest('[data-prada-quantity-change]');
+    if (quantityButton && this.contains(quantityButton)) {
+      this.changeItemQuantity(quantityButton, event);
+      return;
+    }
+
+    const destination = event.target.closest('.prada-cart-drawer__view-cart');
     if (!destination || !this.contains(destination)) return;
 
-    const url = destination.matches('.prada-cart-drawer__view-cart')
-      ? destination.href
-      : destination.dataset.pradaFastCheckout;
+    const url = destination.href;
     if (!url) return;
 
     event.preventDefault();
@@ -387,11 +391,94 @@ class CartDrawer extends HTMLElement {
       });
   }
 
+  changeItemQuantity(control, event) {
+    const row = control?.closest('.cart-item');
+    if (!row || row.dataset.cartQuantityPending === 'true' || row.dataset.cartRemovePending === 'true') return;
+
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+
+    const currentQuantity = this.getRowQuantity(row);
+    const delta = Number.parseInt(control.dataset.pradaQuantityChange || '0', 10) || 0;
+    const minimum = Math.max(1, Number.parseInt(control.dataset.pradaQuantityMin || '1', 10) || 1);
+    const parsedMaximum = Number.parseInt(control.dataset.pradaQuantityMax || '', 10);
+    const maximum = Number.isFinite(parsedMaximum) && parsedMaximum > 0 ? parsedMaximum : Infinity;
+    const nextQuantity = Math.min(maximum, Math.max(minimum, currentQuantity + delta));
+    if (!delta || nextQuantity === currentQuantity) return;
+
+    const lineReference = row._pradaLineReference || this.createLineReference(row);
+    row._pradaLineReference = lineReference;
+    const previousCount = this.getDisplayedItemCount();
+    const previousTotal = this.getDisplayedTotal();
+    const unitPrice = Number.parseInt(row.dataset.cartUnitPrice || '0', 10) || 0;
+    const actionRevision = ++this.revision;
+
+    row.dataset.cartQuantityPending = 'true';
+    row.classList.add('is-quantity-updating');
+    row.querySelectorAll('[data-prada-quantity-change]').forEach((button) => {
+      button.disabled = true;
+      button.setAttribute('aria-disabled', 'true');
+    });
+    control.closest('.prada-cart-drawer__quantity-control')?.setAttribute('aria-busy', 'true');
+
+    this.updateRowQuantity(row, nextQuantity);
+    this.setDisplayedTotals(
+      Math.max(0, previousCount + nextQuantity - currentQuantity),
+      Math.max(0, previousTotal + unitPrice * (nextQuantity - currentQuantity)),
+    );
+
+    const changeRequest = async () => {
+      let lineKey = lineReference.key;
+      if (!lineKey && lineReference.keyPromise) lineKey = await lineReference.keyPromise;
+      if (!lineKey) throw new Error('Cart line is not ready');
+
+      const response = await fetch(`${routes.cart_change_url}`, {
+        ...fetchConfig(),
+        body: JSON.stringify({ id: lineKey, quantity: nextQuantity }),
+      });
+      const cart = await response.json();
+      if (!response.ok || cart?.errors) throw new Error(cart?.errors || window.cartStrings?.error || 'Cart update failed');
+      return { cart, lineKey };
+    };
+
+    const promise = window.PradaCartMutations?.enqueue
+      ? window.PradaCartMutations.enqueue(changeRequest)
+      : changeRequest();
+
+    promise
+      .then(({ cart, lineKey }) => {
+        const confirmedItem = cart.items?.find(
+          (item) => String(item.key) === String(lineKey) || String(item.variant_id) === String(row.dataset.cartVariantId),
+        );
+        const confirmedQuantity = Math.max(minimum, Number.parseInt(confirmedItem?.quantity || nextQuantity, 10) || nextQuantity);
+        this.updateRowQuantity(row, confirmedQuantity);
+        if (actionRevision === this.revision) this.setDisplayedTotals(cart.item_count, cart.total_price);
+        publish(PUB_SUB_EVENTS.cartUpdate, { source: 'cart-drawer', cartData: cart });
+        this.requestCanonicalRefresh();
+      })
+      .catch((error) => {
+        this.updateRowQuantity(row, currentQuantity);
+        this.setDisplayedTotals(previousCount, previousTotal);
+        this.showCartError(error?.message || window.cartStrings?.error || 'Cart update failed');
+        this.requestCanonicalRefresh();
+      })
+      .finally(() => {
+        if (!row.isConnected) return;
+        delete row.dataset.cartQuantityPending;
+        row.classList.remove('is-quantity-updating');
+        const quantityControl = row.querySelector('.prada-cart-drawer__quantity-control');
+        quantityControl?.removeAttribute('aria-busy');
+        this.updateQuantityControlState(row);
+      });
+  }
+
   animateRowRemoval(row, isLastItem) {
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const duration = reducedMotion ? 0 : PRADA_CART_ROW_TRANSITION_DURATION;
     const isHorizontal = Boolean(
-      window.matchMedia('(max-width: 989px)').matches && row.closest('.prada-cart-drawer__items--multiple'),
+      !isLastItem &&
+        window.matchMedia('(max-width: 989px)').matches &&
+        row.closest('.prada-cart-drawer__items--multiple'),
     );
 
     if (isHorizontal) {
@@ -399,13 +486,16 @@ class CartDrawer extends HTMLElement {
       row.style.width = `${row.offsetWidth}px`;
       row.style.maxWidth = `${row.offsetWidth}px`;
       row.style.flexBasis = `${row.offsetWidth}px`;
-    } else {
+    } else if (!isLastItem) {
       row.style.maxHeight = `${row.offsetHeight}px`;
     }
     row.style.overflow = 'hidden';
     row.getBoundingClientRect();
 
-    window.requestAnimationFrame(() => row.classList.add('is-removing', 'is-collapsing'));
+    window.requestAnimationFrame(() => {
+      row.classList.add('is-removing');
+      if (!isLastItem) row.classList.add('is-collapsing');
+    });
     if (isLastItem) this.showEmptyState({ animate: true });
 
     window.setTimeout(() => {
@@ -471,11 +561,70 @@ class CartDrawer extends HTMLElement {
   updateRowQuantity(row, quantity) {
     row.dataset.cartQuantity = String(quantity);
     const label = row.querySelector('.prada-cart-drawer__quantity');
-    if (label) label.textContent = `Qty: ${quantity}`;
+    const value = row.querySelector('.prada-cart-drawer__quantity-value');
+    if (value) value.textContent = String(quantity);
+    else if (label) label.textContent = `Quantity: ${quantity}`;
     row.querySelectorAll('.quantity__input').forEach((input) => {
       input.value = String(quantity);
       input.setAttribute('value', String(quantity));
     });
+    this.updateQuantityControlState(row);
+  }
+
+  updateQuantityControlState(row) {
+    const quantity = this.getRowQuantity(row);
+    const pending = row.dataset.cartQuantityPending === 'true' || row.dataset.cartRemovePending === 'true';
+    row.querySelectorAll('[data-prada-quantity-change]').forEach((button) => {
+      const delta = Number.parseInt(button.dataset.pradaQuantityChange || '0', 10) || 0;
+      const minimum = Math.max(1, Number.parseInt(button.dataset.pradaQuantityMin || '1', 10) || 1);
+      const parsedMaximum = Number.parseInt(button.dataset.pradaQuantityMax || '', 10);
+      const maximum = Number.isFinite(parsedMaximum) && parsedMaximum > 0 ? parsedMaximum : Infinity;
+      const unavailable =
+        button.dataset.pradaQuantityLocked === 'true' ||
+        pending ||
+        (delta < 0 && quantity + delta < minimum) ||
+        (delta > 0 && quantity + delta > maximum);
+      button.disabled = unavailable;
+      button.setAttribute('aria-disabled', String(unavailable));
+    });
+  }
+
+  createQuantityControl(item, quantity) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'prada-cart-drawer__quantity';
+
+    const label = document.createElement('span');
+    label.className = 'prada-cart-drawer__quantity-label';
+    label.textContent = 'Quantity';
+
+    const controls = document.createElement('div');
+    controls.className = 'prada-cart-drawer__quantity-control';
+    controls.setAttribute('role', 'group');
+    controls.setAttribute('aria-label', `Quantity for ${item.title}`);
+
+    const minimum = Math.max(1, Number.parseInt(item.quantityMin || '1', 10) || 1);
+    const step = Math.max(1, Number.parseInt(item.quantityStep || '1', 10) || 1);
+    const maximum = Number.parseInt(item.quantityMax || '', 10);
+    const createButton = (change, text, action) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'prada-cart-drawer__quantity-button';
+      button.dataset.pradaQuantityChange = String(change);
+      button.dataset.pradaQuantityMin = String(minimum);
+      if (Number.isFinite(maximum) && maximum > 0) button.dataset.pradaQuantityMax = String(maximum);
+      button.textContent = text;
+      button.setAttribute('aria-label', `${action} quantity for ${item.title}`);
+      return button;
+    };
+
+    const value = document.createElement('output');
+    value.className = 'prada-cart-drawer__quantity-value';
+    value.textContent = String(quantity);
+    value.setAttribute('aria-live', 'polite');
+
+    controls.append(createButton(-step, '−', 'Decrease'), value, createButton(step, '+', 'Increase'));
+    wrapper.append(label, controls);
+    return wrapper;
   }
 
   ensureCartRowsContainer() {
@@ -544,10 +693,7 @@ class CartDrawer extends HTMLElement {
       optionRow.textContent = `${option.name}: ${option.value}`;
       info.append(optionRow);
     });
-    const quantityRow = document.createElement('p');
-    quantityRow.className = 'prada-cart-drawer__quantity';
-    quantityRow.textContent = `Qty: ${quantity}`;
-    info.append(quantityRow);
+    info.append(this.createQuantityControl(item, quantity));
     if (item.price) {
       const price = document.createElement('p');
       price.className = 'prada-cart-drawer__price money';
@@ -565,6 +711,7 @@ class CartDrawer extends HTMLElement {
     info.append(removeWrap);
     details.append(info);
     row.append(media, details);
+    this.updateQuantityControlState(row);
     return row;
   }
 
@@ -585,8 +732,8 @@ class CartDrawer extends HTMLElement {
 
     const desktopHeading = this.querySelector('.drawer__inner > .drawer__header .prada-cart-drawer__heading-desktop');
     const mobileHeading = this.querySelector('.drawer__inner > .drawer__header .prada-cart-drawer__heading-mobile');
-    if (desktopHeading) desktopHeading.textContent = `Your selection (${count})`;
-    if (mobileHeading) mobileHeading.textContent = `Added to shopping bag (${count})`;
+    if (desktopHeading) desktopHeading.textContent = `Shopping bag (${count})`;
+    if (mobileHeading) mobileHeading.textContent = `Shopping bag (${count})`;
 
     const subtotal = this.querySelector('.drawer__inner > .drawer__footer .totals__total-value');
     if (subtotal) subtotal.textContent = this.formatMoney(total, subtotal.textContent);
@@ -605,8 +752,6 @@ class CartDrawer extends HTMLElement {
     );
     this.querySelector('.drawer__inner-empty')?.setAttribute('hidden', '');
     this.querySelector('cart-drawer-items')?.classList.remove('is-empty');
-    const checkout = this.querySelector('#CartDrawer-Checkout');
-    if (checkout) checkout.disabled = false;
     this.setDisplayedTotals(itemCount, totalPrice);
   }
 
@@ -615,8 +760,6 @@ class CartDrawer extends HTMLElement {
     const empty = this.querySelector('.drawer__inner-empty');
     empty?.removeAttribute('hidden');
     this.querySelector('cart-drawer-items')?.classList.add('is-empty');
-    const checkout = this.querySelector('#CartDrawer-Checkout');
-    if (checkout) checkout.disabled = true;
     this.classList.remove('prada-cart-drawer--multiple', 'is-empty-stable', 'is-empty-revealed');
     this.classList.add('is-empty');
 

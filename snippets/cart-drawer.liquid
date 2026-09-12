@@ -59,8 +59,8 @@
         </div>
       <div class="drawer__header">
         <h2 class="drawer__heading">
-          <span class="prada-cart-drawer__heading-desktop">Your selection ({{ cart.item_count }})</span>
-          <span class="prada-cart-drawer__heading-mobile">Added to shopping bag ({{ cart.item_count }})</span>
+          <span class="prada-cart-drawer__heading-desktop">Shopping bag ({{ cart.item_count }})</span>
+          <span class="prada-cart-drawer__heading-mobile">Shopping bag ({{ cart.item_count }})</span>
         </h2>
         <button
           class="drawer__close"
@@ -200,7 +200,60 @@
                                 {%- endunless -%}
                               {%- endfor -%}
                             {%- endunless -%}
-                            <p class="prada-cart-drawer__quantity">Qty: {{ item.quantity }}</p>
+                            <div class="prada-cart-drawer__quantity">
+                              <span class="prada-cart-drawer__quantity-label">Quantity</span>
+                              <div
+                                class="prada-cart-drawer__quantity-control"
+                                role="group"
+                                aria-label="Quantity for {{ item.product.title | escape }}"
+                              >
+                                <button
+                                  class="prada-cart-drawer__quantity-button"
+                                  type="button"
+                                  data-prada-quantity-change="-{{ item.variant.quantity_rule.increment | default: 1 }}"
+                                  data-prada-quantity-min="{{ item.variant.quantity_rule.min | default: 1 }}"
+                                  {% if item.variant.quantity_rule.max != null %}
+                                    data-prada-quantity-max="{{ item.variant.quantity_rule.max }}"
+                                  {% endif %}
+                                  aria-label="Decrease quantity for {{ item.product.title | escape }}"
+                                  {% if item.instructions and item.instructions.can_update_quantity == false %}
+                                    data-prada-quantity-locked="true"
+                                    disabled
+                                    aria-disabled="true"
+                                  {% elsif item.quantity <= item.variant.quantity_rule.min %}
+                                    disabled
+                                    aria-disabled="true"
+                                  {% else %}
+                                    aria-disabled="false"
+                                  {% endif %}
+                                >
+                                  &minus;
+                                </button>
+                                <output class="prada-cart-drawer__quantity-value" aria-live="polite">{{ item.quantity }}</output>
+                                <button
+                                  class="prada-cart-drawer__quantity-button"
+                                  type="button"
+                                  data-prada-quantity-change="{{ item.variant.quantity_rule.increment | default: 1 }}"
+                                  data-prada-quantity-min="{{ item.variant.quantity_rule.min | default: 1 }}"
+                                  {% if item.variant.quantity_rule.max != null %}
+                                    data-prada-quantity-max="{{ item.variant.quantity_rule.max }}"
+                                  {% endif %}
+                                  aria-label="Increase quantity for {{ item.product.title | escape }}"
+                                  {% if item.instructions and item.instructions.can_update_quantity == false %}
+                                    data-prada-quantity-locked="true"
+                                    disabled
+                                    aria-disabled="true"
+                                  {% elsif item.variant.quantity_rule.max != null and item.quantity >= item.variant.quantity_rule.max %}
+                                    disabled
+                                    aria-disabled="true"
+                                  {% else %}
+                                    aria-disabled="false"
+                                  {% endif %}
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
                             <p class="prada-cart-drawer__price money" data-currency-price>{{ item.final_price | money }}</p>
                             <cart-remove-button
                               class="prada-cart-drawer__remove-wrap"
@@ -631,19 +684,6 @@
 
         <div class="cart__ctas" {{ block.shopify_attributes }}>
           <a class="prada-cart-drawer__view-cart" href="{{ routes.cart_url }}">Go to shopping bag</a>
-          <button
-            type="submit"
-            id="CartDrawer-Checkout"
-            class="cart__checkout-button button"
-            name="checkout"
-            form="CartDrawer-Form"
-            data-prada-fast-checkout="{{ routes.root_url }}checkout"
-            {% if cart == empty %}
-              disabled
-            {% endif %}
-          >
-            Proceed to checkout
-          </button>
         </div>
       </div>
     </div>
