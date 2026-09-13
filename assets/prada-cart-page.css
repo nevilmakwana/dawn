@@ -2037,3 +2037,37 @@ cart-items.prada-shopping-bag-page.is-empty .cart__warnings .button {
     will-change: auto;
   }
 }
+
+/* Canonical /cart empty state: the cart section owns the message and the
+   checkout footer leaves the layout completely when no purchasable line is
+   left. These final rules intentionally win over the desktop summary layout. */
+cart-items.prada-shopping-bag-page.is-empty .cart__warnings {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+#main-cart-footer.is-empty,
+#main-cart-footer.is-empty .prada-shopping-bag-footer__contents,
+#main-cart-footer.is-empty [name='checkout'],
+#MainContent > .shopify-section:has(#main-cart-footer.is-empty) {
+  display: none !important;
+}
+
+@media screen and (min-width: 990px) {
+  #MainContent:has(cart-items.prada-shopping-bag-page.is-empty) {
+    display: block;
+    grid-template-columns: none;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: var(--header-height, 72px) 0 0 !important;
+    background: #ffffff;
+  }
+
+  #MainContent:has(cart-items.prada-shopping-bag-page.is-empty)
+    > .shopify-section:has(.prada-shopping-bag-page) {
+    width: 100%;
+    background: #ffffff;
+  }
+}

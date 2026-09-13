@@ -108,13 +108,21 @@ class CartRemoveButton extends HTMLElement {
         }
       });
 
+      const lineKey =
+        this.dataset.quantityLineKey ||
+        cartItem.dataset.cartLineKey ||
+        cartItem.querySelector('[data-quantity-line-key]')?.dataset.quantityLineKey;
+      const lineVariantId =
+        this.dataset.quantityVariantId ||
+        cartItem.dataset.cartVariantId ||
+        cartItem.querySelector('[data-quantity-variant-id]')?.dataset.quantityVariantId;
       const removeEvent = { currentTarget: this };
       // Start the AJAX removal on the very next frame. The CSS transition can
       // continue visually without holding the network request for 180ms.
       const removeDelay = 0;
       const removeFromCart = () => {
         cartItem.classList.add('is-collapsing');
-        cartItems.updateQuantity(this.dataset.index, 0, removeEvent);
+        cartItems.updateQuantity(this.dataset.index, 0, removeEvent, undefined, lineVariantId, lineKey);
       };
 
       window.requestAnimationFrame(() => {
@@ -303,12 +311,9 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
   }
 
   getSectionsToRender() {
-    return [
-      {
-        id: 'main-cart-items',
-        section: document.getElementById('main-cart-items').dataset.id,
-        selector: '.js-contents',
-      },
+    const mainCartItems = document.getElementById('main-cart-items');
+    const mainCartFooter = document.getElementById('main-cart-footer');
+    const sections = [
       {
         id: 'cart-icon-bubble',
         section: 'cart-icon-bubble',
@@ -319,15 +324,100 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
         section: 'cart-live-region-text',
         selector: '.shopify-section',
       },
-      {
-        id: 'main-cart-footer',
-        section: document.getElementById('main-cart-footer').dataset.id,
-        selector: '.js-contents',
-      },
     ];
+
+    // Shopify returns sections under their dynamic section IDs. Keep the
+    // stable DOM target separate from the key requested from /cart/change.js.
+    if (mainCartItems?.dataset.id) {
+      sections.unshift({
+        id: 'main-cart-items',
+        section: mainCartItems.dataset.id,
+        selector: '.js-contents',
+      });
+    }
+    if (mainCartFooter?.dataset.id) {
+      sections.push({
+        id: 'main-cart-footer',
+        section: mainCartFooter.dataset.id,
+        selector: '.js-contents',
+      });
+    }
+
+    return sections;
   }
 
-  updateQuantity(line, quantity, event, name, variantId) {
+  formatCartMoney(cents, referenceText = '') {
+    const locale = document.documentElement.lang || 'en-IN';
+    const currency = window.Shopify?.currency?.active || 'INR';
+    const number = new Intl.NumberFormat(locale, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(cents / 100);
+    const prefix = referenceText.trim().match(/^[^\d-]+/)?.[0]?.trim();
+    return prefix
+      ? `${prefix} ${number}`
+      : new Intl.NumberFormat(locale, { style: 'currency', currency }).format(cents / 100);
+  }
+
+  updateShoppingBagTotals(parsedState, { preserveProjectedEmpty = false } = {}) {
+    const footer = document.getElementById('main-cart-footer');
+    const moneyElements = footer?.querySelectorAll(
+      '.prada-shopping-bag-footer__mobile-totals .money, .prada-shopping-bag-footer__desktop-totals .money',
+    );
+    const referenceText = moneyElements?.[0]?.textContent || '';
+    const formattedTotal = this.formatCartMoney(parsedState.total_price, referenceText);
+    moneyElements?.forEach((money) => {
+      money.textContent = formattedTotal;
+    });
+
+    if (!preserveProjectedEmpty) {
+      document.querySelectorAll('[data-prada-shopping-bag-count]').forEach((count) => {
+        count.textContent = String(parsedState.item_count);
+      });
+      window.PradaCartHeader?.update?.(parsedState.item_count);
+    }
+  }
+
+  applyShoppingBagState(parsedState, { preserveProjectedEmpty = false } = {}) {
+    const shoppingBag = document.querySelector('cart-items.prada-shopping-bag-page');
+    const footer = document.getElementById('main-cart-footer');
+    if (!shoppingBag || preserveProjectedEmpty) return;
+
+    const isEmpty = parsedState.item_count === 0;
+    shoppingBag.classList.toggle('is-empty', isEmpty);
+    footer?.classList.toggle('is-empty', isEmpty);
+    footer?.toggleAttribute('hidden', isEmpty);
+    if (footer) {
+      if (isEmpty) footer.style.setProperty('display', 'none', 'important');
+      else footer.style.removeProperty('display');
+    }
+    shoppingBag.removeAttribute('data-prada-projected-empty');
+    const warnings = shoppingBag.querySelector('.cart__warnings');
+    if (isEmpty) warnings?.removeAttribute('hidden');
+    footer?.querySelectorAll('[name="checkout"]').forEach((button) => {
+      button.disabled = isEmpty;
+      button.setAttribute('aria-disabled', String(isEmpty));
+    });
+  }
+
+  commitShoppingBagRemoval(removeButton) {
+    const row = removeButton?.closest('.cart-item');
+    if (!row) return;
+
+    const startedAt = Number.parseFloat(row.dataset.pradaRemoveStartedAt || '0');
+    const elapsed = startedAt ? (window.performance?.now?.() || Date.now()) - startedAt : 180;
+    const remainingAnimation = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      ? 0
+      : Math.max(0, 180 - elapsed);
+
+    window.setTimeout(() => {
+      if (row.dataset.pradaRemovePending !== 'true') return;
+      row.remove();
+      removeButton.optimisticEmptyState = null;
+    }, remainingAnimation);
+  }
+
+  updateQuantity(line, quantity, event, name, variantId, lineKeyOverride) {
     const eventTarget = event.currentTarget instanceof CartRemoveButton ? 'clear' : 'change';
     const cartPerformanceUpdateMarker = CartPerformance.createStartingMarker(`${eventTarget}:user-action`);
 
@@ -339,7 +429,7 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
     const action = quantity === 0 ? 'remove' : 'update';
     const quantityInput = this.querySelector(`#Quantity-${line}`) || this.querySelector(`#Drawer-quantity-${line}`);
     const lineVariantId = variantId || quantityInput?.dataset.quantityVariantId;
-    const lineKey = quantityInput?.dataset.quantityLineKey;
+    const lineKey = lineKeyOverride || quantityInput?.dataset.quantityLineKey;
     const linesUpdateDeferred = this.createCartLinesUpdateEvent(action, lineVariantId, quantity, lineKey);
 
     // Cache sections before the fetch so we read dataset.id while elements still exist in the DOM
@@ -402,6 +492,15 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
           cartDrawerWrapper?.classList.contains('active') &&
           event.currentTarget instanceof CartRemoveButton
         );
+        const isShoppingBagRemoval = Boolean(
+          !parsedState.errors &&
+          quantity === 0 &&
+          this.matches('cart-items.prada-shopping-bag-page') &&
+          event.currentTarget instanceof CartRemoveButton
+        );
+        if (isShoppingBagRemoval) {
+          this.updateShoppingBagTotals(parsedState, { preserveProjectedEmpty });
+        }
         if (shouldRevealEmptyDrawer) {
           window.clearTimeout(cartDrawerWrapper.emptyTransitionTimer);
           cartDrawerWrapper.classList.remove('is-empty-entering', 'is-empty-visible');
@@ -451,6 +550,13 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
 
           sectionsToRender.forEach((section) => {
             const sectionElement = document.getElementById(section.id);
+
+            // A shopping-bag removal is already represented by its optimistic
+            // row transition. Replacing either section would reload every
+            // product image and destroy controls for queued rapid removals.
+            if (isShoppingBagRemoval && (section.id === 'main-cart-items' || section.id === 'main-cart-footer')) {
+              return;
+            }
 
             // Keep the custom header cart button intact when cart page sections refresh.
             if (section.id === 'cart-icon-bubble' && sectionElement?.classList.contains('prada-header-btn--cart')) {
@@ -523,6 +629,13 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
               section.selector
             );
           });
+
+          if (isShoppingBagRemoval) {
+            // Re-assert the canonical empty/populated state only after all
+            // safe section patches are complete, then discard just this row.
+            this.applyShoppingBagState(parsedState, { preserveProjectedEmpty });
+            this.commitShoppingBagRemoval(event.currentTarget);
+          }
 
           if (shouldRevealEmptyDrawer) {
             window.requestAnimationFrame(() => {

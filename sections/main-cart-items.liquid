@@ -107,6 +107,8 @@
                   <tr
                     class="cart-item {% if item.parent_relationship.parent != null %}cart-item__nested-line{% endif %}"
                     id="CartItem-{{ item.index | plus: 1 }}"
+                    data-cart-line-key="{{ item.key | escape }}"
+                    data-cart-variant-id="{{ item.variant.id }}"
                     {% if item.parent_relationship.parent != null %}
                       aria-label="{{- 'products.product.nested_label' | t: title: item.product.title, parent_title: item.parent_relationship.parent.title | escape -}}"
                     {% endif %}
@@ -329,6 +331,8 @@
                           <cart-remove-button
                             id="Remove-{{ item.index | plus: 1 }}"
                             data-index="{{ item.index | plus: 1 }}"
+                            data-quantity-line-key="{{ item.key | escape }}"
+                            data-quantity-variant-id="{{ item.variant.id }}"
                             {% assign can_remove = item.instructions.can_remove | default: true %}
                             {% if can_remove == false %}
                               class="hidden"
@@ -450,6 +454,8 @@
                         <cart-remove-button
                           class="prada-shopping-bag-page__remove"
                           data-index="{{ item.index | plus: 1 }}"
+                          data-quantity-line-key="{{ item.key | escape }}"
+                          data-quantity-variant-id="{{ item.variant.id }}"
                         >
                           <button
                             type="button"
