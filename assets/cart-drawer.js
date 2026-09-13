@@ -403,10 +403,25 @@ class CartDrawer extends HTMLElement {
   animateRowRemoval(row, isLastItem) {
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const duration = reducedMotion ? 0 : PRADA_CART_ROW_TRANSITION_DURATION;
-    const stagesMobileEmptyState = Boolean(isLastItem && window.matchMedia('(max-width: 989px)').matches);
-    row.style.maxHeight = `${row.offsetHeight}px`;
-    row.style.overflow = 'hidden';
-    row.getBoundingClientRect();
+    const isMobile = window.matchMedia('(max-width: 989px)').matches;
+    const stagesMobileEmptyState = Boolean(isLastItem && isMobile);
+    const scroller = isMobile ? row.closest('cart-drawer-items') : null;
+    const carouselRows = scroller
+      ? [...row.parentElement.querySelectorAll('.cart-item')].filter(
+          (item) => item === row || item.dataset.cartRemovePending !== 'true',
+        )
+      : [];
+    const removedIndex = carouselRows.indexOf(row);
+
+    if (scroller) {
+      // Keep every slide's width intact while it fades. Collapsing a flex item
+      // inside a snap container makes mobile browsers fling the scroll position.
+      scroller.classList.add('is-repositioning');
+    } else {
+      row.style.maxHeight = `${row.offsetHeight}px`;
+      row.style.overflow = 'hidden';
+      row.getBoundingClientRect();
+    }
 
     if (stagesMobileEmptyState) {
       this.querySelector('.drawer__inner-empty')?.removeAttribute('hidden');
@@ -415,7 +430,8 @@ class CartDrawer extends HTMLElement {
       this.showEmptyState({ animate: true });
     }
     window.requestAnimationFrame(() => {
-      row.classList.add('is-removing', 'is-collapsing');
+      row.classList.add('is-removing');
+      if (!scroller) row.classList.add('is-collapsing');
       if (stagesMobileEmptyState && this.classList.contains('is-empty-pending')) {
         this.classList.add('is-empty-revealed');
       }
@@ -425,6 +441,18 @@ class CartDrawer extends HTMLElement {
       if (row.dataset.cartRemovePending !== 'true') return;
       row.remove();
       this.updateMultipleLayout();
+      if (scroller && !isLastItem) {
+        const remainingRows = [...scroller.querySelectorAll('.cart-item:not([data-cart-remove-pending="true"])')];
+        const targetIndex = Math.min(Math.max(removedIndex, 0), remainingRows.length - 1);
+        const firstRowLeft = remainingRows[0]?.offsetLeft || 0;
+        const targetRowLeft = remainingRows[targetIndex]?.offsetLeft || firstRowLeft;
+        scroller.scrollLeft = Math.max(0, targetRowLeft - firstRowLeft);
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => scroller.classList.remove('is-repositioning'));
+        });
+      } else {
+        scroller?.classList.remove('is-repositioning');
+      }
       if (stagesMobileEmptyState) {
         this.classList.remove('is-empty-pending');
         this.showEmptyState({ animate: false });
