@@ -1,5 +1,5 @@
 const PRADA_CART_DRAWER_TRANSITION_DURATION = 260;
-const PRADA_CART_ROW_TRANSITION_DURATION = 180;
+const PRADA_CART_ROW_TRANSITION_DURATION = 220;
 
 const updatePradaCartIcon = (itemCount) => {
   const safeCount = Math.max(0, Number.parseInt(itemCount || '0', 10) || 0);
@@ -64,6 +64,7 @@ class CartDrawer extends HTMLElement {
     this.deferredCanonicalState = null;
     this.refreshTimer = null;
     this.refreshPromise = null;
+    this.reconcileTimer = null;
 
     this.addEventListener('keyup', (event) => event.code === 'Escape' && this.close());
     this.addEventListener('click', (event) => this.handleDrawerClick(event), true);
@@ -171,10 +172,9 @@ class CartDrawer extends HTMLElement {
       this.classList.remove('is-opening');
       if (!this.classList.contains('active')) return;
 
-      const focusContainer = this.classList.contains('is-empty')
-        ? this.querySelector('.drawer__inner-empty')
-        : this.querySelector('#CartDrawer');
-      const focusElement = this.querySelector('.drawer__inner') || this.querySelector('.drawer__close');
+      const focusContainer = this.querySelector('.drawer__inner');
+      const focusElement =
+        this.querySelector('.drawer__inner > .drawer__header .drawer__close') || this.querySelector('.drawer__close');
       if (focusContainer && focusElement) trapFocus(focusContainer, focusElement);
     }, PRADA_CART_DRAWER_TRANSITION_DURATION);
 
@@ -338,6 +338,7 @@ class CartDrawer extends HTMLElement {
     const nextSibling = row.nextElementSibling;
 
     row.dataset.cartRemovePending = 'true';
+    this.setDrawerBusy(true);
     row.querySelectorAll('button, a').forEach((control) => {
       control.setAttribute('aria-disabled', 'true');
       if ('disabled' in control) control.disabled = true;
@@ -371,7 +372,11 @@ class CartDrawer extends HTMLElement {
       .then((cart) => {
         if (actionRevision === this.revision) {
           this.setDisplayedTotals(cart.item_count, cart.total_price);
-          if (cart.item_count === 0 && !this.classList.contains('is-empty')) {
+          if (
+            cart.item_count === 0 &&
+            !this.classList.contains('is-empty') &&
+            !this.classList.contains('is-empty-pending')
+          ) {
             this.showEmptyState({ animate: false });
           }
         }
@@ -384,33 +389,52 @@ class CartDrawer extends HTMLElement {
         }
         this.showCartError(error?.message || window.cartStrings?.error || 'Cart update failed');
         this.requestCanonicalRefresh();
+      })
+      .finally(() => {
+        const clearBusy = () => this.setDrawerBusy(false);
+        if (window.PradaCartMutations?.pending) {
+          window.PradaCartMutations.whenIdle().then(clearBusy);
+        } else {
+          clearBusy();
+        }
       });
   }
 
   animateRowRemoval(row, isLastItem) {
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const duration = reducedMotion ? 0 : PRADA_CART_ROW_TRANSITION_DURATION;
-    const isHorizontal = Boolean(
-      window.matchMedia('(max-width: 989px)').matches && row.closest('.prada-cart-drawer__items--multiple'),
-    );
-
-    if (isHorizontal) {
-      row.classList.add('is-horizontal-removal');
-      row.style.width = `${row.offsetWidth}px`;
-      row.style.maxWidth = `${row.offsetWidth}px`;
-      row.style.flexBasis = `${row.offsetWidth}px`;
-    } else {
-      row.style.maxHeight = `${row.offsetHeight}px`;
-    }
+    const stagesMobileEmptyState = Boolean(isLastItem && window.matchMedia('(max-width: 989px)').matches);
+    row.style.maxHeight = `${row.offsetHeight}px`;
     row.style.overflow = 'hidden';
     row.getBoundingClientRect();
 
-    window.requestAnimationFrame(() => row.classList.add('is-removing', 'is-collapsing'));
-    if (isLastItem) this.showEmptyState({ animate: true });
+    if (stagesMobileEmptyState) {
+      this.querySelector('.drawer__inner-empty')?.removeAttribute('hidden');
+      this.classList.add('is-empty-pending');
+    } else if (isLastItem) {
+      this.showEmptyState({ animate: true });
+    }
+    window.requestAnimationFrame(() => {
+      row.classList.add('is-removing', 'is-collapsing');
+      if (stagesMobileEmptyState && this.classList.contains('is-empty-pending')) {
+        this.classList.add('is-empty-revealed');
+      }
+    });
 
     window.setTimeout(() => {
+      if (row.dataset.cartRemovePending !== 'true') return;
       row.remove();
       this.updateMultipleLayout();
+      if (stagesMobileEmptyState) {
+        this.classList.remove('is-empty-pending');
+        this.showEmptyState({ animate: false });
+      }
+      if (this.classList.contains('active')) {
+        const focusTarget = isLastItem
+          ? this.querySelector('.drawer__inner > .drawer__header .drawer__close')
+          : this.querySelector('.cart-item:not([data-cart-remove-pending="true"]) .prada-cart-drawer__remove');
+        focusTarget?.focus({ preventScroll: true });
+      }
     }, duration);
   }
 
@@ -596,6 +620,7 @@ class CartDrawer extends HTMLElement {
     window.clearTimeout(this.emptyTimer);
     this.classList.remove(
       'is-empty',
+      'is-empty-pending',
       'is-empty-stable',
       'is-empty-transitioning',
       'is-empty-revealed',
@@ -617,7 +642,12 @@ class CartDrawer extends HTMLElement {
     this.querySelector('cart-drawer-items')?.classList.add('is-empty');
     const checkout = this.querySelector('#CartDrawer-Checkout');
     if (checkout) checkout.disabled = true;
-    this.classList.remove('prada-cart-drawer--multiple', 'is-empty-stable', 'is-empty-revealed');
+    this.classList.remove(
+      'prada-cart-drawer--multiple',
+      'is-empty-pending',
+      'is-empty-stable',
+      'is-empty-revealed',
+    );
     this.classList.add('is-empty');
 
     if (!animate || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
@@ -637,12 +667,22 @@ class CartDrawer extends HTMLElement {
   }
 
   updateMultipleLayout() {
-    const visibleRows = [...this.querySelectorAll('#CartDrawer-CartItems .cart-item')].filter(
-      (row) => row.dataset.cartRemovePending !== 'true',
-    );
-    const multiple = visibleRows.length > 1;
-    this.classList.toggle('prada-cart-drawer--multiple', multiple);
-    this.querySelector('.prada-cart-drawer__items')?.classList.toggle('prada-cart-drawer__items--multiple', multiple);
+    // One vertical mobile layout is used for every cart size. Removing the
+    // legacy mode classes also normalizes stale section HTML already in cache.
+    this.classList.remove('prada-cart-drawer--multiple');
+    this.querySelector('.prada-cart-drawer__items')?.classList.remove('prada-cart-drawer__items--multiple');
+  }
+
+  setDrawerBusy(isBusy) {
+    const inner = this.querySelector('.drawer__inner');
+    const items = this.querySelector('cart-drawer-items');
+    if (isBusy) {
+      inner?.setAttribute('aria-busy', 'true');
+      items?.setAttribute('aria-busy', 'true');
+      return;
+    }
+    inner?.removeAttribute('aria-busy');
+    items?.removeAttribute('aria-busy');
   }
 
   formatMoney(cents, referenceText = '') {
@@ -709,6 +749,14 @@ class CartDrawer extends HTMLElement {
 
   flushDeferredCanonicalSection() {
     if (!this.deferredCanonicalState || window.PradaCartMutations?.pending) return false;
+    if (this.querySelector('.cart-item.is-removing, .cart-item.is-collapsing')) {
+      window.clearTimeout(this.reconcileTimer);
+      this.reconcileTimer = window.setTimeout(
+        () => this.flushDeferredCanonicalSection(),
+        PRADA_CART_ROW_TRANSITION_DURATION + 20,
+      );
+      return false;
+    }
     const state = this.deferredCanonicalState;
     this.deferredCanonicalState = null;
     this.applyCanonicalSection(state.sections['cart-drawer']);
@@ -733,7 +781,8 @@ class CartDrawer extends HTMLElement {
     );
     this.classList.toggle('is-empty', sourceDrawer.classList.contains('is-empty'));
     this.classList.toggle('is-empty-stable', sourceDrawer.classList.contains('is-empty'));
-    this.classList.toggle('prada-cart-drawer--multiple', sourceDrawer.classList.contains('prada-cart-drawer--multiple'));
+    this.classList.remove('prada-cart-drawer--multiple');
+    this.querySelector('.prada-cart-drawer__items')?.classList.remove('prada-cart-drawer__items--multiple');
     updatePradaCartIcon(this.dataset.cartItemCount);
     return true;
   }

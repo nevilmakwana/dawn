@@ -22,7 +22,7 @@
 </style>
 
 <cart-drawer
-  class="drawer prada-cart-drawer{% if cart == empty %} is-empty{% endif %}{% if cart.items.size > 1 %} prada-cart-drawer--multiple{% endif %}"
+  class="drawer prada-cart-drawer{% if cart == empty %} is-empty{% endif %}"
   data-cart-item-count="{{ cart.item_count }}"
   data-cart-total-price="{{ cart.total_price }}"
 >
@@ -90,7 +90,7 @@
             {%- if cart != empty -%}
               <div class="drawer__cart-items-wrapper">
                 <table
-                  class="cart-items prada-cart-drawer__items{% if cart.items.size > 1 %} prada-cart-drawer__items--multiple{% endif %}"
+                  class="cart-items prada-cart-drawer__items"
                   role="table"
                 >
                   <thead role="rowgroup">

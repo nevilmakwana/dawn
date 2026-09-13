@@ -14,42 +14,26 @@
 cart-drawer.prada-cart-drawer .cart-item {
   transition:
     opacity 180ms ease,
-    transform 180ms ease,
-    max-height 180ms ease,
-    min-height 180ms ease,
-    padding-top 180ms ease,
-    padding-bottom 180ms ease,
-    border-color 180ms ease,
-    width 180ms ease,
-    max-width 180ms ease,
-    flex-basis 180ms ease,
-    padding-left 180ms ease,
-    padding-right 180ms ease;
-  transform-origin: center;
-  will-change: opacity, transform;
+    max-height 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    min-height 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 160ms ease;
 }
 
 cart-drawer.prada-cart-drawer .cart-item.is-removing {
   opacity: 0;
-  transform: scale(0.98);
   pointer-events: none;
 }
 
-cart-drawer.prada-cart-drawer .cart-item.is-collapsing:not(.is-horizontal-removal) {
+cart-drawer.prada-cart-drawer .cart-item.is-collapsing {
   max-height: 0 !important;
   min-height: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   border-color: transparent;
-}
-
-cart-drawer.prada-cart-drawer .cart-item.is-horizontal-removal.is-collapsing {
-  width: 0 !important;
-  min-width: 0 !important;
-  max-width: 0 !important;
-  flex-basis: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -828,7 +812,8 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     right: 20px;
   }
 
-  cart-drawer.prada-cart-drawer.is-empty .prada-cart-drawer__empty-message {
+  cart-drawer.prada-cart-drawer.is-empty .prada-cart-drawer__empty-message,
+  cart-drawer.prada-cart-drawer.is-empty-pending .prada-cart-drawer__empty-message {
     margin: 0 0 30px;
     color: #111111;
     font-size: 15px;
@@ -836,7 +821,8 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     line-height: 1.35;
   }
 
-  cart-drawer.prada-cart-drawer.is-empty .prada-cart-drawer__empty-login {
+  cart-drawer.prada-cart-drawer.is-empty .prada-cart-drawer__empty-login,
+  cart-drawer.prada-cart-drawer.is-empty-pending .prada-cart-drawer__empty-login {
     color: #111111;
     font-size: 14px;
     font-weight: 500;
@@ -937,8 +923,9 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     display: inline;
   }
 
-  cart-drawer.prada-cart-drawer:not(.is-empty) .drawer__inner {
+  cart-drawer.prada-cart-drawer .drawer__inner {
     display: flex;
+    flex-direction: column;
     position: fixed;
     right: 0;
     bottom: 0;
@@ -952,29 +939,29 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     background: #ffffff;
     color: #111111;
     transform: translate3d(0, 105%, 0) !important;
-    transition:
-      transform var(--prada-cart-drawer-slide-duration) var(--prada-cart-drawer-slide-in-ease),
-      height 360ms var(--prada-cart-drawer-slide-in-ease) !important;
+    transition: transform var(--prada-cart-drawer-slide-duration) var(--prada-cart-drawer-slide-in-ease) !important;
   }
 
-  cart-drawer.prada-cart-drawer:not(.is-empty).active .drawer__inner {
+  cart-drawer.prada-cart-drawer.active .drawer__inner {
     transform: translate3d(0, 0, 0) !important;
   }
 
-  cart-drawer.prada-cart-drawer:not(.is-empty).is-closing .drawer__inner {
-    transition:
-      transform var(--prada-cart-drawer-slide-duration) var(--prada-cart-drawer-slide-out-ease),
-      height 300ms var(--prada-cart-drawer-slide-out-ease) !important;
+  cart-drawer.prada-cart-drawer.is-closing .drawer__inner {
+    transition: transform var(--prada-cart-drawer-slide-duration) var(--prada-cart-drawer-slide-out-ease) !important;
   }
 
-  cart-drawer.prada-cart-drawer:not(.is-empty) .drawer__header {
+  cart-drawer.prada-cart-drawer .drawer__header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
     flex: 0 0 54px;
     min-height: 54px;
     padding: 0 15px;
     border-bottom: 0;
+    background: #ffffff;
   }
 
-  cart-drawer.prada-cart-drawer:not(.is-empty) .drawer__heading {
+  cart-drawer.prada-cart-drawer .drawer__heading {
     margin: 0;
     color: #111111;
     font-size: 14px;
@@ -982,7 +969,7 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     line-height: 1.2;
   }
 
-  cart-drawer.prada-cart-drawer:not(.is-empty) .drawer__close {
+  cart-drawer.prada-cart-drawer .drawer__header .drawer__close {
     position: static;
     display: grid;
     width: 36px;
@@ -993,26 +980,24 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     place-items: center;
   }
 
-  cart-drawer.prada-cart-drawer:not(.is-empty) .drawer__close .svg-wrapper {
+  cart-drawer.prada-cart-drawer .drawer__header .drawer__close .svg-wrapper {
     width: 19px;
     height: 19px;
   }
 
   cart-drawer.prada-cart-drawer:not(.is-empty) cart-drawer-items {
     min-height: 0;
+    max-height: calc(100dvh - 280px);
     padding: 0 20px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    scroll-behavior: smooth;
-    scroll-padding-inline: 20px;
-    scroll-snap-type: x mandatory;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
+    overscroll-behavior-y: contain;
   }
 
   cart-drawer.prada-cart-drawer:not(.is-empty) cart-drawer-items::-webkit-scrollbar {
-    display: none;
+    width: 3px;
   }
 
   cart-drawer.prada-cart-drawer:not(.is-empty) .cart-drawer__form,
@@ -1214,114 +1199,10 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     color: #ffffff;
   }
 
-  cart-drawer.prada-cart-drawer:not(.is-empty).prada-cart-drawer--multiple .drawer__inner {
-    height: clamp(429px, 45.65dvh, 462px);
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty).prada-cart-drawer--multiple .drawer__cart-items-wrapper {
-    padding-bottom: 0;
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty).prada-cart-drawer--multiple cart-drawer-items,
-  cart-drawer.prada-cart-drawer:not(.is-empty):has(.prada-cart-drawer__items--multiple) cart-drawer-items {
-    padding-inline: 0;
-    scroll-padding-inline: 0;
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__items--multiple {
-    display: block;
-    width: max-content;
-    min-width: 100vw;
-    border-collapse: collapse;
-    border-spacing: 0;
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__items--multiple tbody {
-    display: flex;
-    width: max-content;
-    gap: 0;
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__items--multiple .cart-item {
-    display: grid;
-    grid-template: minmax(156px, auto) auto / 124px minmax(0, 1fr);
-    box-sizing: border-box;
-    flex: 0 0 100vw;
-    width: 100vw;
-    gap: 0 14px;
-    min-height: 156px;
-    margin: 0;
-    padding: 0 20px 16px;
-    border: 0;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__items--multiple .cart-item__media {
-    grid-column: 1;
-    grid-row: 1 / span 2;
-    width: 124px;
-    height: 156px;
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__items--multiple .cart-item__image {
-    display: block;
-    width: 100%;
-    height: 156px;
-    max-width: none;
-    object-fit: cover;
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__items--multiple .cart-item__details {
-    grid-column: 2;
-    grid-row: 1;
-    width: auto;
-    margin-top: 0;
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__items--multiple .cart-item__title {
-    margin: 0;
-    font-size: 12px;
-    line-height: 1.35;
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__items--multiple .cart-item__name {
-    font-size: 12px;
-    line-height: 1.35;
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__items--multiple .cart-item__disclosure {
-    display: none;
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__items--multiple .prada-cart-drawer__item-info {
-    margin-top: 5px;
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__items--multiple .prada-cart-drawer__option,
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__items--multiple .prada-cart-drawer__quantity {
-    margin: 0 0 6px;
-    font-size: 12px;
-    line-height: 1.35;
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__items--multiple .prada-cart-drawer__quantity {
-    margin-top: 3px;
-    margin-bottom: 2px;
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__items--multiple .prada-cart-drawer__price {
-    margin: 4px 0 22px;
-    font-size: 14px;
-    line-height: 1.35;
-  }
-
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__items--multiple .prada-cart-drawer__remove {
-    font-size: 12px;
-  }
-
   cart-drawer.prada-cart-drawer.is-empty .drawer__inner {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     position: fixed;
     right: 0;
     bottom: 0;
@@ -1329,15 +1210,13 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     z-index: 1;
     width: 100%;
     max-width: none;
-    height: clamp(220px, 30dvh, 280px);
+    height: clamp(429px, 45.65dvh, 462px);
     padding: 0;
     border: 0;
     background: #ffffff;
     color: #111111;
     transform: translate3d(0, 105%, 0) !important;
-    transition:
-      transform var(--prada-cart-drawer-slide-duration) var(--prada-cart-drawer-slide-in-ease),
-      height 360ms var(--prada-cart-drawer-slide-in-ease) !important;
+    transition: transform var(--prada-cart-drawer-slide-duration) var(--prada-cart-drawer-slide-in-ease) !important;
   }
 
   cart-drawer.prada-cart-drawer.is-empty.active .drawer__inner {
@@ -1345,67 +1224,63 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
   }
 
   cart-drawer.prada-cart-drawer.is-empty.is-closing .drawer__inner {
-    transition:
-      transform var(--prada-cart-drawer-slide-duration) var(--prada-cart-drawer-slide-out-ease),
-      height 300ms var(--prada-cart-drawer-slide-out-ease) !important;
-  }
-
-  /* Once the empty-state morph completes, lock the final height so later
-     server reconciliation cannot move the centered message. */
-  cart-drawer.prada-cart-drawer.is-empty.is-empty-stable:not(.is-closing) .drawer__inner {
-    transition: transform var(--prada-cart-drawer-slide-duration) var(--prada-cart-drawer-slide-in-ease) !important;
+    transition: transform var(--prada-cart-drawer-slide-duration) var(--prada-cart-drawer-slide-out-ease) !important;
   }
 
   cart-drawer.prada-cart-drawer.is-empty.is-empty-transitioning:not(.is-closing) .drawer__inner {
-    transition:
-      transform var(--prada-cart-drawer-slide-duration) var(--prada-cart-drawer-slide-in-ease),
-      height 300ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+    transition: transform var(--prada-cart-drawer-slide-duration) var(--prada-cart-drawer-slide-in-ease) !important;
   }
 
-  cart-drawer.prada-cart-drawer.is-empty-transitioning .drawer__inner > .drawer__header,
   cart-drawer.prada-cart-drawer.is-empty-transitioning .drawer__inner > cart-drawer-items,
-  cart-drawer.prada-cart-drawer.is-empty-transitioning .drawer__inner > .drawer__footer {
+  cart-drawer.prada-cart-drawer.is-empty-transitioning .drawer__inner > .drawer__footer,
+  cart-drawer.prada-cart-drawer.is-empty-pending .drawer__inner > cart-drawer-items,
+  cart-drawer.prada-cart-drawer.is-empty-pending .drawer__inner > .drawer__footer {
     display: block !important;
     opacity: 0;
-    transform: translate3d(0, -6px, 0);
     pointer-events: none;
-    transition:
-      opacity 140ms ease,
-      transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition: opacity 160ms ease;
   }
 
-  cart-drawer.prada-cart-drawer.is-empty-transitioning .drawer__inner > .drawer__header {
+  cart-drawer.prada-cart-drawer.is-empty .drawer__inner > .drawer__header {
     display: flex !important;
+    opacity: 1;
+    pointer-events: auto;
   }
 
-  cart-drawer.prada-cart-drawer.is-empty-transitioning .drawer__inner-empty {
+  cart-drawer.prada-cart-drawer.is-empty .drawer__inner-empty,
+  cart-drawer.prada-cart-drawer.is-empty-pending .drawer__inner-empty {
     position: absolute;
+    top: 54px;
     right: 0;
     bottom: 0;
     left: 0;
     z-index: 6;
-    height: clamp(220px, 30dvh, 280px);
+    width: 100%;
+    height: auto;
     min-height: 0;
+    padding: 0;
+    contain: layout paint;
+  }
+
+  cart-drawer.prada-cart-drawer.is-empty .drawer__inner-empty {
+    opacity: 1;
+  }
+
+  cart-drawer.prada-cart-drawer.is-empty-transitioning .drawer__inner-empty,
+  cart-drawer.prada-cart-drawer.is-empty-pending .drawer__inner-empty {
     opacity: 0;
     pointer-events: none;
     transition: opacity 180ms ease;
   }
 
-  cart-drawer.prada-cart-drawer.is-empty-transitioning.is-empty-revealed .drawer__inner-empty {
+  cart-drawer.prada-cart-drawer.is-empty-transitioning.is-empty-revealed .drawer__inner-empty,
+  cart-drawer.prada-cart-drawer.is-empty-pending.is-empty-revealed .drawer__inner-empty {
     opacity: 1;
     pointer-events: auto;
   }
 
-  cart-drawer.prada-cart-drawer.is-empty .drawer__inner-empty {
-    height: 100%;
-    padding: 0;
-  }
-
-  cart-drawer.prada-cart-drawer.is-empty-entering .drawer__inner-empty .drawer__close {
-    transition-delay: 360ms;
-  }
-
-  cart-drawer.prada-cart-drawer.is-empty .cart-drawer__warnings {
+  cart-drawer.prada-cart-drawer.is-empty .cart-drawer__warnings,
+  cart-drawer.prada-cart-drawer.is-empty-pending .cart-drawer__warnings {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1413,7 +1288,8 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     height: 100%;
   }
 
-  cart-drawer.prada-cart-drawer.is-empty .prada-cart-drawer__empty-content {
+  cart-drawer.prada-cart-drawer.is-empty .prada-cart-drawer__empty-content,
+  cart-drawer.prada-cart-drawer.is-empty-pending .prada-cart-drawer__empty-content {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1421,23 +1297,14 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     text-align: center;
   }
 
-  cart-drawer.prada-cart-drawer.is-empty .drawer__inner-empty .drawer__close {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    display: grid;
-    width: 36px;
-    min-width: 36px;
-    height: 36px;
-    min-height: 36px;
-    padding: 0;
-    place-items: center;
+  cart-drawer.prada-cart-drawer.is-empty .drawer__inner-empty .drawer__close,
+  cart-drawer.prada-cart-drawer.is-empty-pending .drawer__inner-empty .drawer__close {
+    display: none !important;
   }
 
   @media (prefers-reduced-motion: reduce) {
     cart-drawer.prada-cart-drawer.is-empty.is-empty-transitioning .drawer__inner,
     cart-drawer.prada-cart-drawer.is-empty-transitioning .drawer__inner-empty,
-    cart-drawer.prada-cart-drawer.is-empty-transitioning .drawer__inner > .drawer__header,
     cart-drawer.prada-cart-drawer.is-empty-transitioning .drawer__inner > cart-drawer-items,
     cart-drawer.prada-cart-drawer.is-empty-transitioning .drawer__inner > .drawer__footer {
       transition: none !important;
@@ -1449,7 +1316,8 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     height: 19px;
   }
 
-  cart-drawer.prada-cart-drawer.is-empty .prada-cart-drawer__empty-message {
+  cart-drawer.prada-cart-drawer.is-empty .prada-cart-drawer__empty-message,
+  cart-drawer.prada-cart-drawer.is-empty-pending .prada-cart-drawer__empty-message {
     margin: 0 0 28px;
     color: #111111;
     font-size: 15px;
@@ -1457,7 +1325,8 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     line-height: 1.35;
   }
 
-  cart-drawer.prada-cart-drawer.is-empty .prada-cart-drawer__empty-login {
+  cart-drawer.prada-cart-drawer.is-empty .prada-cart-drawer__empty-login,
+  cart-drawer.prada-cart-drawer.is-empty-pending .prada-cart-drawer__empty-login {
     color: #111111;
     font-size: 14px;
     font-weight: 500;
@@ -1467,14 +1336,15 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
   }
 }
 
-/* Keep the empty shell in one coordinate system before, during and after the
-   last-item morph. Switching from absolute to normal flow after reconciliation
-   caused the centered message to move by a few pixels on mobile WebKit. */
-cart-drawer.prada-cart-drawer.is-empty .drawer__inner-empty {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  contain: layout paint;
+@media screen and (min-width: 990px) {
+  /* Desktop keeps the empty shell mounted in one coordinate system while the
+     open drawer waits to apply its deferred canonical section. */
+  cart-drawer.prada-cart-drawer.is-empty .drawer__inner-empty {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    contain: layout paint;
+  }
 }

@@ -94,20 +94,7 @@ class CartRemoveButton extends HTMLElement {
       ).length === 1;
       cartItem.dataset.pradaRemovePending = 'true';
 
-      const isHorizontalDrawerItem = Boolean(
-        isCartDrawerItem &&
-        window.matchMedia('(max-width: 989px)').matches &&
-        cartItem.closest('.prada-cart-drawer__items--multiple')
-      );
-
-      if (isHorizontalDrawerItem) {
-        cartItem.classList.add('is-horizontal-removal');
-        cartItem.style.width = `${cartItem.offsetWidth}px`;
-        cartItem.style.maxWidth = `${cartItem.offsetWidth}px`;
-        cartItem.style.flexBasis = `${cartItem.offsetWidth}px`;
-      } else {
-        cartItem.style.maxHeight = `${cartItem.offsetHeight}px`;
-      }
+      cartItem.style.maxHeight = `${cartItem.offsetHeight}px`;
       cartItem.style.overflow = 'hidden';
       cartItem.dataset.pradaRemoveStartedAt = String(window.performance?.now?.() || 0);
       cartItem.getBoundingClientRect();
@@ -453,7 +440,7 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
               parsedState.item_count === 0 && !cartDrawerWrapper.classList.contains('is-empty-transitioning')
             );
             cartDrawerWrapper.classList.remove('is-empty-leaving');
-            cartDrawerWrapper.classList.toggle('prada-cart-drawer--multiple', parsedState.items.length > 1);
+            cartDrawerWrapper.classList.remove('prada-cart-drawer--multiple');
             window.PradaCartHeader?.update?.(parsedState.item_count);
           }
           if (!preserveProjectedEmpty) {
