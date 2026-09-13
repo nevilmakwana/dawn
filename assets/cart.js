@@ -413,8 +413,49 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
     window.setTimeout(() => {
       if (row.dataset.pradaRemovePending !== 'true') return;
       row.remove();
+      this.reindexShoppingBagRows();
       removeButton.optimisticEmptyState = null;
     }, remainingAnimation);
+  }
+
+  reindexShoppingBagRows() {
+    if (!this.matches('cart-items.prada-shopping-bag-page')) return;
+
+    this.querySelectorAll('.cart-item').forEach((row, offset) => {
+      const index = offset + 1;
+      row.id = `CartItem-${index}`;
+      row.dataset.index = String(index);
+
+      const quantityInput = row.querySelector('.quantity__input[data-quantity-line-key]');
+      if (quantityInput) {
+        quantityInput.id = `Quantity-${index}`;
+        quantityInput.dataset.index = String(index);
+      }
+      const quantityLabel = row.querySelector('label[for^="Quantity-"]');
+      if (quantityLabel) quantityLabel.htmlFor = `Quantity-${index}`;
+
+      row.querySelectorAll('cart-remove-button').forEach((button) => {
+        button.dataset.index = String(index);
+        if (button.id) button.id = `Remove-${index}`;
+      });
+
+      const error = row.querySelector('.cart-item__error[id^="Line-item-error-"]');
+      if (error) error.id = `Line-item-error-${index}`;
+
+      const editData = row.querySelector('script[id^="PradaCartEditData-"]');
+      const editButton = row.querySelector('[data-prada-cart-edit]');
+      if (editData) {
+        editData.id = `PradaCartEditData-${index}`;
+        try {
+          const data = JSON.parse(editData.textContent);
+          data.line = index;
+          editData.textContent = JSON.stringify(data);
+        } catch (error) {
+          console.error('Unable to re-index cart editor data.', error);
+        }
+      }
+      if (editButton) editButton.dataset.pradaCartEditData = `PradaCartEditData-${index}`;
+    });
   }
 
   updateQuantity(line, quantity, event, name, variantId, lineKeyOverride) {
@@ -430,13 +471,25 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
     const quantityInput = this.querySelector(`#Quantity-${line}`) || this.querySelector(`#Drawer-quantity-${line}`);
     const lineVariantId = variantId || quantityInput?.dataset.quantityVariantId;
     const lineKey = lineKeyOverride || quantityInput?.dataset.quantityLineKey;
+
+    if (quantity === 0 && !lineKey) {
+      const message = 'Cannot remove cart item without a valid line key';
+      console.error(message);
+      if (event.currentTarget instanceof CartRemoveButton) event.currentTarget.restoreRemovingState();
+      const errors = document.getElementById('cart-errors') || document.getElementById('CartDrawer-CartErrors');
+      if (errors) errors.textContent = window.cartStrings?.error || message;
+      this.dispatchCartErrorEvent(message, 'INVALID');
+      CartPerformance.measureFromMarker(`${eventTarget}:user-action`, cartPerformanceUpdateMarker);
+      return;
+    }
+
     const linesUpdateDeferred = this.createCartLinesUpdateEvent(action, lineVariantId, quantity, lineKey);
 
     // Cache sections before the fetch so we read dataset.id while elements still exist in the DOM
     const sectionsToRender = this.getSectionsToRender();
 
     const body = JSON.stringify({
-      ...(lineKey ? { id: lineKey } : { line }),
+      ...(quantity === 0 ? { id: lineKey } : lineKey ? { id: lineKey } : { line }),
       quantity,
       sections: sectionsToRender.map((section) => section.section),
       sections_url: window.location.pathname,
@@ -448,8 +501,19 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
       : changeRequest();
 
     changePromise
-      .then((response) => {
-        return response.text();
+      .then(async (response) => {
+        const responseText = await response.text();
+        if (!response.ok) {
+          let message = window.cartStrings?.error || 'Cart update failed';
+          try {
+            const errorState = JSON.parse(responseText);
+            message = errorState.description || errorState.message || errorState.errors || message;
+          } catch {
+            // Keep the localized fallback when Shopify returns a non-JSON error.
+          }
+          throw new Error(message);
+        }
+        return responseText;
       })
       .then((state) => {
         const parsedState = JSON.parse(state);
