@@ -333,6 +333,106 @@ window.PradaCartMutations = window.PradaCartMutations || (() => {
   };
 })();
 
+// A cart mutation can still be in flight after its optimistic UI has finished.
+// Keep same-tab navigation behind the mutation queue so the destination page
+// is rendered from the confirmed Shopify cart instead of an older snapshot.
+if (!window.PradaCartNavigationGuard) {
+  window.PradaCartNavigationGuard = true;
+  let cartNavigationQueued = false;
+
+  const waitForCartThenNavigate = (destination, source) => {
+    if (!destination || !window.PradaCartMutations?.pending) return false;
+    if (cartNavigationQueued) return true;
+    cartNavigationQueued = true;
+
+    source?.setAttribute?.('aria-busy', 'true');
+    source?.setAttribute?.('aria-disabled', 'true');
+    window.PradaCartMutations.whenIdle().then(() => window.location.assign(destination));
+    return true;
+  };
+
+  document.addEventListener(
+    'click',
+    (event) => {
+      if (!window.PradaCartMutations?.pending || event.defaultPrevented || event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+      const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+      if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+      // Remove links are enhanced controls, not page navigation. They must be
+      // allowed to join the queue while another row is still being removed.
+      if (link.closest('cart-remove-button')) return;
+
+      let destination;
+      try {
+        destination = new URL(link.href, window.location.href);
+      } catch {
+        return;
+      }
+
+      if (!/^https?:$/.test(destination.protocol) || destination.origin !== window.location.origin) return;
+      if (
+        destination.pathname === window.location.pathname &&
+        destination.search === window.location.search &&
+        destination.hash
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      waitForCartThenNavigate(destination.href, link);
+    },
+    true
+  );
+
+  document.addEventListener(
+    'submit',
+    (event) => {
+      if (!window.PradaCartMutations?.pending || event.defaultPrevented) return;
+      const form = event.target instanceof HTMLFormElement ? event.target : null;
+      if (!form) return;
+
+      let destination;
+      try {
+        destination = new URL(form.action || window.location.href, window.location.href);
+      } catch {
+        return;
+      }
+      if (!/^https?:$/.test(destination.protocol) || destination.origin !== window.location.origin) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (cartNavigationQueued) return;
+      cartNavigationQueued = true;
+      const submitter = event.submitter;
+      submitter?.setAttribute?.('aria-busy', 'true');
+      submitter?.setAttribute?.('aria-disabled', 'true');
+      window.PradaCartMutations.whenIdle().then(() => {
+        submitter?.removeAttribute?.('aria-busy');
+        submitter?.removeAttribute?.('aria-disabled');
+        if (submitter?.isConnected) form.requestSubmit(submitter);
+        else form.requestSubmit();
+      });
+    },
+    true
+  );
+
+  // Browser back/forward can restore stale drawer markup from the bfcache.
+  // Reconcile it without reloading the page once any surviving mutation ends.
+  window.addEventListener('pageshow', (event) => {
+    if (!event.persisted) return;
+
+    const reconcile = () => {
+      document.querySelector('cart-drawer')?.requestCanonicalRefresh?.();
+      document.querySelector('cart-items.prada-shopping-bag-page')?.reconcileAfterHistoryRestore?.();
+    };
+
+    if (window.PradaCartMutations?.pending) window.PradaCartMutations.whenIdle().then(reconcile);
+    else reconcile();
+  });
+}
+
 /*
  * Shopify Common JS
  *

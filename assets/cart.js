@@ -378,6 +378,35 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
     }
   }
 
+  reconcileAfterHistoryRestore() {
+    if (!this.matches('cart-items.prada-shopping-bag-page') || this.historyRestorePromise) {
+      return this.historyRestorePromise || Promise.resolve();
+    }
+
+    const refreshPromise = Promise.all([
+      this.onCartUpdate(),
+      fetch(`${routes.cart_url}.js`, {
+        cache: 'no-store',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      }).then((response) => {
+        if (!response.ok) throw new Error(`Cart reconciliation failed: ${response.status}`);
+        return response.json();
+      }),
+    ])
+      .then(([, cartState]) => {
+        this.updateShoppingBagTotals(cartState);
+        this.applyShoppingBagState(cartState);
+        document.querySelector('cart-drawer')?.requestCanonicalRefresh?.();
+      })
+      .catch((error) => console.error(error))
+      .finally(() => {
+        if (this.historyRestorePromise === refreshPromise) this.historyRestorePromise = null;
+      });
+
+    this.historyRestorePromise = refreshPromise;
+    return refreshPromise;
+  }
+
   applyShoppingBagState(parsedState, { preserveProjectedEmpty = false } = {}) {
     const shoppingBag = document.querySelector('cart-items.prada-shopping-bag-page');
     const footer = document.getElementById('main-cart-footer');
@@ -495,7 +524,15 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
       sections_url: window.location.pathname,
     });
 
-    const changeRequest = () => fetch(`${routes.cart_change_url}`, { ...fetchConfig(), body });
+    const changeRequest = () =>
+      fetch(`${routes.cart_change_url}`, {
+        ...fetchConfig(),
+        body,
+        cache: 'no-store',
+        // A customer may leave /cart immediately after the row fades out.
+        // keepalive lets Shopify finish the confirmed removal during unload.
+        keepalive: quantity === 0,
+      });
     const changePromise = window.PradaCartMutations?.enqueue
       ? window.PradaCartMutations.enqueue(changeRequest)
       : changeRequest();
