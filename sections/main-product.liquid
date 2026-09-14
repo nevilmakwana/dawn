@@ -786,7 +786,7 @@
       }
     };
 
-    const updateVariant = ({ updateHistory = true, revealGallery = false, syncWishlist = false } = {}) => {
+    const updateVariant = ({ updateHistory = true, syncWishlist = false } = {}) => {
       syncCompatibleColors();
       const selected = selectors.map((selector) => selector.value);
       const selectedVariantId = Number(idInput.value);
@@ -848,12 +848,11 @@
         window.PradaWishlist?.updateFromButton?.(wishlistButtons[0]);
       }
       renderVariantGallery(variant);
-      if (revealGallery) returnToVariantGallery({ behavior: 'smooth' });
       if (updateHistory) window.history.replaceState({}, '', `${root.dataset.productUrl}?variant=${variant.id}`);
     };
 
     selectors.forEach((selector) => {
-      selector.addEventListener('change', () => updateVariant({ revealGallery: true, syncWishlist: true }));
+      selector.addEventListener('change', () => updateVariant({ syncWishlist: true }));
     });
 
     const drawerShell = root.querySelector('[data-prada-drawer]');
@@ -1001,6 +1000,7 @@
     let handleDragY = 0;
     let galleryTouchStart = 0;
     let galleryTouchStartedAtEnd = false;
+    let galleryReturnScrollTop = mobileGallery?.scrollTop || 0;
     let handleIsDragging = false;
     let suppressHandleClick = false;
     let onboardingTimer;
@@ -1033,6 +1033,7 @@
     const commitGalleryContent = (galleryContent, nextGalleryKey) => {
       mediaList.replaceChildren(galleryContent);
       activeGalleryKey = nextGalleryKey;
+      galleryReturnScrollTop = 0;
       mobileGallery?.scrollTo({ top: 0, behavior: 'auto' });
       initializeImageLoading(mediaList);
       refreshGalleryTracking();
@@ -1082,28 +1083,6 @@
       }
     };
 
-    const returnToVariantGallery = ({ behavior = 'auto' } = {}) => {
-      if (!mobileQuery.matches) return;
-      const scrollBehavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : behavior;
-      window.clearTimeout(onboardingTimer);
-      root.classList.remove(
-        'mobile-info-open',
-        'mobile-info-closing',
-        'mobile-info-dragging',
-        'mobile-info-settling',
-        'mobile-gallery-onboarding'
-      );
-      sheetHandle?.setAttribute('aria-expanded', 'false');
-      sheetHandle?.setAttribute('aria-label', 'Open product information');
-      setActiveDot(0);
-      mobileGallery?.scrollTo({ top: 0, behavior: scrollBehavior });
-      scrollHint?.classList.remove('is-visible');
-
-      window.requestAnimationFrame(() => {
-        (root.closest('.shopify-section') || root).scrollIntoView({ behavior: scrollBehavior, block: 'start' });
-      });
-    };
-
     const playMobileOnboarding = () => {
       if (!mobileQuery.matches || !mobileGallery || galleryMedia.length < 2) return;
       window.clearTimeout(onboardingTimer);
@@ -1120,7 +1099,10 @@
       root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
       sheetHandle?.setAttribute('aria-expanded', 'false');
       sheetHandle?.setAttribute('aria-label', 'Open product information');
-      mobileGallery?.scrollTo({ top: mobileGallery.scrollHeight - mobileGallery.clientHeight, behavior: 'auto' });
+      if (mobileGallery) {
+        const maximumScrollTop = Math.max(0, mobileGallery.scrollHeight - mobileGallery.clientHeight);
+        mobileGallery.scrollTo({ top: Math.min(galleryReturnScrollTop, maximumScrollTop), behavior: 'auto' });
+      }
       window.requestAnimationFrame(() => {
         (root.closest('.shopify-section') || root).scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
@@ -1132,6 +1114,7 @@
       if (!mobileQuery.matches || root.classList.contains('mobile-info-open')) return;
       root.classList.remove('mobile-info-closing');
       root.classList.add('mobile-info-open');
+      galleryReturnScrollTop = mobileGallery?.scrollTop || 0;
       sheetHandle?.setAttribute('aria-expanded', 'true');
       sheetHandle?.setAttribute('aria-label', 'Close product information');
       window.requestAnimationFrame(() => mobilePanel?.scrollIntoView({ behavior: 'smooth', block: 'start' }));

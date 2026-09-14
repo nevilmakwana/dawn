@@ -983,7 +983,7 @@
 
         var currentPath = normalizeUrl(window.location.href);
         var currentTitle = textFrom(title).toLowerCase();
-        var match = null;
+        var match = getShowcaseNavigationMatch();
 
         function addUniqueTab(
           tabList,
@@ -1223,8 +1223,6 @@
             };
           }
         });
-
-        if (!match) match = getShowcaseNavigationMatch();
 
         if (!match || !match.tabs || match.tabs.length < 2) {
           updateTabIndicator(tabs, tabs.querySelector('.prada-collection__tab.is-active'));
