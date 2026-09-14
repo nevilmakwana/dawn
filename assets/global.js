@@ -1195,22 +1195,42 @@ customElements.define('slideshow-component', SlideshowComponent);
 class VariantSelects extends HTMLElement {
   constructor() {
     super();
+    this.selectionCache = new Map();
+    this.handleSelectionChange = this.handleSelectionChange.bind(this);
   }
 
   connectedCallback() {
-    this.addEventListener('change', (event) => {
-      const target = this.getInputForEventTarget(event.target);
-      this.updateSelectionMetadata(event);
+    this.addEventListener('change', this.handleSelectionChange);
+  }
 
-      this.dispatchProductSelectEvent();
+  disconnectedCallback() {
+    this.removeEventListener('change', this.handleSelectionChange);
+  }
 
-      publish(PUB_SUB_EVENTS.optionValueSelectionChange, {
-        data: {
-          event,
-          target,
-          selectedOptionValues: this.selectedOptionValues,
-        },
-      });
+  handleSelectionChange(event) {
+    const target = this.getInputForEventTarget(event.target);
+    this.updateSelectionMetadata(event);
+
+    const selectedOptionValues = this.selectedOptionValues;
+    const hasStableOptionValueIds = selectedOptionValues.length > 0 && selectedOptionValues.every(Boolean);
+    let cacheKey = hasStableOptionValueIds ? selectedOptionValues.join(',') : '';
+    let selectedOptions = cacheKey ? this.selectionCache.get(cacheKey) : null;
+    if (!selectedOptions) {
+      selectedOptions = this.getAllSelectedOptions();
+      if (!cacheKey) {
+        cacheKey = selectedOptions.map(({ name, value }) => `${name}:${value}`).join('|');
+      }
+      this.selectionCache.set(cacheKey, selectedOptions);
+    }
+    this.pendingSelectedOptions = selectedOptions;
+    this.dispatchProductSelectEvent(selectedOptions);
+
+    publish(PUB_SUB_EVENTS.optionValueSelectionChange, {
+      data: {
+        event,
+        target,
+        selectedOptionValues,
+      },
     });
   }
 
@@ -1225,7 +1245,7 @@ class VariantSelects extends HTMLElement {
     return options;
   }
 
-  dispatchProductSelectEvent() {
+  dispatchProductSelectEvent(selectedOptions = this.getAllSelectedOptions()) {
     const { ProductSelectEvent } = window.StandardEvents || {};
     if (!ProductSelectEvent) return;
 
@@ -1239,7 +1259,7 @@ class VariantSelects extends HTMLElement {
           title: this.dataset.productTitle,
           handle: this.dataset.productHandle,
         },
-        selectedOptions: this.getAllSelectedOptions(),
+        selectedOptions,
         promise: deferred.promise,
       })
     );
@@ -1255,6 +1275,9 @@ class VariantSelects extends HTMLElement {
     const deferred = this.takePendingSelectPromise();
     if (!deferred) return;
 
+    const selectedOptions = this.pendingSelectedOptions || this.getAllSelectedOptions();
+    this.pendingSelectedOptions = null;
+
     if (variant) {
       deferred.resolve({
         variant: {
@@ -1265,7 +1288,7 @@ class VariantSelects extends HTMLElement {
             amount: sourceVariantSelects?.dataset.selectedPriceAmount,
             currencyCode: sourceVariantSelects?.dataset.currencyCode,
           },
-          selectedOptions: this.getAllSelectedOptions(),
+          selectedOptions,
         },
       });
     } else {

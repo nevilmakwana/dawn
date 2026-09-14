@@ -620,6 +620,11 @@
     syncDesktopWishlist();
 
     const variants = JSON.parse(document.getElementById('PradaVariants-{{ section.id }}').textContent);
+    const variantSelectionKey = (options) => options.join('\u001f');
+    const variantsBySelection = new Map(
+      variants.map((variant) => [variantSelectionKey(variant.options), variant])
+    );
+    const variantsById = new Map(variants.map((variant) => [Number(variant.id), variant]));
     const variantColors = JSON.parse(document.getElementById('PradaVariantColors-{{ section.id }}').textContent);
     const optionNames = {{ product.options | json }};
     const productColorLabel = {{ product_color_label | json }};
@@ -741,12 +746,11 @@
       image.fetchPriority = 'low';
     };
 
-    const findVariantForColor = (colorValue) => variants.find((variant) =>
-      variant.options.every((value, index) => {
-        if (index === colorOptionIndex) return value === colorValue;
-        return value === selectors[index]?.value;
-      })
-    );
+    const findVariantForColor = (colorValue) => {
+      const selected = selectors.map((selector) => selector.value);
+      selected[colorOptionIndex] = colorValue;
+      return variantsBySelection.get(variantSelectionKey(selected));
+    };
 
     const syncCompatibleColors = () => {
       if (!colorSelector || colorOptionIndex < 0) return;
@@ -791,8 +795,8 @@
       const selected = selectors.map((selector) => selector.value);
       const selectedVariantId = Number(idInput.value);
       const variant = selectors.length
-        ? variants.find((item) => item.options.every((value, index) => value === selected[index]))
-        : variants.find((item) => Number(item.id) === selectedVariantId)
+        ? variantsBySelection.get(variantSelectionKey(selected))
+        : variantsById.get(selectedVariantId)
           || variants.find((item) => item.available)
           || variants[0];
       if (!variant) {
@@ -847,7 +851,7 @@
       if (syncWishlist && wishlistButtons[0]) {
         window.PradaWishlist?.updateFromButton?.(wishlistButtons[0]);
       }
-      renderVariantGallery(variant);
+      scheduleVariantGallery(variant);
       if (updateHistory) window.history.replaceState({}, '', `${root.dataset.productUrl}?variant=${variant.id}`);
     };
 
@@ -1081,6 +1085,19 @@
         if (!galleryChanged) replacePrimaryImage(fallbackSource);
         syncFallbackColorImage(fallbackSource);
       }
+    };
+
+    let galleryRenderFrame = 0;
+    let pendingGalleryVariant = null;
+    const scheduleVariantGallery = (variant) => {
+      pendingGalleryVariant = variant;
+      if (galleryRenderFrame) return;
+      galleryRenderFrame = window.requestAnimationFrame(() => {
+        galleryRenderFrame = 0;
+        const nextVariant = pendingGalleryVariant;
+        pendingGalleryVariant = null;
+        if (nextVariant) renderVariantGallery(nextVariant);
+      });
     };
 
     const playMobileOnboarding = () => {

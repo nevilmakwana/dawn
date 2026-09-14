@@ -47,6 +47,24 @@
     endfor
   endif
 
+  assign mobile_video_poster_url = ''
+  if section.settings.mobile_video.preview_image != blank
+    assign mobile_video_poster_url = section.settings.mobile_video.preview_image | image_url: width: 720
+  elsif section.settings.mobile_image != blank
+    assign mobile_video_poster_url = section.settings.mobile_image | image_url: width: 720
+  elsif section.settings.video.preview_image != blank
+    assign mobile_video_poster_url = section.settings.video.preview_image | image_url: width: 720
+  elsif section.settings.image != blank
+    assign mobile_video_poster_url = section.settings.image | image_url: width: 720
+  endif
+
+  assign desktop_video_poster_url = ''
+  if section.settings.video.preview_image != blank
+    assign desktop_video_poster_url = section.settings.video.preview_image | image_url: width: 3840
+  elsif section.settings.image != blank
+    assign desktop_video_poster_url = section.settings.image | image_url: width: 3840
+  endif
+
   assign has_desktop_video = false
   if section.settings.video != blank or desktop_webm_url != blank
     assign has_desktop_video = true
@@ -632,21 +650,19 @@
         {% if desktop_video_fallback_url != blank %}
           data-desktop-fallback-src="{{ desktop_video_fallback_url | escape }}"
         {% endif %}
-        {% if section.settings.mobile_video.preview_image != blank %}
-          data-mobile-poster="{{ section.settings.mobile_video.preview_image | image_url: width: 900 }}"
-          poster="{{ section.settings.mobile_video.preview_image | image_url: width: 900 }}"
-        {% elsif section.settings.video.preview_image != blank %}
-          poster="{{ section.settings.video.preview_image | image_url: width: 900 }}"
+        {% if mobile_video_poster_url != blank %}
+          data-mobile-poster="{{ mobile_video_poster_url }}"
+          poster="{{ mobile_video_poster_url }}"
         {% endif %}
-        {% if section.settings.video.preview_image != blank %}
-          data-desktop-poster="{{ section.settings.video.preview_image | image_url: width: 3840 }}"
+        {% if desktop_video_poster_url != blank %}
+          data-desktop-poster="{{ desktop_video_poster_url }}"
         {% endif %}
         autoplay
         loop
         muted
         playsinline
         {% if section.index == 1 %}fetchpriority="high"{% endif %}
-        preload="{% if section.index == 1 %}auto{% else %}metadata{% endif %}"
+        preload="metadata"
       >
         <source src="{{ mobile_webm_url }}" type="video/webm" media="(max-width: 749px)">
         {% if mobile_video_fallback_url != blank %}
@@ -668,9 +684,10 @@
           loop
           muted
           playsinline
-          preload="{% if section.index == 1 %}auto{% else %}metadata{% endif %}"
-          {% if section.settings.video.preview_image != blank %}
-            poster="{{ section.settings.video.preview_image | image_url: width: 3840 }}"
+          preload="metadata"
+          {% if section.index == 1 %}fetchpriority="high"{% endif %}
+          {% if desktop_video_poster_url != blank %}
+            poster="{{ desktop_video_poster_url }}"
           {% endif %}
         >
           <source src="{{ desktop_webm_url }}" type="video/webm">
@@ -787,8 +804,9 @@
           muted
           playsinline
           preload="metadata"
-          {% if section.settings.mobile_video.preview_image != blank %}
-            poster="{{ section.settings.mobile_video.preview_image | image_url: width: 900 }}"
+          {% if section.index == 1 %}fetchpriority="high"{% endif %}
+          {% if mobile_video_poster_url != blank %}
+            poster="{{ mobile_video_poster_url }}"
           {% endif %}
         >
           <source src="{{ mobile_webm_url }}" type="video/webm">

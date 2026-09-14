@@ -2171,14 +2171,6 @@
   <script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
 {%- endif -%}
 
-{%- liquid
-  for block in section.blocks
-    if block.type == '@app'
-      assign has_app_block = true
-    endif
-  endfor
--%}
-
 {% liquid
   assign header_tag = 'div'
 
@@ -2193,18 +2185,6 @@
   {% endif %}
   class="header-wrapper color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator %} header-wrapper--border-bottom{% endif %}"
 >
-  {%- liquid
-    assign social_links = false
-    assign localization_forms = false
-
-    if settings.social_twitter_link != blank or settings.social_facebook_link != blank or settings.social_pinterest_link != blank or settings.social_instagram_link != blank or settings.social_youtube_link != blank or settings.social_vimeo_link != blank or settings.social_tiktok_link != blank or settings.social_tumblr_link != blank or settings.social_snapchat_link != blank
-      assign social_links = true
-    endif
-
-    if localization.available_countries.size > 1 and section.settings.enable_country_selector or section.settings.enable_language_selector and localization.available_languages.size > 1
-      assign localization_forms = true
-    endif
-  -%}
   <header class="header prada-header{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}" role="banner" data-prada-compact-header>
     
     {%- comment -%} LEFT: Menu + Search {%- endcomment -%}
@@ -2225,11 +2205,19 @@
           <div class="header__heading-logo-wrapper{% if settings.logo_hover != blank %} has-hover-logo{% endif %}">
             {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
             {%- assign logo_height = settings.logo_width | divided_by: settings.logo.aspect_ratio -%}
-            {% capture sizes %}(min-width: 750px) {{ settings.logo_width }}px, 50vw{% endcapture %}
-            {% capture widths %}{{ settings.logo_width }}, {{ settings.logo_width | times: 1.5 | round }}, {{ settings.logo_width | times: 2 }}{% endcapture %}
+            {%- assign mobile_logo_px = settings.mobile_logo_width | default: 120 -%}
+            {%- assign mobile_logo_2x = mobile_logo_px | times: 2 -%}
+            {%- assign desktop_logo_px = 160 -%}
+            {%- assign desktop_logo_2x = desktop_logo_px | times: 2 -%}
+            {%- assign logo_request_width = mobile_logo_2x -%}
+            {%- if desktop_logo_2x > logo_request_width -%}
+              {%- assign logo_request_width = desktop_logo_2x -%}
+            {%- endif -%}
+            {% capture sizes %}(min-width: 990px) {{ desktop_logo_px }}px, {{ mobile_logo_px }}px{% endcapture %}
+            {% capture widths %}{{ mobile_logo_px }}, {{ desktop_logo_px }}, {{ mobile_logo_2x }}, {{ desktop_logo_2x }}{% endcapture %}
             {{
               settings.logo
-              | image_url: width: 600
+              | image_url: width: logo_request_width
               | image_tag:
                 class: 'header__heading-logo default-logo',
                 widths: widths,
@@ -2243,7 +2231,7 @@
               {%- assign logo_hover_height = settings.logo_width | divided_by: settings.logo_hover.aspect_ratio -%}
               {{
                 settings.logo_hover
-                | image_url: width: 600
+                | image_url: width: logo_request_width
                 | image_tag:
                   class: 'header__heading-logo hover-logo',
                   widths: widths,
@@ -2251,7 +2239,8 @@
                   width: settings.logo_width,
                   alt: logo_alt,
                   sizes: sizes,
-                  preload: true
+                  loading: 'lazy',
+                  fetchpriority: 'low'
               }}
             {%- endif -%}
           </div>

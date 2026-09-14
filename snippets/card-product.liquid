@@ -100,16 +100,15 @@
                     {%- if card_primary_media.width >= 360 -%}{{ card_primary_media | image_url: width: 360 }} 360w,{%- endif -%}
                     {%- if card_primary_media.width >= 533 -%}{{ card_primary_media | image_url: width: 533 }} 533w,{%- endif -%}
                     {%- if card_primary_media.width >= 720 -%}{{ card_primary_media | image_url: width: 720 }} 720w,{%- endif -%}
-                    {%- if card_primary_media.width >= 940 -%}{{ card_primary_media | image_url: width: 940 }} 940w,{%- endif -%}
-                    {%- if card_primary_media.width >= 1066 -%}{{ card_primary_media | image_url: width: 1066 }} 1066w,{%- endif -%}
-                    {{ card_primary_media | image_url }} {{ card_primary_media.width }}w
+                    {{ card_primary_media | image_url: width: 940 }} 940w
                   "
-                  src="{{ card_primary_media | image_url: width: 500 }}"
-                  sizes="(max-width: 749px) 45vw, (max-width: 989px) 30vw, 25vw"
+                  src="{{ card_primary_media | image_url: width: 360 }}"
+                  sizes="(max-width: 749px) calc(50vw - 16px), (max-width: 989px) 30vw, 25vw"
                   alt="{{ card_primary_media.alt | default: card_product.title | escape }}"
                   class="motion-reduce"
                   {% unless lazy_load == false %}
                     loading="lazy"
+                    fetchpriority="low"
                   {% endunless %}
                   width="{{ card_primary_media.width }}"
                   height="{{ card_primary_media.height }}"
@@ -123,15 +122,14 @@
                       {%- if card_secondary_media.width >= 360 -%}{{ card_secondary_media | image_url: width: 360 }} 360w,{%- endif -%}
                       {%- if card_secondary_media.width >= 533 -%}{{ card_secondary_media | image_url: width: 533 }} 533w,{%- endif -%}
                       {%- if card_secondary_media.width >= 720 -%}{{ card_secondary_media | image_url: width: 720 }} 720w,{%- endif -%}
-                      {%- if card_secondary_media.width >= 940 -%}{{ card_secondary_media | image_url: width: 940 }} 940w,{%- endif -%}
-                      {%- if card_secondary_media.width >= 1066 -%}{{ card_secondary_media | image_url: width: 1066 }} 1066w,{%- endif -%}
-                      {{ card_secondary_media | image_url }} {{ card_secondary_media.width }}w
+                      {{ card_secondary_media | image_url: width: 940 }} 940w
                     "
-                    src="{{ card_secondary_media | image_url: width: 500 }}"
-                    sizes="(max-width: 749px) 45vw, (max-width: 989px) 30vw, 25vw"
+                    src="{{ card_secondary_media | image_url: width: 360 }}"
+                    sizes="(max-width: 749px) calc(50vw - 16px), (max-width: 989px) 30vw, 25vw"
                     alt="{{ card_secondary_media.alt | escape }}"
                     class="motion-reduce"
                     loading="lazy"
+                    fetchpriority="low"
                     width="{{ card_secondary_media.width }}"
                     height="{{ card_secondary_media.height }}"
                   >

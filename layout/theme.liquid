@@ -6,6 +6,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="#ffffff">
     <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+    {%- unless settings.type_body_font.system? -%}
+      {% comment %}theme-check-disable AssetPreload{% endcomment %}
+      <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>
+      {% comment %}theme-check-enable AssetPreload{% endcomment %}
+    {%- endunless -%}
     <style>
       .facet-checkbox .icon-checkmark,
       .mobile-facets__label .icon-checkmark {
@@ -115,20 +122,17 @@
     {%- liquid
       assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'
       assign body_font_medium = settings.type_body_font | font_modify: 'weight', '500'
-      assign body_font_thin = settings.type_body_font | font_modify: 'weight', 300
-      assign body_font_italic = settings.type_body_font | font_modify: 'style', 'italic'
-      assign body_font_bold_italic = body_font_bold | font_modify: 'style', 'italic'
     %}
 
     {% style %}
       {{ settings.type_body_font | font_face: font_display: 'swap' }}
-      {{ body_font_thin | font_face: font_display: 'swap' }}
       {{ body_font_medium | font_face: font_display: 'swap' }}
       {{ body_font_bold | font_face: font_display: 'swap' }}
-      {{ body_font_italic | font_face: font_display: 'swap' }}
-      {{ body_font_bold_italic | font_face: font_display: 'swap' }}
-      {{ settings.type_header_font | font_face: font_display: 'swap' }}
+      {%- unless settings.type_header_font == settings.type_body_font -%}
+        {{ settings.type_header_font | font_face: font_display: 'swap' }}
+      {%- endunless -%}
 
+      {% assign scheme_classes = '' %}
       {% for scheme in settings.color_schemes -%}
         {% assign scheme_classes = scheme_classes | append: ', .color-' | append: scheme.id %}
         {% if forloop.index == 1 -%}
@@ -352,19 +356,6 @@
       </noscript>
     {%- endif -%}
 
-    {%- unless settings.type_body_font.system? -%}
-      {% comment %}theme-check-disable AssetPreload{% endcomment %}
-      <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>
-      {% comment %}theme-check-enable AssetPreload{% endcomment %}
-    {%- endunless -%}
-    {%- unless settings.type_header_font.system? -%}
-      {%- unless settings.type_header_font == settings.type_body_font -%}
-        {% comment %}theme-check-disable AssetPreload{% endcomment %}
-        <link rel="preload" as="font" href="{{ settings.type_header_font | font_url }}" type="font/woff2" crossorigin>
-        {% comment %}theme-check-enable AssetPreload{% endcomment %}
-      {%- endunless -%}
-    {%- endunless -%}
-
     {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
       {{ 'component-localization-form.css' | asset_url | stylesheet_tag: preload: true }}
       <script src="{{ 'localization-form.js' | asset_url }}" defer="defer"></script>
@@ -424,9 +415,29 @@
 
     {% sections 'footer-group' %}
 
-    {{ 'grey-cookie-consent.css' | asset_url | stylesheet_tag }}
+    <link rel="stylesheet" href="{{ 'grey-cookie-consent.css' | asset_url }}" media="print" onload="this.media='all'">
+    <noscript>{{ 'grey-cookie-consent.css' | asset_url | stylesheet_tag }}</noscript>
     {%- render 'grey-cookie-consent' -%}
-    <script src="{{ 'grey-cookie-consent.js' | asset_url }}" defer="defer"></script>
+    <script>
+      (() => {
+        const loadConsent = () => {
+          if (document.querySelector('script[data-grey-cookie-consent-script]')) return;
+          const script = document.createElement('script');
+          script.src = "{{ 'grey-cookie-consent.js' | asset_url }}";
+          script.dataset.greyCookieConsentScript = '';
+          document.body.appendChild(script);
+        };
+        const queueConsent = () => {
+          if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(loadConsent, { timeout: 2500 });
+          } else {
+            window.setTimeout(loadConsent, 1500);
+          }
+        };
+        if (document.readyState === 'complete') queueConsent();
+        else window.addEventListener('load', queueConsent, { once: true });
+      })();
+    </script>
 
     {{ 'greyexim-typography.css' | asset_url | stylesheet_tag }}
 

@@ -211,13 +211,12 @@
                           {%- if primary_media.width >= 360 -%}{{ primary_media | image_url: width: 360 }} 360w,{%- endif -%}
                           {%- if primary_media.width >= 533 -%}{{ primary_media | image_url: width: 533 }} 533w,{%- endif -%}
                           {%- if primary_media.width >= 720 -%}{{ primary_media | image_url: width: 720 }} 720w,{%- endif -%}
-                          {%- if primary_media.width >= 940 -%}{{ primary_media | image_url: width: 940 }} 940w,{%- endif -%}
-                          {{ primary_media | image_url }} {{ primary_media.width }}w
+                          {{ primary_media | image_url: width: 940 }} 940w
                         "
-                        src="{{ primary_media | image_url: width: 500 }}"
-                        sizes="(max-width: 749px) 45vw, (max-width: 989px) 30vw, 25vw"
+                        src="{{ primary_media | image_url: width: 360 }}"
+                        sizes="(max-width: 749px) calc(50vw - 16px), (max-width: 989px) 30vw, 25vw"
                         alt="{{ primary_media.alt | default: product.title | escape }}"
-                        {% if forloop.index > 4 %}loading="lazy"{% endif %}
+                        {% if forloop.index > 4 %}loading="lazy" fetchpriority="low"{% endif %}
                         width="{{ primary_media.width }}"
                         height="{{ primary_media.height }}"
                       >
@@ -228,14 +227,14 @@
                             {%- if secondary_media.width >= 360 -%}{{ secondary_media | image_url: width: 360 }} 360w,{%- endif -%}
                             {%- if secondary_media.width >= 533 -%}{{ secondary_media | image_url: width: 533 }} 533w,{%- endif -%}
                             {%- if secondary_media.width >= 720 -%}{{ secondary_media | image_url: width: 720 }} 720w,{%- endif -%}
-                            {%- if secondary_media.width >= 940 -%}{{ secondary_media | image_url: width: 940 }} 940w,{%- endif -%}
-                            {{ secondary_media | image_url }} {{ secondary_media.width }}w
+                            {{ secondary_media | image_url: width: 940 }} 940w
                           "
-                          src="{{ secondary_media | image_url: width: 500 }}"
-                          sizes="(max-width: 749px) 45vw, (max-width: 989px) 30vw, 25vw"
+                          src="{{ secondary_media | image_url: width: 360 }}"
+                          sizes="(max-width: 749px) calc(50vw - 16px), (max-width: 989px) 30vw, 25vw"
                           alt=""
                           aria-hidden="true"
                           loading="lazy"
+                          fetchpriority="low"
                           decoding="async"
                           width="{{ secondary_media.width }}"
                           height="{{ secondary_media.height }}"
