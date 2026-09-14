@@ -121,7 +121,6 @@ body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
   transition: color 180ms ease;
 }
 
-.prada-collection__tab:hover,
 .prada-collection__tab.is-active {
   color: var(--prada-ink);
 }
