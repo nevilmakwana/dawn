@@ -128,21 +128,36 @@
                   assign media_loading = 'lazy'
                   assign media_fetch_priority = 'low'
                   assign media_preload = false
+                  assign mobile_image_width = media.preview_image.width | at_most: 720
                   if forloop.first
                     assign media_loading = 'eager'
                     assign media_fetch_priority = 'high'
                     assign media_preload = true
                   endif
                 -%}
-                {{ media.preview_image | image_url: width: 1800 | image_tag:
-                  loading: media_loading,
-                  fetchpriority: media_fetch_priority,
-                  preload: media_preload,
-                  widths: '360, 480, 550, 640, 750, 950, 1200, 1500, 1800',
-                  sizes: '(min-width: 990px) 50vw, 100vw',
-                  alt: media.alt | default: product.title,
-                  class: 'prada-product__gallery-image'
-                }}
+                <picture style="display: contents;">
+                  <source
+                    data-prada-mobile-source
+                    media="(max-width: 749px)"
+                    srcset="
+                      {%- if media.preview_image.width >= 360 -%}{{ media.preview_image | image_url: width: 360 }} 360w,{%- endif -%}
+                      {%- if media.preview_image.width >= 480 -%}{{ media.preview_image | image_url: width: 480 }} 480w,{%- endif -%}
+                      {%- if media.preview_image.width >= 550 -%}{{ media.preview_image | image_url: width: 550 }} 550w,{%- endif -%}
+                      {%- if media.preview_image.width >= 640 -%}{{ media.preview_image | image_url: width: 640 }} 640w,{%- endif -%}
+                      {{ media.preview_image | image_url: width: mobile_image_width }} {{ mobile_image_width }}w
+                    "
+                    sizes="100vw"
+                  >
+                  {{ media.preview_image | image_url: width: 1800 | image_tag:
+                    loading: media_loading,
+                    fetchpriority: media_fetch_priority,
+                    preload: media_preload,
+                    widths: '360, 480, 550, 640, 750, 950, 1200, 1500, 1800',
+                    sizes: '(min-width: 990px) 50vw, 100vw',
+                    alt: media.alt | default: product.title,
+                    class: 'prada-product__gallery-image'
+                  }}
+                </picture>
               {%- when 'video' -%}
                 {{ media | video_tag: controls: false, autoplay: true, loop: true, muted: true, playsinline: true, preload: 'metadata', image_size: '1200x' }}
               {%- when 'external_video' -%}
@@ -478,14 +493,29 @@
         >
           {%- case media.media_type -%}
             {%- when 'image' -%}
-              {{ media.preview_image | image_url: width: 1800 | image_tag:
-                loading: 'lazy',
-                fetchpriority: 'low',
-                widths: '360, 480, 550, 640, 750, 950, 1200, 1500, 1800',
-                sizes: '(min-width: 990px) 50vw, 100vw',
-                alt: media.alt | default: product.title,
-                class: 'prada-product__gallery-image'
-              }}
+              {%- assign mobile_image_width = media.preview_image.width | at_most: 720 -%}
+              <picture style="display: contents;">
+                <source
+                  data-prada-mobile-source
+                  media="(max-width: 749px)"
+                  srcset="
+                    {%- if media.preview_image.width >= 360 -%}{{ media.preview_image | image_url: width: 360 }} 360w,{%- endif -%}
+                    {%- if media.preview_image.width >= 480 -%}{{ media.preview_image | image_url: width: 480 }} 480w,{%- endif -%}
+                    {%- if media.preview_image.width >= 550 -%}{{ media.preview_image | image_url: width: 550 }} 550w,{%- endif -%}
+                    {%- if media.preview_image.width >= 640 -%}{{ media.preview_image | image_url: width: 640 }} 640w,{%- endif -%}
+                    {{ media.preview_image | image_url: width: mobile_image_width }} {{ mobile_image_width }}w
+                  "
+                  sizes="100vw"
+                >
+                {{ media.preview_image | image_url: width: 1800 | image_tag:
+                  loading: 'lazy',
+                  fetchpriority: 'low',
+                  widths: '360, 480, 550, 640, 750, 950, 1200, 1500, 1800',
+                  sizes: '(min-width: 990px) 50vw, 100vw',
+                  alt: media.alt | default: product.title,
+                  class: 'prada-product__gallery-image'
+                }}
+              </picture>
             {%- when 'video' -%}
               {{ media | video_tag: controls: false, autoplay: true, loop: true, muted: true, playsinline: true, preload: 'metadata', image_size: '1200x' }}
             {%- when 'external_video' -%}
@@ -662,6 +692,23 @@
         image.srcset = candidates.map((candidate, index) => `${candidate} ${widths[index]}w`).join(', ');
         image.sizes = sizes;
         image.src = shopifyImageUrlAtWidth(source, fallbackWidth);
+
+        if (image.classList.contains('prada-product__gallery-image')) {
+          const mobileWidths = [360, 480, 550, 640, 720];
+          let mobileSource = image.closest('picture')?.querySelector('[data-prada-mobile-source]');
+          if (!mobileSource && image.parentElement?.tagName === 'PICTURE') {
+            mobileSource = document.createElement('source');
+            mobileSource.dataset.pradaMobileSource = '';
+            mobileSource.media = '(max-width: 749px)';
+            image.parentElement.insertBefore(mobileSource, image);
+          }
+          if (mobileSource) {
+            mobileSource.srcset = mobileWidths
+              .map((width) => `${shopifyImageUrlAtWidth(source, width)} ${width}w`)
+              .join(', ');
+            mobileSource.sizes = '100vw';
+          }
+        }
       } else {
         image.removeAttribute('srcset');
         image.src = source;

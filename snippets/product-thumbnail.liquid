@@ -43,6 +43,7 @@
   if media.media_type == 'image'
     assign image_class = 'image-magnify-' | append: section.settings.image_zoom
   endif
+  assign mobile_image_width = media.preview_image.width | at_most: 720
 -%}
 
 {%- capture sizes -%}
@@ -78,15 +79,27 @@
     </span>
     {%- render 'loading-spinner' -%}
     <div class="product__media media media--transparent">
-      {{
-        media.preview_image
-        | image_url: width: 1946
-        | image_tag:
-          class: image_class,
-          loading: lazy,
-          sizes: sizes,
-          widths: '246, 493, 600, 713, 823, 990, 1100, 1206, 1346, 1426, 1646, 1946'
-      }}
+      <picture style="display: contents;">
+        <source
+          media="(max-width: 749px)"
+          srcset="
+            {%- if media.preview_image.width >= 246 -%}{{ media.preview_image | image_url: width: 246 }} 246w,{%- endif -%}
+            {%- if media.preview_image.width >= 493 -%}{{ media.preview_image | image_url: width: 493 }} 493w,{%- endif -%}
+            {%- if media.preview_image.width >= 600 -%}{{ media.preview_image | image_url: width: 600 }} 600w,{%- endif -%}
+            {{ media.preview_image | image_url: width: mobile_image_width }} {{ mobile_image_width }}w
+          "
+          sizes="calc(100vw / {{ mobile_columns }} - 4rem)"
+        >
+        {{
+          media.preview_image
+          | image_url: width: 1946
+          | image_tag:
+            class: image_class,
+            loading: lazy,
+            sizes: sizes,
+            widths: '246, 493, 600, 713, 823, 990, 1100, 1206, 1346, 1426, 1646, 1946'
+        }}
+      </picture>
     </div>
     <button
       class="product__media-toggle quick-add-hidden product__media-zoom-{{ section.settings.image_zoom }}"

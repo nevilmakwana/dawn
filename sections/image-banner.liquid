@@ -634,6 +634,9 @@
         {% endif %}
         {% if section.settings.mobile_video.preview_image != blank %}
           data-mobile-poster="{{ section.settings.mobile_video.preview_image | image_url: width: 900 }}"
+          poster="{{ section.settings.mobile_video.preview_image | image_url: width: 900 }}"
+        {% elsif section.settings.video.preview_image != blank %}
+          poster="{{ section.settings.video.preview_image | image_url: width: 900 }}"
         {% endif %}
         {% if section.settings.video.preview_image != blank %}
           data-desktop-poster="{{ section.settings.video.preview_image | image_url: width: 3840 }}"

@@ -214,8 +214,8 @@
                           {%- if primary_media.width >= 940 -%}{{ primary_media | image_url: width: 940 }} 940w,{%- endif -%}
                           {{ primary_media | image_url }} {{ primary_media.width }}w
                         "
-                        src="{{ primary_media | image_url: width: 720 }}"
-                        sizes="(min-width: 990px) 25vw, 50vw"
+                        src="{{ primary_media | image_url: width: 500 }}"
+                        sizes="(max-width: 749px) 45vw, (max-width: 989px) 30vw, 25vw"
                         alt="{{ primary_media.alt | default: product.title | escape }}"
                         {% if forloop.index > 4 %}loading="lazy"{% endif %}
                         width="{{ primary_media.width }}"
@@ -231,8 +231,8 @@
                             {%- if secondary_media.width >= 940 -%}{{ secondary_media | image_url: width: 940 }} 940w,{%- endif -%}
                             {{ secondary_media | image_url }} {{ secondary_media.width }}w
                           "
-                          src="{{ secondary_media | image_url: width: 720 }}"
-                          sizes="(min-width: 990px) 25vw, 50vw"
+                          src="{{ secondary_media | image_url: width: 500 }}"
+                          sizes="(max-width: 749px) 45vw, (max-width: 989px) 30vw, 25vw"
                           alt=""
                           aria-hidden="true"
                           loading="lazy"
