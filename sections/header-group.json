@@ -80,6 +80,21 @@
             "title": "Home and Lifestyle",
             "link": "/collections/scented-candles"
           }
+        },
+        "drawer_child_scented_candles": {
+          "type": "drawer_child",
+          "settings": {
+            "title": "Scented Candles",
+            "link": "/collections/scented-candles"
+          }
+        },
+        "drawer_grandchild_french_vanilla": {
+          "type": "drawer_grandchild",
+          "settings": {
+            "title": "French Vanilla",
+            "link": "/collections/scented-candles",
+            "products": []
+          }
         }
       },
       "block_order": [
@@ -91,7 +106,9 @@
         "drawer_grandchild_cotton_scarves",
         "drawer_grandchild_cotton_bandanas",
         "drawer_parent_men",
-        "drawer_parent_home_lifestyle"
+        "drawer_parent_home_lifestyle",
+        "drawer_child_scented_candles",
+        "drawer_grandchild_french_vanilla"
       ],
       "settings": {
         "logo_position": "middle-left",
