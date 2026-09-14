@@ -1,0 +1,188 @@
+{%- liquid
+  assign grey_cookie_policy_url = routes.root_url | append: 'pages/contact?view=cookie-policy'
+  assign grey_privacy_url = routes.root_url | append: 'policies/privacy-policy'
+  if shop.privacy_policy != blank
+    assign grey_privacy_url = shop.privacy_policy.url
+  endif
+-%}
+
+<div
+  class="grey-cookie-consent"
+  data-grey-cookie-consent
+  data-cookie-policy-url="{{ grey_cookie_policy_url }}"
+>
+  <section
+    class="grey-cookie-banner"
+    data-grey-cookie-banner
+    aria-labelledby="GreyCookieBannerTitle"
+    hidden
+  >
+    <div class="grey-cookie-banner__copy">
+      <h2 id="GreyCookieBannerTitle">Your privacy choices</h2>
+      <p>
+        Grey Exim uses necessary technologies for our store, cart, checkout and security. With your permission,
+        we also use optional technologies for preferences, analytics and marketing.
+        <a href="{{ grey_cookie_policy_url }}">Cookie Policy</a>
+      </p>
+    </div>
+    <div class="grey-cookie-banner__actions" aria-label="Cookie choices">
+      <button type="button" class="grey-cookie-button grey-cookie-button--secondary" data-cookie-action="reject">
+        Reject non-essential
+      </button>
+      <button type="button" class="grey-cookie-button grey-cookie-button--secondary" data-cookie-action="manage">
+        Manage preferences
+      </button>
+      <button type="button" class="grey-cookie-button grey-cookie-button--primary" data-cookie-action="accept">
+        Accept all
+      </button>
+    </div>
+  </section>
+
+  <div class="grey-cookie-modal" data-grey-cookie-modal hidden>
+    <button
+      type="button"
+      class="grey-cookie-modal__overlay"
+      data-cookie-action="close"
+      aria-label="Close cookie settings"
+      tabindex="-1"
+    ></button>
+    <section
+      class="grey-cookie-modal__panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="GreyCookieSettingsTitle"
+      aria-describedby="GreyCookieSettingsIntroduction"
+    >
+      <header class="grey-cookie-modal__header">
+        <div>
+          <p class="grey-cookie-modal__eyebrow">Grey Exim privacy</p>
+          <h2 id="GreyCookieSettingsTitle">Cookie settings</h2>
+        </div>
+        <button type="button" class="grey-cookie-modal__close" data-cookie-action="close" aria-label="Close cookie settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l16 16M20 4L4 20"/></svg>
+        </button>
+      </header>
+
+      <div class="grey-cookie-modal__body">
+        <div class="grey-cookie-modal__intro" id="GreyCookieSettingsIntroduction">
+          <p>
+            At Grey Exim, we respect your privacy and give you control over how optional cookies and similar
+            technologies are used on <a href="{{ routes.root_url }}">www.greyexim.com</a>.
+          </p>
+          <p>
+            Necessary technologies support our website, shopping cart, checkout and security. With your permission
+            where required, optional technologies may support preferences, analytics, performance, personalization
+            and marketing. Changing your choices does not affect technologies that are strictly necessary.
+          </p>
+        </div>
+
+        <div class="grey-cookie-categories">
+          <details class="grey-cookie-category" open>
+            <summary>
+              <span>
+                <strong>Strictly necessary</strong>
+                <small>Required for the website to function</small>
+              </span>
+              <span class="grey-cookie-category__status">Always active</span>
+            </summary>
+            <div class="grey-cookie-category__content">
+              <p>These technologies cannot normally be switched off through Cookie Settings. They may be used to:</p>
+              <ul>
+                <li>operate our ecommerce website and maintain your shopping cart;</li>
+                <li>support checkout, secure browsing sessions and customer accounts;</li>
+                <li>remember privacy choices, location, market or currency settings;</li>
+                <li>prevent fraud or misuse and provide services requested by you.</li>
+              </ul>
+              <p>Blocking them in your browser may cause parts of the website to stop working correctly.</p>
+            </div>
+          </details>
+
+          <details class="grey-cookie-category">
+            <summary>
+              <span>
+                <strong>Preferences and functionality</strong>
+                <small>Remember choices and optional features</small>
+              </span>
+              <label class="grey-cookie-switch" aria-label="Allow preference cookies">
+                <input type="checkbox" data-cookie-consent="preferences">
+                <span aria-hidden="true"></span>
+              </label>
+            </summary>
+            <div class="grey-cookie-category__content">
+              <p>
+                These technologies can remember language, country or market, currency, localization and other
+                customer preferences. If disabled, some optional features may not work as intended.
+              </p>
+            </div>
+          </details>
+
+          <details class="grey-cookie-category">
+            <summary>
+              <span>
+                <strong>Analytics and performance</strong>
+                <small>Help us measure and improve the store</small>
+              </span>
+              <label class="grey-cookie-switch" aria-label="Allow analytics cookies">
+                <input type="checkbox" data-cookie-consent="analytics">
+                <span aria-hidden="true"></span>
+              </label>
+            </summary>
+            <div class="grey-cookie-category__content">
+              <p>
+                These technologies help us understand visits, sessions, pages and products viewed, store navigation,
+                shopping interactions, website performance and how visitors reach Grey Exim. Where required, they
+                are used only after consent.
+              </p>
+            </div>
+          </details>
+
+          <details class="grey-cookie-category">
+            <summary>
+              <span>
+                <strong>Marketing and advertising</strong>
+                <small>Measure campaigns and improve relevance</small>
+              </span>
+              <label class="grey-cookie-switch" aria-label="Allow marketing cookies">
+                <input type="checkbox" data-cookie-consent="marketing">
+                <span aria-hidden="true"></span>
+              </label>
+            </summary>
+            <div class="grey-cookie-category__content">
+              <p>
+                Where enabled, these technologies may measure advertising effectiveness, campaign engagement and
+                conversions, understand advertising referrals, support audience measurement and provide more relevant
+                marketing. Where consent is required, they are used according to your choice.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <details class="grey-cookie-more">
+          <summary>Browser controls and more information</summary>
+          <div>
+            <p>
+              Most browsers let you view, delete or block cookies. Blocking all cookies can affect the cart, customer
+              account, checkout, saved preferences and other essential ecommerce features.
+            </p>
+            <p>
+              Read our <a href="{{ grey_cookie_policy_url }}">Cookie Policy</a> and
+              <a href="{{ grey_privacy_url }}">Privacy Statement</a>, or contact
+              <a href="{{ routes.root_url }}pages/contact#send-us-email">care@greyexim.com</a> with privacy questions.
+            </p>
+          </div>
+        </details>
+
+        <p class="grey-cookie-modal__status" data-cookie-status aria-live="polite"></p>
+      </div>
+
+      <footer class="grey-cookie-modal__footer">
+        <button type="button" class="grey-cookie-button grey-cookie-button--secondary" data-cookie-action="reject">
+          Reject non-essential
+        </button>
+        <button type="button" class="grey-cookie-button grey-cookie-button--primary" data-cookie-action="save">
+          Save preferences
+        </button>
+      </footer>
+    </section>
+  </div>
+</div>

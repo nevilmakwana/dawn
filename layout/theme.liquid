@@ -424,6 +424,10 @@
 
     {% sections 'footer-group' %}
 
+    {{ 'grey-cookie-consent.css' | asset_url | stylesheet_tag }}
+    {%- render 'grey-cookie-consent' -%}
+    <script src="{{ 'grey-cookie-consent.js' | asset_url }}" defer="defer"></script>
+
     {{ 'greyexim-typography.css' | asset_url | stylesheet_tag }}
 
     <script>

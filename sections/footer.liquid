@@ -271,11 +271,7 @@
       });
 
       footer.querySelector('[data-cookie-settings]')?.addEventListener('click', () => {
-        if (window.Shopify?.customerPrivacy?.showPreferences) {
-          window.Shopify.customerPrivacy.showPreferences();
-        } else {
-          document.dispatchEvent(new CustomEvent('shopify:open-cookie-preferences'));
-        }
+        document.dispatchEvent(new CustomEvent('shopify:open-cookie-preferences'));
       });
     })();
   </script>
