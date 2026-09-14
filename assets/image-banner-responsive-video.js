@@ -81,7 +81,10 @@
     video.dataset.currentViewport = viewport;
     video.dataset.activeFallbackSrc = nextFallbackSource || '';
 
-    if (video.dataset.currentSrc !== resolvedNextSource || !video.currentSrc) {
+    const activeSource = resolveUrl(video.currentSrc);
+    if (activeSource === resolvedNextSource) {
+      video.dataset.currentSrc = resolvedNextSource;
+    } else if (video.dataset.currentSrc !== resolvedNextSource || !video.currentSrc) {
       video.dataset.currentSrc = resolvedNextSource;
       video.src = nextSource;
       video.load();
