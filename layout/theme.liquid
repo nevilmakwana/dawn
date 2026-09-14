@@ -14,6 +14,17 @@
       {% comment %}theme-check-enable AssetPreload{% endcomment %}
     {%- endunless -%}
     <style>
+      /* Match the header's final fixed state before its section CSS finishes parsing. */
+      .section-header {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        margin-bottom: 0 !important;
+        border: none !important;
+      }
+
       .facet-checkbox .icon-checkmark,
       .mobile-facets__label .icon-checkmark {
         visibility: hidden;
