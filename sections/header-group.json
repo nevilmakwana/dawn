@@ -88,12 +88,100 @@
             "link": "/collections/scented-candles"
           }
         },
-        "drawer_grandchild_french_vanilla": {
+        "drawer_grandchild_sculptural": {
           "type": "drawer_grandchild",
           "settings": {
-            "title": "French Vanilla",
-            "link": "/collections/scented-candles",
-            "products": []
+            "title": "Sculptural",
+            "link": "",
+            "products": [
+              "sculpted-pillar-french-vanilla-candle",
+              "sculpted-french-vanilla-candle-1",
+              "carved-pillar-french-vanilla-candle",
+              "sculptural-wavy-pillar-french-vanilla-candle",
+              "pillar-french-vanilla-candle-2",
+              "sculptural-pillar-french-vanilla-candle",
+              "pillar-french-vanilla-candle-1",
+              "pillar-french-vanilla-candle",
+              "sculptural-french-vanilla-candle",
+              "wave-pillar-french-vanilla-candle"
+            ]
+          }
+        },
+        "drawer_grandchild_animals": {
+          "type": "drawer_grandchild",
+          "settings": {
+            "title": "Animals",
+            "link": "",
+            "products": [
+              "sculpted-bear-french-vanilla-candle",
+              "butterfly-floral-pillar-french-vanilla-candle",
+              "snake-rose-sculpted-french-vanilla-candle",
+              "dolphin-ocean-french-vanilla-candle",
+              "floral-unicorn-french-vanilla-candle",
+              "sculpted-french-vanilla-candle"
+            ]
+          }
+        },
+        "drawer_grandchild_floral": {
+          "type": "drawer_grandchild",
+          "settings": {
+            "title": "Floral",
+            "link": "",
+            "products": [
+              "floral-face-french-vanilla-candle",
+              "butterfly-floral-pillar-french-vanilla-candle",
+              "botanical-mushroom-pillar-french-vanilla-candle",
+              "snake-rose-sculpted-french-vanilla-candle",
+              "floral-unicorn-french-vanilla-candle"
+            ]
+          }
+        },
+        "drawer_grandchild_figurative": {
+          "type": "drawer_grandchild",
+          "settings": {
+            "title": "Figurative",
+            "link": "",
+            "products": [
+              "floral-face-french-vanilla-candle",
+              "angel-wings-french-vanilla-candle"
+            ]
+          }
+        },
+        "drawer_grandchild_nature": {
+          "type": "drawer_grandchild",
+          "settings": {
+            "title": "Nature",
+            "link": "",
+            "products": [
+              "butterfly-floral-pillar-french-vanilla-candle",
+              "botanical-mushroom-pillar-french-vanilla-candle",
+              "snake-rose-sculpted-french-vanilla-candle",
+              "merry-forest-french-vanilla-scented-soy-wax-candle"
+            ]
+          }
+        },
+        "drawer_grandchild_coastal": {
+          "type": "drawer_grandchild",
+          "settings": {
+            "title": "Coastal",
+            "link": "",
+            "products": [
+              "seashell-pillar-french-vanilla-candle",
+              "dolphin-ocean-french-vanilla-candle",
+              "wave-pillar-french-vanilla-candle"
+            ]
+          }
+        },
+        "drawer_grandchild_fantasy": {
+          "type": "drawer_grandchild",
+          "settings": {
+            "title": "Fantasy",
+            "link": "",
+            "products": [
+              "angel-wings-french-vanilla-candle",
+              "floral-unicorn-french-vanilla-candle",
+              "merry-forest-french-vanilla-scented-soy-wax-candle"
+            ]
           }
         }
       },
@@ -108,7 +196,13 @@
         "drawer_parent_men",
         "drawer_parent_home_lifestyle",
         "drawer_child_scented_candles",
-        "drawer_grandchild_french_vanilla"
+        "drawer_grandchild_sculptural",
+        "drawer_grandchild_animals",
+        "drawer_grandchild_floral",
+        "drawer_grandchild_figurative",
+        "drawer_grandchild_nature",
+        "drawer_grandchild_coastal",
+        "drawer_grandchild_fantasy"
       ],
       "settings": {
         "logo_position": "middle-left",
