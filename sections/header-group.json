@@ -13,6 +13,86 @@
   "sections": {
     "header": {
       "type": "header",
+      "blocks": {
+        "drawer_parent_home": {
+          "type": "drawer_parent",
+          "settings": {
+            "title": "Home",
+            "link": "/"
+          }
+        },
+        "drawer_parent_women": {
+          "type": "drawer_parent",
+          "settings": {
+            "title": "Women",
+            "link": "/collections/women-scarves"
+          }
+        },
+        "drawer_child_scarves": {
+          "type": "drawer_child",
+          "settings": {
+            "title": "Scarves",
+            "link": "/collections/women-scarves"
+          }
+        },
+        "drawer_grandchild_crepe_scarves": {
+          "type": "drawer_grandchild",
+          "settings": {
+            "title": "Crepe Scarves",
+            "link": "/collections/women-scarves",
+            "products": []
+          }
+        },
+        "drawer_grandchild_crepe_bandanas": {
+          "type": "drawer_grandchild",
+          "settings": {
+            "title": "Crepe Bandanas",
+            "link": "/collections/women-bandanas",
+            "products": []
+          }
+        },
+        "drawer_grandchild_cotton_scarves": {
+          "type": "drawer_grandchild",
+          "settings": {
+            "title": "Cotton Scarves",
+            "link": "/collections/women-cotton-scarves",
+            "products": []
+          }
+        },
+        "drawer_grandchild_cotton_bandanas": {
+          "type": "drawer_grandchild",
+          "settings": {
+            "title": "Cotton Bandanas",
+            "link": "/collections/women-cotton-bandanas",
+            "products": []
+          }
+        },
+        "drawer_parent_men": {
+          "type": "drawer_parent",
+          "settings": {
+            "title": "Men",
+            "link": "/collections/all"
+          }
+        },
+        "drawer_parent_home_lifestyle": {
+          "type": "drawer_parent",
+          "settings": {
+            "title": "Home and Lifestyle",
+            "link": "/collections/scented-candles"
+          }
+        }
+      },
+      "block_order": [
+        "drawer_parent_home",
+        "drawer_parent_women",
+        "drawer_child_scarves",
+        "drawer_grandchild_crepe_scarves",
+        "drawer_grandchild_crepe_bandanas",
+        "drawer_grandchild_cotton_scarves",
+        "drawer_grandchild_cotton_bandanas",
+        "drawer_parent_men",
+        "drawer_parent_home_lifestyle"
+      ],
       "settings": {
         "logo_position": "middle-left",
         "mobile_logo_position": "center",
