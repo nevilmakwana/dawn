@@ -220,10 +220,12 @@
             endif
 
             assign card_url = block.settings.link
+            assign card_uses_showcase_context = false
             assign tag_handle = block.settings.product_tag | handleize
             if card_url == blank
               if child_count > 0 or block.settings.collection_list != blank
                 assign card_url = landing_collection.url
+                assign card_uses_showcase_context = true
               endif
             endif
             if card_url == blank and selected_collection != blank and tag_handle != blank
@@ -234,6 +236,9 @@
               assign card_url = selected_product.url
             elsif card_url == blank and tag_handle != blank
               assign card_url = routes.all_products_collection_url | append: '/' | append: tag_handle
+            endif
+            if card_uses_showcase_context and card_url != blank
+              assign card_url = card_url | append: '?showcase_parent=' | append: block.id
             endif
 
             assign card_alt = card_image.alt | default: card_title
@@ -348,11 +353,19 @@
       assign child_count = 0
       assign parent_selected_count = 0
       assign parent_selected_ids = '|'
+      assign parent_aggregate_collection_ids = '|'
       for child_block in section.blocks
         if child_block.type == 'child_collection'
           assign child_parent_key = child_block.settings.parent_group | handleize
           if child_parent_key != blank and child_parent_key == parent_group_key
             assign child_count = child_count | plus: 1
+            assign child_collection = child_block.settings.collection
+            if child_collection != blank
+              assign child_collection_key = '|' | append: child_collection.id | append: '|'
+              unless parent_aggregate_collection_ids contains child_collection_key
+                assign parent_aggregate_collection_ids = parent_aggregate_collection_ids | append: child_collection.id | append: '|'
+              endunless
+            endif
             if parent_landing_collection == blank and child_block.settings.collection != blank
               assign parent_landing_collection = child_block.settings.collection
             endif
@@ -366,6 +379,9 @@
           assign parent_selected_ids = parent_selected_ids | append: parent_selected_collection.id | append: '|'
           assign parent_selected_count = parent_selected_count | plus: 1
         endunless
+        unless parent_aggregate_collection_ids contains parent_selected_key
+          assign parent_aggregate_collection_ids = parent_aggregate_collection_ids | append: parent_selected_collection.id | append: '|'
+        endunless
       endfor
 
       assign parent_direct_collection = parent_block.settings.collection
@@ -373,6 +389,16 @@
         assign parent_direct_key = '|' | append: parent_direct_collection.id | append: '|'
         unless parent_selected_ids contains parent_direct_key
           assign parent_selected_count = parent_selected_count | plus: 1
+        endunless
+        unless parent_aggregate_collection_ids contains parent_direct_key
+          assign parent_aggregate_collection_ids = parent_aggregate_collection_ids | append: parent_direct_collection.id | append: '|'
+        endunless
+      endif
+
+      if parent_landing_collection != blank
+        assign parent_landing_key = '|' | append: parent_landing_collection.id | append: '|'
+        unless parent_aggregate_collection_ids contains parent_landing_key
+          assign parent_aggregate_collection_ids = parent_aggregate_collection_ids | append: parent_landing_collection.id | append: '|'
         endunless
       endif
     -%}
@@ -384,6 +410,7 @@
         data-showcase-panel="{{ parent_block.id }}"
         data-showcase-navigation-title="{{ parent_title | escape }}"
         data-showcase-view-all-url="{{ parent_landing_collection.url }}"
+        data-showcase-aggregate-collection-ids="{{ parent_aggregate_collection_ids }}"
         aria-labelledby="CollectionShowcasePanelTitle-{{ section.id }}-{{ parent_block.id }}"
         {% unless parent_block.id == active_parent_block_id %}hidden{% endunless %}
       >

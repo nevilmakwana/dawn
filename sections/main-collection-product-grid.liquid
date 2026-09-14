@@ -536,6 +536,33 @@
           return (element?.textContent || '').replace(/\s+/g, ' ').trim();
         }
 
+        function showcaseParentFromUrl(url) {
+          try {
+            return new URL(url, window.location.origin).searchParams.get('showcase_parent') || '';
+          } catch (_error) {
+            return '';
+          }
+        }
+
+        function syncShowcaseContextInput(parentId) {
+          var controls = collectionRoot.querySelector('.prada-collection__controls');
+          if (!controls) return;
+
+          var input = controls.querySelector('input[name="showcase_parent"]');
+          if (!parentId) {
+            input?.remove();
+            return;
+          }
+
+          if (!input) {
+            input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'showcase_parent';
+            controls.appendChild(input);
+          }
+          input.value = parentId;
+        }
+
         function cacheKeyFromUrl(url) {
           var cacheUrl = new URL(url.href, window.location.origin);
           cacheUrl.hash = '';
@@ -775,6 +802,7 @@
 
           if (sourceCount && targetCount) targetCount.replaceWith(sourceCount);
           if (sourceControls && targetControls) targetControls.replaceWith(sourceControls);
+          syncShowcaseContextInput(showcaseParentFromUrl(targetUrl.href));
           if (sourceCollection && targetCollection) {
             delete targetCollection.dataset.pradaAggregateCollectionIds;
             delete targetCollection.dataset.pradaNestedActive;
@@ -819,16 +847,39 @@
           nestedViewAllSnapshot = {
             gridContainer: gridContainer.cloneNode(true),
             count: count ? count.cloneNode(true) : null,
+            path: normalizeUrl(window.location.href),
           };
         }
 
         function renderNestedProducts(tab, updateHistory) {
           var productTemplate = productTemplateForTab(tab);
           var currentGridContainer = document.querySelector('#ProductGridContainer');
-          if (!productTemplate || !currentGridContainer) return false;
+          if (!currentGridContainer) return false;
 
           var aggregateCollectionIds =
-            tab.dataset.pradaAggregateCollectionIds || productTemplate.dataset.pradaAggregateCollectionIds || '';
+            tab.dataset.pradaAggregateCollectionIds || productTemplate?.dataset.pradaAggregateCollectionIds || '';
+          var hasAggregateCollections = aggregateCollectionIds.split('|').filter(Boolean).length > 0;
+
+          if (!productTemplate && hasAggregateCollections) {
+            captureViewAllSnapshot();
+            currentGridContainer.querySelector('[data-prada-load-more]')?.remove();
+            collectionRoot.dataset.pradaAggregateCollectionIds = aggregateCollectionIds;
+            collectionRoot.dataset.pradaNestedActive = 'true';
+            setActiveTab(tabs, tab);
+            syncShowcaseContextInput(showcaseParentFromUrl(tab.href));
+            refreshCollectionCarousel();
+
+            if (updateHistory) {
+              var aggregateUrl = new URL(tab.href, window.location.origin);
+              window.history.pushState({ pradaAggregateCollection: true }, '', aggregateUrl.href);
+            }
+
+            scrollCollectionToStart(collectionRoot);
+            return true;
+          }
+
+          if (!productTemplate) return false;
+
           var productItems = Array.from(productTemplate.content.children).filter(function (item) {
             return item.matches('.prada-collection__item');
           });
@@ -913,7 +964,7 @@
 
           var targetUrl = new URL(tab.href, window.location.origin);
 
-          if (productTemplateForTab(tab)) {
+          if (productTemplateForTab(tab) || tab.dataset.pradaAggregateCollectionIds) {
             event.preventDefault();
             if (window.pradaCollectionNavigationState.request) {
               window.pradaCollectionNavigationState.request.abort();
@@ -926,6 +977,7 @@
 
           if (
             collectionRoot.dataset.pradaNestedActive === 'true' &&
+            nestedViewAllSnapshot?.path === normalizeUrl(targetUrl.href) &&
             normalizeUrl(targetUrl.href) === normalizeUrl(window.location.href)
           ) {
             event.preventDefault();
@@ -1040,13 +1092,16 @@
         }
 
         function getShowcaseNavigationMatch() {
+          var requestedShowcaseParent = showcaseParentFromUrl(window.location.href);
+          if (!requestedShowcaseParent) return null;
+
           var showcase = Array.from(
             document.querySelectorAll('collection-showcase[data-showcase-active-parent]')
           ).find(function (candidate) {
             return Boolean(candidate.dataset.showcaseActiveParent);
           });
           var activeParentId = showcase?.dataset.showcaseActiveParent;
-          if (!showcase || !activeParentId) return null;
+          if (!showcase || !activeParentId || activeParentId !== requestedShowcaseParent) return null;
 
           var panel = Array.from(showcase.querySelectorAll('[data-showcase-panel]')).find(function (candidate) {
             return candidate.dataset.showcasePanel === activeParentId;
@@ -1054,15 +1109,31 @@
           var viewAllHref = panel?.dataset.showcaseViewAllUrl;
           if (!panel || !normalizeUrl(viewAllHref)) return null;
 
+          var withShowcaseContext = function (href) {
+            var url = new URL(href, window.location.origin);
+            url.searchParams.set('showcase_parent', requestedShowcaseParent);
+            return url.href;
+          };
+          var aggregateCollectionIds = panel.dataset.showcaseAggregateCollectionIds || '';
+          var aggregateCollectionCount = aggregateCollectionIds.split('|').filter(Boolean).length;
+          var contextualViewAllHref = withShowcaseContext(viewAllHref);
           var showcaseTabs = [];
-          addUniqueTab(showcaseTabs, 'View all', viewAllHref, normalizeUrl(viewAllHref));
+          addUniqueTab(
+            showcaseTabs,
+            'View all',
+            contextualViewAllHref,
+            normalizeUrl(viewAllHref),
+            '',
+            aggregateCollectionCount > 1,
+            aggregateCollectionCount > 1 ? aggregateCollectionIds : ''
+          );
 
           var selectedLinks = Array.from(panel.querySelectorAll('[data-showcase-selected-navigation] a'));
           var childLinks = Array.from(panel.querySelectorAll('[data-showcase-child-card] [data-showcase-navigation-link]'));
           var navigationLinks = childLinks.concat(selectedLinks);
 
           navigationLinks.forEach(function (childLink) {
-            var childHref = childLink.href;
+            var childHref = withShowcaseContext(childLink.href);
             addUniqueTab(
               showcaseTabs,
               childLink.dataset.showcaseTabLabel || textFrom(childLink),
@@ -1096,6 +1167,7 @@
             tabs: showcaseTabs,
             activePath: activeTab.path,
             activeTab: activeTab,
+            showcaseParentId: requestedShowcaseParent,
           };
         }
 
@@ -1241,6 +1313,7 @@
         });
 
         if (!match || !match.tabs || match.tabs.length < 2) {
+          syncShowcaseContextInput('');
           updateTabIndicator(tabs, tabs.querySelector('.prada-collection__tab.is-active'));
           // Resolve the initial indicator position while the navigation is
           // still hidden. This prevents it animating from View all on load.
@@ -1260,6 +1333,7 @@
           return;
         }
 
+        syncShowcaseContextInput(match.showcaseParentId || '');
         tabs.replaceChildren();
         title.textContent = match.title;
         tabs.setAttribute('aria-label', match.title + ' categories');
