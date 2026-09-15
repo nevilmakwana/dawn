@@ -3638,3 +3638,32 @@ details-disclosure > details {
     contain-intrinsic-size: auto 720px;
   }
 }
+
+:is(
+  .prada-product-tile__media,
+  .card__media,
+  .collection-showcase__media,
+  .prada-category-showcase__media,
+  .prada-featured-tile__link
+).ge-image-placeholder {
+  background-color: #dedede !important;
+  background-image: url('./grey-exim-image-placeholder-logo.png') !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: clamp(12rem, 42%, 32rem) auto !important;
+}
+
+.ge-image-placeholder .ge-image-placeholder__target {
+  opacity: 0;
+  transition: opacity 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ge-image-placeholder.ge-image-loaded .ge-image-placeholder__target {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ge-image-placeholder .ge-image-placeholder__target {
+    transition: none;
+  }
+}

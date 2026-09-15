@@ -1613,3 +1613,66 @@ class CartPerformance {
     );
   }
 }
+
+(() => {
+  const containerSelector = [
+    '.prada-product-tile__media',
+    '.card__media',
+    '.collection-showcase__media',
+    '.prada-category-showcase__media',
+    '.prada-featured-tile__link',
+  ].join(', ');
+
+  const initializeContainer = (container) => {
+    if (!(container instanceof HTMLElement) || container.dataset.geImagePlaceholderBound === 'true') return;
+
+    const image = container.querySelector('img');
+    if (!image) return;
+
+    container.dataset.geImagePlaceholderBound = 'true';
+    if (image.complete && image.naturalWidth > 0) return;
+
+    container.classList.add('ge-image-placeholder');
+    image.classList.add('ge-image-placeholder__target');
+
+    let revealed = false;
+    const revealImage = async () => {
+      if (revealed || image.naturalWidth === 0) return;
+      revealed = true;
+
+      if (typeof image.decode === 'function') {
+        await image.decode().catch(() => {});
+      }
+
+      requestAnimationFrame(() => {
+        container.classList.add('ge-image-loaded');
+        window.setTimeout(() => {
+          container.classList.remove('ge-image-placeholder', 'ge-image-loaded');
+          image.classList.remove('ge-image-placeholder__target');
+        }, 400);
+      });
+    };
+
+    image.addEventListener('load', revealImage, { once: true });
+    if (image.complete && image.naturalWidth > 0) revealImage();
+  };
+
+  const initializeImagePlaceholders = (root = document) => {
+    if (root instanceof Element && root.matches(containerSelector)) initializeContainer(root);
+    root.querySelectorAll?.(containerSelector).forEach(initializeContainer);
+  };
+
+  initializeImagePlaceholders();
+  document.addEventListener('shopify:section:load', (event) => initializeImagePlaceholders(event.target));
+  document.addEventListener('prada:collection:updated', () => initializeImagePlaceholders());
+
+  const observer = new MutationObserver((records) => {
+    records.forEach((record) => {
+      record.addedNodes.forEach((node) => {
+        if (node instanceof Element) initializeImagePlaceholders(node);
+      });
+    });
+  });
+
+  if (document.body) observer.observe(document.body, { childList: true, subtree: true });
+})();
