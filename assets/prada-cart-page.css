@@ -661,6 +661,9 @@
     background: transparent;
     color: #111111;
     font: inherit;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
     transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
   }
 
