@@ -14,7 +14,7 @@
 {%- liquid
   assign media_loading = loading | default: 'lazy'
   assign media_fetch_priority = fetchpriority | default: 'low'
-  assign mobile_image_width = media.preview_image.width | at_most: 720
+  assign mobile_image_width = media.preview_image.width | at_most: 950
   assign media_preload = false
   if preload == true
     assign media_preload = true
@@ -33,10 +33,9 @@
           data-prada-mobile-source
           media="(max-width: 749px)"
           srcset="
-            {%- if media.preview_image.width >= 360 -%}{{ media.preview_image | image_url: width: 360 }} 360w,{%- endif -%}
-            {%- if media.preview_image.width >= 480 -%}{{ media.preview_image | image_url: width: 480 }} 480w,{%- endif -%}
-            {%- if media.preview_image.width >= 550 -%}{{ media.preview_image | image_url: width: 550 }} 550w,{%- endif -%}
-            {%- if media.preview_image.width >= 640 -%}{{ media.preview_image | image_url: width: 640 }} 640w,{%- endif -%}
+            {%- if media.preview_image.width > 360 -%}{{ media.preview_image | image_url: width: 360 }} 360w,{%- endif -%}
+            {%- if media.preview_image.width > 550 -%}{{ media.preview_image | image_url: width: 550 }} 550w,{%- endif -%}
+            {%- if media.preview_image.width > 750 -%}{{ media.preview_image | image_url: width: 750 }} 750w,{%- endif -%}
             {{ media.preview_image | image_url: width: mobile_image_width }} {{ mobile_image_width }}w
           "
           sizes="100vw"

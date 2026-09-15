@@ -8,12 +8,7 @@ body:has(main[data-template='product']) .section-header.shopify-section-group-he
 .prada-product__media-list { margin: 0; padding: 0; }
 .prada-product__media { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: auto; min-height: 0; aspect-ratio: 4 / 5; margin: 0; overflow: hidden; scroll-margin-top: var(--header-height, 72px); background: #f1f1f1; }
 .prada-product__media img, .prada-product__media video, .prada-product__media iframe, .prada-product__media model-viewer, .prada-product__media svg { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; border: 0; }
-.prada-product__media--image::before { content: ''; position: absolute; z-index: 1; inset: 0; background-color: #dedede; background-image: var(--prada-placeholder-logo); background-repeat: no-repeat; background-position: center; background-size: clamp(180px, 42%, 320px) auto; opacity: 0; visibility: hidden; transition: opacity .48s cubic-bezier(.22, 1, .36, 1), visibility 0s linear .48s; }
-.prada-product__gallery-image { position: relative; z-index: 2; opacity: 1; transition: opacity .48s cubic-bezier(.22, 1, .36, 1); }
-.prada-product__media--image.is-image-loading::before { opacity: 1; visibility: visible; transition-delay: 0s; }
-.prada-product__media--image.is-image-loading .prada-product__gallery-image { opacity: 0; }
-.prada-product__media--image.is-image-loaded::before { opacity: 0; visibility: hidden; transition-delay: 0s, .48s; }
-.prada-product__media--image.is-image-loaded .prada-product__gallery-image { opacity: 1; }
+.prada-product__gallery-image { position: relative; z-index: 2; opacity: 1; }
 .prada-product__media--video video { object-fit: cover; background: #000; pointer-events: none; }
 .prada-product__media--video video::-webkit-media-controls { display: none !important; }
 .prada-product__media--video video::-webkit-media-controls-enclosure { display: none !important; }
@@ -144,8 +139,6 @@ html.prada-drawer-open, html.prada-drawer-open body { overflow: hidden; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .prada-product__media--image::before,
-  .prada-product__gallery-image { transition-duration: .01ms; }
   .prada-product__scroll-hint { transition-duration: .01ms; }
   .prada-product__media:first-child img,
   .prada-product__media:first-child video { transition-duration: .01ms; }

@@ -205,29 +205,39 @@
                       {% endif %}
                     >
                     {%- if primary_media -%}
+                      {%- assign primary_image_width = primary_media.width | at_most: 940 -%}
                       <img
                         class="prada-product-tile__image"
                         srcset="
-                          {%- if primary_media.width >= 360 -%}{{ primary_media | image_url: width: 360 }} 360w,{%- endif -%}
-                          {%- if primary_media.width >= 533 -%}{{ primary_media | image_url: width: 533 }} 533w,{%- endif -%}
-                          {%- if primary_media.width >= 720 -%}{{ primary_media | image_url: width: 720 }} 720w,{%- endif -%}
-                          {{ primary_media | image_url: width: 940 }} 940w
+                          {%- if primary_media.width > 360 -%}{{ primary_media | image_url: width: 360 }} 360w,{%- endif -%}
+                          {%- if primary_media.width > 533 -%}{{ primary_media | image_url: width: 533 }} 533w,{%- endif -%}
+                          {%- if primary_media.width > 720 -%}{{ primary_media | image_url: width: 720 }} 720w,{%- endif -%}
+                          {{ primary_media | image_url: width: primary_image_width }} {{ primary_image_width }}w
                         "
                         src="{{ primary_media | image_url: width: 360 }}"
                         sizes="(max-width: 749px) calc(50vw - 16px), (max-width: 989px) 30vw, 25vw"
                         alt="{{ primary_media.alt | default: product.title | escape }}"
-                        {% if forloop.index > 4 %}loading="lazy" fetchpriority="low"{% endif %}
+                        {% if forloop.index <= 4 %}
+                          loading="eager"
+                          fetchpriority="high"
+                          decoding="sync"
+                        {% else %}
+                          loading="lazy"
+                          fetchpriority="low"
+                          decoding="async"
+                        {% endif %}
                         width="{{ primary_media.width }}"
                         height="{{ primary_media.height }}"
                       >
                       {%- if has_secondary_image -%}
+                        {%- assign secondary_image_width = secondary_media.width | at_most: 940 -%}
                         <img
                           class="prada-product-tile__image prada-product-tile__image--secondary"
                           srcset="
-                            {%- if secondary_media.width >= 360 -%}{{ secondary_media | image_url: width: 360 }} 360w,{%- endif -%}
-                            {%- if secondary_media.width >= 533 -%}{{ secondary_media | image_url: width: 533 }} 533w,{%- endif -%}
-                            {%- if secondary_media.width >= 720 -%}{{ secondary_media | image_url: width: 720 }} 720w,{%- endif -%}
-                            {{ secondary_media | image_url: width: 940 }} 940w
+                            {%- if secondary_media.width > 360 -%}{{ secondary_media | image_url: width: 360 }} 360w,{%- endif -%}
+                            {%- if secondary_media.width > 533 -%}{{ secondary_media | image_url: width: 533 }} 533w,{%- endif -%}
+                            {%- if secondary_media.width > 720 -%}{{ secondary_media | image_url: width: 720 }} 720w,{%- endif -%}
+                            {{ secondary_media | image_url: width: secondary_image_width }} {{ secondary_image_width }}w
                           "
                           src="{{ secondary_media | image_url: width: 360 }}"
                           sizes="(max-width: 749px) calc(50vw - 16px), (max-width: 989px) 30vw, 25vw"

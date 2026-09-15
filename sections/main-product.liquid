@@ -62,7 +62,6 @@
 <section
   class="prada-product"
   id="PradaProduct-{{ section.id }}"
-  style="--prada-placeholder-logo: url('{{ 'grey-exim-wordmark-logo-white.png' | asset_url }}');"
   data-section-id="{{ section.id }}"
   data-product-url="{{ product.url }}"
   data-initial-gallery-key="{% if current_variant_gallery != blank %}{{ current_variant.id }}{% else %}default{% endif %}"
@@ -128,7 +127,7 @@
                   assign media_loading = 'lazy'
                   assign media_fetch_priority = 'low'
                   assign media_preload = false
-                  assign mobile_image_width = media.preview_image.width | at_most: 720
+                  assign mobile_image_width = media.preview_image.width | at_most: 950
                   if forloop.first
                     assign media_loading = 'eager'
                     assign media_fetch_priority = 'high'
@@ -140,10 +139,9 @@
                     data-prada-mobile-source
                     media="(max-width: 749px)"
                     srcset="
-                      {%- if media.preview_image.width >= 360 -%}{{ media.preview_image | image_url: width: 360 }} 360w,{%- endif -%}
-                      {%- if media.preview_image.width >= 480 -%}{{ media.preview_image | image_url: width: 480 }} 480w,{%- endif -%}
-                      {%- if media.preview_image.width >= 550 -%}{{ media.preview_image | image_url: width: 550 }} 550w,{%- endif -%}
-                      {%- if media.preview_image.width >= 640 -%}{{ media.preview_image | image_url: width: 640 }} 640w,{%- endif -%}
+                      {%- if media.preview_image.width > 360 -%}{{ media.preview_image | image_url: width: 360 }} 360w,{%- endif -%}
+                      {%- if media.preview_image.width > 550 -%}{{ media.preview_image | image_url: width: 550 }} 550w,{%- endif -%}
+                      {%- if media.preview_image.width > 750 -%}{{ media.preview_image | image_url: width: 750 }} 750w,{%- endif -%}
                       {{ media.preview_image | image_url: width: mobile_image_width }} {{ mobile_image_width }}w
                     "
                     sizes="100vw"
@@ -493,16 +491,15 @@
         >
           {%- case media.media_type -%}
             {%- when 'image' -%}
-              {%- assign mobile_image_width = media.preview_image.width | at_most: 720 -%}
+              {%- assign mobile_image_width = media.preview_image.width | at_most: 950 -%}
               <picture style="display: contents;">
                 <source
                   data-prada-mobile-source
                   media="(max-width: 749px)"
                   srcset="
-                    {%- if media.preview_image.width >= 360 -%}{{ media.preview_image | image_url: width: 360 }} 360w,{%- endif -%}
-                    {%- if media.preview_image.width >= 480 -%}{{ media.preview_image | image_url: width: 480 }} 480w,{%- endif -%}
-                    {%- if media.preview_image.width >= 550 -%}{{ media.preview_image | image_url: width: 550 }} 550w,{%- endif -%}
-                    {%- if media.preview_image.width >= 640 -%}{{ media.preview_image | image_url: width: 640 }} 640w,{%- endif -%}
+                    {%- if media.preview_image.width > 360 -%}{{ media.preview_image | image_url: width: 360 }} 360w,{%- endif -%}
+                    {%- if media.preview_image.width > 550 -%}{{ media.preview_image | image_url: width: 550 }} 550w,{%- endif -%}
+                    {%- if media.preview_image.width > 750 -%}{{ media.preview_image | image_url: width: 750 }} 750w,{%- endif -%}
                     {{ media.preview_image | image_url: width: mobile_image_width }} {{ mobile_image_width }}w
                   "
                   sizes="100vw"
@@ -649,33 +646,6 @@
       return moneyFormat.replace(/\{\{\s*amount(?:_with_comma_separator)?\s*\}\}/, amount).replace(/<[^>]*>/g, '');
     };
 
-    const initializeProductImage = (image) => {
-      const media = image.closest('.prada-product__media--image');
-      if (!media) return;
-
-      const loadToken = `${image.currentSrc || image.src}-${performance.now()}`;
-      image.dataset.pradaLoadToken = loadToken;
-      media.classList.add('is-image-loading');
-      media.classList.remove('is-image-loaded');
-
-      const revealImage = async () => {
-        await image.decode?.().catch(() => {});
-        if (image.dataset.pradaLoadToken !== loadToken) return;
-        window.requestAnimationFrame(() => {
-          media.classList.remove('is-image-loading');
-          media.classList.add('is-image-loaded');
-        });
-      };
-
-      if (image.complete && image.naturalWidth > 0) revealImage();
-      else image.addEventListener('load', revealImage, { once: true });
-    };
-
-    const initializeImageLoading = (scope = mediaList) => {
-      scope?.querySelectorAll('.prada-product__media--image .prada-product__gallery-image')
-        .forEach(initializeProductImage);
-    };
-
     const shopifyImageUrlAtWidth = (source, width) => {
       try {
         const url = new URL(source, window.location.origin);
@@ -699,7 +669,7 @@
         image.src = shopifyImageUrlAtWidth(source, fallbackWidth);
 
         if (image.classList.contains('prada-product__gallery-image')) {
-          const mobileWidths = [360, 480, 550, 640, 720];
+          const mobileWidths = [360, 550, 750, 950];
           let mobileSource = image.closest('picture')?.querySelector('[data-prada-mobile-source]');
           if (!mobileSource && image.parentElement?.tagName === 'PICTURE') {
             mobileSource = document.createElement('source');
@@ -730,7 +700,6 @@
         '(min-width: 990px) 50vw, 100vw',
         1800
       );
-      initializeProductImage(primaryImage);
     };
 
     const setSwatchImageSource = (image, source) => {
@@ -1039,7 +1008,6 @@
       activeGalleryKey = nextGalleryKey;
       galleryReturnScrollTop = 0;
       mobileGallery?.scrollTo({ top: 0, behavior: 'auto' });
-      initializeImageLoading(mediaList);
       refreshGalleryTracking();
       setupProductVideos();
       syncDesktopWishlist();
@@ -1233,7 +1201,6 @@
       window.addEventListener('load', () => window.setTimeout(playMobileOnboarding, 650), { once: true });
     }
 
-    initializeImageLoading(mediaList);
     setupProductVideos();
     updateVariant({ updateHistory: false });
   })();
