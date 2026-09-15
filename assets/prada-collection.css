@@ -79,11 +79,12 @@ body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
 }
 
 .js .prada-collection__tabs[data-prada-navigation-state='resolving'] {
-  visibility: hidden;
+  visibility: visible;
 }
 
 .prada-collection__tabs[data-prada-navigation-state='resolving']::after {
-  transition: none;
+  opacity: 0;
+  transition: none !important;
 }
 
 .prada-collection__tabs::after {

@@ -25,6 +25,94 @@
         border: none !important;
       }
 
+      .header.prada-header,
+      .prada-header {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        padding: 0 24px !important;
+        grid-template-columns: none !important;
+        column-gap: 0 !important;
+      }
+
+      .prada-header-left,
+      .prada-header-center,
+      .prada-header-right {
+        display: flex !important;
+        align-items: center !important;
+      }
+
+      .prada-header-left {
+        flex: 1 1 0% !important;
+        justify-content: flex-start !important;
+      }
+
+      .prada-header-center {
+        flex: 0 0 auto !important;
+        justify-content: center !important;
+      }
+
+      .prada-header-right {
+        flex: 1 1 0% !important;
+        justify-content: flex-end !important;
+      }
+
+      @media screen and (max-width: 989px) {
+        .header.prada-header,
+        .prada-header {
+          display: grid !important;
+          grid-template-columns: 76px minmax(0, 1fr) 104px !important;
+          height: var(--prada-mobile-header-height, 56px) !important;
+          min-height: var(--prada-mobile-header-height, 56px) !important;
+          max-height: var(--prada-mobile-header-height, 56px) !important;
+          padding: 10px 16px !important;
+        }
+
+        .prada-header-left {
+          flex: none !important;
+          min-width: 76px;
+          justify-content: flex-start !important;
+        }
+
+        .prada-header-center {
+          min-width: 0;
+          justify-content: center !important;
+        }
+
+        .prada-header-right {
+          flex: none !important;
+          min-width: 104px;
+          justify-content: flex-end !important;
+        }
+      }
+
+      @media screen and (max-width: 360px) {
+        .header.prada-header,
+        .prada-header {
+          grid-template-columns: 72px minmax(0, 1fr) 100px !important;
+          padding: 10px 12px !important;
+        }
+
+        .prada-header-left {
+          min-width: 72px;
+        }
+
+        .prada-header-right {
+          min-width: 100px;
+        }
+      }
+
+      @media screen and (min-width: 990px) {
+        .header.prada-header,
+        .prada-header {
+          height: var(--prada-desktop-header-height, 89px) !important;
+          min-height: var(--prada-desktop-header-height, 89px) !important;
+          max-height: var(--prada-desktop-header-height, 89px) !important;
+        }
+      }
+
       /* Keep the hidden cart drawer out of document flow before its async stylesheet loads. */
       cart-drawer.drawer {
         position: fixed;
@@ -403,7 +491,7 @@
     </script>
   </head>
 
-  <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
+  <body class="gradient template-{{ template.name | default: 'unknown' | handle }}{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
     <a class="skip-to-content-link button visually-hidden" href="#MainContent">
       {{ 'accessibility.skip_to_text' | t }}
     </a>
