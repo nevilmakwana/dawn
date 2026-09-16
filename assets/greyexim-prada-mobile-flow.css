@@ -71,15 +71,19 @@
 
   main[data-template='product'] .related-products .media.media--hover-effect > img:first-child {
     opacity: 1;
-    transform: none !important;
-    transition: opacity 280ms cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(1);
+    transition:
+      opacity 280ms cubic-bezier(0.4, 0, 0.2, 1),
+      transform var(--duration-long) ease;
   }
 
   main[data-template='product'] .related-products .media.media--hover-effect > img + img {
     opacity: 0;
-    transform: none !important;
+    transform: scale(1);
     pointer-events: none;
-    transition: opacity 280ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      opacity 280ms cubic-bezier(0.4, 0, 0.2, 1),
+      transform var(--duration-long) ease;
   }
 
   main[data-template='product'] .related-products .card > .card__content {
@@ -120,14 +124,26 @@
 }
 
 @media screen and (min-width: 990px) and (hover: hover) and (pointer: fine) {
-  main[data-template='product'] .related-products .card-wrapper:hover .media.media--hover-effect > img:first-child {
+  main[data-template='product']
+    .related-products
+    .card-wrapper:hover
+    .media.media--hover-effect
+    > img:first-child:only-child {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+
+  main[data-template='product']
+    .related-products
+    .card-wrapper:hover
+    .media.media--hover-effect
+    > img:first-child:not(:only-child) {
     opacity: 0;
-    transform: none !important;
   }
 
   main[data-template='product'] .related-products .card-wrapper:hover .media.media--hover-effect > img + img {
     opacity: 1;
-    transform: none !important;
+    transform: scale(1.03);
   }
 }
 
