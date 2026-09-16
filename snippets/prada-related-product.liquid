@@ -81,7 +81,8 @@
   if secondary_media != blank and secondary_media.media_type == 'image'
     assign has_secondary_image = true
   endif
-  assign product_url = product_item.url | append: '?variant=' | append: display_variant.id
+  assign product_base_url = product_item.url | split: '?' | first
+  assign product_url = product_base_url | append: '?variant=' | append: display_variant.id
   assign is_eager = false
   if forloop_index <= 4
     assign is_eager = true

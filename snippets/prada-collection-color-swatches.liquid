@@ -88,7 +88,8 @@
           endcase
         endif
 
-        assign color_variant_url = product.url | append: '?variant=' | append: color_variant.id
+        assign product_base_url = product.url | split: '?' | first
+        assign color_variant_url = product_base_url | append: '?variant=' | append: color_variant.id
       -%}
       <a
         class="prada-product-tile__color{% if selected_color == value %} is-selected{% endif %}"
