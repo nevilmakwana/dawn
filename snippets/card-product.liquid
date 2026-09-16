@@ -35,16 +35,6 @@
   {%- liquid
     assign card_primary_media = card_product.featured_media
     assign card_secondary_media = card_product.media[1]
-    if product_view_context == 'recommendation'
-      assign card_primary_media = card_product.images.first
-      assign card_secondary_media = null
-      for image_item in card_product.images offset: 1
-        if image_item.id != card_primary_media.id
-          assign card_secondary_media = image_item
-          break
-        endif
-      endfor
-    endif
     if card_primary_media == blank
       assign card_variant_gallery = card_product.selected_or_first_available_variant.metafields.custom.variant_images.value
       if card_variant_gallery == blank
