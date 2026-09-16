@@ -1,6 +1,6 @@
-{{ 'component-card.css' | asset_url | stylesheet_tag }}
 {{ 'component-price.css' | asset_url | stylesheet_tag }}
 {{ 'section-related-products.css' | asset_url | stylesheet_tag }}
+{{ 'prada-collection.css' | asset_url | stylesheet_tag }}
 
 {% if section.settings.image_shape == 'blob' %}
   {{ 'mask-blobs.css' | asset_url | stylesheet_tag }}
@@ -37,17 +37,16 @@
         role="list"
         data-prada-related-list
       >
-        {% assign skip_card_product_styles = false %}
         {% assign rendered_related_count = 0 %}
         {% assign rendered_related_handles = '|' | append: product.handle | append: '|' %}
         {% for recommendation in recommendations.products limit: max_related_products %}
           {%- assign recommendation_token = '|' | append: recommendation.handle | append: '|' -%}
           {% if rendered_related_count < max_related_products %}
             {% unless rendered_related_handles contains recommendation_token %}
-              {% render 'prada-related-product', related_product: recommendation, section: section, skip_card_product_styles: skip_card_product_styles %}
+              {%- assign related_render_position = rendered_related_count | plus: 1 -%}
+              {% render 'prada-related-product', related_product: recommendation, forloop_index: related_render_position %}
               {%- assign rendered_related_count = rendered_related_count | plus: 1 -%}
               {%- assign rendered_related_handles = rendered_related_handles | append: recommendation.handle | append: '|' -%}
-              {%- assign skip_card_product_styles = true -%}
             {% endunless %}
           {% endif %}
         {% endfor %}
@@ -56,10 +55,10 @@
             {%- assign fallback_token = '|' | append: fallback_product.handle | append: '|' -%}
             {% if rendered_related_count < max_related_products and fallback_product.id != product.id %}
               {% unless rendered_related_handles contains fallback_token %}
-                {% render 'prada-related-product', related_product: fallback_product, section: section, skip_card_product_styles: skip_card_product_styles %}
+                {%- assign related_render_position = rendered_related_count | plus: 1 -%}
+                {% render 'prada-related-product', related_product: fallback_product, forloop_index: related_render_position %}
                 {%- assign rendered_related_count = rendered_related_count | plus: 1 -%}
                 {%- assign rendered_related_handles = rendered_related_handles | append: fallback_product.handle | append: '|' -%}
-                {%- assign skip_card_product_styles = true -%}
               {% endunless %}
             {% endif %}
           {% endfor %}
