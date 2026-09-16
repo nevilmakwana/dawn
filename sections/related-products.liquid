@@ -20,14 +20,15 @@
   }
 {%- endstyle -%}
 
+{%- assign max_related_products = 8 -%}
 <div class="color-{{ section.settings.color_scheme }} gradient">
   <product-recommendations
     class="related-products page-width section-{{ section.id }}-padding isolate{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
-    data-url="{{ routes.product_recommendations_url }}?limit={{ section.settings.products_to_show }}"
+    data-url="{{ routes.product_recommendations_url }}?limit={{ max_related_products }}"
     data-section-id="{{ section.id }}"
     data-product-id="{{ product.id }}"
   >
-    {% if recommendations.performed and recommendations.products_count > 0 %}
+    {% if recommendations.performed %}
       <h2 class="related-products__heading inline-richtext {{ section.settings.heading_size }}">
         {{ section.settings.heading }}
       </h2>
@@ -38,17 +39,22 @@
       >
         {% assign skip_card_product_styles = false %}
         {% assign rendered_related_count = 0 %}
-        {% assign rendered_related_handles = '|' %}
-        {% for recommendation in recommendations.products limit: 4 %}
-          {% render 'prada-related-product', related_product: recommendation, section: section, skip_card_product_styles: skip_card_product_styles %}
-          {%- assign rendered_related_count = rendered_related_count | plus: 1 -%}
-          {%- assign rendered_related_handles = rendered_related_handles | append: recommendation.handle | append: '|' -%}
-          {%- assign skip_card_product_styles = true -%}
+        {% assign rendered_related_handles = '|' | append: product.handle | append: '|' %}
+        {% for recommendation in recommendations.products limit: max_related_products %}
+          {%- assign recommendation_token = '|' | append: recommendation.handle | append: '|' -%}
+          {% if rendered_related_count < max_related_products %}
+            {% unless rendered_related_handles contains recommendation_token %}
+              {% render 'prada-related-product', related_product: recommendation, section: section, skip_card_product_styles: skip_card_product_styles %}
+              {%- assign rendered_related_count = rendered_related_count | plus: 1 -%}
+              {%- assign rendered_related_handles = rendered_related_handles | append: recommendation.handle | append: '|' -%}
+              {%- assign skip_card_product_styles = true -%}
+            {% endunless %}
+          {% endif %}
         {% endfor %}
-        {% if rendered_related_count < 4 %}
+        {% if rendered_related_count < max_related_products %}
           {% for fallback_product in collections.all.products %}
             {%- assign fallback_token = '|' | append: fallback_product.handle | append: '|' -%}
-            {% if rendered_related_count < 4 and fallback_product.id != product.id %}
+            {% if rendered_related_count < max_related_products and fallback_product.id != product.id %}
               {% unless rendered_related_handles contains fallback_token %}
                 {% render 'prada-related-product', related_product: fallback_product, section: section, skip_card_product_styles: skip_card_product_styles %}
                 {%- assign rendered_related_count = rendered_related_count | plus: 1 -%}
@@ -191,7 +197,7 @@
       "min": 2,
       "max": 10,
       "step": 1,
-      "default": 4,
+      "default": 8,
       "label": "t:sections.related-products.settings.products_to_show.label"
     },
     {
@@ -293,7 +299,7 @@
     {
       "type": "checkbox",
       "id": "show_secondary_image",
-      "default": false,
+      "default": true,
       "label": "t:sections.related-products.settings.show_secondary_image.label"
     },
     {
