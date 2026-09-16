@@ -84,8 +84,12 @@
   assign product_base_url = product_item.url | split: '?' | first
   assign product_url = product_base_url | append: '?variant=' | append: display_variant.id
   assign is_eager = false
+  assign is_high_priority = false
   if forloop_index <= 4
     assign is_eager = true
+  endif
+  if forloop_index == 1
+    assign is_high_priority = true
   endif
 -%}
 
@@ -116,7 +120,11 @@
               alt="{{ primary_media.alt | default: product_item.title | escape }}"
               {% if is_eager %}
                 loading="eager"
-                fetchpriority="high"
+                {% if is_high_priority %}
+                  fetchpriority="high"
+                {% else %}
+                  fetchpriority="auto"
+                {% endif %}
                 decoding="async"
               {% else %}
                 loading="lazy"

@@ -14,6 +14,9 @@
   assign primary_fetchpriority = 'low'
   if effective_card_index <= 4
     assign primary_loading = 'eager'
+    assign primary_fetchpriority = 'auto'
+  endif
+  if effective_card_index == 1
     assign primary_fetchpriority = 'high'
   endif
 
