@@ -672,6 +672,11 @@ body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
     font-size: 1.05rem;
   }
 
+  .prada-collection__controls {
+    min-width: 14.1rem;
+    justify-content: flex-end;
+  }
+
   .prada-collection__filter-menu,
   .prada-collection__control-divider {
     display: none !important;
