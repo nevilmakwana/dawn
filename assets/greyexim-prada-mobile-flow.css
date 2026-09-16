@@ -225,6 +225,21 @@
     display: none !important;
   }
 
+  main[data-template='product']
+    .related-products
+    .prada-product-tile__pagination {
+    pointer-events: auto;
+  }
+
+  main[data-template='product']
+    .related-products
+    .prada-product-tile__pagination-dot {
+    display: block;
+    padding: 0;
+    cursor: pointer;
+    appearance: none;
+  }
+
   main[data-template='product'] .related-products .prada-product-tile__information {
     min-height: 7.8rem;
     padding: 1.1rem 1rem 1.3rem;
@@ -490,5 +505,16 @@
     width: max-content;
     max-width: 100%;
     margin: 5px auto 0;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  main[data-template='product']
+    .related-products
+    .prada-product-tile__carousel[data-prada-mobile-carousel]
+    .prada-product-tile__image--secondary {
+    position: static;
+    display: block !important;
+    opacity: 1;
   }
 }

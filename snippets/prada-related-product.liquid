@@ -104,7 +104,12 @@
   <product-component view-event-payload="{{ product_item | standard_event_data: 'view', context: 'recommendation' | escape }}">
     <article class="prada-product-tile">
       <div class="prada-product-tile__media">
-        <a class="prada-product-tile__carousel" href="{{ product_url }}">
+        <a
+          id="PradaRelatedCarousel-{{ product_item.id }}-{{ display_variant.id }}"
+          class="prada-product-tile__carousel"
+          href="{{ product_url }}"
+          {% if has_secondary_image %}data-prada-mobile-carousel{% endif %}
+        >
           {%- if primary_media -%}
             {%- assign primary_image_width = primary_media.width | at_most: 900 -%}
             <img
@@ -159,6 +164,26 @@
             {{ 'product-apparel-2' | placeholder_svg_tag: 'prada-product-tile__placeholder' }}
           {%- endif -%}
         </a>
+
+        {%- if has_secondary_image -%}
+          <span class="prada-product-tile__pagination">
+            <button
+              type="button"
+              class="prada-product-tile__pagination-dot is-active"
+              data-prada-carousel-dot="0"
+              aria-label="{{ 'products.product.media.load_image' | t: index: 1 }}"
+              aria-controls="PradaRelatedCarousel-{{ product_item.id }}-{{ display_variant.id }}"
+              aria-current="true"
+            ></button>
+            <button
+              type="button"
+              class="prada-product-tile__pagination-dot"
+              data-prada-carousel-dot="1"
+              aria-label="{{ 'products.product.media.load_image' | t: index: 2 }}"
+              aria-controls="PradaRelatedCarousel-{{ product_item.id }}-{{ display_variant.id }}"
+            ></button>
+          </span>
+        {%- endif -%}
       </div>
 
       <button

@@ -98,11 +98,47 @@
     if (!recommendations || recommendations.dataset.pradaPaginationObserver === 'true') return;
     recommendations.dataset.pradaPaginationObserver = 'true';
 
+    const initialiseCardCarousels = () => {
+      recommendations.querySelectorAll('[data-prada-mobile-carousel]').forEach((carousel) => {
+        if (carousel.dataset.pradaCarouselReady === 'true') return;
+
+        const dots = Array.from(
+          carousel.parentElement.querySelectorAll('[data-prada-carousel-dot]')
+        );
+        if (dots.length !== 2) return;
+
+        carousel.dataset.pradaCarouselReady = 'true';
+        let frame;
+
+        const setActiveImage = () => {
+          frame = undefined;
+          const activeIndex = carousel.scrollLeft >= carousel.clientWidth / 2 ? 1 : 0;
+          dots.forEach((dot, index) => {
+            const active = index === activeIndex;
+            dot.classList.toggle('is-active', active);
+            if (active) dot.setAttribute('aria-current', 'true');
+            else dot.removeAttribute('aria-current');
+          });
+        };
+
+        carousel.addEventListener('scroll', () => {
+          if (!frame) frame = window.requestAnimationFrame(setActiveImage);
+        }, { passive: true });
+        dots.forEach((dot, index) => dot.addEventListener('click', () => {
+          carousel.scrollTo({ left: index * carousel.clientWidth, behavior: 'smooth' });
+        }));
+        setActiveImage();
+      });
+    };
+
     const initialisePagination = () => {
       const list = recommendations.querySelector('[data-prada-related-list]');
       const dots = Array.from(recommendations.querySelectorAll('[data-prada-related-page]'));
       const arrows = Array.from(recommendations.querySelectorAll('[data-prada-related-arrow]'));
-      if (!list || !dots.length || list.dataset.pradaPaginationReady === 'true') return false;
+      if (!list) return false;
+      initialiseCardCarousels();
+      if (!dots.length) return true;
+      if (list.dataset.pradaPaginationReady === 'true') return true;
       list.dataset.pradaPaginationReady = 'true';
 
       let frame;
