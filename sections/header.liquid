@@ -2169,6 +2169,18 @@
     }
   }
 
+  @media screen and (min-width: 990px) {
+    body.template-product .section-header {
+      transform: translate3d(0, 0, 0);
+      transition: transform 240ms cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+    }
+
+    body.template-product .section-header.shopify-section-header-hidden {
+      transform: translate3d(0, -100%, 0);
+    }
+  }
+
   /* Header-owned overlays must escape page-specific sticky/transform layers. */
   .section-header.menu-open,
   .section-header:has(.prada-header .header__search details[open]),
