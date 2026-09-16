@@ -14,6 +14,10 @@
       {% comment %}theme-check-enable AssetPreload{% endcomment %}
     {%- endunless -%}
     <style>
+      html {
+        scrollbar-gutter: stable;
+      }
+
       /* Match the header's final fixed state before its section CSS finishes parsing. */
       .section-header {
         position: fixed !important;
@@ -64,9 +68,6 @@
         .prada-header {
           display: grid !important;
           grid-template-columns: 76px minmax(0, 1fr) 104px !important;
-          height: var(--prada-mobile-header-height, 56px) !important;
-          min-height: var(--prada-mobile-header-height, 56px) !important;
-          max-height: var(--prada-mobile-header-height, 56px) !important;
           padding: 10px 16px !important;
         }
 
@@ -124,9 +125,7 @@
       @media screen and (min-width: 990px) {
         .header.prada-header,
         .prada-header {
-          height: var(--prada-desktop-header-height, 89px) !important;
-          min-height: var(--prada-desktop-header-height, 89px) !important;
-          max-height: var(--prada-desktop-header-height, 89px) !important;
+          padding: 0 24px !important;
         }
       }
 

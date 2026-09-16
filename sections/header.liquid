@@ -86,20 +86,29 @@
 
   /* ---- Prada Header Container ---- */
   .prada-header {
-    display: flex !important;
+    display: grid !important;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 14px 20px !important;
+    box-sizing: border-box !important;
+    grid-template-columns: 76px minmax(0, 1fr) 104px !important;
+    padding: 10px 16px !important;
+    height: var(--prada-mobile-header-height, 56px) !important;
+    min-height: var(--prada-mobile-header-height, 56px) !important;
+    max-height: var(--prada-mobile-header-height, 56px) !important;
     background: rgba(255, 255, 255, 0) !important;
     border: none !important;
-    grid-template-columns: none !important;
     column-gap: 0 !important;
   }
 
   @media screen and (min-width: 990px) {
     .prada-header {
-      padding: 12px 24px !important;
+      display: flex !important;
+      grid-template-columns: none !important;
+      padding: 0 24px !important;
+      height: var(--prada-desktop-header-height, 89px) !important;
+      min-height: var(--prada-desktop-header-height, 89px) !important;
+      max-height: var(--prada-desktop-header-height, 89px) !important;
     }
   }
 
@@ -2176,7 +2185,7 @@
       will-change: transform;
     }
 
-    body.template-product .section-header.shopify-section-header-hidden {
+    body.template-product .section-header.shopify-section-header-hidden:not(.is-navigating) {
       transform: translate3d(0, -100%, 0);
     }
   }
@@ -2198,6 +2207,11 @@
 
 {% liquid
   assign header_tag = 'div'
+  assign has_server_hero = false
+
+  if request.page_type == 'index'
+    assign has_server_hero = true
+  endif
 
   if section.settings.sticky_header_type != 'none'
     assign header_tag = 'sticky-header'
@@ -2208,7 +2222,7 @@
   {% if header_tag == 'sticky-header' %}
     data-sticky-type="{{ section.settings.sticky_header_type }}"
   {% endif %}
-  class="header-wrapper color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator %} header-wrapper--border-bottom{% endif %}"
+  class="header-wrapper color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator %} header-wrapper--border-bottom{% endif %}{% if has_server_hero %} has-hero-banner{% endif %}"
 >
   <header class="header prada-header{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}" role="banner" data-prada-compact-header>
     
@@ -2356,14 +2370,6 @@
       });
 
       if (header) {
-        if (desktop.matches) {
-          header.style.setProperty('padding-top', '0', 'important');
-          header.style.setProperty('padding-bottom', '0', 'important');
-        } else {
-          header.style.removeProperty('padding-top');
-          header.style.removeProperty('padding-bottom');
-        }
-
         header.querySelectorAll('.prada-menu-icon-wrapper, .prada-menu-glyph, .prada-close-glyph').forEach((icon) => {
           ['width', 'height'].forEach((property) => {
             if (desktop.matches) icon.style.setProperty(property, '15px', 'important');
@@ -2377,6 +2383,45 @@
 
     syncCompactHeader();
     desktop.addEventListener?.('change', syncCompactHeader);
+
+    if (!window.pradaHeaderNavigationGuard) {
+      window.pradaHeaderNavigationGuard = true;
+      const setNavigating = () => {
+        const activeSection = document.querySelector('.section-header');
+        activeSection?.classList.add('is-navigating');
+        activeSection?.classList.remove('shopify-section-header-hidden');
+      };
+      const clearNavigating = () => document.querySelector('.section-header')?.classList.remove('is-navigating');
+
+      document.addEventListener(
+        'click',
+        (event) => {
+          if (event.defaultPrevented || event.button !== 0) return;
+          if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+          const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+          if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+
+          let destination;
+          try {
+            destination = new URL(link.href, window.location.href);
+          } catch (_error) {
+            return;
+          }
+          if (destination.origin !== window.location.origin || !/^https?:$/.test(destination.protocol)) return;
+          if (
+            destination.pathname === window.location.pathname &&
+            destination.search === window.location.search &&
+            destination.hash
+          ) {
+            return;
+          }
+          setNavigating();
+        },
+        { passive: true }
+      );
+      window.addEventListener('pagehide', setNavigating);
+      window.addEventListener('pageshow', clearNavigating);
+    }
   })();
 </script>
 

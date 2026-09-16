@@ -146,6 +146,7 @@ class CartDrawer extends HTMLElement {
   open(triggeredBy) {
     if (this.classList.contains('active') && !this.classList.contains('is-closing')) return;
     if (!window.PradaCartMutations?.pending) this.flushDeferredCanonicalSection();
+    window.PradaFastCheckout?.prewarm?.(this.querySelector('[data-prada-fast-checkout]'));
 
     if (triggeredBy) {
       this.setActiveElement(triggeredBy);

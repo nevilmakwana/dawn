@@ -315,6 +315,7 @@ window.PradaCartMutations = window.PradaCartMutations || (() => {
 
   return {
     enqueue(task) {
+      window.PradaFastCheckout?.invalidate?.();
       pending += 1;
       const result = tail.catch(() => undefined).then(task);
       tail = result
@@ -331,6 +332,106 @@ window.PradaCartMutations = window.PradaCartMutations || (() => {
       return tail.catch(() => undefined);
     },
   };
+})();
+
+window.PradaFastCheckout = window.PradaFastCheckout || (() => {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  let prefetchLink = null;
+  let prefetchRevision = 0;
+  let navigationStarted = false;
+
+  const checkoutUrl = (source) => {
+    const configuredUrl = source?.dataset?.pradaFastCheckout;
+    return new URL(configuredUrl || `${window.routes?.root_url || '/'}checkout`, window.location.origin).href;
+  };
+
+  const canPrefetch = () => {
+    const effectiveType = connection?.effectiveType || '';
+    return !connection?.saveData && !/(^|-)2g$/.test(effectiveType) && document.visibilityState !== 'hidden';
+  };
+
+  const appendPrefetch = (url, revision) => {
+    if (revision !== prefetchRevision || !canPrefetch() || prefetchLink?.href === url) return;
+    prefetchLink?.remove();
+    prefetchLink = document.createElement('link');
+    prefetchLink.rel = 'prefetch';
+    prefetchLink.href = url;
+    document.head.append(prefetchLink);
+  };
+
+  const prewarm = (source) => {
+    if (!canPrefetch()) return;
+    const url = checkoutUrl(source);
+    const revision = prefetchRevision;
+
+    if (window.PradaCartMutations?.pending) {
+      window.PradaCartMutations.whenIdle().then(() => appendPrefetch(url, revision));
+    } else {
+      appendPrefetch(url, revision);
+    }
+  };
+
+  const invalidate = () => {
+    prefetchRevision += 1;
+    prefetchLink?.remove();
+    prefetchLink = null;
+  };
+
+  const navigate = (source) => {
+    if (navigationStarted) return;
+    navigationStarted = true;
+    const url = checkoutUrl(source);
+
+    source?.setAttribute?.('aria-busy', 'true');
+    source?.setAttribute?.('aria-disabled', 'true');
+    if (source && 'disabled' in source) source.disabled = true;
+
+    const proceed = () => window.location.assign(url);
+    if (window.PradaCartMutations?.pending) window.PradaCartMutations.whenIdle().then(proceed);
+    else proceed();
+  };
+
+  const findCheckoutControl = (event) =>
+    event.target instanceof Element ? event.target.closest('[data-prada-fast-checkout]') : null;
+
+  ['pointerover', 'focusin', 'touchstart'].forEach((eventName) => {
+    document.addEventListener(
+      eventName,
+      (event) => {
+        const control = findCheckoutControl(event);
+        if (control && !control.disabled && control.getAttribute('aria-disabled') !== 'true') prewarm(control);
+      },
+      { passive: true, capture: true }
+    );
+  });
+
+  document.addEventListener(
+    'click',
+    (event) => {
+      const control = findCheckoutControl(event);
+      if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      navigate(control);
+    },
+    true
+  );
+
+  const cartPath = new URL(window.routes?.cart_url || '/cart', window.location.origin).pathname.replace(/\/+$/, '') || '/';
+  const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+  if (currentPath === cartPath) {
+    const schedulePrewarm = () => {
+      const run = () => prewarm(document.querySelector('[data-prada-fast-checkout]'));
+      if ('requestIdleCallback' in window) window.requestIdleCallback(run);
+      else window.setTimeout(run, 500);
+    };
+    if (document.readyState === 'complete') schedulePrewarm();
+    else window.addEventListener('load', schedulePrewarm, { once: true });
+  }
+
+  return { invalidate, navigate, prewarm };
 })();
 
 // A cart mutation can still be in flight after its optimistic UI has finished.
