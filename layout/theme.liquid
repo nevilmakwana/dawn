@@ -443,6 +443,9 @@
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'greyexim-typography.css' | asset_url | stylesheet_tag }}
     {{ 'prada-product-wishlist.css' | asset_url | stylesheet_tag }}
+    {%- if request.page_type == 'collection' -%}
+      {{ 'prada-collection.css' | asset_url | stylesheet_tag }}
+    {%- endif -%}
     <script src="{{ 'prada-product-wishlist.js' | asset_url }}" defer="defer"></script>
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 
