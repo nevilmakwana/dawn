@@ -446,6 +446,14 @@
     {%- if request.page_type == 'collection' -%}
       {{ 'prada-collection.css' | asset_url | stylesheet_tag }}
     {%- endif -%}
+    {%- if request.page_type == 'search' -%}
+      {{ 'template-collection.css' | asset_url | stylesheet_tag }}
+      {{ 'component-card.css' | asset_url | stylesheet_tag }}
+      {{ 'component-price.css' | asset_url | stylesheet_tag }}
+      {{ 'component-search.css' | asset_url | stylesheet_tag }}
+      {{ 'component-facets.css' | asset_url | stylesheet_tag }}
+      {{ 'mask-blobs.css' | asset_url | stylesheet_tag }}
+    {%- endif -%}
     <script src="{{ 'prada-product-wishlist.js' | asset_url }}" defer="defer"></script>
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 

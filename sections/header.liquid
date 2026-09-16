@@ -2002,6 +2002,16 @@
 </style>
 
 {%- style -%}
+  :root {
+    --header-height: {{ section.settings.mobile_header_height | default: 56 }}px;
+  }
+
+  @media screen and (min-width: 990px) {
+    :root {
+      --header-height: {{ section.settings.desktop_header_height | default: 89 }}px;
+    }
+  }
+
   #shopify-section-{{ section.id }} {
     --prada-desktop-header-height: {{ section.settings.desktop_header_height | default: 89 }}px;
     --prada-mobile-header-height: {{ section.settings.mobile_header_height | default: 56 }}px;
