@@ -8,28 +8,80 @@
 {%- liquid
   assign product_item = related_product
   assign display_variant = product_item.selected_or_first_available_variant
-  assign primary_media = product_item.featured_media | default: product_item.images.first
-  assign secondary_media = null
-  if product_item.media.size > 1
-    for media_item in product_item.media
-      if media_item.id != primary_media.id and media_item.media_type == 'image'
-        assign secondary_media = media_item
-        break
+  assign variant_gallery = display_variant.metafields.custom.variant_images.value
+  if variant_gallery == blank
+    assign variant_gallery = display_variant.metafields.custom.custom_variant_images.value
+  endif
+
+  if variant_gallery == blank
+    assign fallback_gallery_variant = blank
+    assign fallback_variant_gallery = blank
+    for candidate_variant in product_item.variants
+      assign candidate_gallery = candidate_variant.metafields.custom.variant_images.value
+      if candidate_gallery == blank
+        assign candidate_gallery = candidate_variant.metafields.custom.custom_variant_images.value
+      endif
+      if candidate_gallery != blank
+        if fallback_gallery_variant == blank
+          assign fallback_gallery_variant = candidate_variant
+          assign fallback_variant_gallery = candidate_gallery
+        endif
+        if candidate_variant.available
+          assign display_variant = candidate_variant
+          assign variant_gallery = candidate_gallery
+          break
+        endif
+      endif
+    endfor
+    if variant_gallery == blank and fallback_gallery_variant != blank
+      assign display_variant = fallback_gallery_variant
+      assign variant_gallery = fallback_variant_gallery
+    endif
+  endif
+
+  assign primary_media = blank
+  assign secondary_media = blank
+  assign image_source = 'product-media'
+  if variant_gallery != blank
+    assign image_source = 'variant-metafield'
+    for variant_media in variant_gallery
+      if variant_media.media_type == 'image'
+        if primary_media == blank
+          assign primary_media = variant_media
+        elsif secondary_media == blank
+          assign secondary_media = variant_media
+          break
+        endif
       endif
     endfor
   endif
-  if secondary_media == null and product_item.images.size > 1
-    for image_item in product_item.images
-      if image_item.id != primary_media.id
-        assign secondary_media = image_item
-        break
-      endif
-    endfor
+
+  if primary_media == blank
+    assign image_source = 'product-media-fallback'
+    assign primary_media = display_variant.featured_media | default: product_item.featured_media | default: product_item.images.first
+    if product_item.media.size > 1
+      for media_item in product_item.media
+        if media_item.id != primary_media.id and media_item.media_type == 'image'
+          assign secondary_media = media_item
+          break
+        endif
+      endfor
+    endif
+    if secondary_media == blank and product_item.images.size > 1
+      for image_item in product_item.images
+        if image_item.id != primary_media.id
+          assign secondary_media = image_item
+          break
+        endif
+      endfor
+    endif
   endif
+
   assign has_secondary_image = false
-  if secondary_media != null
+  if secondary_media != blank and secondary_media.media_type == 'image'
     assign has_secondary_image = true
   endif
+  assign product_url = product_item.url | append: '?variant=' | append: display_variant.id
   assign is_eager = false
   if forloop_index <= 4
     assign is_eager = true
@@ -39,13 +91,15 @@
 <li
   class="grid__item prada-collection__item"
   data-prada-product-id="{{ product_item.id }}"
+  data-prada-variant-id="{{ display_variant.id }}"
+  data-prada-image-source="{{ image_source }}"
   data-prada-product-title="{{ product_item.title | escape }}"
-  data-prada-product-price="{{ product_item.price }}"
+  data-prada-product-price="{{ display_variant.price }}"
 >
   <product-component view-event-payload="{{ product_item | standard_event_data: 'view', context: 'recommendation' | escape }}">
     <article class="prada-product-tile">
       <div class="prada-product-tile__media">
-        <a class="prada-product-tile__carousel" href="{{ product_item.url }}">
+        <a class="prada-product-tile__carousel" href="{{ product_url }}">
           {%- if primary_media -%}
             {%- assign primary_image_width = primary_media.width | at_most: 940 -%}
             <img
@@ -104,7 +158,7 @@
         data-prada-product-wishlist
         data-product-id="{{ product_item.id }}"
         data-product-title="{{ product_item.title | escape }}"
-        data-product-url="{{ product_item.url | escape }}"
+        data-product-url="{{ product_url | escape }}"
         data-product-image="{% if primary_media %}{{ primary_media | image_url: width: 720 | escape }}{% endif %}"
         data-product-image-alt="{{ primary_media.alt | default: product_item.title | escape }}"
         data-product-price="{{ display_variant.price | money | strip_html | escape }}"
@@ -117,12 +171,12 @@
       </button>
 
       <div class="prada-product-tile__information">
-        <h3 class="prada-product-tile__title"><a href="{{ product_item.url }}">{{ product_item.title | escape }}</a></h3>
+        <h3 class="prada-product-tile__title"><a href="{{ product_url }}">{{ product_item.title | escape }}</a></h3>
         <p class="prada-product-tile__price" data-currency-price>
-          {%- if product_item.compare_at_price > product_item.price -%}
-            <span class="price-item--regular money">{{ product_item.compare_at_price | money }}</span>
+          {%- if display_variant.compare_at_price > display_variant.price -%}
+            <span class="price-item--regular money">{{ display_variant.compare_at_price | money }}</span>
           {%- endif -%}
-          <span class="price-item--sale money">{{ product_item.price | money }}</span>
+          <span class="price-item--sale money">{{ display_variant.price | money }}</span>
         </p>
         {% render 'prada-collection-color-swatches', product: product_item, selected_variant: display_variant %}
       </div>
