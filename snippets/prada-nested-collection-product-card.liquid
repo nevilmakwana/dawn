@@ -1,6 +1,21 @@
+{% doc %}
+  Renders a Prada collection product tile using the variant linked to the collection context.
+
+  @param {product} product - Product to render.
+  @param {collection} [collection_context] - Collection used to select the linked variant.
+  @param {number} [card_index] - One-based visible card position used for image loading priority.
+{% enddoc %}
+
 {%- liquid
   assign card_collection = collection_context | default: collection
   assign collection_variant = blank
+  assign effective_card_index = card_index | default: 1
+  assign primary_loading = 'lazy'
+  assign primary_fetchpriority = 'low'
+  if effective_card_index <= 4
+    assign primary_loading = 'eager'
+    assign primary_fetchpriority = 'high'
+  endif
 
   for candidate_variant in product.variants
     assign candidate_collection_refs = candidate_variant.metafields.custom.linked_collections.value
@@ -22,7 +37,8 @@
     assign collection_variant = product.selected_or_first_available_variant
   endif
 
-  assign collection_product_url = product.url | append: '?variant=' | append: collection_variant.id
+  assign collection_product_base_url = product.url | split: '?' | first
+  assign collection_product_url = collection_product_base_url | append: '?variant=' | append: collection_variant.id
   assign primary_media = blank
   assign secondary_media = blank
   assign collection_variant_gallery = collection_variant.metafields.custom.variant_images.value
@@ -66,35 +82,35 @@
           {% if has_secondary_image %}data-prada-mobile-carousel{% endif %}
         >
           {%- if primary_media -%}
-            {%- assign primary_image_width = primary_media.width | at_most: 940 -%}
+            {%- assign primary_image_width = primary_media.width | at_most: 900 -%}
             <img
               class="prada-product-tile__image"
               srcset="
                 {%- if primary_media.width > 360 -%}{{ primary_media | image_url: width: 360 }} 360w,{%- endif -%}
-                {%- if primary_media.width > 533 -%}{{ primary_media | image_url: width: 533 }} 533w,{%- endif -%}
+                {%- if primary_media.width > 540 -%}{{ primary_media | image_url: width: 540 }} 540w,{%- endif -%}
                 {%- if primary_media.width > 720 -%}{{ primary_media | image_url: width: 720 }} 720w,{%- endif -%}
                 {{ primary_media | image_url: width: primary_image_width }} {{ primary_image_width }}w
               "
-              src="{{ primary_media | image_url: width: 360 }}"
+              src="{{ primary_media | image_url: width: 540 }}"
               sizes="(max-width: 749px) calc(50vw - 16px), (max-width: 989px) 30vw, 25vw"
               alt="{{ primary_media.alt | default: product.title | escape }}"
-              loading="lazy"
-              fetchpriority="low"
+              loading="{{ primary_loading }}"
+              fetchpriority="{{ primary_fetchpriority }}"
               decoding="async"
               width="{{ primary_media.width }}"
               height="{{ primary_media.height }}"
             >
             {%- if has_secondary_image -%}
-              {%- assign secondary_image_width = secondary_media.width | at_most: 940 -%}
+              {%- assign secondary_image_width = secondary_media.width | at_most: 900 -%}
               <img
                 class="prada-product-tile__image prada-product-tile__image--secondary"
                 srcset="
                   {%- if secondary_media.width > 360 -%}{{ secondary_media | image_url: width: 360 }} 360w,{%- endif -%}
-                  {%- if secondary_media.width > 533 -%}{{ secondary_media | image_url: width: 533 }} 533w,{%- endif -%}
+                  {%- if secondary_media.width > 540 -%}{{ secondary_media | image_url: width: 540 }} 540w,{%- endif -%}
                   {%- if secondary_media.width > 720 -%}{{ secondary_media | image_url: width: 720 }} 720w,{%- endif -%}
                   {{ secondary_media | image_url: width: secondary_image_width }} {{ secondary_image_width }}w
                 "
-                src="{{ secondary_media | image_url: width: 360 }}"
+                src="{{ secondary_media | image_url: width: 540 }}"
                 sizes="(max-width: 749px) calc(50vw - 16px), (max-width: 989px) 30vw, 25vw"
                 alt=""
                 aria-hidden="true"

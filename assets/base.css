@@ -3639,6 +3639,14 @@ details-disclosure > details {
   }
 }
 
+.footer,
+.related-products,
+.product-recommendations,
+product-recommendations {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 600px;
+}
+
 :is(
   .prada-product-tile__media,
   .card__media,

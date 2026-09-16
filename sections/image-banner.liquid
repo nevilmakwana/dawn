@@ -60,9 +60,9 @@
 
   assign desktop_video_poster_url = ''
   if section.settings.video.preview_image != blank
-    assign desktop_video_poster_url = section.settings.video.preview_image | image_url: width: 3840
+    assign desktop_video_poster_url = section.settings.video.preview_image | image_url: width: 1920
   elsif section.settings.image != blank
-    assign desktop_video_poster_url = section.settings.image | image_url: width: 3840
+    assign desktop_video_poster_url = section.settings.image | image_url: width: 1920
   endif
 
   assign has_desktop_video = false
@@ -694,7 +694,7 @@
           {%- if section.settings.video.preview_image != blank -%}
             {{
               section.settings.video.preview_image
-              | image_url: width: 3840
+              | image_url: width: 1920
               | image_tag: class: 'banner__media-video-poster', loading: 'lazy'
             }}
           {%- endif -%}
@@ -703,7 +703,7 @@
         {{
           section.settings.video
           | video_tag:
-            image_size: '3840x',
+            image_size: '1920x',
             autoplay: true,
             loop: true,
             muted: true,

@@ -6,9 +6,12 @@
   const fetchedUrls = new Set();
   const queuedUrls = new Set();
   const observedLinks = new WeakSet();
+  const observedProductTiles = new WeakSet();
+  const warmedSecondaryImages = new Map();
   const queue = [];
   const maxAutomaticPrefetches = 6;
   const maxMenuPrefetches = 8;
+  const maxWarmedSecondaryImages = 24;
   let automaticPrefetches = 0;
   let menuPrefetches = 0;
   let queueScheduled = false;
@@ -133,6 +136,56 @@
       )
     : null;
 
+  const warmSecondaryImage = (tile, userInitiated = false) => {
+    if (!(tile instanceof Element) || (!userInitiated && shouldAvoidPrefetch())) return;
+
+    const secondaryImage = tile.querySelector('.prada-product-tile__image--secondary');
+    const imageUrl = secondaryImage?.currentSrc || secondaryImage?.getAttribute('src');
+    if (!imageUrl || warmedSecondaryImages.has(imageUrl)) return;
+
+    if (warmedSecondaryImages.size >= maxWarmedSecondaryImages) {
+      const oldestUrl = warmedSecondaryImages.keys().next().value;
+      warmedSecondaryImages.delete(oldestUrl);
+    }
+
+    const preloadImage = new Image();
+    preloadImage.decoding = 'async';
+    if (secondaryImage.srcset) preloadImage.srcset = secondaryImage.srcset;
+    if (secondaryImage.sizes) preloadImage.sizes = secondaryImage.sizes;
+    preloadImage.src = imageUrl;
+    warmedSecondaryImages.set(imageUrl, preloadImage);
+    if (typeof preloadImage.decode === 'function') preloadImage.decode().catch(() => {});
+  };
+
+  const secondaryImageObserver = !shouldAvoidPrefetch() && 'IntersectionObserver' in window
+    ? new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+
+            secondaryImageObserver.unobserve(entry.target);
+            warmSecondaryImage(entry.target);
+          });
+        },
+        { rootMargin: '300px 0px' }
+      )
+    : null;
+
+  const observeSecondaryImages = (root = document) => {
+    if (!secondaryImageObserver) return;
+
+    const tiles = [];
+    if (root instanceof Element && root.matches('.prada-product-tile')) tiles.push(root);
+    root.querySelectorAll?.('.prada-product-tile').forEach((tile) => tiles.push(tile));
+
+    tiles.forEach((tile) => {
+      if (observedProductTiles.has(tile) || !tile.querySelector('.prada-product-tile__image--secondary')) return;
+
+      observedProductTiles.add(tile);
+      secondaryImageObserver.observe(tile);
+    });
+  };
+
   const observePriorityLinks = (root = document) => {
     if (!observer) return;
 
@@ -161,6 +214,11 @@
     }
 
     prepareContent(url, urgent);
+  };
+
+  const warmSecondaryFromEvent = (event) => {
+    const tile = event.target.closest?.('.prada-product-tile');
+    if (tile) warmSecondaryImage(tile, true);
   };
 
   const warmVisibleMenuLinks = () => {
@@ -208,13 +266,19 @@
   };
 
   document.addEventListener('pointerover', prepareFromEvent, { passive: true, capture: true });
+  document.addEventListener('pointerover', warmSecondaryFromEvent, { passive: true, capture: true });
   document.addEventListener('pointerdown', prepareFromEvent, { passive: true, capture: true });
   document.addEventListener('focusin', prepareFromEvent, true);
+  document.addEventListener('focusin', warmSecondaryFromEvent, true);
   // Retain touchstart for older iOS versions that do not emit Pointer Events.
   document.addEventListener('touchstart', prepareFromEvent, { passive: true, capture: true });
-  document.addEventListener('shopify:section:load', (event) => observePriorityLinks(event.target));
+  document.addEventListener('shopify:section:load', (event) => {
+    observePriorityLinks(event.target);
+    observeSecondaryImages(event.target);
+  });
   document.addEventListener('prada:collection:updated', () => {
     observePriorityLinks();
+    observeSecondaryImages();
     publishNavigationTiming();
   });
   document.addEventListener('click', () => window.setTimeout(warmVisibleMenuLinks, 0), true);
@@ -222,6 +286,17 @@
   document.addEventListener('focusin', () => window.setTimeout(warmVisibleMenuLinks, 0), true);
   window.addEventListener('pageshow', publishNavigationTiming);
 
+  if (document.body) {
+    new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node instanceof Element) observeSecondaryImages(node);
+        });
+      });
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+
   observePriorityLinks();
+  observeSecondaryImages();
   publishNavigationTiming();
 })();
