@@ -33,8 +33,24 @@
 {%- endunless -%}
 {%- if card_product and card_product != empty -%}
   {%- liquid
-    assign card_primary_media = card_product.featured_media
-    assign card_secondary_media = card_product.media[1]
+    assign card_primary_media = card_product.featured_media | default: card_product.images.first
+    assign card_secondary_media = null
+    if card_product.media.size > 1
+      for media_item in card_product.media
+        if media_item.id != card_primary_media.id and media_item.media_type == 'image'
+          assign card_secondary_media = media_item
+          break
+        endif
+      endfor
+    endif
+    if card_secondary_media == null and card_product.images.size > 1
+      for image_item in card_product.images
+        if image_item.id != card_primary_media.id
+          assign card_secondary_media = image_item
+          break
+        endif
+      endfor
+    endif
     if card_primary_media == blank
       assign card_variant_gallery = card_product.selected_or_first_available_variant.metafields.custom.variant_images.value
       if card_variant_gallery == blank
