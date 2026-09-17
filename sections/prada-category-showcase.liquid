@@ -1,3 +1,8 @@
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'section-related-products.css' | asset_url | stylesheet_tag }}
+{{ 'prada-collection.css' | asset_url | stylesheet_tag }}
+{{ 'greyexim-prada-mobile-flow.css' | asset_url | stylesheet_tag }}
+
 {%- liquid
   assign showcase_mode = section.settings.content_mode | default: 'categories'
   assign heading_handle = section.settings.heading | handleize
@@ -11,14 +16,19 @@
   endif
 -%}
 
-<section class="prada-category-showcase color-{{ section.settings.color_scheme }} gradient" data-showcase-mode="{{ showcase_mode }}">
-  <div class="prada-category-showcase__intro">
+<section
+  id="PradaCategoryShowcase-{{ section.id }}"
+  class="prada-category-showcase{% if is_best_sellers %} prada-best-sellers{% endif %} color-{{ section.settings.color_scheme }} gradient"
+  data-showcase-mode="{{ showcase_mode }}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="prada-category-showcase__intro{% if is_best_sellers %} prada-best-sellers__intro{% endif %}">
     {%- if section.settings.heading != blank -%}
-      <h2 class="prada-category-showcase__heading">{{ section.settings.heading | escape }}</h2>
+      <h2 class="prada-category-showcase__heading{% if is_best_sellers %} prada-best-sellers__heading{% endif %}">{{ section.settings.heading }}</h2>
     {%- endif -%}
 
     {%- if section.settings.text != blank -%}
-      <div class="prada-category-showcase__text rte">
+      <div class="prada-category-showcase__text{% if is_best_sellers %} prada-best-sellers__text{% endif %} rte">
         {{ section.settings.text }}
       </div>
     {%- endif -%}
@@ -56,109 +66,187 @@
 
   {%- if is_best_sellers -%}
     {%- liquid
-      assign products_to_show = 8
-      assign target_tag = section.settings.product_tag | default: 'Best Sellers' | handleize
-      assign source_collection = collections.all
-      assign rendered_product_ids = ','
-      assign products_rendered = 0
+      assign target_tag = section.settings.product_tag | default: 'best-seller' | handleize
+      assign category_filter = section.settings.category_filter | default: 'all'
+      assign products_to_show = section.settings.products_to_show | default: 8
+      assign rendered_count = 0
+      assign rendered_handles = '|'
+      assign fallback_collection = section.settings.collection
+
+      if fallback_collection == blank or fallback_collection.products_count == 0
+        assign configured_best_sellers = collections['best-sellers']
+        if configured_best_sellers != blank and configured_best_sellers.products_count > 0
+          assign fallback_collection = configured_best_sellers
+        else
+          assign fallback_collection = collections.all
+        endif
+      endif
     -%}
 
-    <div class="prada-best-sellers__carousel" data-best-sellers-carousel>
-      <div
-        id="PradaCategoryGrid-{{ section.id }}"
-        class="prada-category-showcase__viewport prada-category-showcase__grid"
-        data-best-sellers-track
-        role="region"
-        aria-roledescription="carousel"
-        aria-label="{{ section.settings.heading | default: 'Best Sellers' | escape }} carousel"
+    <div class="prada-best-sellers__viewport">
+      <ul
+        class="grid product-grid prada-best-sellers__track"
+        role="list"
+        data-prada-related-list
       >
-      {%- for block in section.blocks -%}
-        {%- if products_rendered >= products_to_show -%}{%- break -%}{%- endif -%}
-        {%- liquid
-          assign manual_product = blank
-          if block.type == 'manual_product'
-            assign manual_product = block.settings.product
-          elsif block.settings.product != blank
-            assign manual_product = block.settings.product
-          endif
-          assign manual_product_marker = blank
-          if manual_product != blank
-            assign manual_product_marker = ',' | append: manual_product.id | append: ','
-          endif
-        -%}
-        {%- if manual_product != blank -%}
-          {%- unless rendered_product_ids contains manual_product_marker -%}
-            <div class="prada-category-showcase__slot" style="--tile-index: {{ products_rendered }};">
-              {%- render 'prada-best-seller-tile', product: manual_product, block: block -%}
-            </div>
-            {%- assign rendered_product_ids = rendered_product_ids | append: manual_product.id | append: ',' -%}
-            {%- assign products_rendered = products_rendered | plus: 1 -%}
-          {%- endunless -%}
-        {%- endif -%}
-      {%- endfor -%}
+        {%- paginate collections.all.products by 250 -%}
+          {%- for product in collections.all.products -%}
+            {%- if rendered_count >= products_to_show -%}{% break %}{%- endif -%}
+            {%- unless product.available -%}{% continue %}{%- endunless -%}
 
-      {%- if products_rendered < products_to_show -%}
-        {%- paginate source_collection.products by 250 -%}
-          {%- for tagged_product in source_collection.products -%}
-            {%- if products_rendered >= products_to_show -%}{%- break -%}{%- endif -%}
             {%- liquid
-              assign has_best_seller_tag = false
-              for product_tag in tagged_product.tags
+              assign is_tagged = false
+              for product_tag in product.tags
                 assign product_tag_handle = product_tag | handleize
                 if product_tag_handle == target_tag
-                  assign has_best_seller_tag = true
-                  break
-                elsif target_tag == 'best-sellers' and product_tag_handle == 'best-seller'
-                  assign has_best_seller_tag = true
-                  break
-                elsif target_tag == 'best-seller' and product_tag_handle == 'best-sellers'
-                  assign has_best_seller_tag = true
+                  assign is_tagged = true
                   break
                 endif
+                if target_tag == 'best-seller' or target_tag == 'best-sellers'
+                  if product_tag_handle == 'best-seller' or product_tag_handle == 'best-sellers'
+                    assign is_tagged = true
+                    break
+                  endif
+                endif
               endfor
-              assign tagged_product_marker = ',' | append: tagged_product.id | append: ','
+
+              assign matches_category = true
+              if category_filter == 'scarves'
+                assign title_lower = product.title | downcase
+                assign type_lower = product.type | downcase
+                unless title_lower contains 'scarf' or type_lower contains 'scarf'
+                  assign matches_category = false
+                endunless
+              elsif category_filter == 'candles'
+                assign title_lower = product.title | downcase
+                assign type_lower = product.type | downcase
+                unless title_lower contains 'candle' or type_lower contains 'candle'
+                  assign matches_category = false
+                endunless
+              endif
+
+              assign product_token = '|' | append: product.handle | append: '|'
             -%}
-            {%- if has_best_seller_tag -%}
-              {%- unless rendered_product_ids contains tagged_product_marker -%}
-                <div class="prada-category-showcase__slot" style="--tile-index: {{ products_rendered }};">
-                  {%- render 'prada-best-seller-tile', product: tagged_product -%}
-                </div>
-                {%- assign rendered_product_ids = rendered_product_ids | append: tagged_product.id | append: ',' -%}
-                {%- assign products_rendered = products_rendered | plus: 1 -%}
+
+            {%- if is_tagged and matches_category -%}
+              {%- unless rendered_handles contains product_token -%}
+                {%- assign rendered_position = rendered_count | plus: 1 -%}
+                {%- render 'prada-related-product', related_product: product, forloop_index: rendered_position -%}
+                {%- assign rendered_handles = rendered_handles | append: product.handle | append: '|' -%}
+                {%- assign rendered_count = rendered_count | plus: 1 -%}
               {%- endunless -%}
             {%- endif -%}
           {%- endfor -%}
+
+          {%- if rendered_count < products_to_show and fallback_collection != blank -%}
+            {%- for product in fallback_collection.products -%}
+              {%- if rendered_count >= products_to_show -%}{% break %}{%- endif -%}
+              {%- unless product.available -%}{% continue %}{%- endunless -%}
+
+              {%- liquid
+                assign matches_category = true
+                if category_filter == 'scarves'
+                  assign title_lower = product.title | downcase
+                  assign type_lower = product.type | downcase
+                  unless title_lower contains 'scarf' or type_lower contains 'scarf'
+                    assign matches_category = false
+                  endunless
+                elsif category_filter == 'candles'
+                  assign title_lower = product.title | downcase
+                  assign type_lower = product.type | downcase
+                  unless title_lower contains 'candle' or type_lower contains 'candle'
+                    assign matches_category = false
+                  endunless
+                endif
+
+                assign product_token = '|' | append: product.handle | append: '|'
+              -%}
+
+              {%- if matches_category -%}
+                {%- unless rendered_handles contains product_token -%}
+                  {%- assign rendered_position = rendered_count | plus: 1 -%}
+                  {%- render 'prada-related-product', related_product: product, forloop_index: rendered_position -%}
+                  {%- assign rendered_handles = rendered_handles | append: product.handle | append: '|' -%}
+                  {%- assign rendered_count = rendered_count | plus: 1 -%}
+                {%- endunless -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
+
+          {%- if rendered_count < products_to_show -%}
+            {%- for product in collections.all.products -%}
+              {%- if rendered_count >= products_to_show -%}{% break %}{%- endif -%}
+              {%- unless product.available -%}{% continue %}{%- endunless -%}
+
+              {%- liquid
+                assign matches_category = true
+                if category_filter == 'scarves'
+                  assign title_lower = product.title | downcase
+                  assign type_lower = product.type | downcase
+                  unless title_lower contains 'scarf' or type_lower contains 'scarf'
+                    assign matches_category = false
+                  endunless
+                elsif category_filter == 'candles'
+                  assign title_lower = product.title | downcase
+                  assign type_lower = product.type | downcase
+                  unless title_lower contains 'candle' or type_lower contains 'candle'
+                    assign matches_category = false
+                  endunless
+                endif
+
+                assign product_token = '|' | append: product.handle | append: '|'
+              -%}
+
+              {%- if matches_category -%}
+                {%- unless rendered_handles contains product_token -%}
+                  {%- assign rendered_position = rendered_count | plus: 1 -%}
+                  {%- render 'prada-related-product', related_product: product, forloop_index: rendered_position -%}
+                  {%- assign rendered_handles = rendered_handles | append: product.handle | append: '|' -%}
+                  {%- assign rendered_count = rendered_count | plus: 1 -%}
+                {%- endunless -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
         {%- endpaginate -%}
-      {%- endif -%}
+      </ul>
 
-      {%- if products_rendered == 0 and request.design_mode -%}
-        <p class="prada-category-showcase__empty">Tag products "best-seller" or add a Manual product block.</p>
-      {%- endif -%}
-      </div>
-
-      {%- if products_rendered > 2 -%}
-        <div class="prada-best-sellers__controls" data-best-sellers-controls hidden>
+      {%- if rendered_count > 4 -%}
+        <div class="prada-related-arrows" data-prada-related-arrows>
           <button
             type="button"
-            class="prada-best-sellers__button prada-best-sellers__button--prev"
-            data-best-sellers-prev
+            class="prada-related-arrow prada-related-arrow--prev"
+            data-prada-related-prev
             aria-label="Previous best sellers"
-            title="Previous best sellers"
+            disabled
           >
-            {{- 'icon-caret.svg' | inline_asset_content -}}
+            &#8249;
           </button>
           <button
             type="button"
-            class="prada-best-sellers__button prada-best-sellers__button--next"
-            data-best-sellers-next
+            class="prada-related-arrow prada-related-arrow--next"
+            data-prada-related-next
             aria-label="Next best sellers"
-            title="Next best sellers"
           >
-            {{- 'icon-caret.svg' | inline_asset_content -}}
+            &#8250;
           </button>
         </div>
       {%- endif -%}
     </div>
+
+    {%- assign page_count = rendered_count | plus: 1 | divided_by: 2 -%}
+    {%- if page_count > 1 -%}
+      <div class="prada-related-pagination" data-prada-related-pagination aria-label="Best sellers pages">
+        {%- for page_number in (1..page_count) -%}
+          <button
+            type="button"
+            class="prada-related-page-dot{% if forloop.first %} is-active{% endif %}"
+            data-prada-related-page="{{ forloop.index0 }}"
+            aria-label="Show best sellers page {{ page_number }}"
+            aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+          ></button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
   {%- else -%}
     <div id="PradaCategoryGrid-{{ section.id }}" class="prada-category-showcase__viewport prada-category-showcase__grid" role="tabpanel" data-prada-category-viewport data-active="{{ section.settings.active_tab }}">
     {%- for block in section.blocks -%}
@@ -630,40 +718,73 @@
 {%- if is_best_sellers -%}
 <script>
   (() => {
-    const root = document.querySelector('#shopify-section-{{ section.id }} [data-best-sellers-carousel]');
-    if (!root || root.dataset.carouselReady === 'true') return;
+    const section = document.getElementById('PradaCategoryShowcase-{{ section.id }}');
+    if (!section || section.dataset.pradaBestSellersReady === 'true') return;
+    section.dataset.pradaBestSellersReady = 'true';
 
-    const track = root.querySelector('[data-best-sellers-track]');
-    const controls = root.querySelector('[data-best-sellers-controls]');
-    const previousButton = root.querySelector('[data-best-sellers-prev]');
-    const nextButton = root.querySelector('[data-best-sellers-next]');
-    if (!track || !controls || !previousButton || !nextButton) return;
+    const list = section.querySelector('[data-prada-related-list]');
+    const prevButton = section.querySelector('[data-prada-related-prev]');
+    const nextButton = section.querySelector('[data-prada-related-next]');
+    const pageDots = Array.from(section.querySelectorAll('[data-prada-related-page]'));
+    if (!list) return;
 
-    root.dataset.carouselReady = 'true';
-    let updateFrame;
+    const initialiseCardCarousels = () => {
+      section.querySelectorAll('[data-prada-mobile-carousel]').forEach((carousel) => {
+        if (carousel.dataset.carouselReady === 'true') return;
+        carousel.dataset.carouselReady = 'true';
+
+        const dotButtons = Array.from(carousel.querySelectorAll('[data-prada-carousel-dot]'));
+        const mediaLink = carousel.querySelector('.prada-related-card__media-link');
+
+        const updateDots = () => {
+          if (!dotButtons.length) return;
+          const maxScroll = Math.max(mediaLink.scrollWidth - mediaLink.clientWidth, 0);
+          const activeIndex = maxScroll > 1 && mediaLink.scrollLeft > maxScroll / 2 ? 1 : 0;
+          dotButtons.forEach((dot, index) => {
+            dot.classList.toggle('is-active', index === activeIndex);
+            dot.setAttribute('aria-current', index === activeIndex ? 'true' : 'false');
+          });
+        };
+
+        dotButtons.forEach((dot) => {
+          dot.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const targetIndex = Number(dot.dataset.pradaCarouselDot || 0);
+            mediaLink.scrollTo({ left: mediaLink.clientWidth * targetIndex, behavior: 'smooth' });
+          });
+        });
+
+        mediaLink.addEventListener('scroll', () => window.requestAnimationFrame(updateDots), { passive: true });
+        updateDots();
+      });
+    };
 
     const updateControls = () => {
-      const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
-      controls.hidden = maxScroll <= 1;
-      previousButton.disabled = track.scrollLeft <= 1;
-      nextButton.disabled = track.scrollLeft >= maxScroll - 1;
+      const maxScroll = Math.max(list.scrollWidth - list.clientWidth, 0);
+      const currentPage = list.clientWidth > 0 ? Math.round(list.scrollLeft / list.clientWidth) : 0;
+
+      if (prevButton) prevButton.disabled = list.scrollLeft <= 2;
+      if (nextButton) nextButton.disabled = list.scrollLeft >= maxScroll - 2;
+
+      pageDots.forEach((dot, index) => {
+        dot.classList.toggle('is-active', index === currentPage);
+        dot.setAttribute('aria-current', index === currentPage ? 'true' : 'false');
+      });
     };
 
-    const queueUpdate = () => {
-      window.cancelAnimationFrame(updateFrame);
-      updateFrame = window.requestAnimationFrame(updateControls);
+    const scrollToPage = (pageIndex) => {
+      list.scrollTo({ left: list.clientWidth * pageIndex, behavior: 'smooth' });
     };
 
-    const movePage = (direction) => {
-      track.scrollBy({ left: direction * track.clientWidth, behavior: 'smooth' });
-    };
+    prevButton?.addEventListener('click', () => scrollToPage(Math.max(Math.round(list.scrollLeft / list.clientWidth) - 1, 0)));
+    nextButton?.addEventListener('click', () => scrollToPage(Math.round(list.scrollLeft / list.clientWidth) + 1));
+    pageDots.forEach((dot) => dot.addEventListener('click', () => scrollToPage(Number(dot.dataset.pradaRelatedPage || 0))));
 
-    previousButton.addEventListener('click', () => movePage(-1));
-    nextButton.addEventListener('click', () => movePage(1));
-    track.addEventListener('scroll', queueUpdate, { passive: true });
-
-    new ResizeObserver(queueUpdate).observe(track);
-    queueUpdate();
+    list.addEventListener('scroll', () => window.requestAnimationFrame(updateControls), { passive: true });
+    window.addEventListener('resize', updateControls, { passive: true });
+    initialiseCardCarousels();
+    updateControls();
   })();
 </script>
 {%- else -%}
@@ -751,7 +872,7 @@
       ]
     },
     {
-      "type": "text",
+      "type": "inline_richtext",
       "id": "heading",
       "label": "Heading",
       "default": "Scarves Collections"
@@ -770,8 +891,43 @@
       "type": "text",
       "id": "product_tag",
       "label": "Product tag",
-      "default": "Best Sellers",
-      "info": "Matches both best-seller and best-sellers across the full Online Store catalog."
+      "default": "best-seller",
+      "info": "Products tagged best-seller or best-sellers appear first."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Sales-ranked fallback collection",
+      "info": "For automatic sales ranking, select a collection sorted by Best selling."
+    },
+    {
+      "type": "select",
+      "id": "category_filter",
+      "label": "Category filter",
+      "default": "all",
+      "options": [
+        {
+          "value": "all",
+          "label": "All categories"
+        },
+        {
+          "value": "scarves",
+          "label": "Scarves"
+        },
+        {
+          "value": "candles",
+          "label": "Candles"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 16,
+      "step": 1,
+      "default": 8,
+      "label": "Products to show"
     },
     {
       "type": "header",

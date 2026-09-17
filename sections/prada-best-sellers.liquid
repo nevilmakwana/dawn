@@ -1,0 +1,379 @@
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'section-related-products.css' | asset_url | stylesheet_tag }}
+{{ 'prada-collection.css' | asset_url | stylesheet_tag }}
+{{ 'greyexim-prada-mobile-flow.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign target_tag = section.settings.product_tag | default: 'best-seller' | handleize
+  assign category_filter = section.settings.category_filter | default: 'all'
+  assign products_to_show = section.settings.products_to_show | default: 8
+  assign rendered_count = 0
+  assign rendered_handles = '|'
+  assign fallback_collection = section.settings.collection
+
+  if fallback_collection == blank or fallback_collection.products_count == 0
+    assign configured_best_sellers = collections['best-sellers']
+    if configured_best_sellers != blank and configured_best_sellers.products_count > 0
+      assign fallback_collection = configured_best_sellers
+    else
+      assign fallback_collection = collections.all
+    endif
+  endif
+-%}
+
+<section
+  id="PradaBestSellers-{{ section.id }}"
+  class="prada-best-sellers color-{{ section.settings.color_scheme }} gradient isolate section-{{ section.id }}-padding"
+  data-section-id="{{ section.id }}"
+>
+  <div class="prada-best-sellers__intro">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="prada-best-sellers__heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.text != blank -%}
+      <div class="prada-best-sellers__text prada-best-sellers__subheading rte">{{ section.settings.text }}</div>
+    {%- endif -%}
+  </div>
+
+  <div class="prada-best-sellers__viewport">
+    <ul
+      class="grid product-grid prada-best-sellers__track"
+      role="list"
+      data-prada-related-list
+    >
+      {%- paginate collections.all.products by 250 -%}
+        {%- for product in collections.all.products -%}
+          {%- if rendered_count >= products_to_show -%}{% break %}{%- endif -%}
+          {%- unless product.available -%}{% continue %}{%- endunless -%}
+
+          {%- liquid
+            assign is_tagged = false
+            for product_tag in product.tags
+              assign product_tag_handle = product_tag | handleize
+              if product_tag_handle == target_tag
+                assign is_tagged = true
+                break
+              endif
+              if target_tag == 'best-seller' or target_tag == 'best-sellers'
+                if product_tag_handle == 'best-seller' or product_tag_handle == 'best-sellers'
+                  assign is_tagged = true
+                  break
+                endif
+              endif
+            endfor
+
+            assign matches_category = true
+            if category_filter == 'scarves'
+              assign title_lower = product.title | downcase
+              assign type_lower = product.type | downcase
+              unless title_lower contains 'scarf' or type_lower contains 'scarf'
+                assign matches_category = false
+              endunless
+            elsif category_filter == 'candles'
+              assign title_lower = product.title | downcase
+              assign type_lower = product.type | downcase
+              unless title_lower contains 'candle' or type_lower contains 'candle'
+                assign matches_category = false
+              endunless
+            endif
+
+            assign product_token = '|' | append: product.handle | append: '|'
+          -%}
+
+            {%- if is_tagged and matches_category -%}
+              {%- unless rendered_handles contains product_token -%}
+              {%- assign rendered_position = rendered_count | plus: 1 -%}
+              {%- render 'prada-related-product', related_product: product, forloop_index: rendered_position -%}
+              {%- assign rendered_handles = rendered_handles | append: product.handle | append: '|' -%}
+              {%- assign rendered_count = rendered_count | plus: 1 -%}
+            {%- endunless -%}
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- if rendered_count < products_to_show and fallback_collection != blank -%}
+          {%- for product in fallback_collection.products -%}
+            {%- if rendered_count >= products_to_show -%}{% break %}{%- endif -%}
+            {%- unless product.available -%}{% continue %}{%- endunless -%}
+
+            {%- liquid
+              assign matches_category = true
+              if category_filter == 'scarves'
+                assign title_lower = product.title | downcase
+                assign type_lower = product.type | downcase
+                unless title_lower contains 'scarf' or type_lower contains 'scarf'
+                  assign matches_category = false
+                endunless
+              elsif category_filter == 'candles'
+                assign title_lower = product.title | downcase
+                assign type_lower = product.type | downcase
+                unless title_lower contains 'candle' or type_lower contains 'candle'
+                  assign matches_category = false
+                endunless
+              endif
+
+              assign product_token = '|' | append: product.handle | append: '|'
+            -%}
+
+            {%- if matches_category -%}
+              {%- unless rendered_handles contains product_token -%}
+                {%- assign rendered_position = rendered_count | plus: 1 -%}
+                {%- render 'prada-related-product', related_product: product, forloop_index: rendered_position -%}
+                {%- assign rendered_handles = rendered_handles | append: product.handle | append: '|' -%}
+                {%- assign rendered_count = rendered_count | plus: 1 -%}
+              {%- endunless -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+
+        {%- if rendered_count < products_to_show -%}
+          {%- for product in collections.all.products -%}
+            {%- if rendered_count >= products_to_show -%}{% break %}{%- endif -%}
+            {%- unless product.available -%}{% continue %}{%- endunless -%}
+
+            {%- liquid
+              assign matches_category = true
+              if category_filter == 'scarves'
+                assign title_lower = product.title | downcase
+                assign type_lower = product.type | downcase
+                unless title_lower contains 'scarf' or type_lower contains 'scarf'
+                  assign matches_category = false
+                endunless
+              elsif category_filter == 'candles'
+                assign title_lower = product.title | downcase
+                assign type_lower = product.type | downcase
+                unless title_lower contains 'candle' or type_lower contains 'candle'
+                  assign matches_category = false
+                endunless
+              endif
+
+              assign product_token = '|' | append: product.handle | append: '|'
+            -%}
+
+            {%- if matches_category -%}
+              {%- unless rendered_handles contains product_token -%}
+                {%- assign rendered_position = rendered_count | plus: 1 -%}
+                {%- render 'prada-related-product', related_product: product, forloop_index: rendered_position -%}
+                {%- assign rendered_handles = rendered_handles | append: product.handle | append: '|' -%}
+                {%- assign rendered_count = rendered_count | plus: 1 -%}
+              {%- endunless -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      {%- endpaginate -%}
+    </ul>
+
+    {%- if rendered_count > 4 -%}
+      <div class="prada-related-arrows" data-prada-related-arrows>
+        <button
+          type="button"
+          class="prada-related-arrow prada-related-arrow--prev"
+          data-prada-related-prev
+          aria-label="Previous best sellers"
+          disabled
+        >
+          &#8249;
+        </button>
+        <button
+          type="button"
+          class="prada-related-arrow prada-related-arrow--next"
+          data-prada-related-next
+          aria-label="Next best sellers"
+        >
+          &#8250;
+        </button>
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- assign page_count = rendered_count | plus: 1 | divided_by: 2 -%}
+  {%- if page_count > 1 -%}
+    <div class="prada-related-pagination" data-prada-related-pagination aria-label="Best sellers pages">
+      {%- for page_number in (1..page_count) -%}
+        <button
+          type="button"
+          class="prada-related-page-dot{% if forloop.first %} is-active{% endif %}"
+          data-prada-related-page="{{ forloop.index0 }}"
+          aria-label="Show best sellers page {{ page_number }}"
+          aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+        ></button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</section>
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<script>
+  (() => {
+    const section = document.getElementById('PradaBestSellers-{{ section.id }}');
+    if (!section || section.dataset.pradaBestSellersReady === 'true') return;
+    section.dataset.pradaBestSellersReady = 'true';
+
+    const list = section.querySelector('[data-prada-related-list]');
+    const prevButton = section.querySelector('[data-prada-related-prev]');
+    const nextButton = section.querySelector('[data-prada-related-next]');
+    const pageDots = Array.from(section.querySelectorAll('[data-prada-related-page]'));
+    if (!list) return;
+
+    const initialiseCardCarousels = () => {
+      section.querySelectorAll('[data-prada-mobile-carousel]').forEach((carousel) => {
+        if (carousel.dataset.carouselReady === 'true') return;
+        carousel.dataset.carouselReady = 'true';
+
+        const dotButtons = Array.from(carousel.querySelectorAll('[data-prada-carousel-dot]'));
+        const mediaLink = carousel.querySelector('.prada-related-card__media-link');
+
+        const updateDots = () => {
+          if (!dotButtons.length) return;
+          const maxScroll = Math.max(mediaLink.scrollWidth - mediaLink.clientWidth, 0);
+          const activeIndex = maxScroll > 1 && mediaLink.scrollLeft > maxScroll / 2 ? 1 : 0;
+          dotButtons.forEach((dot, index) => {
+            dot.classList.toggle('is-active', index === activeIndex);
+            dot.setAttribute('aria-current', index === activeIndex ? 'true' : 'false');
+          });
+        };
+
+        dotButtons.forEach((dot) => {
+          dot.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const targetIndex = Number(dot.dataset.pradaCarouselDot || 0);
+            mediaLink.scrollTo({ left: mediaLink.clientWidth * targetIndex, behavior: 'smooth' });
+          });
+        });
+
+        mediaLink.addEventListener('scroll', () => window.requestAnimationFrame(updateDots), { passive: true });
+        updateDots();
+      });
+    };
+
+    const updateControls = () => {
+      const maxScroll = Math.max(list.scrollWidth - list.clientWidth, 0);
+      const currentPage = list.clientWidth > 0 ? Math.round(list.scrollLeft / list.clientWidth) : 0;
+
+      if (prevButton) prevButton.disabled = list.scrollLeft <= 2;
+      if (nextButton) nextButton.disabled = list.scrollLeft >= maxScroll - 2;
+
+      pageDots.forEach((dot, index) => {
+        dot.classList.toggle('is-active', index === currentPage);
+        dot.setAttribute('aria-current', index === currentPage ? 'true' : 'false');
+      });
+    };
+
+    const scrollToPage = (pageIndex) => {
+      list.scrollTo({ left: list.clientWidth * pageIndex, behavior: 'smooth' });
+    };
+
+    prevButton?.addEventListener('click', () => scrollToPage(Math.max(Math.round(list.scrollLeft / list.clientWidth) - 1, 0)));
+    nextButton?.addEventListener('click', () => scrollToPage(Math.round(list.scrollLeft / list.clientWidth) + 1));
+    pageDots.forEach((dot) => dot.addEventListener('click', () => scrollToPage(Number(dot.dataset.pradaRelatedPage || 0))));
+
+    list.addEventListener('scroll', () => window.requestAnimationFrame(updateControls), { passive: true });
+    window.addEventListener('resize', updateControls, { passive: true });
+    initialiseCardCarousels();
+    updateControls();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Prada best sellers",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "default": "Best Sellers",
+      "label": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "default": "<p>Our most-loved scarves, chosen for their effortless style and timeless appeal.</p>",
+      "label": "Subtitle"
+    },
+    {
+      "type": "text",
+      "id": "product_tag",
+      "default": "best-seller",
+      "label": "Priority product tag",
+      "info": "Products tagged best-seller or best-sellers appear first."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Sales-ranked fallback collection",
+      "info": "For automatic sales ranking, select a collection sorted by Best selling."
+    },
+    {
+      "type": "select",
+      "id": "category_filter",
+      "label": "Category filter",
+      "default": "all",
+      "options": [
+        { "value": "all", "label": "All categories" },
+        { "value": "scarves", "label": "Scarves" },
+        { "value": "candles", "label": "Candles" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 16,
+      "step": 1,
+      "default": 8,
+      "label": "Products to show"
+    },
+    {
+      "type": "header",
+      "content": "Section spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "presets": [
+    {
+      "name": "Prada best sellers"
+    }
+  ]
+}
+{% endschema %}
