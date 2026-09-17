@@ -1,0 +1,326 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} .prada-sitemap {
+    padding-top: var(--header-height, 72px);
+    color: #111111;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__inner {
+    width: min(100%, {{ section.settings.page_width }}px);
+    margin: 0 auto;
+    padding: {{ section.settings.padding_top }}px 32px {{ section.settings.padding_bottom }}px;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__header {
+    margin-bottom: 24px;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__title {
+    margin: 0 0 28px;
+    color: #111111;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__quick-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 40px;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__quick-link {
+    color: #111111;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-decoration: none;
+    transition: opacity 200ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__quick-link:hover {
+    opacity: 0.65;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__quick-link:focus-visible,
+  #shopify-section-{{ section.id }} .prada-sitemap__group-title a:focus-visible,
+  #shopify-section-{{ section.id }} .prada-sitemap__sub-title a:focus-visible,
+  #shopify-section-{{ section.id }} .prada-sitemap__link:focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: 4px;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__divider {
+    margin: 24px 0 48px;
+    border: 0;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__group {
+    margin-bottom: 64px;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__group:last-child {
+    margin-bottom: 0;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__group-title {
+    margin: 0 0 32px;
+    color: #111111;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__group-title a,
+  #shopify-section-{{ section.id }} .prada-sitemap__sub-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__group-title a:hover,
+  #shopify-section-{{ section.id }} .prada-sitemap__sub-title a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 48px 32px;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__column {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__sub-title {
+    margin: 0 0 16px;
+    color: #111111;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__list {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    flex-direction: column;
+    gap: 10px;
+    list-style: none;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__link {
+    color: #333333;
+    font-size: 13px;
+    line-height: 1.5;
+    letter-spacing: 0;
+    text-decoration: none;
+    transition: color 150ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .prada-sitemap__link:hover {
+    color: #000000;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media screen and (max-width: 989px) {
+    #shopify-section-{{ section.id }} .prada-sitemap__inner {
+      padding: 40px 24px 70px;
+    }
+
+    #shopify-section-{{ section.id }} .prada-sitemap__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 36px 24px;
+    }
+  }
+
+  @media screen and (max-width: 540px) {
+    #shopify-section-{{ section.id }} .prada-sitemap__inner {
+      padding: 32px 18px 50px;
+    }
+
+    #shopify-section-{{ section.id }} .prada-sitemap__title {
+      margin-bottom: 20px;
+      font-size: 26px;
+    }
+
+    #shopify-section-{{ section.id }} .prada-sitemap__quick-links {
+      gap: 12px 24px;
+    }
+
+    #shopify-section-{{ section.id }} .prada-sitemap__divider {
+      margin: 20px 0 36px;
+    }
+
+    #shopify-section-{{ section.id }} .prada-sitemap__group {
+      margin-bottom: 48px;
+    }
+
+    #shopify-section-{{ section.id }} .prada-sitemap__group-title {
+      margin-bottom: 24px;
+      font-size: 18px;
+    }
+
+    #shopify-section-{{ section.id }} .prada-sitemap__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+    }
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign sitemap_menu = section.settings.menu
+  if sitemap_menu == blank or sitemap_menu.links.size == 0
+    assign sitemap_menu = linklists['main-menu']
+  endif
+-%}
+
+<div class="prada-sitemap color-{{ section.settings.color_scheme }} gradient">
+  <div class="prada-sitemap__inner">
+    <header class="prada-sitemap__header">
+      <h1 class="prada-sitemap__title">{{ section.settings.heading | escape }}</h1>
+      <nav class="prada-sitemap__quick-links" aria-label="Sitemap shortcuts">
+        <a href="{{ routes.root_url }}" class="prada-sitemap__quick-link">Homepage</a>
+        {%- if section.settings.secondary_quick_link != blank and section.settings.secondary_quick_label != blank -%}
+          <a href="{{ section.settings.secondary_quick_link }}" class="prada-sitemap__quick-link">
+            {{- section.settings.secondary_quick_label | escape -}}
+          </a>
+        {%- endif -%}
+      </nav>
+    </header>
+
+    <hr class="prada-sitemap__divider">
+
+    {%- if sitemap_menu != blank and sitemap_menu.links.size > 0 -%}
+      <div class="prada-sitemap__groups">
+        {%- for parent_link in sitemap_menu.links -%}
+          <section class="prada-sitemap__group" aria-labelledby="SitemapGroup-{{ section.id }}-{{ forloop.index }}">
+            <h2 id="SitemapGroup-{{ section.id }}-{{ forloop.index }}" class="prada-sitemap__group-title">
+              <a href="{{ parent_link.url }}">{{ parent_link.title | escape }}</a>
+            </h2>
+
+            {%- if parent_link.links.size > 0 -%}
+              <div class="prada-sitemap__grid">
+                {%- for child_link in parent_link.links -%}
+                  <div class="prada-sitemap__column">
+                    <h3 class="prada-sitemap__sub-title">
+                      <a href="{{ child_link.url }}">{{ child_link.title | escape }}</a>
+                    </h3>
+
+                    {%- if child_link.links.size > 0 -%}
+                      <ul class="prada-sitemap__list" role="list">
+                        {%- for grandchild_link in child_link.links -%}
+                          <li>
+                            <a href="{{ grandchild_link.url }}" class="prada-sitemap__link">
+                              {{- grandchild_link.title | escape -}}
+                            </a>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+                  </div>
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
+          </section>
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <div class="prada-sitemap__grid">
+        {%- for collection in collections -%}
+          {%- unless collection.handle == 'frontpage' -%}
+            <div class="prada-sitemap__column">
+              <h2 class="prada-sitemap__sub-title">
+                <a href="{{ collection.url }}">{{ collection.title | escape }}</a>
+              </h2>
+            </div>
+          {%- endunless -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Prada sitemap",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Page heading",
+      "default": "Sitemap"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation source menu",
+      "default": "main-menu",
+      "info": "Select the menu containing the three-level category hierarchy."
+    },
+    {
+      "type": "text",
+      "id": "secondary_quick_label",
+      "label": "Secondary quick-link label",
+      "default": "Collections"
+    },
+    {
+      "type": "url",
+      "id": "secondary_quick_link",
+      "label": "Secondary quick-link URL",
+      "default": "/collections/all"
+    },
+    {
+      "type": "range",
+      "id": "page_width",
+      "min": 1000,
+      "max": 1600,
+      "step": 40,
+      "unit": "px",
+      "label": "Maximum content width",
+      "default": 1360
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 20,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 20,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Prada sitemap"
+    }
+  ]
+}
+{% endschema %}
