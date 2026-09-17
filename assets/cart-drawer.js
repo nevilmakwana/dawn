@@ -98,7 +98,17 @@ class CartDrawer extends HTMLElement {
     destination.setAttribute('aria-disabled', 'true');
     if ('disabled' in destination) destination.disabled = true;
 
-    // Checkout must never be held behind an in-flight cart reconciliation.
+    const form = document.getElementById('CartDrawer-Form');
+    if (form && typeof form.submit === 'function') {
+      const checkoutInput = document.createElement('input');
+      checkoutInput.type = 'hidden';
+      checkoutInput.name = 'checkout';
+      checkoutInput.value = '';
+      form.append(checkoutInput);
+      form.submit();
+      return;
+    }
+
     window.location.assign(url);
   }
 

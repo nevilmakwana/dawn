@@ -376,6 +376,17 @@ window.PradaFastCheckout = window.PradaFastCheckout || (() => {
     source?.setAttribute?.('aria-disabled', 'true');
     if (source && 'disabled' in source) source.disabled = true;
 
+    const form = document.getElementById('CartDrawer-Form');
+    if (form && typeof form.submit === 'function') {
+      const checkoutInput = document.createElement('input');
+      checkoutInput.type = 'hidden';
+      checkoutInput.name = 'checkout';
+      checkoutInput.value = '';
+      form.append(checkoutInput);
+      form.submit();
+      return;
+    }
+
     window.location.assign(url);
   };
 
@@ -400,8 +411,6 @@ window.PradaFastCheckout = window.PradaFastCheckout || (() => {
       if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
 
-      event.preventDefault();
-      event.stopImmediatePropagation();
       navigate(control);
     },
     true
