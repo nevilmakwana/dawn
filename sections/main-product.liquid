@@ -197,12 +197,7 @@
         {%- endfor -%}
       {%- endif -%}
     </nav>
-    <div class="prada-product__scroll-hint" data-prada-scroll-hint aria-hidden="true">
-      <span>Scroll for more pictures</span>
-      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-        <path d="M6 1V11M6 11L1.5 6.5M6 11L10.5 6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
+    <div class="prada-product__scroll-hint" data-prada-scroll-hint aria-hidden="true">Scroll more pictures</div>
   </div>
 
   <div class="prada-product__panel">
@@ -981,13 +976,8 @@
     let galleryReturnScrollTop = mobileGallery?.scrollTop || 0;
     let handleIsDragging = false;
     let suppressHandleClick = false;
-    let scrollHintIdleTimer = null;
-    let scrollHintDismissTimer = null;
-    let scrollHintTransitionTimer = null;
-    let scrollHintActive = false;
-    let scrollHintScheduleIsReIdle = false;
-    let galleryHasLeftFirstMedia = false;
-    let scrollHintReIdleShown = false;
+    let onboardingTimer;
+    let scrollHintConsumed = false;
 
     const setupProductVideos = () => {
       mediaList?.querySelectorAll('.prada-product__media video').forEach((video) => {
@@ -1032,13 +1022,10 @@
       const fallbackSource = variantImage || defaultPrimarySource;
 
       if (galleryChanged) {
-        window.clearTimeout(scrollHintIdleTimer);
-        window.clearTimeout(scrollHintDismissTimer);
-        window.clearTimeout(scrollHintTransitionTimer);
+        window.clearTimeout(onboardingTimer);
         root.classList.remove('mobile-gallery-onboarding');
-        scrollHint?.classList.remove('is-visible', 'is-dismissing');
-        scrollHintActive = false;
-        scrollHintReIdleShown = true;
+        scrollHint?.classList.remove('is-visible');
+        scrollHintConsumed = true;
 
         const sourceTemplate = variantTemplate || defaultGalleryTemplate;
         const galleryContent = sourceTemplate.content.cloneNode(true);
@@ -1081,35 +1068,14 @@
       });
     };
 
-    const hideScrollHint = () => {
-      window.clearTimeout(scrollHintDismissTimer);
-      window.clearTimeout(scrollHintTransitionTimer);
-      if (scrollHintActive) scrollHint?.classList.add('is-dismissing');
-      scrollHint?.classList.remove('is-visible');
-      scrollHintActive = false;
-      scrollHintTransitionTimer = window.setTimeout(() => {
-        scrollHint?.classList.remove('is-dismissing');
-      }, 200);
-    };
-
-    const showScrollHint = () => {
+    const playMobileOnboarding = () => {
       if (!mobileQuery.matches || !mobileGallery || galleryMedia.length < 2) return;
-      if (mobileGallery.scrollTop > 20) return;
-      if (scrollHintScheduleIsReIdle && scrollHintReIdleShown) return;
-      if (scrollHintScheduleIsReIdle) scrollHintReIdleShown = true;
-      window.clearTimeout(scrollHintTransitionTimer);
-      scrollHint?.classList.remove('is-dismissing');
-      scrollHint?.classList.add('is-visible');
-      scrollHintActive = true;
-      window.clearTimeout(scrollHintDismissTimer);
-      scrollHintDismissTimer = window.setTimeout(hideScrollHint, 4000);
-    };
-
-    const scheduleScrollHint = (delayMs = 1200, isReIdle = false) => {
-      if (isReIdle && scrollHintReIdleShown) return;
-      window.clearTimeout(scrollHintIdleTimer);
-      scrollHintScheduleIsReIdle = isReIdle;
-      scrollHintIdleTimer = window.setTimeout(showScrollHint, delayMs);
+      window.clearTimeout(onboardingTimer);
+      root.classList.add('mobile-gallery-onboarding');
+      onboardingTimer = window.setTimeout(() => {
+        root.classList.remove('mobile-gallery-onboarding');
+        scrollHintConsumed = true;
+      }, 3200);
     };
 
     const closeMobileSheet = () => {
@@ -1138,28 +1104,28 @@
       sheetHandle?.setAttribute('aria-label', 'Close product information');
       window.requestAnimationFrame(() => mobilePanel?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
     };
-    const onUserGalleryInteraction = () => {
-      window.clearTimeout(scrollHintIdleTimer);
-      if (scrollHintActive) hideScrollHint();
-    };
     const updateMobileGallery = () => {
       if (!mobileQuery.matches || !mobileGallery || galleryMedia.length < 2) return;
-      onUserGalleryInteraction();
-      if (mobileGallery.scrollTop > 15) {
-        galleryHasLeftFirstMedia = true;
-      } else if (mobileGallery.scrollTop <= 5 && galleryHasLeftFirstMedia && !scrollHintReIdleShown) {
-        scheduleScrollHint(2000, true);
+      const remaining = mobileGallery.scrollHeight - mobileGallery.scrollTop - mobileGallery.clientHeight;
+      const atLastMedia = remaining <= 8;
+      const hasStarted = mobileGallery.scrollTop > 10;
+      if (hasStarted) {
+        scrollHintConsumed = true;
+        root.classList.remove('mobile-gallery-onboarding');
       }
+      if (scrollHint) scrollHint.classList.toggle('is-visible', !scrollHintConsumed && hasStarted && !atLastMedia);
     };
 
     mobileGallery?.addEventListener('scroll', updateMobileGallery, { passive: true });
     mobileGallery?.addEventListener('touchstart', (event) => {
-      onUserGalleryInteraction();
+      window.clearTimeout(onboardingTimer);
+      scrollHintConsumed = true;
+      root.classList.remove('mobile-gallery-onboarding');
+      scrollHint?.classList.remove('is-visible');
       galleryTouchStart = event.touches[0].clientY;
       const remaining = mobileGallery.scrollHeight - mobileGallery.scrollTop - mobileGallery.clientHeight;
       galleryTouchStartedAtEnd = remaining <= 8;
     }, { passive: true });
-    mobileGallery?.addEventListener('pointerdown', onUserGalleryInteraction, { passive: true });
     mobileGallery?.addEventListener('touchend', (event) => {
       const upwardDistance = galleryTouchStart - event.changedTouches[0].clientY;
       if (galleryTouchStartedAtEnd && upwardDistance > 45) openMobileSheet();
@@ -1225,18 +1191,14 @@
       }
     }, { passive: true });
     mobileQuery.addEventListener?.('change', () => {
-      if (!mobileQuery.matches) {
-        window.clearTimeout(scrollHintIdleTimer);
-        hideScrollHint();
-        root.classList.remove('mobile-info-open', 'mobile-info-closing');
-      }
+      if (!mobileQuery.matches) root.classList.remove('mobile-info-open', 'mobile-info-closing');
       else updateMobileGallery();
     });
 
     if (document.readyState === 'complete') {
-      scheduleScrollHint(1200);
+      window.setTimeout(playMobileOnboarding, 650);
     } else {
-      window.addEventListener('load', () => scheduleScrollHint(1200), { once: true });
+      window.addEventListener('load', () => window.setTimeout(playMobileOnboarding, 650), { once: true });
     }
 
     setupProductVideos();
