@@ -82,12 +82,13 @@ class CartDrawer extends HTMLElement {
       return;
     }
 
-    const destination = event.target.closest('.prada-cart-drawer__view-cart, [data-prada-fast-checkout]');
+    const viewCartLink = event.target.closest('.prada-cart-drawer__view-cart');
+    if (viewCartLink && this.contains(viewCartLink)) return;
+
+    const destination = event.target.closest('[data-prada-fast-checkout]');
     if (!destination || !this.contains(destination)) return;
 
-    const url = destination.matches('.prada-cart-drawer__view-cart')
-      ? destination.href
-      : destination.dataset.pradaFastCheckout;
+    const url = destination.dataset.pradaFastCheckout;
     if (!url) return;
 
     event.preventDefault();
