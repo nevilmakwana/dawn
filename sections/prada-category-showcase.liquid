@@ -66,11 +66,8 @@
 
   {%- if is_best_sellers -%}
     {%- liquid
-      assign target_tag = section.settings.product_tag | default: 'best-seller' | handleize
-      assign category_filter = section.settings.category_filter | default: 'all'
       assign products_to_show = section.settings.products_to_show | default: 8
       assign rendered_count = 0
-      assign rendered_handles = '|'
       assign fallback_collection = section.settings.collection
 
       if fallback_collection == blank or fallback_collection.products_count == 0
@@ -89,125 +86,12 @@
         role="list"
         data-prada-related-list
       >
-        {%- paginate collections.all.products by 250 -%}
-          {%- for product in collections.all.products -%}
-            {%- if rendered_count >= products_to_show -%}{% break %}{%- endif -%}
-            {%- unless product.available -%}{% continue %}{%- endunless -%}
-
-            {%- liquid
-              assign is_tagged = false
-              for product_tag in product.tags
-                assign product_tag_handle = product_tag | handleize
-                if product_tag_handle == target_tag
-                  assign is_tagged = true
-                  break
-                endif
-                if target_tag == 'best-seller' or target_tag == 'best-sellers'
-                  if product_tag_handle == 'best-seller' or product_tag_handle == 'best-sellers'
-                    assign is_tagged = true
-                    break
-                  endif
-                endif
-              endfor
-
-              assign matches_category = true
-              if category_filter == 'scarves'
-                assign title_lower = product.title | downcase
-                assign type_lower = product.type | downcase
-                unless title_lower contains 'scarf' or type_lower contains 'scarf'
-                  assign matches_category = false
-                endunless
-              elsif category_filter == 'candles'
-                assign title_lower = product.title | downcase
-                assign type_lower = product.type | downcase
-                unless title_lower contains 'candle' or type_lower contains 'candle'
-                  assign matches_category = false
-                endunless
-              endif
-
-              assign product_token = '|' | append: product.handle | append: '|'
-            -%}
-
-            {%- if is_tagged and matches_category -%}
-              {%- unless rendered_handles contains product_token -%}
-                {%- assign rendered_position = rendered_count | plus: 1 -%}
-                {%- render 'prada-related-product', related_product: product, forloop_index: rendered_position -%}
-                {%- assign rendered_handles = rendered_handles | append: product.handle | append: '|' -%}
-                {%- assign rendered_count = rendered_count | plus: 1 -%}
-              {%- endunless -%}
-            {%- endif -%}
-          {%- endfor -%}
-
-          {%- if rendered_count < products_to_show and fallback_collection != blank -%}
-            {%- for product in fallback_collection.products -%}
-              {%- if rendered_count >= products_to_show -%}{% break %}{%- endif -%}
-              {%- unless product.available -%}{% continue %}{%- endunless -%}
-
-              {%- liquid
-                assign matches_category = true
-                if category_filter == 'scarves'
-                  assign title_lower = product.title | downcase
-                  assign type_lower = product.type | downcase
-                  unless title_lower contains 'scarf' or type_lower contains 'scarf'
-                    assign matches_category = false
-                  endunless
-                elsif category_filter == 'candles'
-                  assign title_lower = product.title | downcase
-                  assign type_lower = product.type | downcase
-                  unless title_lower contains 'candle' or type_lower contains 'candle'
-                    assign matches_category = false
-                  endunless
-                endif
-
-                assign product_token = '|' | append: product.handle | append: '|'
-              -%}
-
-              {%- if matches_category -%}
-                {%- unless rendered_handles contains product_token -%}
-                  {%- assign rendered_position = rendered_count | plus: 1 -%}
-                  {%- render 'prada-related-product', related_product: product, forloop_index: rendered_position -%}
-                  {%- assign rendered_handles = rendered_handles | append: product.handle | append: '|' -%}
-                  {%- assign rendered_count = rendered_count | plus: 1 -%}
-                {%- endunless -%}
-              {%- endif -%}
-            {%- endfor -%}
-          {%- endif -%}
-
-          {%- if rendered_count < products_to_show -%}
-            {%- for product in collections.all.products -%}
-              {%- if rendered_count >= products_to_show -%}{% break %}{%- endif -%}
-              {%- unless product.available -%}{% continue %}{%- endunless -%}
-
-              {%- liquid
-                assign matches_category = true
-                if category_filter == 'scarves'
-                  assign title_lower = product.title | downcase
-                  assign type_lower = product.type | downcase
-                  unless title_lower contains 'scarf' or type_lower contains 'scarf'
-                    assign matches_category = false
-                  endunless
-                elsif category_filter == 'candles'
-                  assign title_lower = product.title | downcase
-                  assign type_lower = product.type | downcase
-                  unless title_lower contains 'candle' or type_lower contains 'candle'
-                    assign matches_category = false
-                  endunless
-                endif
-
-                assign product_token = '|' | append: product.handle | append: '|'
-              -%}
-
-              {%- if matches_category -%}
-                {%- unless rendered_handles contains product_token -%}
-                  {%- assign rendered_position = rendered_count | plus: 1 -%}
-                  {%- render 'prada-related-product', related_product: product, forloop_index: rendered_position -%}
-                  {%- assign rendered_handles = rendered_handles | append: product.handle | append: '|' -%}
-                  {%- assign rendered_count = rendered_count | plus: 1 -%}
-                {%- endunless -%}
-              {%- endif -%}
-            {%- endfor -%}
-          {%- endif -%}
-        {%- endpaginate -%}
+        {%- for product in fallback_collection.products limit: products_to_show -%}
+          {%- unless product.available -%}{% continue %}{%- endunless -%}
+          {%- assign rendered_position = rendered_count | plus: 1 -%}
+          {%- render 'prada-related-product', related_product: product, forloop_index: rendered_position -%}
+          {%- assign rendered_count = rendered_count | plus: 1 -%}
+        {%- endfor -%}
       </ul>
 
       {%- if rendered_count > 4 -%}
@@ -735,6 +619,7 @@
 
         const dotButtons = Array.from(carousel.querySelectorAll('[data-prada-carousel-dot]'));
         const mediaLink = carousel.querySelector('.prada-related-card__media-link');
+        if (!mediaLink) return;
 
         const updateDots = () => {
           if (!dotButtons.length) return;

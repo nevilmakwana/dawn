@@ -82,9 +82,9 @@
     video.dataset.activeFallbackSrc = nextFallbackSource || '';
 
     const activeSource = resolveUrl(video.currentSrc);
-    if (activeSource === resolvedNextSource) {
+    if (activeSource === resolvedNextSource || (video.currentSrc && activeSource.includes(nextSource))) {
       video.dataset.currentSrc = resolvedNextSource;
-    } else if (video.dataset.currentSrc !== resolvedNextSource || !video.currentSrc) {
+    } else if (video.dataset.currentSrc !== resolvedNextSource && !video.currentSrc) {
       video.dataset.currentSrc = resolvedNextSource;
       video.src = nextSource;
       video.load();

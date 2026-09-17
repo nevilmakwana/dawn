@@ -69,6 +69,9 @@
           display: grid !important;
           grid-template-columns: 76px minmax(0, 1fr) 104px !important;
           padding: 10px 16px !important;
+          height: var(--prada-mobile-header-height, 56px) !important;
+          min-height: var(--prada-mobile-header-height, 56px) !important;
+          max-height: var(--prada-mobile-header-height, 56px) !important;
         }
 
         .prada-header-left {
@@ -126,6 +129,9 @@
         .header.prada-header,
         .prada-header {
           padding: 0 24px !important;
+          height: var(--prada-desktop-header-height, 89px) !important;
+          min-height: var(--prada-desktop-header-height, 89px) !important;
+          max-height: var(--prada-desktop-header-height, 89px) !important;
         }
       }
 
@@ -156,6 +162,13 @@
           window.location.replace('{{ routes.root_url }}pages/contact?view=cookie-policy');
         } else if (/\/policies\/contact-information\/?$/.test(window.location.pathname)) {
           window.location.replace('{{ routes.root_url }}pages/contact?view=payment-policy');
+        } else if (/\/policies\/shipping-policy\/?$/.test(window.location.pathname)) {
+          window.location.replace('{{ routes.root_url }}pages/contact?view=faq#topic-shipments');
+        } else if (
+          /\/policies\/terms-of-service\/?$/.test(window.location.pathname) ||
+          /\/pages\/terms-and-conditions\/?$/.test(window.location.pathname)
+        ) {
+          window.location.replace('{{ routes.root_url }}pages/contact?view=terms-and-conditions');
         } else if (/\/policies\/return-and-refund-policy\/?$/.test(window.location.pathname)) {
           window.location.replace('{{ routes.root_url }}policies/refund-policy');
         }
@@ -505,13 +518,6 @@
     {%- endif -%}
 
     <script>
-      if (
-        window.location.pathname.replace(/\/$/, '') === '/policies/terms-of-service' ||
-        window.location.pathname.replace(/\/$/, '') === '/pages/terms-and-conditions'
-      ) {
-        window.location.replace('{{ routes.root_url }}pages/contact?view=terms-and-conditions');
-      }
-
       if (Shopify.designMode) {
         document.documentElement.classList.add('shopify-design-mode');
       }

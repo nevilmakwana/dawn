@@ -235,6 +235,7 @@
 
         const dotButtons = Array.from(carousel.querySelectorAll('[data-prada-carousel-dot]'));
         const mediaLink = carousel.querySelector('.prada-related-card__media-link');
+        if (!mediaLink) return;
 
         const updateDots = () => {
           if (!dotButtons.length) return;

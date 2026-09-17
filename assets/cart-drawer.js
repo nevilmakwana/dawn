@@ -98,12 +98,8 @@ class CartDrawer extends HTMLElement {
     destination.setAttribute('aria-disabled', 'true');
     if ('disabled' in destination) destination.disabled = true;
 
-    const navigate = () => window.location.assign(url);
-    if (window.PradaCartMutations?.pending) {
-      window.PradaCartMutations.whenIdle().then(navigate);
-    } else {
-      navigate();
-    }
+    // Checkout must never be held behind an in-flight cart reconciliation.
+    window.location.assign(url);
   }
 
   setHeaderCartIconAccessibility() {

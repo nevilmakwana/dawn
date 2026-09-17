@@ -351,24 +351,14 @@ window.PradaFastCheckout = window.PradaFastCheckout || (() => {
   };
 
   const appendPrefetch = (url, revision) => {
-    if (revision !== prefetchRevision || !canPrefetch() || prefetchLink?.href === url) return;
-    prefetchLink?.remove();
-    prefetchLink = document.createElement('link');
-    prefetchLink.rel = 'prefetch';
-    prefetchLink.href = url;
-    document.head.append(prefetchLink);
+    // Intentionally disabled: /checkout is private, redirects, and cannot be cached.
+    return;
   };
 
   const prewarm = (source) => {
-    if (!canPrefetch()) return;
-    const url = checkoutUrl(source);
-    const revision = prefetchRevision;
-
-    if (window.PradaCartMutations?.pending) {
-      window.PradaCartMutations.whenIdle().then(() => appendPrefetch(url, revision));
-    } else {
-      appendPrefetch(url, revision);
-    }
+    // Shopify checkout redirects are private and uncacheable; prefetching only
+    // competes with the cart mutation for the mobile connection.
+    return;
   };
 
   const invalidate = () => {
@@ -386,9 +376,7 @@ window.PradaFastCheckout = window.PradaFastCheckout || (() => {
     source?.setAttribute?.('aria-disabled', 'true');
     if (source && 'disabled' in source) source.disabled = true;
 
-    const proceed = () => window.location.assign(url);
-    if (window.PradaCartMutations?.pending) window.PradaCartMutations.whenIdle().then(proceed);
-    else proceed();
+    window.location.assign(url);
   };
 
   const findCheckoutControl = (event) =>

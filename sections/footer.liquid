@@ -53,7 +53,8 @@
       assign greyexim_privacy_url = shop.privacy_policy.url
     endif
 
-    assign greyexim_refund_url = routes.root_url | append: 'policies/return-and-refund-policy'
+    assign greyexim_shipping_url = routes.root_url | append: 'pages/contact?view=faq#topic-shipments'
+    assign greyexim_refund_url = routes.root_url | append: 'policies/refund-policy'
     assign greyexim_terms_url = routes.root_url | append: 'pages/contact?view=terms-and-conditions'
 
     assign greyexim_cookie_url = routes.root_url | append: 'pages/contact?view=cookie-policy'
@@ -101,7 +102,7 @@
       <div class="prada-footer__group-content"><ul>
         <li><a href="/pages/contact?view=track-order">Track your order</a></li>
         <li><a href="/pages/contact?view=returns">Returns</a></li>
-        <li><a href="{{ routes.root_url }}pages/contact?view=faq#topic-shipments">Shipping and delivery</a></li>
+        <li><a href="{{ greyexim_shipping_url }}">Shipping and delivery</a></li>
       </ul></div>
     </details>
 
@@ -609,8 +610,8 @@
         <summary><span>Services</span><span class="prada-mobile-footer__chevron" aria-hidden="true"></span></summary>
         <div class="prada-mobile-footer__accordion-content">
           <ul>
-            {%- if shop.shipping_policy != blank -%}<li><a href="{{ shop.shipping_policy.url }}">Shipping</a></li>{%- endif -%}
-            {%- if shop.refund_policy != blank -%}<li><a href="{{ shop.refund_policy.url }}">Returns and refunds</a></li>{%- endif -%}
+            {%- if shop.shipping_policy != blank -%}<li><a href="{{ greyexim_shipping_url }}">Shipping</a></li>{%- endif -%}
+            {%- if shop.refund_policy != blank -%}<li><a href="{{ greyexim_refund_url }}">Returns and refunds</a></li>{%- endif -%}
             <li><a href="{{ routes.cart_url }}">Shopping bag</a></li>
           </ul>
         </div>
@@ -622,7 +623,17 @@
           <ul>
             <li><a href="{{ greyexim_terms_url }}">Terms &amp; Conditions</a></li>
             {%- for policy in shop.policies -%}
-              {%- if policy != blank and policy.url != shop.terms_of_service.url -%}<li><a href="{{ policy.url }}">{{ policy.title | escape }}</a></li>{%- endif -%}
+              {%- if policy != blank and policy.url != shop.terms_of_service.url -%}
+                {%- liquid
+                  assign greyexim_policy_url = policy.url
+                  if policy.url == shop.shipping_policy.url or policy.url contains '/policies/shipping-policy'
+                    assign greyexim_policy_url = greyexim_shipping_url
+                  elsif policy.url == shop.refund_policy.url or policy.url contains '/policies/return-and-refund-policy'
+                    assign greyexim_policy_url = greyexim_refund_url
+                  endif
+                -%}
+                <li><a href="{{ greyexim_policy_url }}">{{ policy.title | escape }}</a></li>
+              {%- endif -%}
             {%- endfor -%}
           </ul>
         </div>

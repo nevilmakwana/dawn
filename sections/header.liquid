@@ -2084,8 +2084,8 @@
     .section-header .prada-header header-drawer > details > summary .prada-menu-icon-wrapper,
     .section-header .prada-header header-drawer > details > summary .prada-menu-glyph,
     .section-header .prada-header header-drawer > details > summary .prada-close-glyph {
-      width: 20px !important;
-      height: 20px !important;
+      width: 15px !important;
+      height: 15px !important;
       transform: none !important;
     }
 
@@ -2141,8 +2141,8 @@
     body header.header.prada-header .prada-menu-icon-wrapper,
     body header.header.prada-header .prada-menu-glyph,
     body header.header.prada-header .prada-close-glyph {
-      inline-size: 20px !important;
-      block-size: 20px !important;
+      inline-size: 15px !important;
+      block-size: 15px !important;
       scale: 1 !important;
     }
   }
@@ -2369,16 +2369,6 @@
         });
       });
 
-      if (header) {
-        header.querySelectorAll('.prada-menu-icon-wrapper, .prada-menu-glyph, .prada-close-glyph').forEach((icon) => {
-          ['width', 'height'].forEach((property) => {
-            if (desktop.matches) icon.style.setProperty(property, '15px', 'important');
-            else icon.style.removeProperty(property);
-          });
-          if (desktop.matches) icon.style.setProperty('transform', 'none', 'important');
-          else icon.style.removeProperty('transform');
-        });
-      }
     };
 
     syncCompactHeader();
