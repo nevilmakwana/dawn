@@ -277,8 +277,16 @@
       list.scrollTo({ left: list.clientWidth * pageIndex, behavior: 'smooth' });
     };
 
-    prevButton?.addEventListener('click', () => scrollToPage(Math.max(Math.round(list.scrollLeft / list.clientWidth) - 1, 0)));
-    nextButton?.addEventListener('click', () => scrollToPage(Math.round(list.scrollLeft / list.clientWidth) + 1));
+    const scrollByItem = (direction) => {
+      const firstItem = list.querySelector(':scope > .grid__item');
+      const listStyles = window.getComputedStyle(list);
+      const itemGap = Number.parseFloat(listStyles.columnGap || listStyles.gap) || 0;
+      const itemStep = firstItem ? firstItem.getBoundingClientRect().width + itemGap : list.clientWidth;
+      list.scrollBy({ left: direction * itemStep, behavior: 'smooth' });
+    };
+
+    prevButton?.addEventListener('click', () => scrollByItem(-1));
+    nextButton?.addEventListener('click', () => scrollByItem(1));
     pageDots.forEach((dot) => dot.addEventListener('click', () => scrollToPage(Number(dot.dataset.pradaRelatedPage || 0))));
 
     list.addEventListener('scroll', () => window.requestAnimationFrame(updateControls), { passive: true });

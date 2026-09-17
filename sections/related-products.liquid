@@ -165,7 +165,11 @@
       }));
       arrows.forEach((arrow) => arrow.addEventListener('click', () => {
         const direction = arrow.dataset.pradaRelatedArrow === 'previous' ? -1 : 1;
-        list.scrollBy({ left: direction * list.clientWidth, behavior: 'smooth' });
+        const firstItem = list.querySelector(':scope > .grid__item');
+        const listStyles = window.getComputedStyle(list);
+        const itemGap = Number.parseFloat(listStyles.columnGap || listStyles.gap) || 0;
+        const itemStep = firstItem ? firstItem.getBoundingClientRect().width + itemGap : list.clientWidth;
+        list.scrollBy({ left: direction * itemStep, behavior: 'smooth' });
       }));
       window.addEventListener('resize', updateArrowVisibility, { passive: true });
       updateArrowVisibility();
