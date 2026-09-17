@@ -225,59 +225,6 @@
         "tile_background": "#f3f3f3"
       }
     },
-    "image_banner_amTGtF": {
-      "type": "image-banner",
-      "blocks": {
-        "heading": {
-          "type": "heading",
-          "settings": {
-            "heading": "Discover the collection",
-            "heading_size": "h1"
-          }
-        },
-        "text": {
-          "type": "text",
-          "settings": {
-            "text": "Explore the latest pieces from Grey Exim.",
-            "text_style": "body"
-          }
-        },
-        "button": {
-          "type": "buttons",
-          "settings": {
-            "button_label_1": "Discover",
-            "button_link_1": "shopify://collections/all",
-            "button_style_secondary_1": true,
-            "button_label_2": "",
-            "button_link_2": "",
-            "button_style_secondary_2": false
-          }
-        }
-      },
-      "block_order": [
-        "heading",
-        "text",
-        "button"
-      ],
-      "name": "Image banner 3",
-      "settings": {
-        "image": "shopify://shop_images/imgi_21_menu_DT.jpg",
-        "image_overlay_opacity": 0,
-        "image_height": "adapt",
-        "full_screen_height": true,
-        "show_full_media": false,
-        "mobile_center_zoom": true,
-        "prada_link_button": true,
-        "image_behavior": "none",
-        "desktop_content_position": "bottom-center",
-        "desktop_content_alignment": "center",
-        "show_text_box": false,
-        "color_scheme": "scheme-3",
-        "stack_images_on_mobile": false,
-        "mobile_content_alignment": "center",
-        "show_text_below": false
-      }
-    },
     "pradasphere_news_WHHENq": {
       "type": "pradasphere-news",
       "name": "Pradasphere news",
@@ -296,7 +243,6 @@
     "prada_category_showcase",
     "prada_showcase_banner",
     "prada_category_showcase_X4AnVA",
-    "image_banner_amTGtF",
     "pradasphere_news_WHHENq"
   ]
 }
