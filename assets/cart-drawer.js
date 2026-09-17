@@ -95,18 +95,8 @@ class CartDrawer extends HTMLElement {
     event.stopPropagation();
     if (destination.getAttribute('aria-busy') === 'true') return;
 
-    destination.setAttribute('aria-busy', 'true');
-    destination.setAttribute('aria-disabled', 'true');
-    if ('disabled' in destination) destination.disabled = true;
-
-    const form = document.getElementById('CartDrawer-Form');
-    if (form && typeof form.submit === 'function') {
-      const checkoutInput = document.createElement('input');
-      checkoutInput.type = 'hidden';
-      checkoutInput.name = 'checkout';
-      checkoutInput.value = '';
-      form.append(checkoutInput);
-      form.submit();
+    if (window.PradaFastCheckout?.navigate) {
+      window.PradaFastCheckout.navigate(destination);
       return;
     }
 

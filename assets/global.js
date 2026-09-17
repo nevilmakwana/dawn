@@ -376,18 +376,31 @@ window.PradaFastCheckout = window.PradaFastCheckout || (() => {
     source?.setAttribute?.('aria-disabled', 'true');
     if (source && 'disabled' in source) source.disabled = true;
 
-    const form = document.getElementById('CartDrawer-Form');
-    if (form && typeof form.submit === 'function') {
+    const submitCheckout = () => {
+      // Never submit a cart UI form here. Its updates[] fields can be stale
+      // after the shopping-bag editor changes a variant or quantity and would
+      // overwrite the confirmed server cart while entering checkout.
+      const form = document.createElement('form');
+      form.method = 'post';
+      form.action = new URL(window.routes?.cart_url || '/cart', window.location.origin).href;
+      form.hidden = true;
+
       const checkoutInput = document.createElement('input');
       checkoutInput.type = 'hidden';
       checkoutInput.name = 'checkout';
       checkoutInput.value = '';
       form.append(checkoutInput);
-      form.submit();
+      document.body.append(form);
+      HTMLFormElement.prototype.submit.call(form);
+    };
+
+    const mutationQueue = window.PradaCartMutations;
+    if (mutationQueue?.pending) {
+      mutationQueue.whenIdle().then(submitCheckout, () => window.location.assign(url));
       return;
     }
 
-    window.location.assign(url);
+    submitCheckout();
   };
 
   const findCheckoutControl = (event) =>
@@ -411,6 +424,7 @@ window.PradaFastCheckout = window.PradaFastCheckout || (() => {
       if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
 
+      event.preventDefault();
       navigate(control);
     },
     true
