@@ -38,16 +38,25 @@
       "settings": {
         "video": "shopify://files/videos/hero-video.webm",
         "webm_filename": "hero-video.webm",
+        "mobile_video": "shopify://files/videos/hero_section_mobile.webm",
+        "mobile_webm_filename": "hero_section_mobile.webm",
         "image_overlay_opacity": 0,
         "image_height": "large",
         "full_screen_height": true,
+        "show_full_media": false,
+        "mobile_center_zoom": true,
+        "mobile_auto_subject_focus": true,
+        "prada_link_button": true,
         "image_behavior": "none",
         "desktop_content_position": "bottom-center",
         "desktop_content_alignment": "center",
+        "desktop_button_alignment": "inherit",
         "show_text_box": false,
         "color_scheme": "scheme-3",
         "stack_images_on_mobile": false,
+        "mobile_content_position": "bottom-center",
         "mobile_content_alignment": "center",
+        "mobile_button_alignment": "inherit",
         "show_text_below": false
       }
     },
@@ -57,41 +66,61 @@
         "category_bags": {
           "type": "category",
           "settings": {
-            "title": "Men's Bags",
-            "image": "shopify://shop_images/imgi_73_cq5dam.web.hebebed.600.600.jpg",
+            "title": "American Crepe Scarves",
+            "image": "shopify://shop_images/2-grey-exim-purple-botanical-leaf-geometric-border-polyester-crepe-bandana.webp",
             "product": "",
-            "collection": "",
-            "link": "shopify://collections/all"
+            "collection": "man-scarves",
+            "link": "shopify://collections/all",
+            "women_title": "Cotton Scarves",
+            "women_image": "shopify://shop_images/grey-exim-black-white-city-sketch-architectural-print-polyester-crepe-bandana_png.png",
+            "women_product": "",
+            "women_collection": "",
+            "women_link": "shopify://collections/women-cotton-scarves"
           }
         },
         "category_ready_to_wear": {
           "type": "category",
           "settings": {
-            "title": "Men's Ready to Wear",
-            "image": "shopify://shop_images/imgi_75_cq5dam.web.hebebed.600.600.jpg",
+            "title": "American Crepe Bandana",
+            "image": "shopify://shop_images/2-grey-exim-small-crepe-bandana-brown-white-polka-dot.webp",
             "product": "",
-            "collection": "",
-            "link": "shopify://collections/all"
+            "collection": "man-bandanas",
+            "link": "shopify://collections/all",
+            "women_title": "Cotton Bandana",
+            "women_image": "shopify://shop_images/grey-exim-brown-leaf-print-cambric-cotton-bandana-product-shot.png",
+            "women_product": "",
+            "women_collection": "",
+            "women_link": "shopify://collections/women-cotton-bandanas"
           }
         },
         "category_shoes": {
           "type": "category",
           "settings": {
-            "title": "Men's Shoes",
-            "image": "shopify://shop_images/imgi_81_cq5dam.web.hebebed.600.600.jpg",
+            "title": "Cotton Scarves",
+            "image": "shopify://shop_images/grey-exim-yellow-and-green-abstract-doodle-print-cambric-cotton-bandana-product-shot.png",
             "product": "",
-            "collection": "",
-            "link": "shopify://collections/all"
+            "collection": "man-cotton-scarves",
+            "link": "shopify://collections/man-cotton-scarves",
+            "women_title": "American Crepe Bandana",
+            "women_image": "shopify://shop_images/1-grey-exim-american-crepe-small-bandana-maroon-green-concentric-squares.webp",
+            "women_product": "",
+            "women_collection": "women-bandanas",
+            "women_link": ""
           }
         },
         "category_accessories": {
           "type": "category",
           "settings": {
-            "title": "Men's Accessories",
-            "image": "shopify://shop_images/imgi_85_cq5dam.web.hebebed.600.600.jpg",
+            "title": "Cotton Bandana",
+            "image": "shopify://shop_images/grey-exim-orange-african-art-print-cambric-cotton-bandana-product-shot.png",
             "product": "",
-            "collection": "",
-            "link": "shopify://collections/all"
+            "collection": "man-cotton-bandanas",
+            "link": "shopify://collections/scented-candles",
+            "women_title": "American Crepe Scarves",
+            "women_image": "shopify://shop_images/2-grey-exim-small-crepe-bandana-black-border-stripes.png",
+            "women_product": "",
+            "women_collection": "women-scarves",
+            "women_link": "shopify://collections/scented-candles"
           }
         }
       },
@@ -103,14 +132,17 @@
       ],
       "settings": {
         "color_scheme": "scheme-1",
+        "content_mode": "categories",
+        "heading": "",
         "text": "<p>Rooted in memory and shaped by transformation, evolving forms and refined details reveal new expressions of individuality.</p>",
+        "product_tag": "Best Sellers",
         "women_label": "Women",
         "women_link": "shopify://collections/all",
         "men_label": "Men",
         "men_link": "shopify://collections/all",
         "active_tab": "men",
-        "intro_height": 220,
-        "tile_height": 600,
+        "intro_height": 150,
+        "tile_height": 420,
         "tile_background": "#f3f3f3"
       }
     },
@@ -148,6 +180,86 @@
         "text",
         "button"
       ],
+      "name": "Image banner 2",
+      "settings": {
+        "image": "shopify://shop_images/Generated_image_1_16.png",
+        "mobile_image": "shopify://shop_images/Generated_image_1_16.png",
+        "webm_filename": "",
+        "mobile_webm_filename": "",
+        "image_overlay_opacity": 0,
+        "image_height": "adapt",
+        "full_screen_height": false,
+        "show_full_media": false,
+        "mobile_center_zoom": true,
+        "mobile_auto_subject_focus": true,
+        "prada_link_button": true,
+        "image_behavior": "none",
+        "desktop_content_position": "bottom-center",
+        "desktop_content_alignment": "center",
+        "desktop_button_alignment": "inherit",
+        "show_text_box": false,
+        "color_scheme": "scheme-3",
+        "stack_images_on_mobile": false,
+        "mobile_content_position": "bottom-center",
+        "mobile_content_alignment": "center",
+        "mobile_button_alignment": "inherit",
+        "show_text_below": false
+      }
+    },
+    "prada_category_showcase_X4AnVA": {
+      "type": "prada-category-showcase",
+      "name": "Best Sellers ",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "content_mode": "categories",
+        "heading": "Best Sellers",
+        "text": "<p>Our most-loved scarves, chosen for their effortless style and timeless appeal.</p>",
+        "product_tag": "Best Sellers",
+        "women_label": "Women",
+        "women_link": "shopify://collections/all",
+        "men_label": "Men",
+        "men_link": "shopify://collections/all",
+        "active_tab": "men",
+        "intro_height": 150,
+        "tile_height": 420,
+        "tile_background": "#f3f3f3"
+      }
+    },
+    "image_banner_amTGtF": {
+      "type": "image-banner",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Discover the collection",
+            "heading_size": "h1"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "Explore the latest pieces from Grey Exim.",
+            "text_style": "body"
+          }
+        },
+        "button": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "Discover",
+            "button_link_1": "shopify://collections/all",
+            "button_style_secondary_1": true,
+            "button_label_2": "",
+            "button_link_2": "",
+            "button_style_secondary_2": false
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "button"
+      ],
+      "name": "Image banner 3",
       "settings": {
         "image": "shopify://shop_images/imgi_21_menu_DT.jpg",
         "image_overlay_opacity": 0,
@@ -166,43 +278,16 @@
         "show_text_below": false
       }
     },
-    "featured_collection": {
-      "type": "featured-collection",
-      "settings": {
-        "collection": "all",
-        "products_to_show": 8,
-        "title": "Featured products",
-        "heading_size": "h2",
-        "description": "",
-        "show_description": false,
-        "description_style": "body",
-        "columns_desktop": 4,
-        "enable_desktop_slider": false,
-        "full_width": false,
-        "show_view_all": true,
-        "view_all_style": "solid",
-        "color_scheme": "scheme-1",
-        "image_ratio": "adapt",
-        "image_shape": "default",
-        "show_secondary_image": true,
-        "show_vendor": false,
-        "show_rating": false,
-        "quick_add": "none",
-        "columns_mobile": "2",
-        "swipe_on_mobile": false,
-        "padding_top": 44,
-        "padding_bottom": 36
-      }
-    },
-    "pradasphere_news": {
+    "pradasphere_news_WHHENq": {
       "type": "pradasphere-news",
+      "name": "Pradasphere news",
       "settings": {
-        "heading": "Pradasphere News",
-        "blog": "",
+        "heading": "Greysphere News",
+        "blog": "news",
         "article_limit": 6,
         "discover_label": "Discover",
-        "padding_top": 76,
-        "padding_bottom": 68
+        "padding_top": 40,
+        "padding_bottom": 40
       }
     }
   },
@@ -210,7 +295,8 @@
     "image_banner",
     "prada_category_showcase",
     "prada_showcase_banner",
-    "featured_collection",
-    "pradasphere_news"
+    "prada_category_showcase_X4AnVA",
+    "image_banner_amTGtF",
+    "pradasphere_news_WHHENq"
   ]
 }
