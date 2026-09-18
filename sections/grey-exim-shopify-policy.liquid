@@ -28,6 +28,14 @@
       endif
     endfor
   endif
+
+  if section.settings.title != blank
+    assign policy_heading = section.settings.title
+  endif
+  if section.settings.last_updated != blank
+    assign policy_label = section.settings.last_updated
+  endif
+  assign policy_toc_label = section.settings.toc_label | default: 'On this page'
 -%}
 
 <article id="GreyShopifyPolicy-{{ section.id }}" class="grey-policy grey-policy--editorial" data-policy-kind="{{ policy_kind }}" aria-labelledby="GreyShopifyPolicyTitle-{{ section.id }}">
@@ -41,7 +49,7 @@
   <div class="grey-policy__shell">
     <aside class="grey-policy__aside" data-shopify-policy-navigation hidden>
       <details class="grey-policy__toc" open>
-        <summary>On this page</summary>
+        <summary>{{ policy_toc_label | escape }}</summary>
         <nav aria-label="{{ policy_heading | escape }} sections">
           <ol data-shopify-policy-navigation-list></ol>
         </nav>
@@ -49,7 +57,9 @@
     </aside>
 
     <div class="grey-policy__content rte" data-shopify-policy-content>
-      {%- if policy_source != blank and policy_source.body != blank -%}
+      {%- if section.settings.policy_content != blank -%}
+        {{ section.settings.policy_content }}
+      {%- elsif policy_source != blank and policy_source.body != blank -%}
         {{ policy_source.body }}
       {%- else -%}
         <div class="grey-policy__intro">
@@ -146,9 +156,34 @@
 
 {% schema %}
 {
-  "name": "Shopify policy content",
+  "name": "Editable privacy policy",
   "tag": "section",
   "class": "section-grey-exim-privacy-policy section-grey-exim-shopify-policy",
-  "settings": []
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Policy title",
+      "default": "Privacy Policy"
+    },
+    {
+      "type": "text",
+      "id": "last_updated",
+      "label": "Last updated text",
+      "default": "Last updated: 18 September 2026"
+    },
+    {
+      "type": "text",
+      "id": "toc_label",
+      "label": "Navigation heading",
+      "default": "On this page"
+    },
+    {
+      "type": "richtext",
+      "id": "policy_content",
+      "label": "Policy content",
+      "info": "Use Heading 2 for each section. The numbered navigation is generated automatically. Leave blank to use the content saved in Shopify Admin under Settings > Policies."
+    }
+  ]
 }
 {% endschema %}

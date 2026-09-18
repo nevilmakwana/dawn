@@ -1,14 +1,16 @@
 {{ 'grey-exim-privacy-policy.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
+  assign refund_policy_title = section.settings.title | default: 'Return and Refund Policy'
   assign refund_policy_updated = section.settings.last_updated | default: 'Last updated: 14 August 2026'
+  assign refund_policy_toc_label = section.settings.toc_label | default: 'On this page'
   assign refund_contact_email = section.settings.contact_email | default: 'care@greyexim.com'
 -%}
 
 <article class="grey-policy grey-policy--editorial" aria-labelledby="GreyRefundPolicyTitle">
   <header class="grey-policy__hero">
     <div class="grey-policy__hero-inner">
-      <h1 id="GreyRefundPolicyTitle">Return and Refund Policy</h1>
+      <h1 id="GreyRefundPolicyTitle">{{ refund_policy_title | escape }}</h1>
       <p class="grey-policy__updated">{{ refund_policy_updated | escape }}</p>
     </div>
   </header>
@@ -16,15 +18,17 @@
   <div class="grey-policy__shell">
     <aside class="grey-policy__aside" data-policy-navigation hidden>
       <details class="grey-policy__toc" open>
-        <summary>On this page</summary>
-        <nav aria-label="Return and refund policy sections">
+        <summary>{{ refund_policy_toc_label | escape }}</summary>
+        <nav aria-label="{{ refund_policy_title | escape }} sections">
           <ol data-policy-navigation-list></ol>
         </nav>
       </details>
     </aside>
 
     <div class="grey-policy__content rte" data-policy-content>
-      {%- if shop.refund_policy.body != blank -%}
+      {%- if section.settings.policy_content != blank -%}
+        {{ section.settings.policy_content }}
+      {%- elsif shop.refund_policy.body != blank -%}
         {{ shop.refund_policy.body }}
       {%- else -%}
         <div class="grey-policy__intro">
@@ -60,7 +64,7 @@
     if (window.location.pathname !== publicPath) {
       window.history.replaceState(window.history.state, '', `${publicPath}${window.location.search}${window.location.hash}`);
     }
-    document.title = `Return and Refund Policy – {{ shop.name | escape }}`;
+    document.title = `{{ refund_policy_title | escape }} – {{ shop.name | escape }}`;
 
     const content = section.querySelector('[data-policy-content]');
     const navigation = section.querySelector('[data-policy-navigation]');
@@ -126,9 +130,27 @@
   "settings": [
     {
       "type": "text",
+      "id": "title",
+      "label": "Policy title",
+      "default": "Return and Refund Policy"
+    },
+    {
+      "type": "text",
       "id": "last_updated",
       "label": "Last updated text",
       "default": "Last updated: 14 August 2026"
+    },
+    {
+      "type": "text",
+      "id": "toc_label",
+      "label": "Navigation heading",
+      "default": "On this page"
+    },
+    {
+      "type": "richtext",
+      "id": "policy_content",
+      "label": "Policy content",
+      "info": "Use Heading 2 for each section. The numbered navigation is generated automatically. Leave blank to use the content saved in Shopify Admin under Settings > Policies."
     },
     {
       "type": "text",
