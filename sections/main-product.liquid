@@ -9,6 +9,7 @@
   assign detail_materials = product.metafields.custom.materials
   assign detail_care = product.metafields.custom.care_guide
   assign detail_delivery = product.metafields.custom.delivery_and_payment
+  assign detail_shipping_returns = product.metafields.custom.shipping_and_returns
   assign product_title_downcase = product.title | downcase
   assign product_type_downcase = product.type | downcase
   assign product_handle_downcase = product.handle | downcase
@@ -477,7 +478,11 @@
           {%- endif -%}
         </div>
         <div class="prada-product__drawer-pane rte" data-prada-drawer-pane="shipping" hidden>
-          {%- if is_scarf_product and is_custom_design_product == false -%}
+          {%- if detail_shipping_returns != blank -%}
+            <section class="prada-product__metafield-section">
+              <div>{{ detail_shipping_returns | metafield_tag }}</div>
+            </section>
+          {%- elsif is_scarf_product and is_custom_design_product == false -%}
             <section class="prada-product__metafield-section">
               <div>
                 <p>Free Shipping in India</p>
