@@ -219,7 +219,7 @@
         "women_link": "shopify://collections/all",
         "men_label": "Men",
         "men_link": "shopify://collections/all",
-        "active_tab": "men",
+        "active_tab": "women",
         "intro_height": 150,
         "tile_height": 420,
         "tile_background": "#f3f3f3"
