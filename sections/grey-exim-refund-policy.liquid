@@ -1,10 +1,10 @@
 {{ 'grey-exim-privacy-policy.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
-  assign refund_policy_title = section.settings.title | default: 'Return and Refund Policy'
-  assign refund_policy_updated = section.settings.last_updated | default: 'Last updated: 14 August 2026'
-  assign refund_policy_toc_label = section.settings.toc_label | default: 'On this page'
-  assign refund_contact_email = section.settings.contact_email | default: 'care@greyexim.com'
+  assign refund_policy_title = section.settings.refund_policy_title | default: 'Return and Refund Policy'
+  assign refund_policy_updated = section.settings.refund_policy_last_updated | default: 'Last updated: 14 August 2026'
+  assign refund_policy_toc_label = section.settings.refund_policy_toc_label | default: 'On this page'
+  assign refund_contact_email = section.settings.refund_policy_contact_email | default: 'care@greyexim.com'
 -%}
 
 <article class="grey-policy grey-policy--editorial" aria-labelledby="GreyRefundPolicyTitle">
@@ -26,8 +26,8 @@
     </aside>
 
     <div class="grey-policy__content rte" data-policy-content>
-      {%- if section.settings.policy_content != blank -%}
-        {{ section.settings.policy_content }}
+      {%- if section.settings.refund_policy_content != blank -%}
+        {{ section.settings.refund_policy_content }}
       {%- elsif shop.refund_policy.body != blank -%}
         {{ shop.refund_policy.body }}
       {%- else -%}
@@ -129,32 +129,36 @@
   "class": "section-grey-exim-privacy-policy section-grey-exim-refund-policy",
   "settings": [
     {
+      "type": "paragraph",
+      "content": "This editor stores Return & Refund Policy only. Content entered here is never used by another policy."
+    },
+    {
       "type": "text",
-      "id": "title",
+      "id": "refund_policy_title",
       "label": "Policy title",
       "default": "Return and Refund Policy"
     },
     {
       "type": "text",
-      "id": "last_updated",
+      "id": "refund_policy_last_updated",
       "label": "Last updated text",
       "default": "Last updated: 14 August 2026"
     },
     {
       "type": "text",
-      "id": "toc_label",
+      "id": "refund_policy_toc_label",
       "label": "Navigation heading",
       "default": "On this page"
     },
     {
       "type": "richtext",
-      "id": "policy_content",
+      "id": "refund_policy_content",
       "label": "Policy content",
       "info": "Use Heading 2 for each section. The numbered navigation is generated automatically. Leave blank to use the content saved in Shopify Admin under Settings > Policies."
     },
     {
       "type": "text",
-      "id": "contact_email",
+      "id": "refund_policy_contact_email",
       "label": "Contact email",
       "default": "care@greyexim.com"
     }

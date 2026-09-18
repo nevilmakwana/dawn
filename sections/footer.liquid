@@ -622,19 +622,11 @@
         <div class="prada-mobile-footer__accordion-content">
           <ul>
             <li><a href="{{ greyexim_terms_url }}">Terms &amp; Conditions</a></li>
-            {%- for policy in shop.policies -%}
-              {%- if policy != blank and policy.url != shop.terms_of_service.url -%}
-                {%- liquid
-                  assign greyexim_policy_url = policy.url
-                  if policy.url == shop.shipping_policy.url or policy.url contains '/policies/shipping-policy'
-                    assign greyexim_policy_url = greyexim_shipping_url
-                  elsif policy.url == shop.refund_policy.url or policy.url contains '/policies/return-and-refund-policy'
-                    assign greyexim_policy_url = greyexim_refund_url
-                  endif
-                -%}
-                <li><a href="{{ greyexim_policy_url }}">{{ policy.title | escape }}</a></li>
-              {%- endif -%}
-            {%- endfor -%}
+            <li><a href="{{ greyexim_privacy_url }}">Privacy Policy</a></li>
+            <li><a href="{{ greyexim_cookie_url }}">Cookie Policy</a></li>
+            <li><button type="button" class="prada-footer__cookie-settings" data-cookie-settings>Cookie Settings</button></li>
+            <li><a href="{{ greyexim_payment_url }}">Payment Policy</a></li>
+            <li><a href="{{ greyexim_refund_url }}">Return &amp; Refund Policy</a></li>
           </ul>
         </div>
       </details>

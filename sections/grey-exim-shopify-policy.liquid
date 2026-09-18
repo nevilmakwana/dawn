@@ -1,41 +1,11 @@
 {{ 'grey-exim-privacy-policy.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
-  assign policy_source = blank
-  assign policy_heading = 'Policy'
-  assign policy_label = 'Store policy'
-  assign policy_kind = 'general'
-
-  if request.path contains '/policies/privacy-policy'
-    assign policy_source = shop.privacy_policy
-    assign policy_heading = 'Privacy Policy'
-    assign policy_label = 'Privacy and personal data'
-    assign policy_kind = 'privacy'
-  elsif request.path contains '/policies/terms-of-service'
-    assign policy_source = shop.terms_of_service
-    assign policy_heading = 'Terms & Conditions'
-    assign policy_label = 'Terms governing use and purchases'
-  else
-    for store_policy in shop.policies
-      if request.path contains '/policies/legal-notice' and store_policy.url contains '/policies/legal-notice'
-        assign policy_source = store_policy
-        assign policy_heading = 'Cookie Policy'
-        assign policy_label = 'Cookies and similar technologies'
-      elsif request.path contains '/policies/contact-information' and store_policy.url contains '/policies/contact-information'
-        assign policy_source = store_policy
-        assign policy_heading = 'Payment Policy'
-        assign policy_label = 'Payments, charges and security'
-      endif
-    endfor
-  endif
-
-  if section.settings.title != blank
-    assign policy_heading = section.settings.title
-  endif
-  if section.settings.last_updated != blank
-    assign policy_label = section.settings.last_updated
-  endif
-  assign policy_toc_label = section.settings.toc_label | default: 'On this page'
+  assign policy_source = shop.privacy_policy
+  assign policy_heading = section.settings.privacy_policy_title | default: 'Privacy Policy'
+  assign policy_label = section.settings.privacy_policy_last_updated | default: 'Last updated: 18 September 2026'
+  assign policy_toc_label = section.settings.privacy_policy_toc_label | default: 'On this page'
+  assign policy_kind = 'privacy'
 -%}
 
 <article id="GreyShopifyPolicy-{{ section.id }}" class="grey-policy grey-policy--editorial" data-policy-kind="{{ policy_kind }}" aria-labelledby="GreyShopifyPolicyTitle-{{ section.id }}">
@@ -57,8 +27,8 @@
     </aside>
 
     <div class="grey-policy__content rte" data-shopify-policy-content>
-      {%- if section.settings.policy_content != blank -%}
-        {{ section.settings.policy_content }}
+      {%- if section.settings.privacy_policy_content != blank -%}
+        {{ section.settings.privacy_policy_content }}
       {%- elsif policy_source != blank and policy_source.body != blank -%}
         {{ policy_source.body }}
       {%- else -%}
@@ -156,31 +126,35 @@
 
 {% schema %}
 {
-  "name": "Editable privacy policy",
+  "name": "Grey Exim privacy policy",
   "tag": "section",
   "class": "section-grey-exim-privacy-policy section-grey-exim-shopify-policy",
   "settings": [
     {
+      "type": "paragraph",
+      "content": "This editor stores Privacy Policy only. Content entered here is never used by another policy."
+    },
+    {
       "type": "text",
-      "id": "title",
+      "id": "privacy_policy_title",
       "label": "Policy title",
       "default": "Privacy Policy"
     },
     {
       "type": "text",
-      "id": "last_updated",
+      "id": "privacy_policy_last_updated",
       "label": "Last updated text",
       "default": "Last updated: 18 September 2026"
     },
     {
       "type": "text",
-      "id": "toc_label",
+      "id": "privacy_policy_toc_label",
       "label": "Navigation heading",
       "default": "On this page"
     },
     {
       "type": "richtext",
-      "id": "policy_content",
+      "id": "privacy_policy_content",
       "label": "Policy content",
       "info": "Use Heading 2 for each section. The numbered navigation is generated automatically. Leave blank to use the content saved in Shopify Admin under Settings > Policies."
     }

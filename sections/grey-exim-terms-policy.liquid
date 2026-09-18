@@ -3,9 +3,9 @@
 {{ 'grey-exim-terms-policy.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
-  assign terms_policy_title = section.settings.title | default: 'Terms and Conditions'
-  assign terms_policy_updated = section.settings.last_updated | default: 'Last updated: 14 August 2026'
-  assign terms_policy_toc_label = section.settings.toc_label | default: 'On this page'
+  assign terms_policy_title = section.settings.terms_policy_title | default: 'Terms and Conditions'
+  assign terms_policy_updated = section.settings.terms_policy_last_updated | default: 'Last updated: 14 August 2026'
+  assign terms_policy_toc_label = section.settings.terms_policy_toc_label | default: 'On this page'
 -%}
 
 <article
@@ -35,8 +35,10 @@
 
     <div class="grey-policy__content rte">
       <div class="grey-terms-policy__source" data-terms-policy-source>
-        {%- if section.settings.policy_content != blank -%}
-          {{ section.settings.policy_content }}
+        {%- if section.settings.terms_policy_content != blank -%}
+          {{ section.settings.terms_policy_content }}
+        {%- elsif shop.terms_of_service.body != blank -%}
+          {{ shop.terms_of_service.body }}
         {%- elsif request.design_mode -%}
           <p class="grey-terms-policy__empty">
             Paste your complete Terms and Conditions in this section's <strong>Policy content</strong> setting. Format every main section title as Heading 2 to create the numbered navigation automatically.
@@ -299,26 +301,30 @@
   "class": "section-grey-exim-terms-policy",
   "settings": [
     {
+      "type": "paragraph",
+      "content": "This editor stores Terms & Conditions only. Content entered here is never used by another policy."
+    },
+    {
       "type": "text",
-      "id": "title",
+      "id": "terms_policy_title",
       "label": "Policy title",
       "default": "Terms and Conditions"
     },
     {
       "type": "text",
-      "id": "last_updated",
+      "id": "terms_policy_last_updated",
       "label": "Last updated text",
       "default": "Last updated: 14 August 2026"
     },
     {
       "type": "text",
-      "id": "toc_label",
+      "id": "terms_policy_toc_label",
       "label": "Navigation heading",
       "default": "On this page"
     },
     {
       "type": "richtext",
-      "id": "policy_content",
+      "id": "terms_policy_content",
       "label": "Policy content",
       "info": "Paste the complete Terms and Conditions here. Format every main section title as Heading 2; section numbers and On this page links are created automatically."
     }

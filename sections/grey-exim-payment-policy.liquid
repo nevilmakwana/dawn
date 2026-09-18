@@ -3,9 +3,9 @@
 {{ 'grey-exim-payment-policy.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
-  assign payment_policy_title = section.settings.title | default: 'Payment Policy'
-  assign payment_policy_updated = section.settings.last_updated | default: 'Last updated: 13 August 2026'
-  assign payment_policy_toc_label = section.settings.toc_label | default: 'On this page'
+  assign payment_policy_title = section.settings.payment_policy_title | default: 'Payment Policy'
+  assign payment_policy_updated = section.settings.payment_policy_last_updated | default: 'Last updated: 13 August 2026'
+  assign payment_policy_toc_label = section.settings.payment_policy_toc_label | default: 'On this page'
 -%}
 
 <style>
@@ -53,8 +53,8 @@
 
     <div class="grey-policy__content rte">
       <div class="grey-payment-policy__source" data-payment-policy-source>
-        {%- if section.settings.policy_content != blank -%}
-          {{ section.settings.policy_content }}
+        {%- if section.settings.payment_policy_content != blank -%}
+          {{ section.settings.payment_policy_content }}
         {%- elsif request.design_mode -%}
           <p class="grey-payment-policy__empty">
             Paste your complete Payment Policy in this section's <strong>Policy content</strong> setting. Format every main section title as Heading 2 to create the numbered navigation automatically.
@@ -207,26 +207,30 @@
   "class": "section-grey-exim-payment-policy",
   "settings": [
     {
+      "type": "paragraph",
+      "content": "This editor stores Payment Policy only. Content entered here is never used by another policy."
+    },
+    {
       "type": "text",
-      "id": "title",
+      "id": "payment_policy_title",
       "label": "Policy title",
       "default": "Payment Policy"
     },
     {
       "type": "text",
-      "id": "last_updated",
+      "id": "payment_policy_last_updated",
       "label": "Last updated text",
       "default": "Last updated: 13 August 2026"
     },
     {
       "type": "text",
-      "id": "toc_label",
+      "id": "payment_policy_toc_label",
       "label": "Navigation heading",
       "default": "On this page"
     },
     {
       "type": "richtext",
-      "id": "policy_content",
+      "id": "payment_policy_content",
       "label": "Policy content",
       "info": "Paste the complete Payment Policy here. Format every main section title as Heading 2; section numbers and On this page links are created automatically."
     }

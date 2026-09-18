@@ -2,9 +2,9 @@
 {{ 'grey-exim-cookie-policy.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
-  assign cookie_policy_title = section.settings.title | default: 'Cookie Policy'
-  assign cookie_policy_updated = section.settings.last_updated | default: 'Last updated: 12 August 2026'
-  assign cookie_policy_toc_label = section.settings.toc_label | default: 'On this page'
+  assign cookie_policy_title = section.settings.cookie_policy_title | default: 'Cookie Policy'
+  assign cookie_policy_updated = section.settings.cookie_policy_last_updated | default: 'Last updated: 12 August 2026'
+  assign cookie_policy_toc_label = section.settings.cookie_policy_toc_label | default: 'On this page'
 -%}
 
 <style>
@@ -39,7 +39,7 @@
         <summary>{{ cookie_policy_toc_label | escape }}</summary>
         <nav aria-label="{{ cookie_policy_title | escape }} sections">
           <ol>
-            {%- if section.settings.policy_content == blank -%}
+            {%- if section.settings.cookie_policy_content == blank -%}
             <li><a href="#cookie-overview">Overview</a></li>
             <li><a href="#what-are-cookies">What cookies are</a></li>
             <li><a href="#why-we-use-cookies">Why we use cookies</a></li>
@@ -58,8 +58,8 @@
     </aside>
 
     <div class="grey-policy__content rte" data-cookie-policy-content>
-      {%- if section.settings.policy_content != blank -%}
-        <div data-cookie-policy-source>{{ section.settings.policy_content }}</div>
+      {%- if section.settings.cookie_policy_content != blank -%}
+        <div data-cookie-policy-source>{{ section.settings.cookie_policy_content }}</div>
       {%- else -%}
       <div id="cookie-overview" class="grey-policy__intro">
         <p>Grey Exim (&ldquo;Grey Exim,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) operates the ecommerce website <a href="https://www.greyexim.com">www.greyexim.com</a>, through which we offer fashion and lifestyle products including scarves, bandanas, Indo-Western tops, jewellery and related products.</p>
@@ -281,7 +281,7 @@
   </div>
 </article>
 
-{%- if section.settings.policy_content != blank -%}
+{%- if section.settings.cookie_policy_content != blank -%}
   <script>
     (() => {
       const root = document.getElementById('GreyCookiePolicy');
@@ -352,26 +352,30 @@
   "class": "section-grey-exim-cookie-policy",
   "settings": [
     {
+      "type": "paragraph",
+      "content": "This editor stores Cookie Policy only. Content entered here is never used by another policy."
+    },
+    {
       "type": "text",
-      "id": "title",
+      "id": "cookie_policy_title",
       "label": "Policy title",
       "default": "Cookie Policy"
     },
     {
       "type": "text",
-      "id": "last_updated",
+      "id": "cookie_policy_last_updated",
       "label": "Last updated text",
       "default": "Last updated: 12 August 2026"
     },
     {
       "type": "text",
-      "id": "toc_label",
+      "id": "cookie_policy_toc_label",
       "label": "Navigation heading",
       "default": "On this page"
     },
     {
       "type": "richtext",
-      "id": "policy_content",
+      "id": "cookie_policy_content",
       "label": "Policy content",
       "info": "Use Heading 2 for each section. The numbered navigation is generated automatically. Leave blank to keep the current built-in policy content."
     }

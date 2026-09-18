@@ -547,7 +547,7 @@
       {%- elsif request.path contains '/policies/refund-policy' -%}
         {% section 'grey-exim-refund-policy' %}
       {%- elsif request.path contains '/policies/terms-of-service' -%}
-        {% section 'grey-exim-shopify-policy' %}
+        {% section 'grey-exim-terms-policy' %}
       {%- else -%}
         {{ content_for_layout }}
       {%- endif -%}

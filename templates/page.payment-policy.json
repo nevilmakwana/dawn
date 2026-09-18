@@ -2,7 +2,12 @@
   "sections": {
     "payment_policy": {
       "type": "grey-exim-payment-policy",
-      "settings": {}
+      "settings": {
+        "payment_policy_title": "Payment Policy",
+        "payment_policy_last_updated": "Last updated: 13 August 2026",
+        "payment_policy_toc_label": "On this page",
+        "payment_policy_content": ""
+      }
     }
   },
   "order": [
