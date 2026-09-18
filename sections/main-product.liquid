@@ -394,7 +394,7 @@
       {%- endif -%}
 
       <button class="prada-product__drawer-trigger" type="button" data-prada-drawer-open="shipping">
-        <span>Free shipping and returns</span>
+        <span>Shipping and returns</span>
       </button>
     </div>
   </div>
@@ -846,7 +846,7 @@
         drawerTrigger = trigger;
         const paneName = trigger.dataset.pradaDrawerOpen;
         drawerPanes.forEach((pane) => pane.hidden = pane.dataset.pradaDrawerPane !== paneName);
-        drawerTitle.textContent = trigger.dataset.pradaDrawerLabel || (paneName === 'details' ? 'Product details' : 'Free shipping and returns');
+        drawerTitle.textContent = trigger.dataset.pradaDrawerLabel || (paneName === 'details' ? 'Product details' : 'Shipping and returns');
         drawerShell.setAttribute('aria-hidden', 'false');
         document.documentElement.classList.add('prada-drawer-open');
         requestAnimationFrame(() => {
