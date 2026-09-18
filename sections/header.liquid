@@ -2481,6 +2481,11 @@
       const headerWrapper = this.querySelector('.header-wrapper') || document.querySelector('.header-wrapper');
       if (!headerWrapper) return;
 
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.initHeroBannerDetection(), { once: true });
+        return;
+      }
+
       // Policy documentation can contain examples with "banner" in their
       // class names. They are not hero banners and must not make the header
       // transparent.
@@ -2491,21 +2496,28 @@
         return;
       }
 
-      const banner = document.querySelector('.banner, .image-banner, .slideshow, [class*="banner"]');
-      if (banner) {
-        headerWrapper.classList.add('has-hero-banner');
-        const onScroll = () => {
-          const scrollY = window.pageYOffset || document.documentElement.scrollTop;
-          const threshold = banner.offsetHeight / 2;
-          if (scrollY >= threshold) {
-            headerWrapper.classList.add('scrolled-past-hero');
-          } else {
-            headerWrapper.classList.remove('scrolled-past-hero');
-          }
-        };
-        window.addEventListener('scroll', onScroll, { passive: true });
-        onScroll();
+      // Only the first storefront content section can own the transparent
+      // header. This deliberately excludes cookie, footer and app banners.
+      const firstMainSection = document.querySelector('#MainContent > .shopify-section:first-child');
+      const banner = firstMainSection?.querySelector('.banner, .image-banner, .slideshow');
+
+      if (!banner) {
+        headerWrapper.classList.remove('has-hero-banner', 'scrolled-past-hero');
+        return;
       }
+
+      headerWrapper.classList.add('has-hero-banner');
+      this.heroScrollHandler = () => {
+        const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+        const threshold = banner.offsetHeight / 2;
+        if (scrollY >= threshold) {
+          headerWrapper.classList.add('scrolled-past-hero');
+        } else {
+          headerWrapper.classList.remove('scrolled-past-hero');
+        }
+      };
+      window.addEventListener('scroll', this.heroScrollHandler, { passive: true });
+      this.heroScrollHandler();
     }
 
     setHeaderHeight() {
@@ -2515,6 +2527,7 @@
     disconnectedCallback() {
       this.removeEventListener('preventHeaderReveal', this.hideHeaderOnScrollUp);
       window.removeEventListener('scroll', this.onScrollHandler);
+      if (this.heroScrollHandler) window.removeEventListener('scroll', this.heroScrollHandler);
     }
 
     createObserver() {

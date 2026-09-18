@@ -47,22 +47,37 @@
     endfor
   endif
 
+  assign mobile_video_poster_image = nil
   assign mobile_video_poster_url = ''
   if section.settings.mobile_video.preview_image != blank
+    assign mobile_video_poster_image = section.settings.mobile_video.preview_image
     assign mobile_video_poster_url = section.settings.mobile_video.preview_image | image_url: width: 720
   elsif section.settings.mobile_image != blank
+    assign mobile_video_poster_image = section.settings.mobile_image
     assign mobile_video_poster_url = section.settings.mobile_image | image_url: width: 720
   elsif section.settings.video.preview_image != blank
+    assign mobile_video_poster_image = section.settings.video.preview_image
     assign mobile_video_poster_url = section.settings.video.preview_image | image_url: width: 720
   elsif section.settings.image != blank
+    assign mobile_video_poster_image = section.settings.image
     assign mobile_video_poster_url = section.settings.image | image_url: width: 720
   endif
 
+  assign desktop_video_poster_image = nil
   assign desktop_video_poster_url = ''
   if section.settings.video.preview_image != blank
+    assign desktop_video_poster_image = section.settings.video.preview_image
     assign desktop_video_poster_url = section.settings.video.preview_image | image_url: width: 1920
   elsif section.settings.image != blank
+    assign desktop_video_poster_image = section.settings.image
     assign desktop_video_poster_url = section.settings.image | image_url: width: 1920
+  endif
+
+  assign responsive_video_default_poster_image = desktop_video_poster_image
+  assign responsive_video_default_poster_url = desktop_video_poster_url
+  if responsive_video_default_poster_url == blank
+    assign responsive_video_default_poster_image = mobile_video_poster_image
+    assign responsive_video_default_poster_url = mobile_video_poster_url
   endif
 
   assign has_desktop_video = false
@@ -227,6 +242,35 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    position: relative;
+    z-index: 1;
+    background: transparent;
+  }
+
+  #Banner-{{ section.id }} .banner__video-poster {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    pointer-events: none;
+    background: #f3f3f3;
+    opacity: 1;
+    transition: opacity 160ms linear;
+  }
+
+  #Banner-{{ section.id }} .banner__video-poster > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: {% if section.settings.show_full_media %}contain{% else %}cover{% endif %};
+    object-position: center center;
+  }
+
+  #Banner-{{ section.id }} .banner__media.is-video-ready .banner__video-poster {
+    opacity: 0;
   }
 
   #Banner-{{ section.id }} .banner__responsive-picture,
@@ -296,6 +340,10 @@
     }
 
     #Banner-{{ section.id }} .banner__responsive-picture > img {
+      object-position: var(--mobile-banner-subject-position, center center);
+    }
+
+    #Banner-{{ section.id }} .banner__video-poster > img {
       object-position: var(--mobile-banner-subject-position, center center);
     }
 
@@ -639,6 +687,22 @@
     </div>
   {%- elsif has_responsive_webm_video -%}
     <div class="banner__media media{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if enable_section_reveal %} scroll-trigger animate--fade-in{% endif %}">
+      {%- if responsive_video_default_poster_url != blank -%}
+        <picture class="banner__video-poster" data-responsive-video-poster aria-hidden="true">
+          {%- if mobile_video_poster_url != blank -%}
+            <source media="(max-width: 749px)" srcset="{{ mobile_video_poster_url }}">
+          {%- endif -%}
+          <img
+            src="{{ responsive_video_default_poster_url }}"
+            alt=""
+            width="{{ responsive_video_default_poster_image.width }}"
+            height="{{ responsive_video_default_poster_image.height }}"
+            loading="{{ image_loading }}"
+            fetchpriority="{{ fetch_priority }}"
+            decoding="async"
+          >
+        </picture>
+      {%- endif -%}
       <video
         id="Banner-{{ section.id }}-responsive-webm"
         class="banner__media-video"

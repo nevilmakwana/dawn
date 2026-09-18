@@ -61,6 +61,12 @@
     }
   };
 
+  const setVideoReady = (video, isReady) => {
+    const media = video.closest('.banner__media');
+    if (!media) return;
+    media.classList.toggle('is-video-ready', isReady);
+  };
+
   const updateVideo = (video) => {
     const isMobile = mobileQuery.matches;
     const viewport = isMobile ? 'mobile' : 'desktop';
@@ -70,6 +76,8 @@
     const resolvedNextSource = resolveUrl(nextSource);
 
     if (!nextSource) return;
+
+    setVideoReady(video, video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA);
 
     if (nextPoster && video.getAttribute('poster') !== nextPoster) {
       video.setAttribute('poster', nextPoster);
@@ -92,9 +100,18 @@
 
     if (video.dataset.playbackBound !== 'true') {
       video.dataset.playbackBound = 'true';
-      video.addEventListener('loadeddata', () => playVideo(video));
-      video.addEventListener('canplay', () => playVideo(video));
+      video.addEventListener('loadeddata', () => {
+        setVideoReady(video, true);
+        playVideo(video);
+      });
+      video.addEventListener('canplay', () => {
+        setVideoReady(video, true);
+        playVideo(video);
+      });
+      video.addEventListener('playing', () => setVideoReady(video, true));
+      video.addEventListener('emptied', () => setVideoReady(video, false));
       video.addEventListener('error', () => {
+        setVideoReady(video, false);
         if (useFallbackSource(video)) playVideo(video);
       });
     }
