@@ -1,6 +1,6 @@
 {
   "sections": {
-    "main": {
+    "terms_policy": {
       "type": "grey-exim-terms-policy",
       "settings": {
         "title": "Terms and Conditions",
@@ -11,6 +11,6 @@
     }
   },
   "order": [
-    "main"
+    "terms_policy"
   ]
 }

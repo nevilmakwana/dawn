@@ -1,11 +1,11 @@
 {
   "sections": {
-    "main": {
+    "payment_policy": {
       "type": "grey-exim-payment-policy",
       "settings": {}
     }
   },
   "order": [
-    "main"
+    "payment_policy"
   ]
 }
