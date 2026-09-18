@@ -880,17 +880,23 @@
     const drawerTitle = root.querySelector('[data-prada-drawer-title]');
     const drawerPanes = [...root.querySelectorAll('[data-prada-drawer-pane]')];
     let drawerTrigger = null;
+    let drawerCloseTimer = null;
 
     const closeDrawer = () => {
+      window.clearTimeout(drawerCloseTimer);
       drawerShell.classList.remove('is-open');
       drawerShell.setAttribute('aria-hidden', 'true');
-      document.documentElement.classList.remove('prada-drawer-open');
-      window.setTimeout(() => drawerPanes.forEach((pane) => pane.hidden = true), 450);
+      drawerCloseTimer = window.setTimeout(() => {
+        if (drawerShell.classList.contains('is-open')) return;
+        drawerPanes.forEach((pane) => pane.hidden = true);
+        document.documentElement.classList.remove('prada-drawer-open');
+      }, 450);
       drawerTrigger?.focus({ preventScroll: true });
     };
 
     root.querySelectorAll('[data-prada-drawer-open]').forEach((trigger) => {
       trigger.addEventListener('click', () => {
+        window.clearTimeout(drawerCloseTimer);
         drawerTrigger = trigger;
         const paneName = trigger.dataset.pradaDrawerOpen;
         drawerPanes.forEach((pane) => pane.hidden = pane.dataset.pradaDrawerPane !== paneName);
