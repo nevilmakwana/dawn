@@ -3,31 +3,6 @@
     "main": {
       "type": "prada-story-template",
       "blocks": {
-        "split_1": {
-          "type": "split_block",
-          "settings": {
-            "image_position": "image-left",
-            "eyebrow": "CHAPTER 01",
-            "heading": "ARCHIVAL FORM & MOVEMENT",
-            "body": "<p>A dialogue between architectural structure and human movement, reframing luxury through pure silhouette and understated restraint.</p>"
-          }
-        },
-        "split_2": {
-          "type": "split_block",
-          "settings": {
-            "image_position": "image-right",
-            "eyebrow": "CHAPTER 02",
-            "heading": "MATERIALITY & DEPTH",
-            "body": "<p>Combining tactile luxury with modern precision. Every detail is calibrated for longevity and presence.</p>"
-          }
-        },
-        "quote_1": {
-          "type": "pull_quote",
-          "settings": {
-            "quote": "For Prada, the past is never past but an accumulation of ideas bound by intuition and intellectual exchange.",
-            "author": "MIUCCIA PRADA & RAF SIMONS"
-          }
-        },
         "nav_1": {
           "type": "story_navigation",
           "settings": {
@@ -36,9 +11,6 @@
         }
       },
       "block_order": [
-        "split_1",
-        "split_2",
-        "quote_1",
         "nav_1"
       ],
       "settings": {
