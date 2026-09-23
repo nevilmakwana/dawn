@@ -131,7 +131,64 @@
             >
               {%- for product in predictive_search.resources.products -%}
                 {%- liquid
-                  assign predictive_media = product.featured_media
+                  assign predictive_media = blank
+                  assign predictive_product_url = product.url
+                  assign search_term_lower = predictive_search.terms | downcase | strip | replace: '-', ' '
+                  assign color_query = blank
+                  assign searchable_colors = 'black|white|red|pink|blue|navy|green|olive|yellow|mustard|orange|rust|terracotta|purple|lavender|burgundy|maroon|brown|beige|cream|ivory|gold|grey|gray|multicolour|multicolor|multi colour|multi color' | split: '|'
+
+                  for searchable_color in searchable_colors
+                    if search_term_lower contains searchable_color
+                      assign color_query = searchable_color
+                      break
+                    endif
+                  endfor
+
+                  if color_query != blank
+                    for variant in product.variants
+                      assign variant_title_lower = variant.title | downcase
+                      assign variant_color = variant.metafields.custom.variant_color.value
+                      if variant_color == blank
+                        assign variant_color = variant.metafields.custom.custom_variant_color.value
+                      endif
+                      assign variant_color_lower = variant_color | append: '' | downcase
+                      assign variant_matches_color = false
+
+                      if variant_title_lower contains color_query or variant_color_lower contains color_query
+                        assign variant_matches_color = true
+                      endif
+
+                      unless variant_matches_color
+                        for variant_option in variant.options
+                          assign variant_option_lower = variant_option | downcase
+                          if variant_option_lower contains color_query
+                            assign variant_matches_color = true
+                            break
+                          endif
+                        endfor
+                      endunless
+
+                      if variant_matches_color
+                        assign predictive_product_path = product.url | split: '?' | first
+                        assign predictive_product_url = predictive_product_path | append: '?variant=' | append: variant.id
+                        assign matching_gallery = variant.metafields.custom.variant_images.value
+                        if matching_gallery == blank
+                          assign matching_gallery = variant.metafields.custom.custom_variant_images.value
+                        endif
+                        for variant_media in matching_gallery
+                          if variant_media.media_type == 'image'
+                            assign predictive_media = variant_media
+                            break
+                          endif
+                        endfor
+                        if predictive_media == blank
+                          assign predictive_media = variant.featured_media
+                        endif
+                        break
+                      endif
+                    endfor
+                  endif
+
                   if predictive_media == blank
                     assign predictive_gallery = product.selected_or_first_available_variant.metafields.custom.variant_images.value
                     if predictive_gallery == blank
@@ -144,6 +201,10 @@
                       endif
                     endfor
                   endif
+
+                  if predictive_media == blank
+                    assign predictive_media = product.featured_media
+                  endif
                 -%}
                 <li
                   id="predictive-search-option-product-{{ forloop.index }}"
@@ -153,7 +214,7 @@
                 >
                   <product-component view-event-payload="{{ product | standard_event_data: 'view', context: 'search' | escape }}">
                     <a
-                      href="{{ product.url }}"
+                      href="{{ predictive_product_url }}"
                       class="predictive-search__item predictive-search__item--link-with-thumbnail link link--text"
                       tabindex="-1"
                     >

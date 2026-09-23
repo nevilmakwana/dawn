@@ -1305,6 +1305,12 @@
         "label": "t:settings_schema.brand_information.settings.brand_image.label"
       },
       {
+        "type": "image_picker",
+        "id": "social_share_image",
+        "label": "Social sharing image",
+        "info": "Used for homepage and as a fallback when a page or collection has no image. Recommended size: 1200 x 630px."
+      },
+      {
         "type": "range",
         "id": "brand_image_width",
         "min": 50,

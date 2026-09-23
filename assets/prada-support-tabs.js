@@ -7,7 +7,11 @@
   let canvasContext;
 
   const textFrom = (element) => (element?.textContent || '').replace(/\s+/g, ' ').trim();
-  const isSupportStylesheet = (link) => link.href.includes('/prada-support-tabs.css');
+  const findAllIncludingScope = (scope, selector) => {
+    const matches = [];
+    if (scope instanceof Element && scope.matches(selector)) matches.push(scope);
+    return matches.concat(Array.from(scope.querySelectorAll(selector)));
+  };
 
   const getViewFromUrl = (url) => {
     const target = new URL(url, window.location.origin);
@@ -95,14 +99,15 @@
   };
 
   const initializeFaq = (scope = document) => {
-    scope.querySelectorAll('[data-prada-faq]').forEach((root) => {
+    findAllIncludingScope(scope, '[data-prada-faq]').forEach((root) => {
       if (root.dataset.pradaFaqReady === 'true') return;
-      root.dataset.pradaFaqReady = 'true';
 
       const overview = root.querySelector('[data-faq-overview]');
       const details = root.querySelector('[data-faq-details]');
       const panels = Array.from(root.querySelectorAll('[data-faq-panel]'));
+      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
       if (!overview || !details || !panels.length) return;
+      root.dataset.pradaFaqReady = 'true';
 
       const showOverview = (updateHistory = true) => {
         details.hidden = true;
@@ -111,7 +116,7 @@
           panel.hidden = true;
         });
         if (updateHistory) history.pushState({}, '', `${location.pathname}${location.search}`);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: updateHistory && !reduceMotion ? 'smooth' : 'auto' });
       };
 
       const showTopic = (topic, questionId, updateHistory = true) => {
@@ -127,7 +132,7 @@
           item.open = item.id === questionId;
         });
         if (updateHistory) history.pushState({}, '', questionId ? `#${questionId}` : `#topic-${topic}`);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: updateHistory && !reduceMotion ? 'smooth' : 'auto' });
       };
 
       const applyHash = () => {
@@ -166,17 +171,55 @@
     });
   };
 
-  const syncStyles = (sourceDocument) => {
+  const waitForStylesheet = (stylesheet) => new Promise((resolve) => {
+    if (stylesheet.sheet) {
+      resolve(true);
+      return;
+    }
+
+    let timeoutId;
+    let settled = false;
+    const finish = (loaded) => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timeoutId);
+      stylesheet.removeEventListener('load', handleLoad);
+      stylesheet.removeEventListener('error', handleError);
+      resolve(loaded);
+    };
+    const handleLoad = () => finish(true);
+    const handleError = () => finish(false);
+
+    stylesheet.addEventListener('load', handleLoad, { once: true });
+    stylesheet.addEventListener('error', handleError, { once: true });
+    timeoutId = window.setTimeout(() => finish(false), 4000);
+  });
+
+  const syncStyles = async (sourceDocument) => {
+    const pendingStylesheets = [];
+
     sourceDocument.querySelectorAll('link[rel="stylesheet"][href]').forEach((link) => {
-      const alreadyLoaded = Array.from(document.querySelectorAll('link[rel="stylesheet"][href]'))
-        .some((existingLink) => existingLink.href === link.href);
-      if (alreadyLoaded) return;
-      document.head.appendChild(link.cloneNode(true));
+      const existingStylesheet = Array.from(document.querySelectorAll('link[rel="stylesheet"][href]'))
+        .find((existingLink) => existingLink.href === link.href);
+
+      if (existingStylesheet) {
+        pendingStylesheets.push(waitForStylesheet(existingStylesheet));
+        return;
+      }
+
+      const stylesheet = link.cloneNode(true);
+      pendingStylesheets.push(waitForStylesheet(stylesheet));
+      document.head.appendChild(stylesheet);
     });
 
-    const supportStylesheet = Array.from(document.querySelectorAll('link[rel="stylesheet"][href]'))
-      .find(isSupportStylesheet);
-    if (supportStylesheet) document.head.appendChild(supportStylesheet);
+    const results = await Promise.all(pendingStylesheets);
+    const stylesReady = results.every(Boolean);
+    if (stylesReady) {
+      const supportStylesheet = Array.from(document.querySelectorAll('link[rel="stylesheet"][href]'))
+        .find((stylesheet) => stylesheet.href.includes('/prada-support-tabs.css'));
+      if (supportStylesheet) document.head.appendChild(supportStylesheet);
+    }
+    return stylesReady;
   };
 
   const syncScripts = (sourceDocument, callback) => {
@@ -235,7 +278,6 @@
     const targetRoot = document.querySelector(SUPPORT_SELECTOR);
     if (!sourceRoot || !targetRoot) return false;
 
-    syncStyles(sourceDocument);
     copyIndicatorState(targetRoot, sourceRoot);
     targetRoot.replaceWith(sourceRoot);
     document.title = sourceDocument.title || document.title;
@@ -246,8 +288,7 @@
     if (view) setActiveTab(sourceRoot, view);
     syncScripts(sourceDocument, () => initializeSupportPage(sourceRoot));
 
-    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'auto' });
     return true;
   };
 
@@ -291,20 +332,29 @@
     state.navigationId = navigationId;
     state.request = controller;
 
-    setActiveTab(currentRoot, view);
+    currentRoot.setAttribute('aria-busy', 'true');
 
     loadSupportHtml(targetUrl, controller.signal)
-      .then((html) => {
+      .then(async (html) => {
         if (state.request !== controller || state.navigationId !== navigationId) return;
 
         const sourceDocument = new DOMParser().parseFromString(html, 'text/html');
+        const stylesReady = await syncStyles(sourceDocument);
+        if (state.request !== controller || state.navigationId !== navigationId) return;
+        if (!stylesReady) {
+          window.location.href = targetUrl.href;
+          return;
+        }
         if (!replaceSupportPage(sourceDocument, targetUrl)) window.location.href = targetUrl.href;
       })
       .catch((error) => {
         if (error.name !== 'AbortError') window.location.href = targetUrl.href;
       })
       .finally(() => {
-        if (state.request === controller) state.request = null;
+        if (state.request === controller) {
+          state.request = null;
+          currentRoot.removeAttribute('aria-busy');
+        }
       });
   });
 
@@ -323,4 +373,5 @@
 
   initializeTabs();
   initializeFaq();
+  document.addEventListener('shopify:section:load', (event) => initializeSupportPage(event.target));
 })();

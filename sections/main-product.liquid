@@ -877,35 +877,77 @@
     });
 
     const drawerShell = root.querySelector('[data-prada-drawer]');
+    const drawerPanel = drawerShell?.querySelector('.prada-product__drawer');
+    const drawerBody = drawerShell?.querySelector('.prada-product__drawer-body');
+    const drawerCloseButton = drawerShell?.querySelector('.prada-product__drawer-close');
     const drawerTitle = root.querySelector('[data-prada-drawer-title]');
     const drawerPanes = [...root.querySelectorAll('[data-prada-drawer-pane]')];
     let drawerTrigger = null;
     let drawerCloseTimer = null;
+    let drawerOpenFrame = null;
+    let drawerRevision = 0;
+    let drawerScrollLockMode = null;
+
+    const resetDrawerScroll = () => {
+      drawerPanel?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      drawerBody?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    };
+
+    const lockDrawerScroll = () => {
+      if (drawerScrollLockMode) return;
+      if (window.pradaDrawerScrollLock) {
+        window.pradaDrawerScrollLock.lock();
+        drawerScrollLockMode = 'shared';
+      } else {
+        document.body.classList.add('overflow-hidden');
+        drawerScrollLockMode = 'fallback';
+      }
+    };
+
+    const unlockDrawerScroll = () => {
+      if (drawerScrollLockMode === 'shared') window.pradaDrawerScrollLock?.unlock();
+      if (drawerScrollLockMode === 'fallback') document.body.classList.remove('overflow-hidden');
+      drawerScrollLockMode = null;
+    };
 
     const closeDrawer = () => {
+      const revision = ++drawerRevision;
       window.clearTimeout(drawerCloseTimer);
+      if (drawerOpenFrame) {
+        window.cancelAnimationFrame(drawerOpenFrame);
+        drawerOpenFrame = null;
+      }
       drawerShell.classList.remove('is-open');
       drawerShell.setAttribute('aria-hidden', 'true');
       drawerCloseTimer = window.setTimeout(() => {
-        if (drawerShell.classList.contains('is-open')) return;
+        if (revision !== drawerRevision || drawerShell.classList.contains('is-open')) return;
         drawerPanes.forEach((pane) => pane.hidden = true);
+        resetDrawerScroll();
         document.documentElement.classList.remove('prada-drawer-open');
+        unlockDrawerScroll();
       }, 450);
-      drawerTrigger?.focus({ preventScroll: true });
+      if (drawerTrigger?.isConnected) drawerTrigger.focus({ preventScroll: true });
     };
 
     root.querySelectorAll('[data-prada-drawer-open]').forEach((trigger) => {
       trigger.addEventListener('click', () => {
+        const revision = ++drawerRevision;
         window.clearTimeout(drawerCloseTimer);
+        if (drawerOpenFrame) window.cancelAnimationFrame(drawerOpenFrame);
         drawerTrigger = trigger;
         const paneName = trigger.dataset.pradaDrawerOpen;
         drawerPanes.forEach((pane) => pane.hidden = pane.dataset.pradaDrawerPane !== paneName);
         drawerTitle.textContent = trigger.dataset.pradaDrawerLabel || (paneName === 'details' ? 'Product details' : 'Shipping and returns');
+        resetDrawerScroll();
         drawerShell.setAttribute('aria-hidden', 'false');
         document.documentElement.classList.add('prada-drawer-open');
-        requestAnimationFrame(() => {
+        lockDrawerScroll();
+        drawerOpenFrame = window.requestAnimationFrame(() => {
+          drawerOpenFrame = null;
+          if (revision !== drawerRevision || drawerShell.getAttribute('aria-hidden') === 'true') return;
           drawerShell.classList.add('is-open');
-          root.querySelector('[data-prada-drawer-close]').focus({ preventScroll: true });
+          resetDrawerScroll();
+          drawerCloseButton?.focus({ preventScroll: true });
         });
       });
     });

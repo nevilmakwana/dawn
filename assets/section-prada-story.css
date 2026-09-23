@@ -1,0 +1,881 @@
+/* ==========================================================================
+   PRADA-STYLE MODULAR EDITORIAL STORY TEMPLATE
+   Cinematic Editorial Dark Theme (Black) & Luxury Light Theme Support
+   ========================================================================== */
+
+/* Base Container: Default Editorial Dark (Black Background) */
+.prada-story-section,
+.prada-story-section--editorial_dark {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: var(--font-body-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+  padding-bottom: 90px;
+}
+
+/* --------------------------------------------------------------------------
+   Sub-Header / Category Hairline Bar
+   -------------------------------------------------------------------------- */
+.prada-story__subbar {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-sizing: border-box;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.prada-story__back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+
+.prada-story__back-link:hover {
+  opacity: 0.65;
+}
+
+.prada-story__back-link svg {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+.prada-story__category-hairline {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-width: 500px;
+  gap: 16px;
+  justify-content: flex-end;
+}
+
+.prada-story__hairline-rule {
+  flex: 1;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.prada-story__category-pill {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Full-Screen Hero Image Banner
+   -------------------------------------------------------------------------- */
+.prada-story__hero {
+  width: 100%;
+  position: relative;
+  background-color: #0a0a0a;
+  overflow: hidden;
+  margin-bottom: 36px;
+}
+
+.prada-story__hero-image {
+  width: 100%;
+  height: auto;
+  max-height: 85vh;
+  object-fit: cover;
+  display: block;
+}
+
+.prada-story__hero-caption {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #8e8e93;
+  text-align: center;
+  margin: 14px 24px 0;
+}
+
+/* --------------------------------------------------------------------------
+   Dynamic Title & Editorial Deck
+   -------------------------------------------------------------------------- */
+.prada-story__deck {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 24px 30px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.prada-story__meta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #8e8e93;
+}
+
+.prada-story__category-tag {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.prada-story__meta-sep {
+  opacity: 0.4;
+  font-size: 8px;
+}
+
+.prada-story__date,
+.prada-story__read-time {
+  color: #8e8e93;
+}
+
+.prada-story__title {
+  font-size: clamp(2.1rem, 3.8vw, 3.4rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0 0 24px;
+}
+
+.prada-story__excerpt {
+  font-size: clamp(1.1rem, 1.4vw, 1.25rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.7;
+  color: #e5e5ea;
+  margin: 0 auto 30px;
+  max-width: 720px;
+}
+
+/* Social Share Bar (Dark Mode & End-of-article) */
+.prada-story__share {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 28px 0 10px;
+}
+
+.prada-story__share--end {
+  display: block !important;
+  margin: 56px 0 20px !important;
+  padding-top: 28px !important;
+  border-top: 1px solid #222222 !important;
+}
+
+.prada-story__share-inner {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 16px !important;
+}
+
+.prada-story__share-links {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.prada-story-section--luxury_light .prada-story__share--end {
+  border-top-color: #e5e5e5 !important;
+}
+
+.prada-story__share-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #888888;
+  margin-right: 4px;
+}
+
+.prada-story__share-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #333333;
+  background-color: #111111;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  padding: 0;
+}
+
+.prada-story__share-btn:hover {
+  border-color: #ffffff;
+  background-color: #ffffff;
+  color: #000000;
+  transform: translateY(-2px);
+}
+
+.prada-story__copy-toast {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 4px 8px;
+  background: #ffffff;
+  color: #000000;
+  border-radius: 2px;
+  animation: fadeIn 0.2s ease;
+}
+
+.prada-story__cta {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-decoration: none;
+  border-bottom: 1.5px solid #ffffff;
+  padding-bottom: 4px;
+  margin-top: 14px;
+  transition: opacity 0.2s ease;
+}
+
+.prada-story__cta:hover {
+  opacity: 0.65;
+}
+
+/* --------------------------------------------------------------------------
+   Narrative Reading Column (Dark Theme Typography & Spacing)
+   -------------------------------------------------------------------------- */
+.prada-story__narrative {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 24px 24px 70px;
+  box-sizing: border-box;
+}
+
+.prada-story__content {
+  font-size: 17px;
+  line-height: 1.88;
+  color: #d4d4d8;
+  letter-spacing: 0.01em;
+}
+
+/* Paragraphs & Spacing */
+.prada-story__content p {
+  margin: 0 0 24px;
+}
+
+/* Headings with Editorial Dividers */
+.prada-story__content h2 {
+  font-size: clamp(1.4rem, 2vw, 1.8rem) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: #ffffff !important;
+  margin-top: 56px !important;
+  margin-bottom: 20px !important;
+  padding-bottom: 12px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+  line-height: 1.3 !important;
+}
+
+.prada-story__content h3 {
+  font-size: clamp(1.15rem, 1.5vw, 1.38rem) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  color: #ffffff !important;
+  margin-top: 38px !important;
+  margin-bottom: 14px !important;
+  line-height: 1.35 !important;
+}
+
+.prada-story__content h4 {
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  color: #ffffff !important;
+  margin-top: 28px !important;
+  margin-bottom: 10px !important;
+}
+
+/* Links */
+.prada-story__content a {
+  color: #ffffff;
+  text-decoration: none;
+  border-bottom: 1.5px solid #ffffff;
+  padding-bottom: 2px;
+  transition: opacity 0.2s ease;
+}
+
+.prada-story__content a:hover {
+  opacity: 0.65;
+}
+
+/* Blockquotes & Pullquotes */
+.prada-story__content blockquote {
+  margin: 40px 0 !important;
+  padding: 20px 24px 20px 28px !important;
+  border-left: 2.5px solid #ffffff !important;
+  background-color: #0e0e0e !important;
+  font-size: clamp(1.15rem, 1.5vw, 1.35rem) !important;
+  font-style: italic !important;
+  line-height: 1.65 !important;
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   CRITICAL FIX: Bullet Points, Lists & Indentation (Fixing Floating Dots)
+   ========================================================================== */
+.prada-story__content ul,
+.prada-story__content ol,
+.prada-story-section .rte ul,
+.prada-story-section .rte ol {
+  list-style-position: outside !important;
+  padding-left: 28px !important;
+  margin: 18px 0 30px !important;
+}
+
+.prada-story__content li,
+.prada-story-section .rte li {
+  margin-bottom: 14px !important;
+  line-height: 1.75 !important;
+  color: #d4d4d8 !important;
+  padding-left: 4px !important;
+}
+
+/* Prevent inner paragraphs from breaking into a new line below bullet dot */
+.prada-story__content li p,
+.prada-story-section .rte li p {
+  display: inline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: inherit !important;
+}
+
+.prada-story__content li > strong:first-child,
+.prada-story-section .rte li > strong:first-child {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+/* Clean up blank spacing tags / empty divs */
+.prada-story__content div[type="empty-line"],
+.prada-story__content p:empty,
+.prada-story__content p > br:only-child {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 0 !important;
+}
+
+/* ==========================================================================
+   CRITICAL FIX: Q&A / FAQ Block Separation & Visual Hierarchy
+   ========================================================================== */
+/* Apply block heading ONLY to standalone Q&A paragraphs (never inside list items) */
+.prada-story__content > p > strong:first-child,
+.prada-story__content > p > span > strong:first-child,
+.prada-story__content div:not(li) > p > strong:first-child {
+  display: block !important;
+  font-size: 1.14rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  margin-top: 18px !important;
+  margin-bottom: 8px !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1.4 !important;
+}
+
+/* Bullet Points strong labels strictly inline on the exact same row */
+.prada-story__content li strong,
+.prada-story__content li p strong,
+.prada-story__content li p > strong:first-child,
+.prada-story__content li > strong:first-child,
+.prada-story-section .rte li strong,
+.prada-story-section .rte li p strong,
+.prada-story-section .rte li p > strong:first-child,
+.prada-story-section .rte li > strong:first-child {
+  display: inline !important;
+  font-size: inherit !important;
+  font-weight: 700 !important;
+  margin: 0 4px 0 0 !important;
+  padding: 0 !important;
+  letter-spacing: inherit !important;
+  line-height: inherit !important;
+  color: #ffffff !important;
+}
+
+/* Breakout Images inside Content */
+.prada-story__content img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 44px auto;
+  object-fit: cover;
+  border-radius: 0px;
+}
+
+@media (min-width: 990px) {
+  .prada-story__content img {
+    max-width: 920px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* ==========================================================================
+   Table Styling (Sleek Minimalist Monochrome Spec Table - Dark)
+   ========================================================================== */
+.prada-story__content table,
+.prada-story-section .rte table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin: 36px 0 44px !important;
+  font-size: 14.5px !important;
+  border: 1px solid #262626 !important;
+  background-color: #000000 !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4) !important;
+}
+
+.prada-story__content th,
+.prada-story-section .rte th {
+  background-color: #121212 !important;
+  color: #ffffff !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  font-weight: 700 !important;
+  padding: 14px 18px !important;
+  text-align: left !important;
+  border-bottom: 1.5px solid #ffffff !important;
+  border-right: 1px solid #222222 !important;
+}
+
+.prada-story__content td,
+.prada-story-section .rte td {
+  padding: 14px 18px !important;
+  border-bottom: 1px solid #222222 !important;
+  border-right: 1px solid #222222 !important;
+  color: #d4d4d8 !important;
+  line-height: 1.6 !important;
+}
+
+.prada-story__content tr:last-child td,
+.prada-story-section .rte tr:last-child td {
+  border-bottom: none !important;
+}
+
+.prada-story__content tr:hover td,
+.prada-story-section .rte tr:hover td {
+  background-color: #0c0c0c !important;
+}
+
+/* --------------------------------------------------------------------------
+   BLOCK: Split Image + Content (Image Left or Right)
+   -------------------------------------------------------------------------- */
+.prada-story__split {
+  max-width: 1440px;
+  margin: 70px auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 40px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .prada-story__split {
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+  }
+
+  .prada-story__split--image-right .prada-story__split-media {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .prada-story__split--image-right .prada-story__split-content {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .prada-story__split--image-left .prada-story__split-media {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .prada-story__split--image-left .prada-story__split-content {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+.prada-story__split-media {
+  position: relative;
+  overflow: hidden;
+  background-color: #111111;
+}
+
+.prada-story__split-img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  display: block;
+}
+
+.prada-story__split-caption {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8e8e93;
+  margin-top: 12px;
+}
+
+.prada-story__split-content {
+  padding: 20px 0;
+  max-width: 580px;
+}
+
+.prada-story__split-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8e8e93;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.prada-story__split-heading {
+  font-size: clamp(1.6rem, 2.6vw, 2.3rem);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0 0 20px;
+}
+
+.prada-story__split-body {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #d1d1d6;
+}
+
+.prada-story__split-body p {
+  margin: 0 0 20px;
+}
+
+.prada-story__split-cta {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-decoration: none;
+  border-bottom: 1.5px solid #ffffff;
+  padding-bottom: 4px;
+  margin-top: 10px;
+  transition: opacity 0.2s ease;
+}
+
+.prada-story__split-cta:hover {
+  opacity: 0.65;
+}
+
+/* --------------------------------------------------------------------------
+   BLOCK: Full Screen Photo Banner
+   -------------------------------------------------------------------------- */
+.prada-story__full-image {
+  width: 100%;
+  margin: 70px 0;
+  position: relative;
+  overflow: hidden;
+  background-color: #111111;
+}
+
+.prada-story__full-img {
+  width: 100%;
+  max-width: 1800px;
+  margin: 0 auto;
+  display: block;
+  height: auto;
+  max-height: 88vh;
+  object-fit: cover;
+}
+
+.prada-story__full-caption {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #8e8e93;
+  text-align: center;
+  margin-top: 16px;
+}
+
+/* --------------------------------------------------------------------------
+   BLOCK: Large Pull-Quote
+   -------------------------------------------------------------------------- */
+.prada-story__pullquote {
+  max-width: 860px;
+  margin: 70px auto;
+  padding: 44px 28px;
+  text-align: center;
+  box-sizing: border-box;
+  background-color: #0e0e0e;
+  border-left: 3px solid #ffffff;
+}
+
+.prada-story__pullquote-text {
+  font-size: clamp(1.4rem, 2.5vw, 2.1rem);
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.48;
+  color: #ffffff;
+  margin: 0 0 20px;
+}
+
+.prada-story__pullquote-author {
+  font-size: 11.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #8e8e93;
+  font-style: normal;
+  display: block;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   Story Switcher / Bottom Navigation Bar
+   -------------------------------------------------------------------------- */
+.prada-story__nav {
+  max-width: 1440px;
+  margin: 70px auto 0;
+  padding: 28px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+.prada-story__nav-item {
+  color: #ffffff;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+  max-width: 38%;
+}
+
+.prada-story__nav-item:hover {
+  opacity: 0.65;
+}
+
+.prada-story__nav-item--prev {
+  text-align: left;
+}
+
+.prada-story__nav-item--next {
+  text-align: right;
+  margin-left: auto;
+}
+
+.prada-story__nav-hub {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #aaaaaa;
+  text-decoration: none;
+  padding: 8px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+.prada-story__nav-hub:hover {
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+/* ==========================================================================
+   OPTIONAL: Luxury Light Scheme (White Theme Support)
+   ========================================================================== */
+.prada-story-section--luxury_light {
+  background-color: #ffffff !important;
+  color: #1a1a1a !important;
+}
+
+.prada-story-section--luxury_light .prada-story__subbar {
+  border-bottom-color: #f0f0f0 !important;
+}
+
+.prada-story-section--luxury_light .prada-story__back-link,
+.prada-story-section--luxury_light .prada-story__category-pill,
+.prada-story-section--luxury_light .prada-story__title,
+.prada-story-section--luxury_light .prada-story__content h2,
+.prada-story-section--luxury_light .prada-story__content h3,
+.prada-story-section--luxury_light .prada-story__content a,
+.prada-story-section--luxury_light .prada-story__nav-item {
+  color: #000000 !important;
+}
+
+.prada-story-section--luxury_light .prada-story__hairline-rule {
+  background-color: #e5e5e5 !important;
+}
+
+.prada-story-section--luxury_light .prada-story__content {
+  color: #222222 !important;
+}
+
+.prada-story-section--luxury_light .prada-story__content li {
+  color: #222222 !important;
+}
+
+.prada-story-section--luxury_light .prada-story__content li > strong:first-child,
+.prada-story-section--luxury_light .prada-story__content p > strong:first-child {
+  color: #000000 !important;
+}
+
+.prada-story-section--luxury_light .prada-story__content h2 {
+  border-bottom-color: #e8e8e8 !important;
+}
+
+.prada-story-section--luxury_light .prada-story__content blockquote {
+  background-color: #fafafa !important;
+  border-left-color: #000000 !important;
+  color: #111111 !important;
+}
+
+.prada-story-section--luxury_light .prada-story__content table {
+  background-color: #ffffff !important;
+  border-color: #e2e2e2 !important;
+}
+
+.prada-story-section--luxury_light .prada-story__content th {
+  background-color: #f7f7f7 !important;
+  color: #000000 !important;
+  border-bottom-color: #000000 !important;
+}
+
+.prada-story-section--luxury_light .prada-story__content td {
+  border-color: #eeeeee !important;
+  color: #333333 !important;
+}
+
+.prada-story-section--luxury_light .prada-story__share-btn {
+  background-color: #ffffff !important;
+  border-color: #e0e0e0 !important;
+  color: #000000 !important;
+}
+
+.prada-story-section--luxury_light .prada-story__share-btn:hover {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+.prada-story-section--luxury_light .prada-story__nav {
+  border-color: #e5e5e5 !important;
+}
+
+.prada-story-section--luxury_light .prada-story__nav-hub {
+  border-color: #e0e0e0 !important;
+  color: #666666 !important;
+}
+
+.prada-story-section--luxury_light .prada-story__nav-hub:hover {
+  border-color: #000000 !important;
+  color: #000000 !important;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile Adjustments
+   -------------------------------------------------------------------------- */
+@media (max-width: 749px) {
+  .prada-story__subbar {
+    padding: 14px 18px;
+  }
+
+  .prada-story__category-hairline {
+    max-width: 55%;
+  }
+
+  .prada-story__hero-image {
+    max-height: 60vh;
+  }
+
+  .prada-story__deck {
+    padding: 30px 18px 16px;
+  }
+
+  .prada-story__title {
+    font-size: 1.85rem;
+    line-height: 1.2;
+  }
+
+  .prada-story__narrative {
+    padding: 16px 18px 40px;
+  }
+
+  .prada-story__content {
+    font-size: 15.5px;
+    line-height: 1.8;
+  }
+
+  .prada-story__content ul,
+  .prada-story__content ol {
+    padding-left: 22px !important;
+  }
+
+  .prada-story__content table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .prada-story__split {
+    margin: 40px auto;
+    gap: 28px;
+  }
+
+  .prada-story__split-content {
+    padding: 0;
+  }
+
+  .prada-story__nav {
+    padding: 20px 18px;
+  }
+
+  .prada-story__nav-item span {
+    display: none;
+  }
+}

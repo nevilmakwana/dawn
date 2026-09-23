@@ -2,6 +2,91 @@
   const initializedCollections = new WeakMap();
   const indexPageCache = new Map();
   const pageSize = 50;
+  const primaryImageSelector =
+    '#product-grid .prada-product-tile__image:not(.prada-product-tile__image--secondary)';
+  const allCardImageSelector = '#product-grid .prada-product-tile__image';
+  const imageObserver =
+    'IntersectionObserver' in window
+      ? new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+
+              const image = entry.target;
+              image.loading = 'eager';
+              if (image.fetchPriority === 'low') image.fetchPriority = 'auto';
+              scheduleImageRecovery(image);
+              imageObserver.unobserve(image);
+            });
+          },
+          { rootMargin: '300px 0px' }
+        )
+      : null;
+
+  const imageRetrySource = (image) => {
+    const source = image.currentSrc || image.src || image.getAttribute('src');
+    if (!source) return '';
+
+    try {
+      const url = new URL(source, window.location.href);
+      const renderedWidth = Math.max(image.clientWidth || 0, 180) * Math.max(window.devicePixelRatio || 1, 1);
+      const targetWidth = [360, 540, 720, 900].find((width) => width >= renderedWidth) || 900;
+      if (url.searchParams.has('width')) url.searchParams.set('width', String(targetWidth));
+      url.searchParams.set('_prada_retry', String(Date.now()));
+      return url.href;
+    } catch (_error) {
+      return source;
+    }
+  };
+
+  const retryCardImage = (image) => {
+    const retryCount = Number.parseInt(image.dataset.pradaImageRetryCount || '0', 10);
+    if (!image.isConnected || retryCount >= 2) return;
+
+    const retrySource = imageRetrySource(image);
+    if (!retrySource) return;
+
+    image.dataset.pradaImageRetryCount = String(retryCount + 1);
+    image.loading = 'eager';
+    image.fetchPriority = 'high';
+    image.removeAttribute('srcset');
+    window.setTimeout(() => {
+      if (image.isConnected && (!image.complete || image.naturalWidth === 0)) image.src = retrySource;
+    }, retryCount ? 500 : 150);
+  };
+
+  const scheduleImageRecovery = (image) => {
+    if (image.dataset.pradaImageStallCheckReady === 'true') return;
+
+    image.dataset.pradaImageStallCheckReady = 'true';
+    window.setTimeout(() => {
+      if (image.isConnected && (!image.complete || image.naturalWidth === 0)) retryCardImage(image);
+    }, 4000);
+  };
+
+  const prepareCardImage = (image) => {
+    if (image.dataset.pradaImageRecoveryReady === 'true') return;
+
+    image.dataset.pradaImageRecoveryReady = 'true';
+    image.addEventListener('error', () => retryCardImage(image));
+  };
+
+  const initializeCollectionImages = (root) => {
+    const primaryImages = Array.from(root.querySelectorAll(primaryImageSelector));
+
+    root.querySelectorAll(allCardImageSelector).forEach(prepareCardImage);
+    primaryImages.forEach((image, index) => {
+      if (index < 4) {
+        image.loading = 'eager';
+        image.fetchPriority = 'high';
+        scheduleImageRecovery(image);
+        imageObserver?.unobserve(image);
+      } else if (imageObserver && image.dataset.pradaImageObserved !== 'true') {
+        image.dataset.pradaImageObserved = 'true';
+        imageObserver.observe(image);
+      }
+    });
+  };
 
   const collectionIdsFromPipe = (value) => new Set((value || '').split('|').filter(Boolean));
 
@@ -163,6 +248,8 @@
 
   const initialize = (scope = document) => {
     scope.querySelectorAll?.('collection-component[data-linked-index-url]').forEach((root) => {
+      initializeCollectionImages(root);
+
       const context = activeContext(root);
       if (!context.targetCollectionIds.size || initializedCollections.get(root) === context.key) return;
 
@@ -180,4 +267,8 @@
 
   document.addEventListener('shopify:section:load', (event) => initialize(event.target));
   document.addEventListener('prada:collection:updated', () => initialize());
+  window.addEventListener('pageshow', () => initialize());
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') initialize();
+  });
 })();

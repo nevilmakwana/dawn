@@ -187,12 +187,16 @@ if (!customElements.get('product-form')) {
         const selectedSwatchImage = product.querySelector('.prada-product__swatch.is-selected img');
         const priceContainer = product.querySelector('[data-prada-price]');
         const price = priceContainer?.querySelector(':scope > span.money:last-of-type')?.textContent?.trim() || '';
+        const compareAtPrice = priceContainer?.querySelector(':scope > s.money')?.textContent?.trim() || '';
         const options = [...product.querySelectorAll('select[data-prada-option]')]
           .map((select) => ({
             name: select.dataset.pradaOptionName || '',
             value: select.value,
           }))
           .filter((option) => option.name && option.value && option.value.toLowerCase() !== 'default title');
+        const colorOption = options.find((option) => /colou?r/i.test(option.name));
+        const color =
+          colorOption?.value || product.querySelector('[data-prada-fallback-color-value]')?.textContent?.trim() || '';
 
         return {
           variantId,
@@ -206,7 +210,9 @@ if (!customElements.get('product-form')) {
             product.dataset.wishlistFallbackImage ||
             '',
           imageAlt: image?.alt || title,
+          color,
           price,
+          compareAtPrice,
           priceCents: Number.parseInt(priceContainer?.dataset.pradaPriceCents || '0', 10) || 0,
           quantity,
           options,

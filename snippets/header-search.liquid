@@ -103,22 +103,115 @@
             {{- 'icon-close.svg' | inline_asset_content -}}
           </span>
         </button>
-        <div class="prada-mobile-search-links" aria-label="Quick links">
-          <div class="prada-mobile-search-links__group">
+        <div class="prada-mobile-search-links" aria-label="Quick links" data-dynamic-search-suggestions>
+          <div class="prada-mobile-search-links__group" data-search-suggestion-group="collections">
             <p class="prada-mobile-search-links__heading">Collections</p>
-            <a href="{{ routes.search_url }}?q=Women%27s%20Bags">Women's Bags</a>
-            <a href="{{ routes.search_url }}?q=Women%27s%20Shoes">Women's Shoes</a>
-            <a href="{{ routes.search_url }}?q=Men%27s%20Shoes">Men's Shoes</a>
-            <a href="{{ routes.search_url }}?q=Men%27s%20Ready%20to%20Wear">Men's Ready to Wear</a>
+            {%- assign collection_suggestion_count = 0 -%}
+            {%- for suggested_collection in collections limit: 50 -%}
+              {%- if suggested_collection.handle != 'all'
+                and suggested_collection.handle != 'frontpage'
+                and suggested_collection.all_products_count > 0
+              -%}
+                <a
+                  href="{{ suggested_collection.url }}"
+                  data-search-suggestion
+                  {% if collection_suggestion_count >= 4 %}hidden{% endif %}
+                >
+                  {{- suggested_collection.title | escape -}}
+                </a>
+                {%- assign collection_suggestion_count = collection_suggestion_count | plus: 1 -%}
+                {%- if collection_suggestion_count >= 20 -%}{%- break -%}{%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+            <a href="{{ routes.search_url }}?q=Scarves" data-search-suggestion {% if collection_suggestion_count >= 4 %}hidden{% endif %}>Scarves</a>
+            <a href="{{ routes.search_url }}?q=Bandanas" data-search-suggestion hidden>Bandanas</a>
+            <a href="{{ routes.search_url }}?q=Candles" data-search-suggestion hidden>Candles</a>
+            <a href="{{ routes.search_url }}?q=Custom%20Design" data-search-suggestion hidden>Custom Design</a>
           </div>
-          <div class="prada-mobile-search-links__group">
+          <div class="prada-mobile-search-links__group" data-search-suggestion-group="highlights">
             <p class="prada-mobile-search-links__heading">Highlights</p>
-            <a href="{{ routes.search_url }}?q=New%20Arrivals">New Arrivals</a>
-            <a href="{{ routes.search_url }}?q=Scarves">Scarves</a>
-            <a href="{{ routes.search_url }}?q=Grey%20Home">Grey Home</a>
-            <a href="{{ routes.search_url }}?q=Kurtis">Kurtis</a>
+            {%- assign highlight_suggestion_count = 0 -%}
+            {%- for suggested_type in collections['all'].all_types limit: 24 -%}
+              {%- assign suggested_type_length = suggested_type | size -%}
+              {%- if suggested_type_length <= 28 -%}
+                <a
+                  href="{{ suggested_type | url_for_type }}"
+                  data-search-suggestion
+                  {% if highlight_suggestion_count >= 4 %}hidden{% endif %}
+                >
+                  {{- suggested_type | escape -}}
+                </a>
+                {%- assign highlight_suggestion_count = highlight_suggestion_count | plus: 1 -%}
+                {%- if highlight_suggestion_count >= 12 -%}{%- break -%}{%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+            <a href="{{ routes.all_products_collection_url }}?sort_by=created-descending" data-search-suggestion {% if highlight_suggestion_count >= 4 %}hidden{% endif %}>New Arrivals</a>
+            <a href="{{ routes.all_products_collection_url }}?sort_by=best-selling" data-search-suggestion hidden>Best Sellers</a>
+            <a href="{{ routes.search_url }}?q=Scarves" data-search-suggestion hidden>Scarves</a>
+            <a href="{{ routes.search_url }}?q=Bandanas" data-search-suggestion hidden>Bandanas</a>
+            <a href="{{ routes.search_url }}?q=Candles" data-search-suggestion hidden>Candles</a>
+            <a href="{{ routes.search_url }}?q=Custom%20Design" data-search-suggestion hidden>Custom Design</a>
           </div>
         </div>
+        <script>
+          (() => {
+            const script = document.currentScript;
+            const suggestions = script && script.previousElementSibling;
+
+            if (!suggestions || suggestions.dataset.dynamicSearchReady === 'true') return;
+
+            suggestions.dataset.dynamicSearchReady = 'true';
+
+            const randomIndex = (maximum) => {
+              if (window.crypto && window.crypto.getRandomValues) {
+                const value = new Uint32Array(1);
+                window.crypto.getRandomValues(value);
+                return value[0] % maximum;
+              }
+
+              return Math.floor(Math.random() * maximum);
+            };
+
+            const refreshGroup = (group) => {
+              const candidates = Array.from(group.querySelectorAll('[data-search-suggestion]'));
+              const unique = [];
+              const labels = new Set();
+
+              candidates.forEach((item) => {
+                const label = item.textContent.trim().toLowerCase();
+                item.hidden = true;
+
+                if (label && !labels.has(label)) {
+                  labels.add(label);
+                  unique.push(item);
+                }
+              });
+
+              for (let index = unique.length - 1; index > 0; index -= 1) {
+                const swapIndex = randomIndex(index + 1);
+                [unique[index], unique[swapIndex]] = [unique[swapIndex], unique[index]];
+              }
+
+              unique.slice(0, 4).forEach((item) => {
+                item.hidden = false;
+              });
+            };
+
+            const refreshSuggestions = () => {
+              suggestions.querySelectorAll('[data-search-suggestion-group]').forEach(refreshGroup);
+            };
+
+            const searchDetails = suggestions.closest('details');
+
+            if (searchDetails) {
+              searchDetails.addEventListener('toggle', () => {
+                if (searchDetails.open) refreshSuggestions();
+              });
+            }
+
+            refreshSuggestions();
+          })();
+        </script>
       </div>
     </div>
   </details>

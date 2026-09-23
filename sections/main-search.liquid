@@ -1,7 +1,6 @@
-{%- if section.settings.enable_filtering or section.settings.enable_sorting -%}
-  <script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
-{%- endif -%}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
 
+{{ 'prada-collection.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'main-search.js' | asset_url }}" defer="defer"></script>
 
 <style>
@@ -16,10 +15,6 @@
 
   .template-search__search .search {
     margin-top: 3rem;
-  }
-
-  .template-search--empty {
-    padding-bottom: 18rem;
   }
 
   @media screen and (min-width: 750px) {
@@ -54,7 +49,7 @@
 {%- endstyle -%}
 
 {% paginate search.results by 24 %}
-  <div class="template-search{% unless search.performed and search.results_count > 0 %} template-search--empty{% endunless %} section-{{ section.id }}-padding">
+  <div class="template-search{% unless search.performed %} template-search--discovery{% endunless %}{% if search.performed and search.results_count == 0 %} template-search--no-results{% endif %} section-{{ section.id }}-padding">
     <div class="template-search__header page-width{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
       <h1 class="h2 center">
         {%- if search.performed -%}
@@ -122,6 +117,35 @@
           </predictive-search>
         {%- endif -%}
       </div>
+      {%- unless search.performed -%}
+        <div class="search-zero-state">
+          <p class="search-zero-state__heading">Popular Searches</p>
+          <div class="search-zero-state__pills" role="list">
+            <a href="{{ routes.search_url }}?q=silk+scarf" class="search-zero-state__pill" role="listitem">Silk Scarves</a>
+            <a href="{{ routes.search_url }}?q=mini+heart" class="search-zero-state__pill" role="listitem">Red Mini Heart</a>
+            <a href="{{ routes.search_url }}?q=square+scarf" class="search-zero-state__pill" role="listitem">Square Scarves</a>
+            <a href="{{ routes.search_url }}?q=bandana" class="search-zero-state__pill" role="listitem">Bandanas</a>
+            <a href="{{ routes.search_url }}?q=black" class="search-zero-state__pill" role="listitem">Black Collection</a>
+            <a href="{{ routes.search_url }}?q=tops" class="search-zero-state__pill" role="listitem">Indo-Western Tops</a>
+          </div>
+
+          <p class="search-zero-state__heading">Explore Collections</p>
+          <div class="search-zero-state__grid">
+            <a href="{{ collections['women-scarves'].url | default: routes.all_products_collection_url }}" class="search-curated-card">
+              <h2 class="search-curated-card__title">Scarves</h2>
+              <p class="search-curated-card__subtitle">Explore timeless prints</p>
+            </a>
+            <a href="{{ collections['women-bandanas'].url | default: routes.all_products_collection_url }}" class="search-curated-card">
+              <h2 class="search-curated-card__title">Bandanas</h2>
+              <p class="search-curated-card__subtitle">Discover signature squares</p>
+            </a>
+            <a href="{{ routes.search_url }}?q=indo-western+top" class="search-curated-card">
+              <h2 class="search-curated-card__title">Indo-Western Tops</h2>
+              <p class="search-curated-card__subtitle">Shop contemporary silhouettes</p>
+            </a>
+          </div>
+        </div>
+      {%- endunless -%}
       {%- if search.performed -%}
         {%- unless section.settings.enable_filtering or section.settings.enable_sorting -%}
           {%- if search.results_count > 0 -%}
@@ -130,92 +154,66 @@
             </p>
           {%- endif -%}
         {%- endunless -%}
-        {%- if search.results_count == 0 and search.filters == empty -%}
-          <p role="status">{{ 'templates.search.no_results' | t: terms: search.terms }}</p>
-        {%- endif -%}
       {%- endif -%}
     </div>
-    {%- if search.performed -%}
-      {%- if section.settings.enable_sorting
-        and section.settings.filter_type == 'vertical'
-        and search.filters != empty
+    {%- if search.performed and search.results_count == 0 -%}
+      {%- liquid
+        assign recovery_collection = collections['best-sellers']
+        if recovery_collection == blank or recovery_collection.products_count == 0
+          assign recovery_collection = collections.all
+        endif
       -%}
-        <facet-filters-form class="facets facets-vertical-sort page-width small-hide">
-          <form class="facets-vertical-form" id="FacetSortForm">
-            <div class="facet-filters sorting caption">
-              <div class="facet-filters__field">
-                <h2 class="facet-filters__label caption-large text-body">
-                  <label for="SortBy">{{ 'products.facets.sort_by_label' | t }}</label>
-                </h2>
-                <div class="select">
-                  {%- assign sort_by = search.sort_by | default: search.default_sort_by -%}
-                  <select
-                    name="sort_by"
-                    class="facet-filters__sort select__select caption-large"
-                    id="SortBy"
-                    aria-describedby="a11y-refresh-page-message"
-                  >
-                    {%- for option in search.sort_options -%}
-                      <option
-                        value="{{ option.value | escape }}"
-                        {% if option.value == sort_by %}
-                          selected="selected"
-                        {% endif %}
-                      >
-                        {{ option.name | escape }}
-                      </option>
-                    {%- endfor -%}
-                  </select>
-                  <span class="svg-wrapper">
-                    {{- 'icon-caret.svg' | inline_asset_content -}}
-                  </span>
-                </div>
-              </div>
-            </div>
+      <section class="search-no-results-recovery page-width" aria-labelledby="SearchRecoveryHeading">
+        <div class="search-no-results-recovery__banner" role="status">
+          <p class="search-no-results-recovery__eyebrow">No exact matches</p>
+          <h2 id="SearchRecoveryHeading" class="search-no-results-recovery__message">
+            We couldn't find any matches for “{{ search.terms | escape }}”
+          </h2>
+          <p class="search-no-results-recovery__copy">Explore a curated selection, or try one of our most searched categories.</p>
+          <div class="search-zero-state__pills" role="list">
+            <a href="{{ routes.search_url }}?q=scarf" class="search-zero-state__pill" role="listitem">View Scarves</a>
+            <a href="{{ routes.search_url }}?q=bandana" class="search-zero-state__pill" role="listitem">View Bandanas</a>
+            <a href="{{ routes.all_products_collection_url }}" class="search-zero-state__pill" role="listitem">Shop All</a>
+          </div>
+        </div>
 
-            <div class="product-count-vertical light" role="status">
-              <h2 class="product-count__text text-body">
-                <span id="ProductCountDesktop">
-                  {%- if search.results_count -%}
-                    {{ 'templates.search.results_with_count' | t: terms: search.terms, count: search.results_count }}
-                  {%- elsif search.products_count == search.all_products_count -%}
-                    {{ 'products.facets.product_count_simple' | t: count: search.products_count }}
-                  {%- else -%}
-                    {{
-                      'products.facets.product_count'
-                      | t: product_count: search.products_count, count: search.all_products_count
-                    }}
-                  {%- endif -%}
-                </span>
-              </h2>
-              {%- render 'loading-spinner' -%}
-            </div>
-          </form>
-        </facet-filters-form>
-      {%- endif -%}
-      <div
-        {% if section.settings.filter_type == 'vertical' %}
-          class="facets-vertical page-width"
-        {% endif %}
-      >
-        {%- if search.filters != empty -%}
-          {%- if section.settings.enable_filtering or section.settings.enable_sorting -%}
-            <aside
-              aria-labelledby="verticalTitle"
-              class="facets-wrapper{% unless section.settings.enable_filtering %} facets-wrapper--no-filters{% endunless %}{% if section.settings.filter_type != 'vertical' %} page-width{% endif %}"
-              id="main-search-filters"
-              data-id="{{ section.id }}"
-            >
-              {% render 'facets',
-                results: search,
-                enable_filtering: section.settings.enable_filtering,
-                enable_sorting: section.settings.enable_sorting,
-                filter_type: section.settings.filter_type,
-                paginate: paginate
-              %}
-            </aside>
-          {%- endif -%}
+        {%- if recovery_collection != blank and recovery_collection.products_count > 0 -%}
+          <div class="search-no-results-recovery__products">
+            <p class="search-zero-state__heading">Curated Essentials</p>
+            <ul class="prada-collection__grid prada-search-results__grid" role="list">
+              {%- assign recovery_product_count = 0 -%}
+              {%- for product in recovery_collection.products -%}
+                {%- if recovery_product_count >= 4 -%}{% break %}{%- endif -%}
+                {%- unless product.available -%}{% continue %}{%- endunless -%}
+                {%- assign recovery_card_index = recovery_product_count | plus: 1 -%}
+                {% render 'prada-nested-collection-product-card',
+                  product: product,
+                  card_index: recovery_card_index
+                %}
+                {%- assign recovery_product_count = recovery_product_count | plus: 1 -%}
+              {%- endfor -%}
+            </ul>
+          </div>
         {%- endif -%}
+      </section>
+    {%- endif -%}
+    {%- if search.performed and search.results_count > 0 -%}
+      <div>
+        <aside
+          aria-label="{{ 'products.facets.sort_by_label' | t }}"
+          class="facets-wrapper facets-wrapper--no-filters page-width"
+          id="main-search-filters"
+          data-id="{{ section.id }}"
+        >
+          {% render 'facets',
+            results: search,
+            enable_filtering: false,
+            enable_sorting: true,
+            filter_type: 'horizontal',
+            inline_mobile_sort: true,
+            paginate: paginate
+          %}
+        </aside>
         <div class="product-grid-container" id="ProductGridContainer">
           {%- if search.results.size == 0 and search.filters != empty -%}
             <div
@@ -237,44 +235,21 @@
             </div>
           {%- else -%}
             <div
-              class="template-search__results collection{% if section.settings.filter_type != 'vertical' %} page-width{% endif %}"
+              class="template-search__results collection prada-search-results"
               id="product-grid"
               data-id="{{ section.id }}"
             >
               <div class="loading-overlay gradient"></div>
-              <ul
-                class="grid product-grid  grid--{{ section.settings.columns_mobile }}-col-tablet-down grid--{{ section.settings.columns_desktop }}-col-desktop"
-                role="list"
-              >
-                {%- assign skip_card_product_styles = false -%}
+              <ul class="prada-collection__grid prada-search-results__grid" role="list">
                 {%- for item in search.results -%}
-                  {% assign lazy_load = false %}
-                  {%- if forloop.index > 2 -%}
-                    {%- assign lazy_load = true -%}
-                  {%- endif -%}
-
-                  <li
-                    class="grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
-                    {% if settings.animations_reveal_on_scroll %}
-                      data-cascade
-                    {% endif %}
-                  >
-                    {%- case item.object_type -%}
-                      {%- when 'product' -%}
-                        {%- capture product_settings -%}{%- if section.settings.product_show_vendor -%}vendor,{%- endif -%}title,price{%- endcapture -%}
-                        {% render 'card-product',
-                          card_product: item,
-                          media_aspect_ratio: section.settings.image_ratio,
-                          image_shape: section.settings.image_shape,
-                          show_secondary_image: section.settings.show_secondary_image,
-                          show_vendor: section.settings.show_vendor,
-                          show_rating: section.settings.show_rating,
-                          lazy_load: lazy_load,
-                          skip_styles: skip_card_product_styles,
-                          product_view_context: 'search'
-                        %}
-                        {%- assign skip_card_product_styles = true -%}
-                      {%- when 'article' -%}
+                  {%- case item.object_type -%}
+                    {%- when 'product' -%}
+                      {% render 'prada-nested-collection-product-card',
+                        product: item,
+                        card_index: forloop.index
+                      %}
+                    {%- when 'article' -%}
+                      <li class="prada-collection__item prada-search-result-card">
                         {% render 'article-card',
                           article: item,
                           show_image: true,
@@ -282,9 +257,11 @@
                           show_author: section.settings.article_show_author,
                           show_badge: true,
                           media_aspect_ratio: 1,
-                          lazy_load: lazy_load
+                          lazy_load: true
                         %}
-                      {%- when 'page' -%}
+                      </li>
+                    {%- when 'page' -%}
+                      <li class="prada-collection__item prada-search-result-card">
                         <div class="article-card-wrapper card-wrapper underline-links-hover">
                           <div
                             class="card card--card card--text ratio color-{{ settings.blog_card_color_scheme }}"
@@ -306,8 +283,8 @@
                             </div>
                           </div>
                         </div>
-                    {%- endcase -%}
-                  </li>
+                      </li>
+                  {%- endcase -%}
                 {%- endfor -%}
               </ul>
               {%- if paginate.pages > 1 -%}
@@ -323,6 +300,46 @@
 {% if section.settings.image_shape == 'arch' %}
   {{ 'mask-arch.svg' | inline_asset_content }}
 {%- endif -%}
+
+<script>
+  (() => {
+    const setupSearchCarousels = (root) => {
+      root.querySelectorAll('[data-prada-mobile-carousel]').forEach((carousel) => {
+        if (carousel.dataset.pradaCarouselReady === 'true') return;
+
+        const dots = carousel.parentElement.querySelectorAll('.prada-product-tile__pagination-dot');
+        if (dots.length !== 2) return;
+
+        carousel.dataset.pradaCarouselReady = 'true';
+        let animationFrame;
+        const updatePagination = () => {
+          const secondImageIsActive = carousel.scrollLeft >= carousel.clientWidth / 2;
+          dots[0].classList.toggle('is-active', !secondImageIsActive);
+          dots[1].classList.toggle('is-active', secondImageIsActive);
+          animationFrame = undefined;
+        };
+
+        carousel.addEventListener('scroll', () => {
+          if (animationFrame) return;
+          animationFrame = window.requestAnimationFrame(updatePagination);
+        }, { passive: true });
+
+        updatePagination();
+      });
+    };
+
+    const searchGridContainer = document.getElementById('ProductGridContainer');
+    setupSearchCarousels(document);
+
+    if (searchGridContainer && !searchGridContainer.dataset.pradaCarouselObserverReady) {
+      searchGridContainer.dataset.pradaCarouselObserverReady = 'true';
+      new MutationObserver(() => {
+        setupSearchCarousels(searchGridContainer);
+        window.PradaWishlist?.sync?.();
+      }).observe(searchGridContainer, { childList: true, subtree: true });
+    }
+  })();
+</script>
 
 {% schema %}
 {

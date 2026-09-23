@@ -9,6 +9,49 @@
   color: var(--prada-ink);
 }
 
+.prada-collection__seo {
+  box-sizing: border-box;
+  width: min(100%, 92rem);
+  margin: 0 auto;
+  padding: 6.4rem 4rem 7.2rem;
+}
+
+.prada-collection__seo-title {
+  margin: 0 0 2rem;
+  color: var(--prada-ink);
+  font-size: 2.4rem;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.prada-collection__seo-content {
+  color: var(--prada-ink);
+  font-size: 1.5rem;
+  line-height: 1.65;
+}
+
+.prada-collection__seo-content > :first-child {
+  margin-top: 0;
+}
+
+.prada-collection__seo-content > :last-child {
+  margin-bottom: 0;
+}
+
+@media screen and (max-width: 749px) {
+  .prada-collection__seo {
+    padding: 4.8rem 2rem 5.6rem;
+  }
+
+  .prada-collection__seo-title {
+    font-size: 2rem;
+  }
+
+  .prada-collection__seo-content {
+    font-size: 1.4rem;
+  }
+}
+
 body:has(.prada-collection) {
   --prada-title-height: 5.6rem;
 }
@@ -158,11 +201,13 @@ body:has(.prada-collection):has(.section-header.shopify-section-header-hidden)
 
 .prada-collection__grid-container {
   opacity: 1;
-  transition: opacity 260ms cubic-bezier(0.33, 1, 0.68, 1);
 }
 
-.prada-collection__grid-container.is-prada-entering {
-  opacity: 0;
+html.prada-collection-route-pending .prada-collection__grid-container,
+html.prada-collection-route-pending .prada-collection__count,
+.prada-collection.is-prada-navigation-loading .prada-collection__grid-container,
+.prada-collection.is-prada-navigation-loading .prada-collection__count {
+  visibility: hidden;
 }
 
 .prada-collection__count,

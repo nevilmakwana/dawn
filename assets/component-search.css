@@ -72,3 +72,402 @@ input::-webkit-search-decoration {
 .template-search__results {
   position: relative;
 }
+
+/* Grey Exim search: monochrome editorial treatment. */
+.template-search {
+  --prada-ink: #0a0a0a;
+  --prada-line: #dedede;
+  --prada-media: #f2f2f2;
+  background: #ffffff;
+  color: #000000;
+}
+
+.template-search__header h1,
+.template-search__header .h2 {
+  margin: 0 0 1.5rem;
+  color: #000000;
+  font-family: inherit;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.template-search__header {
+  padding-top: calc(var(--header-height, 70px) + 24px);
+}
+
+.template-search .search .field::before,
+.template-search .search .field::after {
+  display: none;
+  content: none;
+}
+
+.template-search .search__input.field__input {
+  height: 4.8rem;
+  padding: 0 9.8rem 0 1.8rem;
+  border: 1px solid #000000;
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
+  color: #000000;
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media screen and (max-width: 749px) {
+  .template-search .search__input.field__input {
+    font-size: 1.6rem;
+  }
+
+  .template-search .search-inline-sort {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    min-width: 14.1rem;
+    align-items: center;
+    justify-content: flex-end;
+    justify-self: end;
+  }
+
+  .template-search .search-inline-sort__form {
+    display: flex;
+    min-height: 4.8rem;
+    align-items: center;
+    justify-content: flex-end;
+    margin: 0;
+    color: #0a0a0a;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 16px;
+    text-transform: uppercase;
+  }
+
+  .template-search .search-inline-sort__form label {
+    display: none;
+  }
+
+  .template-search .search-inline-sort__select {
+    width: auto;
+    max-width: 18rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #0a0a0a;
+    font: inherit;
+    text-transform: uppercase;
+  }
+
+  .template-search .facets-container > .product-count {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+  }
+
+  .template-search .facets-container > .product-count.light {
+    opacity: 1;
+  }
+
+  .template-search .facets-container .product-count__text {
+    color: #0a0a0a !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    letter-spacing: 0 !important;
+    line-height: 16px !important;
+  }
+}
+
+.template-search .search__input.field__input:focus,
+.template-search .search__input.field__input:focus-visible {
+  border-color: #000000;
+  border-width: 1.5px;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+}
+
+.template-search .search .field__label {
+  color: #555555;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.template-search .search__button,
+.template-search .reset__button {
+  border: 0;
+  border-radius: 0;
+  color: #000000;
+}
+
+.search-zero-state {
+  margin-top: 3.5rem;
+  text-align: center;
+}
+
+.search-zero-state__heading,
+.search-no-results-recovery__eyebrow {
+  margin: 0 0 1.6rem;
+  color: #666666;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.search-zero-state__pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  max-width: 60rem;
+  margin: 0 auto 4rem;
+}
+
+.search-zero-state__pill {
+  display: inline-flex;
+  min-height: 3.8rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 1.6rem;
+  border: 1px solid #d8d8d8;
+  border-radius: 0;
+  background: #ffffff;
+  color: #000000;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.search-zero-state__pill:hover,
+.search-zero-state__pill:focus-visible {
+  border-color: #000000;
+  background: #000000;
+  color: #ffffff;
+}
+
+.search-zero-state__pill:focus-visible,
+.search-curated-card:focus-visible {
+  outline: 1px solid #000000;
+  outline-offset: 3px;
+}
+
+.search-zero-state__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  max-width: 90rem;
+  margin: 0 auto;
+}
+
+.search-curated-card {
+  display: block;
+  padding: 2.5rem 1.5rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 0;
+  background: #fafafa;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.search-curated-card:hover,
+.search-curated-card:focus-visible {
+  border-color: #000000;
+  background: #000000;
+}
+
+.search-curated-card__title {
+  margin: 0 0 0.6rem;
+  color: #000000;
+  font-family: inherit;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.search-curated-card__subtitle {
+  margin: 0;
+  color: #777777;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.search-curated-card:hover .search-curated-card__title,
+.search-curated-card:hover .search-curated-card__subtitle,
+.search-curated-card:focus-visible .search-curated-card__title,
+.search-curated-card:focus-visible .search-curated-card__subtitle {
+  color: #ffffff;
+}
+
+.search-no-results-recovery {
+  margin: 0 auto 6rem;
+  text-align: center;
+}
+
+.search-no-results-recovery__banner {
+  padding: clamp(3.6rem, 6vw, 7rem) 2rem;
+  border-top: 1px solid #dedede;
+  border-bottom: 1px solid #dedede;
+  background: #f7f7f7;
+}
+
+.search-no-results-recovery__message {
+  max-width: 72rem;
+  margin: 0 auto 1.2rem;
+  color: #111111;
+  font-family: inherit;
+  font-size: clamp(1.8rem, 2vw, 2.8rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.search-no-results-recovery__copy {
+  max-width: 58rem;
+  margin: 0 auto 2.6rem;
+  color: #555555;
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+}
+
+.search-no-results-recovery__banner .search-zero-state__pills {
+  margin-bottom: 0;
+}
+
+.search-no-results-recovery__products {
+  padding-top: 5rem;
+  text-align: left;
+}
+
+.search-no-results-recovery__products > .search-zero-state__heading {
+  text-align: center;
+}
+
+.prada-search-results {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
+.prada-search-results__grid {
+  width: 100%;
+}
+
+.prada-search-results__grid .prada-product-tile__title {
+  margin: 0;
+  color: var(--prada-ink);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 18px;
+  text-transform: none;
+}
+
+.prada-search-results__grid .prada-product-tile__price {
+  margin: 0.95rem 0 0;
+  color: var(--prada-ink);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 18px;
+}
+
+.prada-search-result-card {
+  padding: 1.6rem;
+  border-right: 1px solid #ffffff;
+  border-bottom: 1px solid #ffffff;
+  background: #ffffff;
+}
+
+.template-search .pagination-wrapper {
+  padding-right: 3.2rem;
+  padding-left: 3.2rem;
+}
+
+@media screen and (max-width: 749px) {
+  .template-search__header {
+    margin-bottom: 2rem;
+  }
+
+  .template-search__search {
+    margin: 0 auto 2rem;
+  }
+
+  .template-search__search .search {
+    margin-top: 2rem;
+  }
+
+  .template-search__header h1,
+  .template-search__header .h2 {
+    font-size: 1.3rem;
+  }
+
+  .search-zero-state {
+    margin-top: 2.8rem;
+  }
+
+  .search-zero-state__pills {
+    gap: 0.8rem;
+    margin-bottom: 3.2rem;
+  }
+
+  .search-zero-state__pill {
+    min-height: 4rem;
+    padding-right: 1.3rem;
+    padding-left: 1.3rem;
+  }
+
+  .search-zero-state__grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .search-curated-card {
+    padding: 2.2rem 1.5rem;
+  }
+
+  .search-no-results-recovery {
+    margin-bottom: 4rem;
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .search-no-results-recovery__banner {
+    padding: 3.8rem 1.8rem;
+  }
+
+  .search-no-results-recovery__message {
+    font-size: 1.8rem;
+  }
+
+  .search-no-results-recovery__products {
+    padding: 4rem 0 0;
+  }
+
+  .prada-search-results__grid .prada-product-tile__title,
+  .prada-search-results__grid .prada-product-tile__price {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .template-search .pagination-wrapper {
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+  }
+}

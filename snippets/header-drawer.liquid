@@ -291,7 +291,7 @@
                                               {%- if grandchild_block.settings.products != blank and request.page_type == 'collection' -%}
                                                 <template id="{{ nested_product_template_id }}">
                                                   {%- for nested_product in grandchild_block.settings.products -%}
-                                                    {% render 'prada-nested-collection-product-card', product: nested_product, collection_context: collection, card_index: 999 %}
+                                                    {% render 'prada-nested-collection-product-card', product: nested_product, collection_context: collection, card_index: forloop.index %}
                                                   {%- endfor -%}
                                                 </template>
                                               {%- endif -%}
@@ -306,6 +306,7 @@
                                         >
                                           {%- liquid
                                             assign aggregate_product_ids = '|'
+                                            assign aggregate_card_index = 0
                                             assign scan_child_aggregate = false
                                           -%}
                                           {%- for aggregate_block in section.blocks -%}
@@ -321,7 +322,8 @@
                                                   {%- assign aggregate_product_key = '|' | append: aggregate_product.id | append: '|' -%}
                                                   {%- unless aggregate_product_ids contains aggregate_product_key -%}
                                                     {%- assign aggregate_product_ids = aggregate_product_ids | append: aggregate_product.id | append: '|' -%}
-                                                    {% render 'prada-nested-collection-product-card', product: aggregate_product, collection_context: collection, card_index: 999 %}
+                                                    {%- assign aggregate_card_index = aggregate_card_index | plus: 1 -%}
+                                                    {% render 'prada-nested-collection-product-card', product: aggregate_product, collection_context: collection, card_index: aggregate_card_index %}
                                                   {%- endunless -%}
                                                 {%- endfor -%}
                                               {%- else -%}
@@ -341,7 +343,8 @@
                                                     {%- assign aggregate_product_key = '|' | append: aggregate_product.id | append: '|' -%}
                                                     {%- unless aggregate_product_ids contains aggregate_product_key -%}
                                                       {%- assign aggregate_product_ids = aggregate_product_ids | append: aggregate_product.id | append: '|' -%}
-                                                      {% render 'prada-nested-collection-product-card', product: aggregate_product, collection_context: aggregate_collection, card_index: 999 %}
+                                                      {%- assign aggregate_card_index = aggregate_card_index | plus: 1 -%}
+                                                      {% render 'prada-nested-collection-product-card', product: aggregate_product, collection_context: aggregate_collection, card_index: aggregate_card_index %}
                                                     {%- endunless -%}
                                                   {%- endfor -%}
                                                 {%- endif -%}

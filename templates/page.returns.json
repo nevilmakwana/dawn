@@ -3,19 +3,19 @@
     "main": {
       "type": "main-returns",
       "blocks": {
-        "question_1": { "type": "question", "settings": { "text": "Can I return a product purchased online?", "link": "/pages/contact?view=faq" } },
-        "question_2": { "type": "question", "settings": { "text": "Are there exceptions in the return policy?", "link": "/pages/contact?view=faq" } },
-        "question_3": { "type": "question", "settings": { "text": "Can I return my online purchase in a store?", "link": "/pages/contact?view=faq" } },
-        "question_4": { "type": "question", "settings": { "text": "How can I make an online return request?", "link": "/pages/contact?view=faq" } },
-        "question_5": { "type": "question", "settings": { "text": "How can I send my return if I am registered?", "link": "/pages/contact?view=faq" } },
-        "question_6": { "type": "question", "settings": { "text": "Is the return free?", "link": "/pages/contact?view=faq" } },
-        "question_7": { "type": "question", "settings": { "text": "Can I return an order if I am not a registered user?", "link": "/pages/contact?view=faq" } },
-        "question_8": { "type": "question", "settings": { "text": "How long will it take to receive a refund for my return?", "link": "/pages/contact?view=faq" } }
+        "question_1": { "type": "question", "settings": { "text": "When must I request a return or exchange?", "link": "/pages/contact?view=faq#faq-faq_7" } },
+        "question_2": { "type": "question", "settings": { "text": "What condition must a returned product be in?", "link": "/pages/contact?view=faq#faq-faq_8" } },
+        "question_3": { "type": "question", "settings": { "text": "Can I return an item because I changed my mind?", "link": "/pages/contact?view=faq#faq-faq_9" } },
+        "question_4": { "type": "question", "settings": { "text": "How do I request a return or exchange?", "link": "/pages/contact?view=faq#faq-faq_33" } },
+        "question_5": { "type": "question", "settings": { "text": "Is return pickup free, and can I self-ship an item?", "link": "/pages/contact?view=faq#faq-faq_12" } },
+        "question_6": { "type": "question", "settings": { "text": "What if an item is damaged, defective or incorrect?", "link": "/pages/contact?view=faq#faq-faq_11" } },
+        "question_7": { "type": "question", "settings": { "text": "Can sale or discounted products be returned?", "link": "/pages/contact?view=faq#faq-faq_17" } },
+        "question_8": { "type": "question", "settings": { "text": "When and how will I receive an approved refund?", "link": "/pages/contact?view=faq#faq-faq_14" } }
       },
       "block_order": ["question_1", "question_2", "question_3", "question_4", "question_5", "question_6", "question_7", "question_8"],
       "settings": {
         "heading": "Return your order",
-        "intro": "<p>Eligible return or exchange requests must be raised within 48 hours of delivery and are subject to the conditions and approval set out in our <a href=\"/policies/return-and-refund-policy\">Return &amp; Refund Policy</a>. Enter the email address used for your order and your order number below to begin. Approved returns qualify for free pickup; please do not self-ship an item unless our team instructs you to.</p>",
+        "intro": "<p>Eligible return or exchange requests must be raised within 48 hours of delivery and are subject to the conditions and approval set out in our <a href=\"/policies/refund-policy\">Return &amp; Refund Policy</a>. Enter the email address used for your order and your order number below to begin. Approved returns qualify for free pickup; please do not self-ship an item unless our team instructs you to.</p>",
         "questions_heading": "Suggested Questions",
         "faq_url": "/pages/contact?view=faq",
         "opening_hours": "<p><strong>Client Service Opening Hours:</strong><br/>Monday - Saturday: 10 am - 07 pm<br/>Sunday: Closed</p>"

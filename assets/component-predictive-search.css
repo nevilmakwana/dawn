@@ -223,3 +223,99 @@ predictive-search[loading] .predictive-search__results-groups-wrapper ~ .predict
   object-fit: contain;
   font-family: 'object-fit: contain';
 }
+
+/* Grey Exim predictive search: sharp, monochrome and easy to scan. */
+.predictive-search {
+  border: 1px solid #000000;
+  border-top: 0;
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.1);
+  color: #000000;
+  scrollbar-color: #000000 #f5f5f5;
+  scrollbar-width: thin;
+  z-index: 1000;
+}
+
+.predictive-search::-webkit-scrollbar,
+.predictive-search__results-list::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+.predictive-search::-webkit-scrollbar-track,
+.predictive-search__results-list::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+.predictive-search::-webkit-scrollbar-thumb,
+.predictive-search__results-list::-webkit-scrollbar-thumb {
+  background: #000000;
+}
+
+.predictive-search__results-groups-wrapper {
+  border-bottom-color: #e5e5e5;
+}
+
+.predictive-search__heading {
+  border-bottom: 1px solid #eeeeee;
+  color: #000000;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.predictive-search__item-heading {
+  color: #000000;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+}
+
+.predictive-search__item--link-with-thumbnail {
+  grid-template-columns: 7.2rem minmax(0, 1fr);
+  gap: 1.6rem;
+  min-height: 9.6rem;
+  align-items: center;
+}
+
+.predictive-search__image {
+  width: 7.2rem;
+  height: 8rem;
+  background: #f3f3f3;
+  object-fit: contain;
+}
+
+.predictive-search__list-item[aria-selected='true'] > *,
+.predictive-search__list-item:hover > *,
+.predictive-search__item[aria-selected='true'],
+.predictive-search__item:hover {
+  background: #f5f5f5;
+  color: #000000;
+}
+
+.predictive-search__item--term {
+  min-height: 4.8rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+@media screen and (max-width: 749px) {
+  .predictive-search {
+    max-height: calc(100dvh - var(--header-height, 70px) - 7rem);
+  }
+
+  .predictive-search__results-groups-wrapper {
+    gap: 0;
+  }
+
+  .predictive-search__item {
+    padding-right: 1.4rem;
+    padding-left: 1.4rem;
+  }
+}

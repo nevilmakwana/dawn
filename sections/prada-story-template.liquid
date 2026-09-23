@@ -1,0 +1,642 @@
+{{ 'section-prada-story.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign primary_tag = article.tags.first | default: blog.title | default: 'Editorial'
+  assign hero_image = article.image
+  if section.settings.custom_hero_image != blank
+    assign hero_image = section.settings.custom_hero_image
+  endif
+  assign dummy_hero = 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2000&auto=format&fit=crop'
+  assign dummy_img_1 = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1200&auto=format&fit=crop'
+  assign dummy_img_2 = 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=1200&auto=format&fit=crop'
+  assign dummy_img_3 = 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1800&auto=format&fit=crop'
+-%}
+
+<article class="prada-story-section prada-story-section--{{ section.settings.color_scheme | default: 'editorial_dark' }}" id="PradaStory-{{ section.id }}">
+  <!-- 1. Top Category Hairline Bar -->
+  <header class="prada-story__subbar">
+    <a href="{{ blog.url | default: '/blogs/news' }}" class="prada-story__back-link" aria-label="Back to {{ blog.title | default: 'Journal' }}">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+      <span>{{ section.settings.back_label | default: 'Journal' }}</span>
+    </a>
+
+    <div class="prada-story__category-hairline">
+      <div class="prada-story__hairline-rule" aria-hidden="true"></div>
+      <span class="prada-story__category-pill">
+        {%- if section.settings.custom_category != blank -%}
+          {{ section.settings.custom_category | upcase }}
+        {%- else -%}
+          {{ primary_tag | upcase }}
+        {%- endif -%}
+      </span>
+    </div>
+  </header>
+
+  <!-- 2. Full-Screen Cinematic Hero Image Banner -->
+  {%- if section.settings.show_hero_image -%}
+    <div class="prada-story__hero">
+      {%- if hero_image != blank -%}
+        {{
+          hero_image
+          | image_url: width: 3840
+          | image_tag:
+            loading: 'eager',
+            fetchpriority: 'high',
+            widths: '750, 1100, 1500, 1780, 2000, 3000, 3840',
+            sizes: '100vw',
+            class: 'prada-story__hero-image',
+            alt: hero_image.alt | default: article.title
+        }}
+      {%- else -%}
+        <img src="{{ dummy_hero }}" alt="Editorial Hero" class="prada-story__hero-image" loading="eager" width="2000" height="1100">
+      {%- endif -%}
+      {%- if section.settings.hero_caption != blank -%}
+        <div class="prada-story__hero-caption">{{ section.settings.hero_caption | escape }}</div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <!-- 3. Dynamic Title & Editorial Deck -->
+  <div class="prada-story__deck">
+    <div class="prada-story__meta">
+      <span class="prada-story__category-tag">
+        {%- if section.settings.custom_category != blank -%}
+          {{ section.settings.custom_category | upcase }}
+        {%- else -%}
+          {{ primary_tag | upcase }}
+        {%- endif -%}
+      </span>
+      {%- if section.settings.show_date and article.published_at != blank -%}
+        <span class="prada-story__meta-sep">&bull;</span>
+        <span class="prada-story__date">{{ article.published_at | date: '%B %d, %Y' | upcase }}</span>
+      {%- endif -%}
+      {%- if section.settings.show_read_time -%}
+        {%- assign word_count = article.content | strip_html | split: ' ' | size -%}
+        {%- assign read_time = word_count | divided_by: 200 | at_least: 1 -%}
+        <span class="prada-story__meta-sep">&bull;</span>
+        <span class="prada-story__read-time">{{ read_time }} MIN READ</span>
+      {%- endif -%}
+    </div>
+
+    <h1 class="prada-story__title">{{ article.title | escape }}</h1>
+
+    {%- if article.excerpt != blank and section.settings.show_excerpt -%}
+      <div class="prada-story__excerpt">
+        {{ article.excerpt }}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.show_cta and section.settings.cta_text != blank -%}
+      <a href="{{ section.settings.cta_link | default: blog.url }}" class="prada-story__cta">
+        {{ section.settings.cta_text | escape }}
+      </a>
+    {%- endif -%}
+  </div>
+
+  <!-- 4. Primary Unlimited Narrative Column -->
+  {%- if article.content != blank and section.settings.show_article_content -%}
+    <div class="prada-story__narrative">
+      <div class="prada-story__content rte">
+        {{ article.content }}
+      </div>
+
+      {%- if section.settings.show_share_buttons -%}
+        <div class="prada-story__share prada-story__share--end" aria-label="Share article">
+          <div class="prada-story__share-inner">
+            <span class="prada-story__share-label">SHARE THIS ARTICLE</span>
+            <div class="prada-story__share-links">
+              <a href="https://api.whatsapp.com/send?text={{ article.title | url_encode }}%20{{ shop.url | append: article.url | url_encode }}" target="_blank" rel="noopener" class="prada-story__share-btn" aria-label="Share on WhatsApp">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.196 8.196 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.59c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.78 2.72 4.31 3.81.6.26 1.07.42 1.44.54.61.19 1.16.17 1.6.1.49-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.12-.22-.19-.47-.32"/></svg>
+              </a>
+              <a href="https://pinterest.com/pin/create/button/?url={{ shop.url | append: article.url | url_encode }}&media={{ hero_image | image_url: width: 1200 | url_encode }}&description={{ article.title | url_encode }}" target="_blank" rel="noopener" class="prada-story__share-btn" aria-label="Share on Pinterest">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.24 2.65 7.86 6.39 9.29-.09-.78-.17-1.98.04-2.83.19-.77 1.25-5.3 1.25-5.3s-.32-.64-.32-1.58c0-1.48.86-2.59 1.93-2.59.91 0 1.35.68 1.35 1.5 0 .91-.58 2.28-.88 3.55-.25 1.06.53 1.93 1.58 1.93 1.9 0 3.36-2 3.36-4.89 0-2.56-1.84-4.35-4.47-4.35-3.05 0-4.84 2.29-4.84 4.65 0 .92.35 1.91.8 2.44.09.11.1.2.07.31-.08.33-.26 1.06-.29 1.21-.05.19-.16.23-.37.14-1.39-.65-2.26-2.68-2.26-4.32 0-3.52 2.56-6.75 7.37-6.75 3.87 0 6.88 2.76 6.88 6.45 0 3.85-2.43 6.94-5.8 6.94-1.13 0-2.2-.59-2.56-1.28l-.7 2.66c-.25.98-.93 2.21-1.39 2.96.99.31 2.05.47 3.14.47 5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
+              </a>
+              <a href="https://twitter.com/intent/tweet?text={{ article.title | url_encode }}&url={{ shop.url | append: article.url | url_encode }}" target="_blank" rel="noopener" class="prada-story__share-btn" aria-label="Share on X">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </a>
+              <button type="button" class="prada-story__share-btn prada-story__share-copy" data-copy-url="{{ shop.url | append: article.url }}" aria-label="Copy link">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+              <span class="prada-story__copy-toast" style="display:none;" aria-live="polite">LINK COPIED</span>
+            </div>
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <!-- 5. Repeatable Modular Story Blocks Loop -->
+  {%- for block in section.blocks -%}
+    {%- case block.type -%}
+
+      <!-- SPLIT BLOCK: IMAGE LEFT OR RIGHT + CONTENT -->
+      {%- when 'split_block' -%}
+        <div class="prada-story__split prada-story__split--{{ block.settings.image_position }}" {{ block.shopify_attributes }}>
+          <div class="prada-story__split-media">
+            {%- if block.settings.image != blank -%}
+              {{
+                block.settings.image
+                | image_url: width: 1600
+                | image_tag:
+                  loading: 'lazy',
+                  widths: '600, 900, 1200, 1600',
+                  sizes: '(min-width: 768px) 50vw, 100vw',
+                  class: 'prada-story__split-img',
+                  alt: block.settings.heading | default: 'Editorial Visual'
+              }}
+            {%- else -%}
+              {%- assign fallback_img = dummy_img_1 -%}
+              {%- if block.settings.image_position == 'image-right' -%}
+                {%- assign fallback_img = dummy_img_2 -%}
+              {%- endif -%}
+              <img src="{{ fallback_img }}" alt="{{ block.settings.heading | default: 'Editorial Visual' }}" class="prada-story__split-img" loading="lazy" width="1200" height="1500">
+            {%- endif -%}
+            {%- if block.settings.caption != blank -%}
+              <div class="prada-story__split-caption">{{ block.settings.caption | escape }}</div>
+            {%- endif -%}
+          </div>
+
+          <div class="prada-story__split-content">
+            {%- if block.settings.eyebrow != blank -%}
+              <div class="prada-story__split-eyebrow">{{ block.settings.eyebrow | escape }}</div>
+            {%- endif -%}
+            {%- if block.settings.heading != blank -%}
+              <h2 class="prada-story__split-heading">{{ block.settings.heading | escape }}</h2>
+            {%- endif -%}
+            {%- if block.settings.body != blank -%}
+              <div class="prada-story__split-body rte">{{ block.settings.body }}</div>
+            {%- endif -%}
+            {%- if block.settings.cta_text != blank -%}
+              <a href="{{ block.settings.cta_link | default: '#' }}" class="prada-story__split-cta">
+                {{ block.settings.cta_text | escape }}
+              </a>
+            {%- endif -%}
+          </div>
+        </div>
+
+      <!-- FULL SCREEN PHOTO BANNER -->
+      {%- when 'full_screen_image' -%}
+        <div class="prada-story__full-image" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            {{
+              block.settings.image
+              | image_url: width: 3840
+              | image_tag:
+                loading: 'lazy',
+                widths: '750, 1100, 1500, 2000, 3000, 3840',
+                sizes: '100vw',
+                class: 'prada-story__full-img',
+                alt: block.settings.caption | default: 'Campaign Banner'
+            }}
+          {%- else -%}
+            <img src="{{ dummy_img_3 }}" alt="Campaign Banner" class="prada-story__full-img" loading="lazy" width="1800" height="950">
+          {%- endif -%}
+          {%- if block.settings.caption != blank -%}
+            <div class="prada-story__full-caption">{{ block.settings.caption | escape }}</div>
+          {%- endif -%}
+        </div>
+
+      <!-- NARRATIVE CHAPTER (UNLIMITED TEXT) -->
+      {%- when 'narrative_chapter' -%}
+        <div class="prada-story__narrative" {{ block.shopify_attributes }}>
+          <div class="prada-story__content rte">
+            {%- if block.settings.heading != blank -%}
+              <h2>{{ block.settings.heading | escape }}</h2>
+            {%- endif -%}
+            {{ block.settings.text }}
+          </div>
+        </div>
+
+      <!-- PULL-QUOTE -->
+      {%- when 'pull_quote' -%}
+        <div class="prada-story__pullquote" {{ block.shopify_attributes }}>
+          {%- if block.settings.quote != blank -%}
+            <blockquote class="prada-story__pullquote-text">&ldquo;{{ block.settings.quote | escape }}&rdquo;</blockquote>
+          {%- endif -%}
+          {%- if block.settings.author != blank -%}
+            <cite class="prada-story__pullquote-author">&mdash; {{ block.settings.author | escape }}</cite>
+          {%- endif -%}
+        </div>
+
+      <!-- 2-COLUMN PHOTO DUO -->
+      {%- when 'two_image_grid' -%}
+        <div class="prada-story__duo" {{ block.shopify_attributes }}>
+          <div class="prada-story__duo-item">
+            {%- if block.settings.image_1 != blank -%}
+              {{ block.settings.image_1 | image_url: width: 1400 | image_tag: loading: 'lazy', class: 'prada-story__duo-img', alt: block.settings.caption_1 | default: 'Look 1' }}
+            {%- else -%}
+              <img src="{{ dummy_img_1 }}" alt="Look 1" class="prada-story__duo-img" loading="lazy" width="1200" height="1500">
+            {%- endif -%}
+            {%- if block.settings.caption_1 != blank -%}
+              <div class="prada-story__duo-caption">{{ block.settings.caption_1 | escape }}</div>
+            {%- endif -%}
+          </div>
+          <div class="prada-story__duo-item">
+            {%- if block.settings.image_2 != blank -%}
+              {{ block.settings.image_2 | image_url: width: 1400 | image_tag: loading: 'lazy', class: 'prada-story__duo-img', alt: block.settings.caption_2 | default: 'Look 2' }}
+            {%- else -%}
+              <img src="{{ dummy_img_2 }}" alt="Look 2" class="prada-story__duo-img" loading="lazy" width="1200" height="1500">
+            {%- endif -%}
+            {%- if block.settings.caption_2 != blank -%}
+              <div class="prada-story__duo-caption">{{ block.settings.caption_2 | escape }}</div>
+            {%- endif -%}
+          </div>
+        </div>
+
+      <!-- EDITORIAL CREDITS -->
+      {%- when 'credits' -%}
+        <div class="prada-story__credits" {{ block.shopify_attributes }}>
+          {%- if block.settings.title != blank -%}
+            <div class="prada-story__credits-title">{{ block.settings.title | escape }}</div>
+          {%- endif -%}
+          <div class="prada-story__credits-grid">
+            {%- if block.settings.role_1 != blank -%}
+              <div class="prada-story__credit-role">{{ block.settings.role_1 | escape }}</div>
+              <div class="prada-story__credit-name">{{ block.settings.name_1 | escape }}</div>
+            {%- endif -%}
+            {%- if block.settings.role_2 != blank -%}
+              <div class="prada-story__credit-role">{{ block.settings.role_2 | escape }}</div>
+              <div class="prada-story__credit-name">{{ block.settings.name_2 | escape }}</div>
+            {%- endif -%}
+            {%- if block.settings.role_3 != blank -%}
+              <div class="prada-story__credit-role">{{ block.settings.role_3 | escape }}</div>
+              <div class="prada-story__credit-name">{{ block.settings.name_3 | escape }}</div>
+            {%- endif -%}
+            {%- if block.settings.role_4 != blank -%}
+              <div class="prada-story__credit-role">{{ block.settings.role_4 | escape }}</div>
+              <div class="prada-story__credit-name">{{ block.settings.name_4 | escape }}</div>
+            {%- endif -%}
+          </div>
+        </div>
+
+      <!-- STORY SWITCHER NAVIGATION -->
+      {%- when 'story_navigation' -%}
+        <nav class="prada-story__nav" aria-label="Story Navigation" {{ block.shopify_attributes }}>
+          {%- if blog.previous_article -%}
+            <a href="{{ blog.previous_article.url }}" class="prada-story__nav-item prada-story__nav-item--prev" rel="prev">
+              &#8249; <span>{{ blog.previous_article.title | truncate: 25 }}</span>
+            </a>
+          {%- else -%}
+            <span class="prada-story__nav-item prada-story__nav-item--prev" style="opacity: 0.3;">
+              &#8249; <span>Previous</span>
+            </span>
+          {%- endif -%}
+
+          <a href="{{ blog.url | default: '/blogs/news' }}" class="prada-story__nav-hub">
+            {{ block.settings.hub_label | default: 'Explore All Stories' }}
+          </a>
+
+          {%- if blog.next_article -%}
+            <a href="{{ blog.next_article.url }}" class="prada-story__nav-item prada-story__nav-item--next" rel="next">
+              <span>{{ blog.next_article.title | truncate: 25 }}</span> &#8250;
+            </a>
+          {%- else -%}
+            <span class="prada-story__nav-item prada-story__nav-item--next" style="opacity: 0.3;">
+              <span>Next</span> &#8250;
+            </span>
+          {%- endif -%}
+        </nav>
+
+    {%- endcase -%}
+  {%- endfor -%}
+</article>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const copyBtns = document.querySelectorAll('.prada-story__share-copy');
+    copyBtns.forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const url = btn.getAttribute('data-copy-url') || window.location.href;
+        const toast = btn.parentElement?.querySelector('.prada-story__copy-toast');
+        try {
+          await navigator.clipboard.writeText(url);
+          if (toast) {
+            toast.style.display = 'inline-block';
+            setTimeout(() => {
+              toast.style.display = 'none';
+            }, 2200);
+          }
+        } catch (e) {
+          /* fallback */
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Prada Story Template",
+  "tag": "section",
+  "class": "section-prada-story",
+  "settings": [
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Theme Color Scheme",
+      "options": [
+        { "value": "luxury_light", "label": "Luxury Light (White - Matches Store)" },
+        { "value": "editorial_dark", "label": "Editorial Dark (Black)" }
+      ],
+      "default": "editorial_dark"
+    },
+    {
+      "type": "header",
+      "content": "Header & Sub-Bar"
+    },
+    {
+      "type": "text",
+      "id": "back_label",
+      "label": "Back Link Label",
+      "default": "Journal"
+    },
+    {
+      "type": "text",
+      "id": "custom_category",
+      "label": "Custom Category Label",
+      "info": "Leave blank to dynamically use the article's first tag"
+    },
+    {
+      "type": "header",
+      "content": "Hero & Content Defaults"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_hero_image",
+      "label": "Show Full-Screen Hero Image",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "custom_hero_image",
+      "label": "Hero Image Override",
+      "info": "Leave blank to use the article's featured image"
+    },
+    {
+      "type": "text",
+      "id": "hero_caption",
+      "label": "Hero Image Caption"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "Show Publication Date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_read_time",
+      "label": "Show Estimated Reading Time",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_share_buttons",
+      "label": "Show Social Share Buttons",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt",
+      "label": "Show Italicized Lead Deck (Excerpt)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show Action Link (Discover More)",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Action Link Text",
+      "default": "Discover More"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Action Link URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_article_content",
+      "label": "Show Article Body Text",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "split_block",
+      "name": "Split: Image + Content",
+      "settings": [
+        {
+          "type": "select",
+          "id": "image_position",
+          "label": "Image Position",
+          "options": [
+            { "value": "image-left", "label": "Image on Left (Text on Right)" },
+            { "value": "image-right", "label": "Image on Right (Text on Left)" }
+          ],
+          "default": "image-left"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Image Caption"
+        },
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "Eyebrow / Sub-tag",
+          "default": "CHAPTER 01"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "A Continuous Dialogue"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Content / Paragraphs",
+          "default": "<p>For Prada, the past is never past but an accumulation of ideas bound by intuition and intellectual exchange. This foundation brings impulso to life through curated silhouettes.</p>"
+        },
+        {
+          "type": "text",
+          "id": "cta_text",
+          "label": "CTA Button Text"
+        },
+        {
+          "type": "url",
+          "id": "cta_link",
+          "label": "CTA Button URL"
+        }
+      ]
+    },
+    {
+      "type": "full_screen_image",
+      "name": "Full-Screen Photo Banner",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Full Screen Image"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption"
+        }
+      ]
+    },
+    {
+      "type": "narrative_chapter",
+      "name": "Narrative Text Chapter",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Chapter Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Unlimited Paragraphs",
+          "default": "<p>Write your detailed story here with zero length limitations. Each chapter enjoys centered luxury width and high-contrast styling.</p>"
+        }
+      ]
+    },
+    {
+      "type": "pull_quote",
+      "name": "Prada Pull-Quote",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote Text",
+          "default": "Fashion is not a superficial ornament, but a continuous exploration into identity and human form."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author / Citation",
+          "default": "Grey Exim Atelier"
+        }
+      ]
+    },
+    {
+      "type": "two_image_grid",
+      "name": "2-Column Photo Duo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image_1",
+          "label": "First Image"
+        },
+        {
+          "type": "text",
+          "id": "caption_1",
+          "label": "First Caption"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_2",
+          "label": "Second Image"
+        },
+        {
+          "type": "text",
+          "id": "caption_2",
+          "label": "Second Caption"
+        }
+      ]
+    },
+    {
+      "type": "credits",
+      "name": "Editorial Credits",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Section Title",
+          "default": "Credits"
+        },
+        {
+          "type": "text",
+          "id": "role_1",
+          "label": "Role 1",
+          "default": "Creative Direction"
+        },
+        {
+          "type": "text",
+          "id": "name_1",
+          "label": "Name 1",
+          "default": "Grey Exim Studio"
+        },
+        {
+          "type": "text",
+          "id": "role_2",
+          "label": "Role 2",
+          "default": "Photography"
+        },
+        {
+          "type": "text",
+          "id": "name_2",
+          "label": "Name 2",
+          "default": "Milano Archive"
+        },
+        {
+          "type": "text",
+          "id": "role_3",
+          "label": "Role 3",
+          "default": "Styling"
+        },
+        {
+          "type": "text",
+          "id": "name_3",
+          "label": "Name 3",
+          "default": "High Fashion Editorial Team"
+        },
+        {
+          "type": "text",
+          "id": "role_4",
+          "label": "Role 4",
+          "default": "Location"
+        },
+        {
+          "type": "text",
+          "id": "name_4",
+          "label": "Name 4",
+          "default": "Galleria Vittorio Emanuele II, Milano"
+        }
+      ]
+    },
+    {
+      "type": "story_navigation",
+      "name": "Bottom Story Switcher",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "hub_label",
+          "label": "Hub Button Label",
+          "default": "Explore All Stories"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Prada Story Template"
+    }
+  ]
+}
+{% endschema %}

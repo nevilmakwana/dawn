@@ -543,6 +543,94 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
   display: none;
 }
 
+cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-control {
+  display: flex;
+  align-items: center;
+  margin-top: 0;
+  color: #111111;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+cart-drawer.prada-cart-drawer .prada-cart-drawer__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 18px;
+  width: auto;
+  margin-top: 14px;
+}
+
+cart-drawer.prada-cart-drawer .prada-cart-drawer__actions .prada-cart-drawer__quantity-control {
+  margin-top: 0;
+}
+
+cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-stepper {
+  display: grid;
+  grid-template-columns: 30px 30px 30px;
+  align-items: center;
+  width: 90px;
+  height: 34px;
+  border: 1px solid #111111;
+  border-radius: 0;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-button {
+  width: 30px;
+  min-width: 30px;
+  height: 32px;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: #111111;
+  opacity: 1;
+  transition: none;
+}
+
+cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-button .svg-wrapper {
+  width: 10px;
+  height: 10px;
+}
+
+cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-button.disabled,
+cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-button:disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+  color: #111111;
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-button:not(.disabled):not(:disabled):hover {
+    background: #f5f5f5;
+  }
+}
+
+cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-input {
+  width: 30px;
+  min-width: 0;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #111111;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 32px;
+  opacity: 1;
+  cursor: default;
+}
+
+cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-stepper[aria-busy='true'] {
+  color: #111111;
+  opacity: 1;
+}
+
 .prada-cart-drawer__heading-mobile {
   display: none;
 }
@@ -728,28 +816,45 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
 
   cart-drawer.prada-cart-drawer .prada-cart-drawer__item-info {
     display: block;
-    margin-top: 10px;
+    margin-top: 6px;
   }
 
-  cart-drawer.prada-cart-drawer .prada-cart-drawer__option,
-  cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity,
-  cart-drawer.prada-cart-drawer .prada-cart-drawer__price {
-    margin: 0 0 8px;
+  cart-drawer.prada-cart-drawer .prada-cart-drawer__color,
+  cart-drawer.prada-cart-drawer .prada-cart-drawer__option {
+    margin: 0;
     color: #111111;
     font-size: 13px;
     font-weight: 400;
     line-height: 1.35;
   }
 
-  cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity {
-    margin-top: 10px;
+  cart-drawer.prada-cart-drawer .prada-cart-drawer__color {
+    color: #555555;
+  }
+
+  cart-drawer.prada-cart-drawer .prada-cart-drawer__price-row {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 9px 0 10px;
+    line-height: 1.2;
+  }
+
+  cart-drawer.prada-cart-drawer .prada-cart-drawer__compare-price {
+    color: #747474;
+    font-size: 13px;
+    font-weight: 400;
   }
 
   cart-drawer.prada-cart-drawer .prada-cart-drawer__price {
-    margin-top: 10px;
-    margin-bottom: 42px;
+    color: #111111;
     font-size: 15px;
     font-weight: 500;
+  }
+
+  cart-drawer.prada-cart-drawer .prada-cart-drawer__option {
+    margin-bottom: 2px;
   }
 
   cart-drawer.prada-cart-drawer .cart-item__totals {
@@ -1108,37 +1213,73 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
 
   cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__item-info {
     display: block;
-    margin-top: 5px;
+    margin-top: 4px;
   }
 
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__option,
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__quantity,
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__price {
-    margin: 0 0 6px;
+  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__color,
+  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__option {
+    margin: 0;
     color: #111111;
     font-size: 12px;
     font-weight: 400;
     line-height: 1.35;
   }
 
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__quantity {
-    margin-top: 7px;
+  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__color {
+    color: #555555;
+  }
+
+  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__price-row {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 7px 0 8px;
+    line-height: 1.2;
+  }
+
+  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__compare-price {
+    color: #747474;
+    font-size: 11px;
+    font-weight: 400;
   }
 
   cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__price {
-    margin-top: 4px;
-    margin-bottom: 22px;
-    font-size: 14px;
+    color: #111111;
+    font-size: 13px;
     font-weight: 500;
   }
 
   cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__option {
-    margin-bottom: 2px;
+    margin-bottom: 1px;
   }
 
-  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__quantity {
-    margin-top: 3px;
-    margin-bottom: 2px;
+  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__quantity-control {
+    margin-top: 0;
+  }
+
+  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__actions {
+    gap: 14px;
+    margin-top: 11px;
+  }
+
+  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__quantity-stepper {
+    grid-template-columns: 27px 28px 27px;
+    width: 82px;
+    height: 30px;
+  }
+
+  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__quantity-button {
+    width: 27px;
+    min-width: 27px;
+    height: 28px;
+  }
+
+  cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__quantity-input {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    line-height: 28px;
   }
 
   cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__remove-wrap {

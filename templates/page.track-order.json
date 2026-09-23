@@ -6,22 +6,22 @@
         "question_1": {
           "type": "question",
           "settings": {
-            "text": "How long will it take to receive my order?",
-            "link": "/pages/contact?view=faq"
+            "text": "How long does delivery within India normally take?",
+            "link": "/pages/contact?view=faq#faq-faq_20"
           }
         },
         "question_2": {
           "type": "question",
           "settings": {
-            "text": "Are there any restrictions on deliveries?",
-            "link": "/pages/contact?view=faq"
+            "text": "How are shipping methods and charges decided?",
+            "link": "/pages/contact?view=faq#faq-faq_21"
           }
         },
         "question_3": {
           "type": "question",
           "settings": {
-            "text": "How can I track the shipment of my order?",
-            "link": "/pages/contact?view=faq"
+            "text": "How can I track my shipment?",
+            "link": "/pages/contact?view=faq#faq-faq_22"
           }
         }
       },

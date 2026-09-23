@@ -5,6 +5,53 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="#ffffff">
+    {%- if request.page_type == 'collection' -%}
+      <script>
+        if (
+          window.location.hash.indexOf('#nested-') === 0 ||
+          new URLSearchParams(window.location.search).has('showcase_parent')
+        ) {
+          document.documentElement.classList.add('prada-collection-route-pending');
+          window.setTimeout(function () {
+            document.documentElement.classList.remove('prada-collection-route-pending');
+          }, 4000);
+        }
+      </script>
+    {%- endif -%}
+    {%- liquid
+      assign seo_description = page_description | strip_html | strip
+
+      if seo_description == blank
+        case request.page_type
+          when 'product'
+            if product.description != blank
+              assign seo_description = product.description | strip_html | strip
+            else
+              assign seo_description = product.title | append: ' — ' | append: shop.name
+            endif
+          when 'collection'
+            if collection.description != blank
+              assign seo_description = collection.description | strip_html | strip
+            else
+              assign seo_description = collection.title | append: ' — ' | append: shop.name
+            endif
+          when 'page'
+            if page.content != blank
+              assign seo_description = page.content | strip_html | strip
+            else
+              assign seo_description = page.title | append: ' — ' | append: shop.name
+            endif
+          when 'search'
+            assign seo_description = 'general.search.search' | t | append: ' — ' | append: shop.name
+          when 'index'
+            assign seo_description = shop.description | default: shop.name
+          else
+            assign seo_description = shop.description | default: shop.name
+        endcase
+      endif
+
+      assign seo_description = seo_description | strip_html | strip | truncate: 160
+    -%}
     <link rel="canonical" href="{{ canonical_url }}">
     <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
     <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
@@ -194,13 +241,12 @@
       {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
     </title>
 
-    {% if page_description %}
-      <meta name="description" content="{{ page_description | escape }}">
-    {% elsif request.page_type == 'index' %}
-      <meta name="description" content="Shop Grey Exim scarves, bandanas, accessories, scented candles and lifestyle pieces, designed for contemporary wardrobes and homes.">
-    {% endif %}
+    {%- if seo_description != blank -%}
+      <meta name="description" content="{{ seo_description | escape }}">
+    {%- endif -%}
 
-    {% render 'meta-tags' %}
+    {% render 'meta-tags', seo_description: seo_description %}
+    {% render 'dynamic-seo', seo_description: seo_description %}
 
     <script type="module">
       import * as StandardEvents from 'https://cdn.shopify.com/storefront/standard-events.js';

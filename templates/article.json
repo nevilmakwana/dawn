@@ -1,1 +1,61 @@
-{"sections":{"main":{"type":"grey-exim-editorial-story","settings":{"content_source":"article","eyebrow":"GREY EXIM JOURNAL","show_date":true,"show_cta":false,"desktop_ratio":"four-five","mobile_ratio":"four-five","image_position":"left","content_width":"wide","image_column_width":55,"text_max_width":560,"desktop_alignment":"left","mobile_alignment":"left","background_color":"#101010","heading_color":"#ffffff","body_color":"#f5f5f5","eyebrow_color":"#a8a8a8","cta_color":"#ffffff","enable_fade":true}}},"order":["main"]}
+{
+  "sections": {
+    "main": {
+      "type": "prada-story-template",
+      "blocks": {
+        "split_1": {
+          "type": "split_block",
+          "settings": {
+            "image_position": "image-left",
+            "eyebrow": "CHAPTER 01",
+            "heading": "ARCHIVAL FORM & MOVEMENT",
+            "body": "<p>A dialogue between architectural structure and human movement, reframing luxury through pure silhouette and understated restraint.</p>"
+          }
+        },
+        "split_2": {
+          "type": "split_block",
+          "settings": {
+            "image_position": "image-right",
+            "eyebrow": "CHAPTER 02",
+            "heading": "MATERIALITY & DEPTH",
+            "body": "<p>Combining tactile luxury with modern precision. Every detail is calibrated for longevity and presence.</p>"
+          }
+        },
+        "quote_1": {
+          "type": "pull_quote",
+          "settings": {
+            "quote": "For Prada, the past is never past but an accumulation of ideas bound by intuition and intellectual exchange.",
+            "author": "MIUCCIA PRADA & RAF SIMONS"
+          }
+        },
+        "nav_1": {
+          "type": "story_navigation",
+          "settings": {
+            "hub_label": "EXPLORE ALL STORIES"
+          }
+        }
+      },
+      "block_order": [
+        "split_1",
+        "split_2",
+        "quote_1",
+        "nav_1"
+      ],
+      "settings": {
+        "color_scheme": "editorial_dark",
+        "back_label": "JOURNAL",
+        "show_hero_image": true,
+        "show_date": true,
+        "show_read_time": true,
+        "show_share_buttons": true,
+        "show_excerpt": true,
+        "show_article_content": true,
+        "show_cta": false,
+        "cta_text": "DISCOVER MORE"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

@@ -266,14 +266,20 @@ class FacetFiltersForm extends HTMLElement {
   }
 
   static renderAdditionalElements(html) {
-    const mobileElementSelectors = ['.mobile-facets__open', '.mobile-facets__count', '.sorting'];
+    const mobileElementSelectors = [
+      '.mobile-facets__open',
+      '.mobile-facets__count',
+      '.search-inline-sort__form',
+      '.sorting',
+    ];
 
     mobileElementSelectors.forEach((selector) => {
       if (!html.querySelector(selector)) return;
       document.querySelector(selector).innerHTML = html.querySelector(selector).innerHTML;
     });
 
-    document.getElementById('FacetFiltersFormMobile').closest('menu-drawer').bindEvents();
+    const mobileDrawer = document.getElementById('FacetFiltersFormMobile')?.closest('menu-drawer');
+    if (mobileDrawer) mobileDrawer.bindEvents();
   }
 
   static renderCounts(source, target) {

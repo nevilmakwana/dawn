@@ -6,6 +6,7 @@
   - enable_filtering: {Boolean} Show filtering when true
   - enable_sorting: {Boolean} Show sorting when true
   - filter_type: {String} Type of filter
+  - inline_mobile_sort: {Boolean} Show mobile sorting inline instead of in a drawer
   - paginate: {Object}
 
   Usage:
@@ -444,10 +445,38 @@
     </facet-filters-form>
   {%- endif -%}
   {% comment %}  Drawer and mobile filter {% endcomment %}
-  <menu-drawer
-    class="mobile-facets__wrapper{% if filter_type == 'horizontal' or filter_type == 'vertical' %} medium-hide large-up-hide{% endif %}"
-    data-breakpoint="mobile"
-  >
+  {%- if inline_mobile_sort and enable_sorting -%}
+    <facet-filters-form class="search-inline-sort medium-hide large-up-hide">
+      <form id="FacetFiltersFormMobile" class="search-inline-sort__form">
+        {%- if results.terms -%}
+          <input type="hidden" name="q" value="{{ results.terms | escape }}">
+          <input name="options[prefix]" type="hidden" value="last">
+        {%- endif -%}
+        <label for="SortBy-mobile">{{ 'products.facets.sort_by_label' | t }}</label>
+        <select
+          name="sort_by"
+          class="search-inline-sort__select"
+          id="SortBy-mobile"
+          aria-describedby="a11y-refresh-page-message"
+        >
+          {%- for option in results.sort_options -%}
+            <option
+              value="{{ option.value | escape }}"
+              {% if option.value == sort_by %}
+                selected="selected"
+              {% endif %}
+            >
+              {{ option.name | escape }}
+            </option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  {%- else -%}
+    <menu-drawer
+      class="mobile-facets__wrapper{% if filter_type == 'horizontal' or filter_type == 'vertical' %} medium-hide large-up-hide{% endif %}"
+      data-breakpoint="mobile"
+    >
     <details class="mobile-facets__disclosure disclosure-has-popup">
       <summary class="mobile-facets__open-wrapper focus-offset">
         <span class="mobile-facets__open{% if filter_type == 'drawer' and enable_filtering == false %} medium-hide large-up-hide{% endif %}">
@@ -785,9 +814,11 @@
         </form>
       </facet-filters-form>
     </details>
-  </menu-drawer>
+    </menu-drawer>
+  {%- endif -%}
 
-  <div class="active-facets active-facets-mobile medium-hide large-up-hide">
+  {%- if enable_filtering -%}
+    <div class="active-facets active-facets-mobile medium-hide large-up-hide">
     {%- for filter in results.filters -%}
       {%- for value in filter.active_values -%}
         <facet-remove>
@@ -826,7 +857,8 @@
         <span>{{ 'products.facets.clear_all' | t }}</span>
       </a>
     </facet-remove>
-  </div>
+    </div>
+  {%- endif -%}
   {% comment %} Sort, product count and filter pills at the end when filter is type of Drawer for the correct tabbing order {% endcomment %}
   {%- if enable_sorting and filter_type == 'drawer' -%}
     <facet-filters-form class="facets small-hide">
