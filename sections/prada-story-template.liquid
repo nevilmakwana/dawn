@@ -72,12 +72,6 @@
         <span class="prada-story__meta-sep">&bull;</span>
         <span class="prada-story__date">{{ article.published_at | date: '%B %d, %Y' | upcase }}</span>
       {%- endif -%}
-      {%- if section.settings.show_read_time -%}
-        {%- assign word_count = article.content | strip_html | split: ' ' | size -%}
-        {%- assign read_time = word_count | divided_by: 200 | at_least: 1 -%}
-        <span class="prada-story__meta-sep">&bull;</span>
-        <span class="prada-story__read-time">{{ read_time }} MIN READ</span>
-      {%- endif -%}
     </div>
 
     <h1 class="prada-story__title">{{ article.title | escape }}</h1>
@@ -383,12 +377,6 @@
       "type": "checkbox",
       "id": "show_date",
       "label": "Show Publication Date",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_read_time",
-      "label": "Show Estimated Reading Time",
       "default": true
     },
     {

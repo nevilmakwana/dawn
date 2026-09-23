@@ -145,9 +145,27 @@
   font-size: 8px;
 }
 
-.prada-story__date,
-.prada-story__read-time {
+.prada-story__date {
   color: #8e8e93;
+}
+
+body.template-article .section-header {
+  position: absolute !important;
+}
+
+@media (min-width: 750px) {
+  .prada-story__hero {
+    height: 100vh;
+    height: 100svh;
+    min-height: 520px;
+    margin-bottom: 0;
+  }
+
+  .prada-story__hero-image {
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
+  }
 }
 
 .prada-story__title {
@@ -856,10 +874,30 @@
     padding-left: 22px !important;
   }
 
-  .prada-story__content table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
+  .prada-story__content table,
+  .prada-story-section .rte table {
+    display: table !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    font-size: clamp(10px, 3vw, 13px) !important;
+  }
+
+  .prada-story__content th,
+  .prada-story__content td,
+  .prada-story-section .rte th,
+  .prada-story-section .rte td {
+    width: auto !important;
+    min-width: 0 !important;
+    height: auto !important;
+    padding: 10px 7px !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    hyphens: auto;
+    line-height: 1.4 !important;
   }
 
   .prada-story__split {

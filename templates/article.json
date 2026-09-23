@@ -18,7 +18,6 @@
         "back_label": "JOURNAL",
         "show_hero_image": true,
         "show_date": true,
-        "show_read_time": true,
         "show_share_buttons": true,
         "show_excerpt": true,
         "show_article_content": true,
