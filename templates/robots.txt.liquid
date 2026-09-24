@@ -1,0 +1,13 @@
+{% for group in robots.default_groups %}
+  {{ group.user_agent }}
+  {% for rule in group.rules %}
+    {{ rule }}
+  {% endfor %}
+  Disallow: /collections/*?*filter*
+  Disallow: /collections/*?*sort_by*
+  Disallow: /*?*variant=*
+  Disallow: /pages/kp-account
+  {% if group.sitemap %}
+    {{ group.sitemap }}
+  {% endif %}
+{% endfor %}

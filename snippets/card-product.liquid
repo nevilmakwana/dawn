@@ -144,7 +144,7 @@
                     "
                     src="{{ card_secondary_media | image_url: width: 360 }}"
                     sizes="(max-width: 749px) calc(50vw - 16px), (max-width: 989px) 30vw, 25vw"
-                    alt="{{ card_secondary_media.alt | escape }}"
+                    alt="{{ card_secondary_media.alt | default: card_product.title | append: ' - Alternate Angle' | escape }}"
                     class="motion-reduce"
                     loading="lazy"
                     fetchpriority="low"

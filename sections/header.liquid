@@ -2242,6 +2242,7 @@
     <div class="prada-header-center">
       {%- if request.page_type == 'index' -%}
         <h1 class="header__heading">
+          <span class="visually-hidden">Grey Exim | Premium Printed Scarves, Cotton Bandanas & Scented Candles</span>
       {%- endif -%}
       <a href="{{ routes.root_url }}" class="header__heading-link prada-header-logo link link--text focus-inset">
         {%- if settings.logo != blank -%}
@@ -2615,7 +2616,33 @@
       "logo": {{ settings.logo | image_url: width: 500 | prepend: "https:" | json }},
     {% endif %}
     "sameAs": [
-      {{ settings.social_twitter_link | json }},
+      {%- liquid
+        assign raw_socials = ''
+        if settings.social_instagram_link != blank
+          assign raw_socials = raw_socials | append: settings.social_instagram_link | append: '||'
+        endif
+        if settings.social_facebook_link != blank
+          assign raw_socials = raw_socials | append: settings.social_facebook_link | append: '||'
+        endif
+        if settings.social_pinterest_link != blank
+          assign raw_socials = raw_socials | append: settings.social_pinterest_link | append: '||'
+        endif
+        if settings.social_youtube_link != blank
+          assign raw_socials = raw_socials | append: settings.social_youtube_link | append: '||'
+        endif
+        if settings.social_linkedin_link != blank
+          assign raw_socials = raw_socials | append: settings.social_linkedin_link | append: '||'
+        endif
+        if settings.social_twitter_link != blank
+          assign raw_socials = raw_socials | append: settings.social_twitter_link | append: '||'
+        endif
+        assign social_arr = raw_socials | split: '||'
+      -%}
+      {%- for social in social_arr -%}
+        {{ social | json }}{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ],
+
       {{ settings.social_facebook_link | json }},
       {{ settings.social_pinterest_link | json }},
       {{ settings.social_instagram_link | json }},
