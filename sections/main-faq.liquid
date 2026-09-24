@@ -1,6 +1,3 @@
-{{ 'section-faq.css' | asset_url | stylesheet_tag }}
-{{ 'prada-support-tabs.css' | asset_url | stylesheet_tag }}
-
 {%- assign topic_keys = 'online,account,returns,shipments,payments,privacy' | split: ',' -%}
 
 <section class="prada-faq" data-prada-faq data-prada-support-page data-prada-support-view="faq">
@@ -73,9 +70,6 @@
     </div>
   </div>
 </section>
-
-<script src="{{ 'prada-exclusive-accordion.js' | asset_url }}" defer="defer"></script>
-<script src="{{ 'prada-support-tabs.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
 {

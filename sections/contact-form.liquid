@@ -1,6 +1,3 @@
-{{ 'section-contact-form.css' | asset_url | stylesheet_tag }}
-{{ 'prada-support-tabs.css' | asset_url | stylesheet_tag }}
-
 {%- style -%}
   .section-{{ section.id }}-padding {
     padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
@@ -219,9 +216,6 @@
   </div>
   </div>
 </div>
-
-<script src="{{ 'prada-form-validity.js' | asset_url }}" defer="defer"></script>
-<script src="{{ 'prada-support-tabs.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
 {

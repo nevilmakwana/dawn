@@ -497,6 +497,15 @@
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'greyexim-typography.css' | asset_url | stylesheet_tag }}
     {{ 'prada-product-wishlist.css' | asset_url | stylesheet_tag }}
+    {%- if request.path contains '/pages/contact' -%}
+      {{ 'section-contact-form.css' | asset_url | stylesheet_tag }}
+      {{ 'section-track-order.css' | asset_url | stylesheet_tag }}
+      {{ 'section-faq.css' | asset_url | stylesheet_tag }}
+      {{ 'prada-support-tabs.css' | asset_url | stylesheet_tag }}
+      <script src="{{ 'prada-form-validity.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'prada-exclusive-accordion.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'prada-support-tabs.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
     {%- if request.page_type == 'collection' -%}
       {{ 'prada-collection.css' | asset_url | stylesheet_tag }}
     {%- endif -%}

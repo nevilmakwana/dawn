@@ -68,6 +68,10 @@
     text-decoration: none !important;
   }
 
+  [data-prada-support-page] .prada-support-tabs:not([data-prada-support-tabs-ready='true']) a.is-active {
+    box-shadow: inset 0 -2px #111;
+  }
+
   [data-prada-support-page] .prada-support-tabs__text {
     display: inline-block;
     line-height: inherit;

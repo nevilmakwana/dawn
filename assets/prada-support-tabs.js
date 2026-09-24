@@ -2,7 +2,7 @@
   const SUPPORT_SELECTOR = '[data-prada-support-page]';
   const TABS_SELECTOR = '[data-prada-support-tabs]';
   const SUPPORT_VIEWS = new Set(['contact', 'track-order', 'returns', 'faq']);
-  const state = { request: null, navigationId: 0 };
+  const state = { request: null, navigationId: 0, htmlCache: new Map(), prefetchQueued: false };
   let currentPathSearch = `${window.location.pathname}${window.location.search}`;
   let canvasContext;
 
@@ -87,12 +87,14 @@
 
   const initializeTabs = (scope = document) => {
     scope.querySelectorAll(TABS_SELECTOR).forEach((tabs) => {
+      tabs.querySelectorAll('a').forEach(getTabTextElement);
+
       if (tabs.dataset.pradaSupportTabsReady !== 'true') {
-        tabs.dataset.pradaSupportTabsReady = 'true';
         tabs.addEventListener('scroll', () => updateIndicator(tabs, tabs.querySelector('a.is-active')), { passive: true });
+        updateIndicator(tabs, tabs.querySelector('a.is-active'));
+        tabs.dataset.pradaSupportTabsReady = 'true';
       }
 
-      tabs.querySelectorAll('a').forEach(getTabTextElement);
       queueIndicatorUpdate(tabs);
       document.fonts?.ready?.then(() => queueIndicatorUpdate(tabs));
     });
@@ -292,16 +294,48 @@
     return true;
   };
 
-  const loadSupportHtml = (url, signal) => (
-    fetch(url.href, {
+  const supportCacheKey = (url) => `${url.pathname}${url.search}`;
+
+  const loadSupportHtml = (url, signal) => {
+    const cacheKey = supportCacheKey(url);
+    const cachedRequest = state.htmlCache.get(cacheKey);
+    if (cachedRequest) return cachedRequest;
+
+    const request = fetch(url.href, {
       credentials: 'same-origin',
       headers: { Accept: 'text/html' },
       signal,
     }).then((response) => {
       if (!response.ok) throw new Error(`Unable to load ${url.href}`);
       return response.text();
-    })
-  );
+    }).catch((error) => {
+      if (state.htmlCache.get(cacheKey) === request) state.htmlCache.delete(cacheKey);
+      throw error;
+    });
+
+    state.htmlCache.set(cacheKey, request);
+    return request;
+  };
+
+  const prefetchSupportViews = () => {
+    if (state.prefetchQueued) return;
+    state.prefetchQueued = true;
+
+    const prefetch = () => {
+      const currentKey = `${window.location.pathname}${window.location.search}`;
+      const urls = Array.from(document.querySelectorAll(`${TABS_SELECTOR} a`))
+        .map((link) => new URL(link.href, window.location.origin))
+        .filter((url) => getViewFromUrl(url.href) && supportCacheKey(url) !== currentKey);
+
+      Array.from(new Map(urls.map((url) => [supportCacheKey(url), url])).values())
+        .forEach((url, index) => {
+          window.setTimeout(() => loadSupportHtml(url).catch(() => {}), index * 120);
+        });
+    };
+
+    if ('requestIdleCallback' in window) window.requestIdleCallback(prefetch, { timeout: 1200 });
+    else window.setTimeout(prefetch, 500);
+  };
 
   document.addEventListener('click', (event) => {
     const link = event.target.closest?.(`${SUPPORT_SELECTOR} a`);
@@ -324,6 +358,8 @@
       setActiveTab(currentRoot, view);
       return;
     }
+
+    setActiveTab(currentRoot, view);
 
     if (state.request) state.request.abort();
 
@@ -373,5 +409,6 @@
 
   initializeTabs();
   initializeFaq();
+  prefetchSupportViews();
   document.addEventListener('shopify:section:load', (event) => initializeSupportPage(event.target));
 })();
