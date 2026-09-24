@@ -93,6 +93,12 @@
   margin-bottom: 36px;
 }
 
+.prada-story__hero-picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .prada-story__hero-image {
   width: 100%;
   height: auto;

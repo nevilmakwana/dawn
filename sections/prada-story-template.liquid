@@ -3,6 +3,7 @@
 {%- liquid
   assign primary_tag = article.tags.first | default: blog.title | default: 'Editorial'
   assign hero_image = article.image
+  assign mobile_hero_image = article.metafields.custom.mobile_blog_image.value
   if section.settings.custom_hero_image != blank
     assign hero_image = section.settings.custom_hero_image
   endif
@@ -39,17 +40,31 @@
   {%- if section.settings.show_hero_image -%}
     <div class="prada-story__hero">
       {%- if hero_image != blank -%}
-        {{
-          hero_image
-          | image_url: width: 3840
-          | image_tag:
-            loading: 'eager',
-            fetchpriority: 'high',
-            widths: '750, 1100, 1500, 1780, 2000, 3000, 3840',
-            sizes: '100vw',
-            class: 'prada-story__hero-image',
-            alt: hero_image.alt | default: article.title
-        }}
+        <picture class="prada-story__hero-picture">
+          {%- if mobile_hero_image != blank -%}
+            <source
+              media="(max-width: 749px)"
+              srcset="
+                {{ mobile_hero_image | image_url: width: 375 }} 375w,
+                {{ mobile_hero_image | image_url: width: 550 }} 550w,
+                {{ mobile_hero_image | image_url: width: 750 }} 750w,
+                {{ mobile_hero_image | image_url: width: 1100 }} 1100w
+              "
+              sizes="100vw"
+            >
+          {%- endif -%}
+          {{
+            hero_image
+            | image_url: width: 3840
+            | image_tag:
+              loading: 'eager',
+              fetchpriority: 'high',
+              widths: '750, 1100, 1500, 1780, 2000, 3000, 3840',
+              sizes: '100vw',
+              class: 'prada-story__hero-image',
+              alt: hero_image.alt | default: article.title
+          }}
+        </picture>
       {%- else -%}
         <img src="{{ dummy_hero }}" alt="Editorial Hero" class="prada-story__hero-image" loading="eager" width="2000" height="1100">
       {%- endif -%}

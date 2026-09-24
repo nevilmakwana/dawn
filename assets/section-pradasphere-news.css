@@ -64,6 +64,12 @@
 
 .pradasphere-news__media:hover::after { background: rgba(0, 0, 0, .4); }
 
+.pradasphere-news__picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .pradasphere-news__media img,
 .pradasphere-news__placeholder {
   display: block;

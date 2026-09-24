@@ -14,8 +14,8 @@
   if use_article
     if article.image != blank
       assign story_image = article.image
-      assign mobile_image = article.image
     endif
+    assign mobile_image = article.metafields.custom.mobile_blog_image.value
     assign story_heading = article.title
     assign story_intro = blank
     if article.excerpt != blank

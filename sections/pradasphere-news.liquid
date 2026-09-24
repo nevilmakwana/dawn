@@ -16,15 +16,30 @@
     <div class="pradasphere-news__track" data-pradasphere-track tabindex="0" aria-label="{{ section.settings.heading | escape }}">
       {%- if selected_blog != blank and selected_blog.articles_count > 0 -%}
         {%- for article in selected_blog.articles limit: article_limit -%}
+          {%- assign mobile_article_image = article.metafields.custom.mobile_blog_image.value -%}
           <article class="pradasphere-news__slide{% if forloop.first %} is-active{% endif %}" data-pradasphere-slide>
             <a class="pradasphere-news__media" href="{{ article.url }}" aria-label="{{ article.title | escape }}">
               {%- if article.image -%}
-                {{ article.image | image_url: width: 1800 | image_tag:
-                  loading: 'lazy',
-                  widths: '480, 720, 960, 1200, 1500, 1800',
-                  sizes: '(min-width: 990px) 50vw, 68vw',
-                  alt: article.image.alt | default: article.title
-                }}
+                <picture class="pradasphere-news__picture">
+                  {%- if mobile_article_image != blank -%}
+                    <source
+                      media="(max-width: 767px)"
+                      srcset="
+                        {{ mobile_article_image | image_url: width: 375 }} 375w,
+                        {{ mobile_article_image | image_url: width: 550 }} 550w,
+                        {{ mobile_article_image | image_url: width: 750 }} 750w,
+                        {{ mobile_article_image | image_url: width: 900 }} 900w
+                      "
+                      sizes="75vw"
+                    >
+                  {%- endif -%}
+                  {{ article.image | image_url: width: 1800 | image_tag:
+                    loading: 'lazy',
+                    widths: '480, 720, 960, 1200, 1500, 1800',
+                    sizes: '(min-width: 990px) 50vw, 68vw',
+                    alt: article.image.alt | default: article.title
+                  }}
+                </picture>
               {%- else -%}
                 {{ 'lifestyle-1' | placeholder_svg_tag: 'pradasphere-news__placeholder' }}
               {%- endif -%}
