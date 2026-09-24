@@ -2,6 +2,7 @@
   const SUPPORT_SELECTOR = '[data-prada-support-page]';
   const TABS_SELECTOR = '[data-prada-support-tabs]';
   const SUPPORT_VIEWS = new Set(['contact', 'track-order', 'returns', 'faq']);
+  const INDICATOR_TRANSITION_MS = 390;
   const state = { request: null, navigationId: 0, htmlCache: new Map(), prefetchQueued: false };
   let currentPathSearch = `${window.location.pathname}${window.location.search}`;
   let canvasContext;
@@ -337,6 +338,14 @@
     else window.setTimeout(prefetch, 500);
   };
 
+  const waitForIndicatorTransition = (startedAt) => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return Promise.resolve();
+
+    const remaining = INDICATOR_TRANSITION_MS - (performance.now() - startedAt);
+    if (remaining <= 0) return Promise.resolve();
+    return new Promise((resolve) => window.setTimeout(resolve, remaining));
+  };
+
   document.addEventListener('click', (event) => {
     const link = event.target.closest?.(`${SUPPORT_SELECTOR} a`);
     if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
@@ -359,6 +368,7 @@
       return;
     }
 
+    const indicatorStartedAt = performance.now();
     setActiveTab(currentRoot, view);
 
     if (state.request) state.request.abort();
@@ -381,6 +391,8 @@
           window.location.href = targetUrl.href;
           return;
         }
+        await waitForIndicatorTransition(indicatorStartedAt);
+        if (state.request !== controller || state.navigationId !== navigationId) return;
         if (!replaceSupportPage(sourceDocument, targetUrl)) window.location.href = targetUrl.href;
       })
       .catch((error) => {
