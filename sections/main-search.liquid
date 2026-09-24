@@ -1,32 +1,5 @@
-<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
-
 {{ 'prada-collection.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'main-search.js' | asset_url }}" defer="defer"></script>
-
-<style>
-  .template-search__header {
-    margin-bottom: 3rem;
-  }
-
-  .template-search__search {
-    margin: 0 auto 3.5rem;
-    max-width: 74.1rem;
-  }
-
-  .template-search__search .search {
-    margin-top: 3rem;
-  }
-
-  @media screen and (min-width: 750px) {
-    .template-search__header {
-      margin-bottom: 5rem;
-    }
-  }
-
-  .search__button .icon {
-    height: 1.8rem;
-  }
-</style>
 
 {%- liquid
   assign sort_by = search.sort_by | default: search.default_sort_by
@@ -199,21 +172,29 @@
     {%- endif -%}
     {%- if search.performed and search.results_count > 0 -%}
       <div>
-        <aside
-          aria-label="{{ 'products.facets.sort_by_label' | t }}"
-          class="facets-wrapper facets-wrapper--no-filters page-width"
-          id="main-search-filters"
-          data-id="{{ section.id }}"
-        >
-          {% render 'facets',
-            results: search,
-            enable_filtering: false,
-            enable_sorting: true,
-            filter_type: 'horizontal',
-            inline_mobile_sort: true,
-            paginate: paginate
-          %}
-        </aside>
+        <div class="prada-collection__toolbar" id="main-search-filters">
+          <p class="prada-collection__count" role="status">{{ search.results_count }} results</p>
+
+          <form class="prada-collection__controls" action="{{ routes.search_url }}" method="get">
+            <input type="hidden" name="q" value="{{ search.terms | escape }}">
+            <input type="hidden" name="options[prefix]" value="last">
+            <label class="prada-collection__sort" for="SearchSortBy-{{ section.id }}">
+              <span>Sort by:</span>
+              <select
+                id="SearchSortBy-{{ section.id }}"
+                name="sort_by"
+                aria-label="Sort search results"
+                onchange="this.form.submit()"
+              >
+                {%- for option in search.sort_options -%}
+                  <option value="{{ option.value | escape }}"{% if option.value == sort_by %} selected="selected"{% endif %}>
+                    {{- option.name | escape -}}
+                  </option>
+                {%- endfor -%}
+              </select>
+            </label>
+          </form>
+        </div>
         <div class="product-grid-container" id="ProductGridContainer">
           {%- if search.results.size == 0 and search.filters != empty -%}
             <div
@@ -241,12 +222,14 @@
             >
               <div class="loading-overlay gradient"></div>
               <ul class="prada-collection__grid prada-search-results__grid" role="list">
+                {%- assign search_product_index = 0 -%}
                 {%- for item in search.results -%}
                   {%- case item.object_type -%}
                     {%- when 'product' -%}
+                      {%- assign search_product_index = search_product_index | plus: 1 -%}
                       {% render 'prada-nested-collection-product-card',
                         product: item,
-                        card_index: forloop.index
+                        card_index: search_product_index
                       %}
                     {%- when 'article' -%}
                       <li class="prada-collection__item prada-search-result-card">
@@ -328,16 +311,7 @@
       });
     };
 
-    const searchGridContainer = document.getElementById('ProductGridContainer');
     setupSearchCarousels(document);
-
-    if (searchGridContainer && !searchGridContainer.dataset.pradaCarouselObserverReady) {
-      searchGridContainer.dataset.pradaCarouselObserverReady = 'true';
-      new MutationObserver(() => {
-        setupSearchCarousels(searchGridContainer);
-        window.PradaWishlist?.sync?.();
-      }).observe(searchGridContainer, { childList: true, subtree: true });
-    }
   })();
 </script>
 

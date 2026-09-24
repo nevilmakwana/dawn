@@ -15,10 +15,11 @@
 <article class="prada-story-section prada-story-section--{{ section.settings.color_scheme | default: 'editorial_dark' }}" id="PradaStory-{{ section.id }}">
   <!-- 1. Top Category Hairline Bar -->
   <header class="prada-story__subbar">
-    <a href="{{ blog.url | default: '/blogs/news' }}" class="prada-story__back-link" aria-label="Back to {{ blog.title | default: 'Journal' }}">
+    <a href="{{ blog.url | default: '/blogs/news' }}" class="prada-story__back-link">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M15 18l-6-6 6-6"/>
       </svg>
+      <span class="visually-hidden">Back to </span>
       <span>{{ section.settings.back_label | default: 'Journal' }}</span>
     </a>
 
@@ -299,7 +300,39 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const copyBtns = document.querySelectorAll('.prada-story__share-copy');
+    const story = document.getElementById('PradaStory-{{ section.id }}');
+    if (!story) return;
+
+    const articleTitle = {{ article.title | json }};
+    const content = story.querySelector('.prada-story__content');
+
+    content?.querySelectorAll('img:not([alt]), img[alt=""]').forEach((image) => {
+      const caption = image.closest('figure')?.querySelector('figcaption')?.textContent?.trim();
+      image.alt = caption || articleTitle;
+    });
+
+    content?.querySelectorAll('table').forEach((table, tableIndex) => {
+      if (!table.rows.length || table.querySelector('th')) return;
+
+      Array.from(table.rows[0].cells).forEach((cell, cellIndex) => {
+        const header = document.createElement('th');
+        Array.from(cell.attributes).forEach((attribute) => header.setAttribute(attribute.name, attribute.value));
+        header.innerHTML = cell.innerHTML;
+        header.scope = 'col';
+        header.id = `PradaStoryTable-{{ section.id }}-${tableIndex}-Header-${cellIndex}`;
+        cell.replaceWith(header);
+      });
+
+      Array.from(table.rows).slice(1).forEach((row) => {
+        Array.from(row.cells).forEach((cell, cellIndex) => {
+          if (cell.tagName === 'TD' && !cell.hasAttribute('headers')) {
+            cell.setAttribute('headers', `PradaStoryTable-{{ section.id }}-${tableIndex}-Header-${cellIndex}`);
+          }
+        });
+      });
+    });
+
+    const copyBtns = story.querySelectorAll('.prada-story__share-copy');
     copyBtns.forEach((btn) => {
       btn.addEventListener('click', async () => {
         const url = btn.getAttribute('data-copy-url') || window.location.href;

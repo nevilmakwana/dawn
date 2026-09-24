@@ -1,0 +1,6944 @@
+{
+  "generatedAt": "2026-09-23T10:43:38.894Z",
+  "browser": "Google Chrome headless via CDP",
+  "methodology": "Cold-ish sequential navigation in an isolated browser profile; 3.5 second settling window; mobile Safari user agent with Chrome device emulation for narrow widths. Not equivalent to physical iOS Safari.",
+  "cases": [
+    {
+      "name": "home-320",
+      "requestedUrl": "https://www.greyexim.com/",
+      "width": 320,
+      "height": 740,
+      "page": {
+        "title": "Grey Exim",
+        "href": "https://www.greyexim.com/",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 320,
+          "innerHeight": 740,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 320,
+          "htmlScrollWidth": 320,
+          "bodyClientWidth": 320,
+          "bodyScrollWidth": 320,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          ""
+        ],
+        "images": {
+          "total": 30,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "16px",
+            "label": "Search"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 56,
+            "height": 56
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "",
+            "width": 120,
+            "height": 22
+          },
+          {
+            "tag": "A",
+            "label": "Contact us",
+            "width": 16,
+            "height": 32
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Show best sellers page 1",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Show best sellers page 2",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Show best sellers page 3",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Show best sellers page 4",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "A",
+            "label": "Discover",
+            "width": 72,
+            "height": 23
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 18,
+            "height": 18
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1243,
+          "scripts": 82,
+          "stylesheets": 52,
+          "resources": 148,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 2225514,
+          "encodedBytes": 2204039,
+          "decodedBytes": 5407597
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 761,
+          "height": 429
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__header",
+          "position": "sticky",
+          "top": 761,
+          "height": 54
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": 0,
+          "height": 57
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": 68,
+          "height": 684
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 2040,
+          "height": 600
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.53",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.229",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": [
+          {
+            "url": "https://www.greyexim.com/sf_private_access_tokens",
+            "status": 401,
+            "type": "Fetch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "collection-320",
+      "requestedUrl": "https://www.greyexim.com/collections/women-scarves",
+      "width": 320,
+      "height": 740,
+      "page": {
+        "title": "women Scarves – Grey Exim",
+        "href": "https://www.greyexim.com/collections/women-scarves",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 320,
+          "innerHeight": 740,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 320,
+          "htmlScrollWidth": 320,
+          "bodyClientWidth": 320,
+          "bodyScrollWidth": 320,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          "Scarves"
+        ],
+        "images": {
+          "total": 50,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "16px",
+            "label": "Search"
+          },
+          {
+            "tag": "SELECT",
+            "type": "select-one",
+            "id": null,
+            "name": "sort_by",
+            "fontSize": "12px",
+            "label": "Sort by:\n              \n                Most relevant\n                Best selling\n                Price, low to high\n                Price, high to low"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 57,
+            "height": 57
+          },
+          {
+            "tag": "H1",
+            "id": "",
+            "className": "prada-collection__title",
+            "position": "sticky",
+            "top": 57,
+            "bottom": 108,
+            "height": 51
+          },
+          {
+            "tag": "NAV",
+            "id": "",
+            "className": "prada-collection__tabs",
+            "position": "sticky",
+            "top": 108,
+            "bottom": 155,
+            "height": 47
+          },
+          {
+            "tag": "DIV",
+            "id": "",
+            "className": "prada-collection__toolbar",
+            "position": "sticky",
+            "top": 155,
+            "bottom": 203,
+            "height": 48
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "",
+            "width": 120,
+            "height": 23
+          },
+          {
+            "tag": "A",
+            "label": "Contact us",
+            "width": 16,
+            "height": 32
+          },
+          {
+            "tag": "SELECT",
+            "label": "Sort products",
+            "width": 141,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Black",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Blue",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Brown",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 18,
+            "height": 18
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1517,
+          "scripts": 82,
+          "stylesheets": 33,
+          "resources": 215,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 623719,
+          "encodedBytes": 1844162,
+          "decodedBytes": 7027839
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 761,
+          "height": 429
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__header",
+          "position": "sticky",
+          "top": 761,
+          "height": 54
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": -108,
+          "height": 57
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": -39,
+          "height": 683
+        },
+        {
+          "tag": "H1",
+          "id": "",
+          "className": "prada-collection__title",
+          "position": "sticky",
+          "top": -51,
+          "height": 51
+        },
+        {
+          "tag": "NAV",
+          "id": "",
+          "className": "prada-collection__tabs",
+          "position": "sticky",
+          "top": 0,
+          "height": 47
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "prada-collection__toolbar",
+          "position": "sticky",
+          "top": 46,
+          "height": 48
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 2271,
+          "height": 600
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.324",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.493",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": [
+          {
+            "url": "https://www.greyexim.com/sf_private_access_tokens",
+            "status": 401,
+            "type": "Fetch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "product-320",
+      "requestedUrl": "https://www.greyexim.com/products/merry-forest-french-vanilla-candle",
+      "width": 320,
+      "height": 740,
+      "page": {
+        "title": "Merry Forest French Vanilla Candle – Grey Exim",
+        "href": "https://www.greyexim.com/products/merry-forest-french-vanilla-candle",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 320,
+          "innerHeight": 740,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 320,
+          "htmlScrollWidth": 320,
+          "bodyClientWidth": 320,
+          "bodyScrollWidth": 320,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          "Merry Forest French Vanilla Candle"
+        ],
+        "images": {
+          "total": 22,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "16px",
+            "label": "Search"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 57,
+            "height": 57
+          },
+          {
+            "tag": "BUTTON",
+            "id": "",
+            "className": "prada-product__sheet-handle",
+            "position": "sticky",
+            "top": 457,
+            "bottom": 499,
+            "height": 42
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "",
+            "width": 120,
+            "height": 23
+          },
+          {
+            "tag": "A",
+            "label": "Contact us",
+            "width": 16,
+            "height": 32
+          },
+          {
+            "tag": "A",
+            "label": "View image 1",
+            "width": 12,
+            "height": 12
+          },
+          {
+            "tag": "A",
+            "label": "View image 2",
+            "width": 12,
+            "height": 12
+          },
+          {
+            "tag": "A",
+            "label": "View image 3",
+            "width": 12,
+            "height": 12
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Product details",
+            "width": 93,
+            "height": 20
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Shipping and returns",
+            "width": 128,
+            "height": 20
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "View recommended products page 1",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "BUTTON",
+            "label": "View recommended products page 2",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "BUTTON",
+            "label": "View recommended products page 3",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "BUTTON",
+            "label": "View recommended products page 4",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "A",
+            "label": "Grey Exim",
+            "width": 65,
+            "height": 20
+          },
+          {
+            "tag": "A",
+            "label": "Scented Candles",
+            "width": 107,
+            "height": 20
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 18,
+            "height": 18
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1390,
+          "scripts": 82,
+          "stylesheets": 37,
+          "resources": 253,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 485820,
+          "encodedBytes": 1811983,
+          "decodedBytes": 5830656
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 761,
+          "height": 429
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__header",
+          "position": "sticky",
+          "top": 761,
+          "height": 54
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": 0,
+          "height": 57
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": 69,
+          "height": 683
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "className": "prada-product__sheet-handle",
+          "position": "sticky",
+          "top": -202,
+          "height": 42
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "prada-product__drawer-shell",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "HEADER",
+          "id": "",
+          "className": "prada-product__drawer-header",
+          "position": "sticky",
+          "top": 0,
+          "height": 72
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 390,
+          "height": 677
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.646",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.793",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": [
+          {
+            "url": "https://www.greyexim.com/sf_private_access_tokens",
+            "status": 401,
+            "type": "Fetch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "search-320",
+      "requestedUrl": "https://www.greyexim.com/search?q=scarf",
+      "width": 320,
+      "height": 740,
+      "page": {
+        "title": "Search: 50 results found for \"scarf\" – Grey Exim",
+        "href": "https://www.greyexim.com/search?q=scarf",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 320,
+          "innerHeight": 740,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 320,
+          "htmlScrollWidth": 320,
+          "bodyClientWidth": 320,
+          "bodyScrollWidth": 320,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          "Search results"
+        ],
+        "images": {
+          "total": 49,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "16px",
+            "label": "Search"
+          },
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Template",
+            "name": "q",
+            "fontSize": "14px",
+            "label": "Search"
+          },
+          {
+            "tag": "SELECT",
+            "type": "select-one",
+            "id": "SortBy-mobile",
+            "name": "sort_by",
+            "fontSize": "12px",
+            "label": "Sort by:"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 57,
+            "height": 57
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "",
+            "width": 120,
+            "height": 23
+          },
+          {
+            "tag": "A",
+            "label": "Contact us",
+            "width": 16,
+            "height": 32
+          },
+          {
+            "tag": "SELECT",
+            "label": "Relevance Price, low to high Price, high to low",
+            "width": 141,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Black",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Blue",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Brown",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 18,
+            "height": 18
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1616,
+          "scripts": 78,
+          "stylesheets": 44,
+          "resources": 289,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 387722,
+          "encodedBytes": 2320670,
+          "decodedBytes": 6934162
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 761,
+          "height": 429
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__header",
+          "position": "sticky",
+          "top": 761,
+          "height": 54
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": 0,
+          "height": 57
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": 69,
+          "height": 683
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 2744,
+          "height": 600
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.1005",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.1272",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": [
+          {
+            "url": "https://www.greyexim.com/sf_private_access_tokens?q=scarf",
+            "status": 401,
+            "type": "Fetch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "article-320",
+      "requestedUrl": "https://www.greyexim.com/blogs/news/gsm-in-fabric-complete-guide-to-fabric-weight-quality-usage",
+      "width": 320,
+      "height": 740,
+      "page": {
+        "title": "GSM in Fabric: Complete Guide to Fabric Weight, Quality & Usage – Grey Exim",
+        "href": "https://www.greyexim.com/blogs/news/gsm-in-fabric-complete-guide-to-fabric-weight-quality-usage",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 320,
+          "innerHeight": 740,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 320,
+          "htmlScrollWidth": 320,
+          "bodyClientWidth": 320,
+          "bodyScrollWidth": 320,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          "GSM in Fabric: Complete Guide to Fabric Weight, Quality & Usage"
+        ],
+        "images": {
+          "total": 6,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 1
+        },
+        "tables": [
+          {
+            "width": 284,
+            "left": 18,
+            "right": 302,
+            "viewportOverflow": false,
+            "parentClientWidth": 284,
+            "parentScrollWidth": 284,
+            "rows": 5
+          }
+        ],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "16px",
+            "label": "Search"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "",
+            "width": 120,
+            "height": 23
+          },
+          {
+            "tag": "A",
+            "label": "Contact us",
+            "width": 16,
+            "height": 32
+          },
+          {
+            "tag": "A",
+            "label": "Back to Fashion Trends",
+            "width": 88,
+            "height": 20
+          },
+          {
+            "tag": "A",
+            "label": "Explore our collection",
+            "width": 134,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "contact us",
+            "width": 64,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 18,
+            "height": 18
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1550,
+          "scripts": 78,
+          "stylesheets": 32,
+          "resources": 242,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 90313,
+          "encodedBytes": 1763734,
+          "decodedBytes": 5697666
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 761,
+          "height": 429
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__header",
+          "position": "sticky",
+          "top": 761,
+          "height": 54
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": -1131,
+          "height": 683
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 6123,
+          "height": 600
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.1469",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.1598",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.1600",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.1608",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": [
+          {
+            "url": "https://www.greyexim.com/sf_private_access_tokens",
+            "status": 401,
+            "type": "Fetch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "contact-320",
+      "requestedUrl": "https://www.greyexim.com/pages/contact",
+      "width": 320,
+      "height": 740,
+      "page": {
+        "title": "Contact – Grey Exim",
+        "href": "https://www.greyexim.com/pages/contact",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 320,
+          "innerHeight": 740,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 320,
+          "htmlScrollWidth": 320,
+          "bodyClientWidth": 320,
+          "bodyScrollWidth": 320,
+          "horizontalOverflow": false
+        },
+        "headings": [],
+        "images": {
+          "total": 2,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "16px",
+            "label": "Search"
+          },
+          {
+            "tag": "SELECT",
+            "type": "select-one",
+            "id": "ContactForm-reason",
+            "name": "contact[Reason for contact]",
+            "fontSize": "14px",
+            "label": "Reason for contact"
+          },
+          {
+            "tag": "SELECT",
+            "type": "select-one",
+            "id": "ContactForm-details",
+            "name": "contact[Details]",
+            "fontSize": "14px",
+            "label": "Details"
+          },
+          {
+            "tag": "SELECT",
+            "type": "select-one",
+            "id": "ContactForm-title",
+            "name": "contact[Title]",
+            "fontSize": "14px",
+            "label": "Title"
+          },
+          {
+            "tag": "INPUT",
+            "type": "text",
+            "id": "ContactForm-last-name",
+            "name": "contact[Last name]",
+            "fontSize": "14px",
+            "label": "Last name*"
+          },
+          {
+            "tag": "INPUT",
+            "type": "text",
+            "id": "ContactForm-name",
+            "name": "contact[First name]",
+            "fontSize": "14px",
+            "label": "First name*"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": "ContactForm-email",
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email\n            *"
+          },
+          {
+            "tag": "INPUT",
+            "type": "tel",
+            "id": "ContactForm-phone",
+            "name": "contact[Phone number]",
+            "fontSize": "14px",
+            "label": "Phone number"
+          },
+          {
+            "tag": "SELECT",
+            "type": "select-one",
+            "id": "ContactForm-location",
+            "name": "contact[Location]",
+            "fontSize": "14px",
+            "label": "Location"
+          },
+          {
+            "tag": "SELECT",
+            "type": "select-one",
+            "id": "ContactForm-state",
+            "name": "contact[State or Province]",
+            "fontSize": "14px",
+            "label": "State or Province"
+          },
+          {
+            "tag": "SELECT",
+            "type": "select-one",
+            "id": "ContactForm-language",
+            "name": "contact[Language]",
+            "fontSize": "14px",
+            "label": "Language"
+          },
+          {
+            "tag": "INPUT",
+            "type": "text",
+            "id": "ContactForm-subject",
+            "name": "contact[Subject]",
+            "fontSize": "14px",
+            "label": "Subject*"
+          },
+          {
+            "tag": "INPUT",
+            "type": "text",
+            "id": "ContactForm-order-number",
+            "name": "contact[Order number]",
+            "fontSize": "14px",
+            "label": "Order number"
+          },
+          {
+            "tag": "TEXTAREA",
+            "type": "textarea",
+            "id": "ContactForm-body",
+            "name": "contact[Comment]",
+            "fontSize": "14px",
+            "label": "Additional info*"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 57,
+            "height": 57
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "",
+            "width": 120,
+            "height": 23
+          },
+          {
+            "tag": "A",
+            "label": "Contact us",
+            "width": 16,
+            "height": 32
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 18,
+            "height": 18
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1127,
+          "scripts": 79,
+          "stylesheets": 34,
+          "resources": 237,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 18349,
+          "encodedBytes": 1692970,
+          "decodedBytes": 5628549
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 761,
+          "height": 429
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__header",
+          "position": "sticky",
+          "top": 761,
+          "height": 54
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": 0,
+          "height": 57
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": 69,
+          "height": 683
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 207,
+          "height": 677
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.1776",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.1903",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": [
+          {
+            "url": "https://www.greyexim.com/sf_private_access_tokens",
+            "status": 401,
+            "type": "Fetch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "faq-320",
+      "requestedUrl": "https://www.greyexim.com/pages/contact?view=faq",
+      "width": 320,
+      "height": 740,
+      "page": {
+        "title": "Contact – Grey Exim",
+        "href": "https://www.greyexim.com/pages/contact?view=faq",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 320,
+          "innerHeight": 740,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 320,
+          "htmlScrollWidth": 320,
+          "bodyClientWidth": 320,
+          "bodyScrollWidth": 320,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          "Suggested Questions"
+        ],
+        "images": {
+          "total": 2,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "16px",
+            "label": "Search"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 57,
+            "height": 57
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "",
+            "width": 120,
+            "height": 23
+          },
+          {
+            "tag": "A",
+            "label": "Contact us",
+            "width": 16,
+            "height": 32
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 18,
+            "height": 18
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1333,
+          "scripts": 79,
+          "stylesheets": 33,
+          "resources": 238,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 13858,
+          "encodedBytes": 1692887,
+          "decodedBytes": 5626698
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 761,
+          "height": 429
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__header",
+          "position": "sticky",
+          "top": 761,
+          "height": 54
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": 0,
+          "height": 57
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": 69,
+          "height": 683
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 63,
+          "height": 677
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.2076",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.2201",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": [
+          {
+            "url": "https://www.greyexim.com/sf_private_access_tokens?view=faq",
+            "status": 401,
+            "type": "Fetch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "returns-320",
+      "requestedUrl": "https://www.greyexim.com/pages/contact?view=returns",
+      "width": 320,
+      "height": 740,
+      "page": {
+        "title": "Contact – Grey Exim",
+        "href": "https://www.greyexim.com/pages/contact?view=returns",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 320,
+          "innerHeight": 740,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 320,
+          "htmlScrollWidth": 320,
+          "bodyClientWidth": 320,
+          "bodyScrollWidth": 320,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          "Return your order"
+        ],
+        "images": {
+          "total": 2,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "16px",
+            "label": "Search"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "16px",
+            "label": "E-mail*"
+          },
+          {
+            "tag": "INPUT",
+            "type": "text",
+            "id": null,
+            "name": "contact[Order number]",
+            "fontSize": "16px",
+            "label": "Order number*"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 57,
+            "height": 57
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "",
+            "width": 120,
+            "height": 23
+          },
+          {
+            "tag": "A",
+            "label": "Contact us",
+            "width": 16,
+            "height": 32
+          },
+          {
+            "tag": "A",
+            "label": "Return & Refund Policy",
+            "width": 132,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Log in",
+            "width": 35,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "View all FAQs",
+            "width": 85,
+            "height": 20
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 18,
+            "height": 18
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1075,
+          "scripts": 79,
+          "stylesheets": 33,
+          "resources": 239,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 12821,
+          "encodedBytes": 1692203,
+          "decodedBytes": 5624400
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 761,
+          "height": 429
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__header",
+          "position": "sticky",
+          "top": 761,
+          "height": 54
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": 0,
+          "height": 57
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": 69,
+          "height": 683
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 88,
+          "height": 677
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.2376",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.2503",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": [
+          {
+            "url": "https://www.greyexim.com/sf_private_access_tokens?view=returns",
+            "status": 401,
+            "type": "Fetch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "track-320",
+      "requestedUrl": "https://www.greyexim.com/pages/contact?view=track-order",
+      "width": 320,
+      "height": 740,
+      "page": {
+        "title": "Contact – Grey Exim",
+        "href": "https://www.greyexim.com/pages/contact?view=track-order",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 320,
+          "innerHeight": 740,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 320,
+          "htmlScrollWidth": 320,
+          "bodyClientWidth": 320,
+          "bodyScrollWidth": 320,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          "Check your order status"
+        ],
+        "images": {
+          "total": 2,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "16px",
+            "label": "Search"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "16px",
+            "label": "E-mail*"
+          },
+          {
+            "tag": "INPUT",
+            "type": "text",
+            "id": null,
+            "name": "contact[Order number]",
+            "fontSize": "16px",
+            "label": "Order number*"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 57,
+            "height": 57
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "",
+            "width": 120,
+            "height": 23
+          },
+          {
+            "tag": "A",
+            "label": "Contact us",
+            "width": 16,
+            "height": 32
+          },
+          {
+            "tag": "A",
+            "label": "Log in",
+            "width": 35,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "View all FAQs",
+            "width": 85,
+            "height": 20
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 18,
+            "height": 18
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1069,
+          "scripts": 79,
+          "stylesheets": 33,
+          "resources": 236,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 10897,
+          "encodedBytes": 1692224,
+          "decodedBytes": 5624400
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 740
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 761,
+          "height": 429
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__header",
+          "position": "sticky",
+          "top": 761,
+          "height": 54
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": 0,
+          "height": 57
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": 69,
+          "height": 683
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 63,
+          "height": 677
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.2670",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.2769",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": [
+          {
+            "url": "https://www.greyexim.com/sf_private_access_tokens?view=track-order",
+            "status": 401,
+            "type": "Fetch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "home-390",
+      "requestedUrl": "https://www.greyexim.com/",
+      "width": 390,
+      "height": 844,
+      "page": {
+        "title": "Grey Exim",
+        "href": "https://www.greyexim.com/",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 390,
+          "innerHeight": 844,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 390,
+          "htmlScrollWidth": 390,
+          "bodyClientWidth": 390,
+          "bodyScrollWidth": 390,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          ""
+        ],
+        "images": {
+          "total": 30,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "16px",
+            "label": "Search"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 56,
+            "height": 56
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "",
+            "width": 120,
+            "height": 22
+          },
+          {
+            "tag": "A",
+            "label": "Contact us",
+            "width": 20,
+            "height": 32
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "A",
+            "label": "Bear French Vanilla Candle",
+            "width": 146,
+            "height": 14
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Show best sellers page 1",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Show best sellers page 2",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Show best sellers page 3",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Show best sellers page 4",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "A",
+            "label": "Discover",
+            "width": 72,
+            "height": 23
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 18,
+            "height": 18
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1348,
+          "scripts": 82,
+          "stylesheets": 52,
+          "resources": 252,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 871527,
+          "encodedBytes": 2669102,
+          "decodedBytes": 6627352
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 844
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 844
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 865,
+          "height": 429
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__header",
+          "position": "sticky",
+          "top": 865,
+          "height": 54
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": 0,
+          "height": 57
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": 68,
+          "height": 788
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 2489,
+          "height": 600
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.2992",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.3154",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": [
+          {
+            "url": "https://www.greyexim.com/sf_private_access_tokens",
+            "status": 401,
+            "type": "Fetch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "collection-390",
+      "requestedUrl": "https://www.greyexim.com/collections/women-scarves",
+      "width": 390,
+      "height": 844,
+      "page": {
+        "title": "women Scarves – Grey Exim",
+        "href": "https://www.greyexim.com/collections/women-scarves",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 390,
+          "innerHeight": 844,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 390,
+          "htmlScrollWidth": 390,
+          "bodyClientWidth": 390,
+          "bodyScrollWidth": 390,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          "Scarves"
+        ],
+        "images": {
+          "total": 50,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "16px",
+            "label": "Search"
+          },
+          {
+            "tag": "SELECT",
+            "type": "select-one",
+            "id": null,
+            "name": "sort_by",
+            "fontSize": "12px",
+            "label": "Sort by:\n              \n                Most relevant\n                Best selling\n                Price, low to high\n                Price, high to low"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 57,
+            "height": 57
+          },
+          {
+            "tag": "H1",
+            "id": "",
+            "className": "prada-collection__title",
+            "position": "sticky",
+            "top": 57,
+            "bottom": 108,
+            "height": 51
+          },
+          {
+            "tag": "NAV",
+            "id": "",
+            "className": "prada-collection__tabs",
+            "position": "sticky",
+            "top": 108,
+            "bottom": 155,
+            "height": 47
+          },
+          {
+            "tag": "DIV",
+            "id": "",
+            "className": "prada-collection__toolbar",
+            "position": "sticky",
+            "top": 155,
+            "bottom": 203,
+            "height": 48
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "",
+            "width": 120,
+            "height": 23
+          },
+          {
+            "tag": "A",
+            "label": "Contact us",
+            "width": 20,
+            "height": 32
+          },
+          {
+            "tag": "SELECT",
+            "label": "Sort products",
+            "width": 141,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Black",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Blue",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Brown",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 18,
+            "height": 18
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1580,
+          "scripts": 82,
+          "stylesheets": 33,
+          "resources": 270,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 191354,
+          "encodedBytes": 2155181,
+          "decodedBytes": 7878490
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 844
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 844
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 865,
+          "height": 429
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__header",
+          "position": "sticky",
+          "top": 865,
+          "height": 54
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": -108,
+          "height": 57
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": -39,
+          "height": 787
+        },
+        {
+          "tag": "H1",
+          "id": "",
+          "className": "prada-collection__title",
+          "position": "sticky",
+          "top": -51,
+          "height": 51
+        },
+        {
+          "tag": "NAV",
+          "id": "",
+          "className": "prada-collection__tabs",
+          "position": "sticky",
+          "top": 0,
+          "height": 47
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "prada-collection__toolbar",
+          "position": "sticky",
+          "top": 46,
+          "height": 48
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 2640,
+          "height": 600
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.3343",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.3493",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": [
+          {
+            "url": "https://www.greyexim.com/sf_private_access_tokens",
+            "status": 401,
+            "type": "Fetch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "product-390",
+      "requestedUrl": "https://www.greyexim.com/products/merry-forest-french-vanilla-candle",
+      "width": 390,
+      "height": 844,
+      "page": {
+        "title": "Merry Forest French Vanilla Candle – Grey Exim",
+        "href": "https://www.greyexim.com/products/merry-forest-french-vanilla-candle",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 390,
+          "innerHeight": 844,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 390,
+          "htmlScrollWidth": 390,
+          "bodyClientWidth": 390,
+          "bodyScrollWidth": 390,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          "Merry Forest French Vanilla Candle"
+        ],
+        "images": {
+          "total": 22,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "16px",
+            "label": "Search"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 57,
+            "height": 57
+          },
+          {
+            "tag": "BUTTON",
+            "id": "",
+            "className": "prada-product__sheet-handle",
+            "position": "sticky",
+            "top": 545,
+            "bottom": 587,
+            "height": 42
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "",
+            "width": 120,
+            "height": 23
+          },
+          {
+            "tag": "A",
+            "label": "Contact us",
+            "width": 20,
+            "height": 32
+          },
+          {
+            "tag": "A",
+            "label": "View image 1",
+            "width": 12,
+            "height": 12
+          },
+          {
+            "tag": "A",
+            "label": "View image 2",
+            "width": 12,
+            "height": 12
+          },
+          {
+            "tag": "A",
+            "label": "View image 3",
+            "width": 12,
+            "height": 12
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Product details",
+            "width": 93,
+            "height": 20
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Shipping and returns",
+            "width": 128,
+            "height": 20
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "A",
+            "label": "Sculpted French Vanilla Candle",
+            "width": 168,
+            "height": 14
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 1 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Load image 2 in gallery view",
+            "width": 6,
+            "height": 6
+          },
+          {
+            "tag": "BUTTON",
+            "label": "View recommended products page 1",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "BUTTON",
+            "label": "View recommended products page 2",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "BUTTON",
+            "label": "View recommended products page 3",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "BUTTON",
+            "label": "View recommended products page 4",
+            "width": 22,
+            "height": 28
+          },
+          {
+            "tag": "A",
+            "label": "Grey Exim",
+            "width": 65,
+            "height": 20
+          },
+          {
+            "tag": "A",
+            "label": "Scented Candles",
+            "width": 107,
+            "height": 20
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 18,
+            "height": 18
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1390,
+          "scripts": 82,
+          "stylesheets": 37,
+          "resources": 252,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 64634,
+          "encodedBytes": 1830799,
+          "decodedBytes": 5842051
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 844
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 844
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 865,
+          "height": 429
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__header",
+          "position": "sticky",
+          "top": 865,
+          "height": 54
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": 0,
+          "height": 57
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": 69,
+          "height": 787
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "className": "prada-product__sheet-handle",
+          "position": "sticky",
+          "top": -114,
+          "height": 42
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "prada-product__drawer-shell",
+          "position": "fixed",
+          "top": 0,
+          "height": 844
+        },
+        {
+          "tag": "HEADER",
+          "id": "",
+          "className": "prada-product__drawer-header",
+          "position": "sticky",
+          "top": 0,
+          "height": 72
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 522,
+          "height": 661
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.3707",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.3818",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": [
+          {
+            "url": "https://www.greyexim.com/sf_private_access_tokens",
+            "status": 401,
+            "type": "Fetch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "search-390",
+      "requestedUrl": "https://www.greyexim.com/search?q=scarf",
+      "width": 390,
+      "height": 844,
+      "page": {
+        "title": "Search: 50 results found for \"scarf\" – Grey Exim",
+        "href": "https://www.greyexim.com/search?q=scarf",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 390,
+          "innerHeight": 844,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 390,
+          "htmlScrollWidth": 390,
+          "bodyClientWidth": 390,
+          "bodyScrollWidth": 390,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          "Search results"
+        ],
+        "images": {
+          "total": 49,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "16px",
+            "label": "Search"
+          },
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Template",
+            "name": "q",
+            "fontSize": "14px",
+            "label": "Search"
+          },
+          {
+            "tag": "SELECT",
+            "type": "select-one",
+            "id": "SortBy-mobile",
+            "name": "sort_by",
+            "fontSize": "12px",
+            "label": "Sort by:"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 57,
+            "height": 57
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "",
+            "width": 120,
+            "height": 23
+          },
+          {
+            "tag": "A",
+            "label": "Contact us",
+            "width": 20,
+            "height": 32
+          },
+          {
+            "tag": "SELECT",
+            "label": "Relevance Price, low to high Price, high to low",
+            "width": 141,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Floral Printed Square Scarf",
+            "width": 145,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Black",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Blue",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Brown",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "Floral Printed Square Scarf",
+            "width": 145,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Floral Printed Square Scarf",
+            "width": 145,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 18,
+            "height": 18
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1616,
+          "scripts": 78,
+          "stylesheets": 44,
+          "resources": 288,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 131208,
+          "encodedBytes": 2320672,
+          "decodedBytes": 6934162
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 844
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 844
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 865,
+          "height": 429
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__header",
+          "position": "sticky",
+          "top": 865,
+          "height": 54
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": 0,
+          "height": 57
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": 69,
+          "height": 787
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 3173,
+          "height": 600
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.4030",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.4249",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": [
+          {
+            "url": "https://www.greyexim.com/sf_private_access_tokens?q=scarf",
+            "status": 401,
+            "type": "Fetch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "article-390",
+      "requestedUrl": "https://www.greyexim.com/blogs/news/gsm-in-fabric-complete-guide-to-fabric-weight-quality-usage",
+      "width": 390,
+      "height": 844,
+      "page": {
+        "title": "GSM in Fabric: Complete Guide to Fabric Weight, Quality & Usage – Grey Exim",
+        "href": "https://www.greyexim.com/blogs/news/gsm-in-fabric-complete-guide-to-fabric-weight-quality-usage",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 390,
+          "innerHeight": 844,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 390,
+          "htmlScrollWidth": 390,
+          "bodyClientWidth": 390,
+          "bodyScrollWidth": 390,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          "GSM in Fabric: Complete Guide to Fabric Weight, Quality & Usage"
+        ],
+        "images": {
+          "total": 6,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 1
+        },
+        "tables": [
+          {
+            "width": 354,
+            "left": 18,
+            "right": 372,
+            "viewportOverflow": false,
+            "parentClientWidth": 354,
+            "parentScrollWidth": 354,
+            "rows": 5
+          }
+        ],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "16px",
+            "label": "Search"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "",
+            "width": 120,
+            "height": 23
+          },
+          {
+            "tag": "A",
+            "label": "Contact us",
+            "width": 20,
+            "height": 32
+          },
+          {
+            "tag": "A",
+            "label": "Back to Fashion Trends",
+            "width": 88,
+            "height": 20
+          },
+          {
+            "tag": "A",
+            "label": "Explore our collection",
+            "width": 134,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "contact us",
+            "width": 64,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 18,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 18,
+            "height": 18
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1550,
+          "scripts": 78,
+          "stylesheets": 32,
+          "resources": 241,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 10980,
+          "encodedBytes": 1763734,
+          "decodedBytes": 5697666
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 844
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 844
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 865,
+          "height": 429
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__header",
+          "position": "sticky",
+          "top": 865,
+          "height": 54
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": -1131,
+          "height": 787
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 5855,
+          "height": 600
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.4469",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.4572",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.4575",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.4581",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": [
+          {
+            "url": "https://www.greyexim.com/sf_private_access_tokens",
+            "status": 401,
+            "type": "Fetch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "home-1440",
+      "requestedUrl": "https://www.greyexim.com/",
+      "width": 1440,
+      "height": 900,
+      "page": {
+        "title": "Grey Exim",
+        "href": "https://www.greyexim.com/",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 1440,
+          "innerHeight": 900,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 1425,
+          "htmlScrollWidth": 1425,
+          "bodyClientWidth": 1425,
+          "bodyScrollWidth": 1425,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          ""
+        ],
+        "images": {
+          "total": 30,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "14px",
+            "label": "Search"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 72,
+            "height": 72
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Man Bandanas",
+            "width": 92,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Best Sellers",
+            "width": 74,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Custom Design",
+            "width": 95,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Abstract Botanical Printed Square Scarf",
+            "width": 250,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Abstract Horse Printed Square Bandana",
+            "width": 252,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "African Heritage Printed Square Bandana",
+            "width": 259,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Angel Wings French Vanilla Candle",
+            "width": 220,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Architectural Sketch Printed Square Scarf",
+            "width": 261,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Bear French Vanilla Candle",
+            "width": 170,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Black & White Border Pattern Printed Square Scarf",
+            "width": 316,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Black & White Chevron Stripe Printed Square Scarf",
+            "width": 318,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Discover",
+            "width": 72,
+            "height": 23
+          },
+          {
+            "tag": "A",
+            "label": "GSM in Fabric: Complete Guide to Fabric Weight, Quality & Usage",
+            "width": 471,
+            "height": 17
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "SUMMARY",
+            "label": "Contact us",
+            "width": 243,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "care@greyexim.com",
+            "width": 111,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "FAQ",
+            "width": 24,
+            "height": 16
+          },
+          {
+            "tag": "SUMMARY",
+            "label": "Services",
+            "width": 279,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Track your order",
+            "width": 85,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Returns",
+            "width": 42,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Shipping and delivery",
+            "width": 114,
+            "height": 16
+          },
+          {
+            "tag": "SUMMARY",
+            "label": "LEGAL & POLICIES",
+            "width": 279,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Terms & Conditions",
+            "width": 104,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Cookie Policy",
+            "width": 73,
+            "height": 16
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Cookie Settings",
+            "width": 84,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Payment Policy",
+            "width": 83,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Return & Refund Policy",
+            "width": 123,
+            "height": 16
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1347,
+          "scripts": 81,
+          "stylesheets": 52,
+          "resources": 263,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 2878900,
+          "encodedBytes": 4694566,
+          "decodedBytes": 8652677
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": 0,
+          "height": 72
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": 16,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 3476,
+          "height": 600
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.4963",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": []
+      }
+    },
+    {
+      "name": "collection-1440",
+      "requestedUrl": "https://www.greyexim.com/collections/women-scarves",
+      "width": 1440,
+      "height": 900,
+      "page": {
+        "title": "women Scarves – Grey Exim",
+        "href": "https://www.greyexim.com/collections/women-scarves",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 1440,
+          "innerHeight": 900,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 1425,
+          "htmlScrollWidth": 1425,
+          "bodyClientWidth": 1425,
+          "bodyScrollWidth": 1425,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          "Scarves"
+        ],
+        "images": {
+          "total": 50,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "14px",
+            "label": "Search"
+          },
+          {
+            "tag": "SELECT",
+            "type": "select-one",
+            "id": null,
+            "name": "sort_by",
+            "fontSize": "14px",
+            "label": "Sort by:\n              \n                Most relevant\n                Best selling\n                Price, low to high\n                Price, high to low"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 72,
+            "height": 72
+          },
+          {
+            "tag": "HEADER",
+            "id": "",
+            "className": "prada-collection__header",
+            "position": "sticky",
+            "top": 72,
+            "bottom": 178,
+            "height": 106
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Man scarves",
+            "width": 78,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scented Candles",
+            "width": 105,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "women Scarves",
+            "width": 99,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Best Sellers",
+            "width": 74,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Custom Design",
+            "width": 95,
+            "height": 16
+          },
+          {
+            "tag": "SELECT",
+            "label": "Sort products",
+            "width": 162,
+            "height": 17
+          },
+          {
+            "tag": "A",
+            "label": "Olive and Light Green Printed Square Scarf",
+            "width": 269,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Mustard Yellow Black White Printed Square Scarf",
+            "width": 306,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Blue & Gold Marble Printed Square Scarf",
+            "width": 255,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Peacock Feather Printed Square Scarf",
+            "width": 239,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Purple Floral Printed Square Scarf",
+            "width": 213,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Black & White Border Pattern Printed Square Scarf",
+            "width": 316,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Black & White Chevron Stripe Printed Square Scarf",
+            "width": 318,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Blue and White Striped Printed Square Scarf",
+            "width": 277,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Multicolor Abstract Printed Square Scarf",
+            "width": 252,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Multicolor Striped Printed Square Scarf",
+            "width": 245,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Navy Blue & White Striped Printed Square Scarf",
+            "width": 298,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Polka Dot Pattern Printed Square Scarf",
+            "width": 243,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Black",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Blue",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Brown",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "Teal Blue Polka Dot Pattern printed Square Scarf",
+            "width": 303,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "SUMMARY",
+            "label": "Contact us",
+            "width": 243,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "care@greyexim.com",
+            "width": 111,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "FAQ",
+            "width": 24,
+            "height": 16
+          },
+          {
+            "tag": "SUMMARY",
+            "label": "Services",
+            "width": 279,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Track your order",
+            "width": 85,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Returns",
+            "width": 42,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Shipping and delivery",
+            "width": 114,
+            "height": 16
+          },
+          {
+            "tag": "SUMMARY",
+            "label": "LEGAL & POLICIES",
+            "width": 279,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Terms & Conditions",
+            "width": 104,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Cookie Policy",
+            "width": 73,
+            "height": 16
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Cookie Settings",
+            "width": 84,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Payment Policy",
+            "width": 83,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Return & Refund Policy",
+            "width": 123,
+            "height": 16
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1579,
+          "scripts": 81,
+          "stylesheets": 33,
+          "resources": 286,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 191064,
+          "encodedBytes": 2430790,
+          "decodedBytes": 8151954
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": -72,
+          "height": 72
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": -56,
+          "height": 900
+        },
+        {
+          "tag": "HEADER",
+          "id": "",
+          "className": "prada-collection__header",
+          "position": "sticky",
+          "top": 0,
+          "height": 106
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 2253,
+          "height": 600
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.5358",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": []
+      }
+    },
+    {
+      "name": "product-1440",
+      "requestedUrl": "https://www.greyexim.com/products/merry-forest-french-vanilla-candle",
+      "width": 1440,
+      "height": 900,
+      "page": {
+        "title": "Merry Forest French Vanilla Candle – Grey Exim",
+        "href": "https://www.greyexim.com/products/merry-forest-french-vanilla-candle",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 1440,
+          "innerHeight": 900,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 1425,
+          "htmlScrollWidth": 1425,
+          "bodyClientWidth": 1425,
+          "bodyScrollWidth": 1425,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          "Merry Forest French Vanilla Candle"
+        ],
+        "images": {
+          "total": 6,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "14px",
+            "label": "Search"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 72,
+            "height": 72
+          },
+          {
+            "tag": "BUTTON",
+            "id": "",
+            "className": "prada-product__wishlist",
+            "position": "sticky",
+            "top": 96,
+            "bottom": 128,
+            "height": 32
+          },
+          {
+            "tag": "NAV",
+            "id": "",
+            "className": "prada-product__dots",
+            "position": "fixed",
+            "top": 824,
+            "bottom": 876,
+            "height": 52
+          },
+          {
+            "tag": "DIV",
+            "id": "",
+            "className": "prada-product__info",
+            "position": "sticky",
+            "top": 88,
+            "bottom": 613,
+            "height": 525
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Man scarves",
+            "width": 78,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scented Candles",
+            "width": 105,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Custom Design",
+            "width": 95,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "New Arrivals",
+            "width": 78,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Best Sellers",
+            "width": 74,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Custom Design",
+            "width": 95,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "View image 1",
+            "width": 12,
+            "height": 12
+          },
+          {
+            "tag": "A",
+            "label": "View image 2",
+            "width": 12,
+            "height": 12
+          },
+          {
+            "tag": "A",
+            "label": "View image 3",
+            "width": 12,
+            "height": 12
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "SUMMARY",
+            "label": "Contact us",
+            "width": 243,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "care@greyexim.com",
+            "width": 111,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "FAQ",
+            "width": 24,
+            "height": 16
+          },
+          {
+            "tag": "SUMMARY",
+            "label": "Services",
+            "width": 279,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Track your order",
+            "width": 85,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Returns",
+            "width": 42,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Shipping and delivery",
+            "width": 114,
+            "height": 16
+          },
+          {
+            "tag": "SUMMARY",
+            "label": "LEGAL & POLICIES",
+            "width": 279,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Terms & Conditions",
+            "width": 104,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Cookie Policy",
+            "width": 73,
+            "height": 16
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Cookie Settings",
+            "width": 84,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Payment Policy",
+            "width": 83,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Return & Refund Policy",
+            "width": 123,
+            "height": 16
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1201,
+          "scripts": 81,
+          "stylesheets": 37,
+          "resources": 242,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 88165,
+          "encodedBytes": 1775075,
+          "decodedBytes": 5734195
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": -72,
+          "height": 72
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": -56,
+          "height": 900
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "className": "prada-product__wishlist",
+          "position": "sticky",
+          "top": 96,
+          "height": 32
+        },
+        {
+          "tag": "NAV",
+          "id": "",
+          "className": "prada-product__dots",
+          "position": "fixed",
+          "top": 824,
+          "height": 52
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "prada-product__info",
+          "position": "sticky",
+          "top": 88,
+          "height": 525
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "prada-product__drawer-shell",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "HEADER",
+          "id": "",
+          "className": "prada-product__drawer-header",
+          "position": "sticky",
+          "top": 0,
+          "height": 96
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 1580,
+          "height": 300
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.5683",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": []
+      }
+    },
+    {
+      "name": "search-1440",
+      "requestedUrl": "https://www.greyexim.com/search?q=scarf",
+      "width": 1440,
+      "height": 900,
+      "page": {
+        "title": "Search: 50 results found for \"scarf\" – Grey Exim",
+        "href": "https://www.greyexim.com/search?q=scarf",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 1440,
+          "innerHeight": 900,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 1425,
+          "htmlScrollWidth": 1425,
+          "bodyClientWidth": 1425,
+          "bodyScrollWidth": 1425,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          "Search results"
+        ],
+        "images": {
+          "total": 49,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 0
+        },
+        "tables": [],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "14px",
+            "label": "Search"
+          },
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Template",
+            "name": "q",
+            "fontSize": "14px",
+            "label": "Search"
+          },
+          {
+            "tag": "SELECT",
+            "type": "select-one",
+            "id": "SortBy",
+            "name": "sort_by",
+            "fontSize": "14px",
+            "label": "Sort by:"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [
+          {
+            "tag": "DIV",
+            "id": "shopify-section-sections--21841923801246__header",
+            "className": "shopify-section shopify-section-group-header-group section-header",
+            "position": "fixed",
+            "top": 0,
+            "bottom": 72,
+            "height": 72
+          }
+        ],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Man Bandanas",
+            "width": 92,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Man Cotton Bandanas",
+            "width": 137,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "women bandana's",
+            "width": 113,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "women Scarves",
+            "width": 99,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "New Arrivals",
+            "width": 78,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Best Sellers",
+            "width": 74,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Custom Design",
+            "width": 95,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Floral Printed Square Scarf",
+            "width": 169,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Geometric Pattern Printed Square Scarf",
+            "width": 249,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Purple Floral Printed Square Scarf",
+            "width": 213,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Multicolor Abstract Printed Square Scarf",
+            "width": 252,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Floral Botanical Printed Square Scarf",
+            "width": 232,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Polka Dot Pattern Printed Square Scarf",
+            "width": 243,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Black",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Blue",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "View Polka Dot Pattern Printed Square Scarf in Brown",
+            "width": 13,
+            "height": 13
+          },
+          {
+            "tag": "A",
+            "label": "Floral Printed Square Scarf",
+            "width": 169,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Multi-Color Geometric Printed Square Scarf",
+            "width": 273,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Minimal Abstract Printed Square Scarf",
+            "width": 239,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Black & White Border Pattern Printed Square Scarf",
+            "width": 316,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Multicolor Striped Printed Square Scarf",
+            "width": 245,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Olive Green Geometric Printed Square Scarf",
+            "width": 278,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Floral Printed Square Scarf",
+            "width": 169,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Olive and Light Green Printed Square Scarf",
+            "width": 269,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Black & White Chevron Stripe Printed Square Scarf",
+            "width": 318,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Black & White Polka Dot Printed Square Scarf",
+            "width": 285,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Teal Blue Polka Dot Pattern printed Square Scarf",
+            "width": 303,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "Mustard Yellow Black White Printed Square Scarf",
+            "width": 306,
+            "height": 15
+          },
+          {
+            "tag": "A",
+            "label": "GSM in Fabric: Complete Guide to Fabric Weight,...",
+            "width": 323,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "SUMMARY",
+            "label": "Contact us",
+            "width": 243,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "care@greyexim.com",
+            "width": 111,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "FAQ",
+            "width": 24,
+            "height": 16
+          },
+          {
+            "tag": "SUMMARY",
+            "label": "Services",
+            "width": 279,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Track your order",
+            "width": 85,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Returns",
+            "width": 42,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Shipping and delivery",
+            "width": 114,
+            "height": 16
+          },
+          {
+            "tag": "SUMMARY",
+            "label": "LEGAL & POLICIES",
+            "width": 279,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Terms & Conditions",
+            "width": 104,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Cookie Policy",
+            "width": 73,
+            "height": 16
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Cookie Settings",
+            "width": 84,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Payment Policy",
+            "width": 83,
+            "height": 16
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1615,
+          "scripts": 77,
+          "stylesheets": 44,
+          "resources": 295,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 130905,
+          "encodedBytes": 2430632,
+          "decodedBytes": 7041990
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "shopify-section-sections--21841923801246__header",
+          "className": "shopify-section shopify-section-group-header-group section-header scrolled-past-header shopify-section-header-hidden sho",
+          "position": "fixed",
+          "top": 0,
+          "height": 72
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": 16,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 2557,
+          "height": 600
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.6098",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": []
+      }
+    },
+    {
+      "name": "article-1440",
+      "requestedUrl": "https://www.greyexim.com/blogs/news/gsm-in-fabric-complete-guide-to-fabric-weight-quality-usage",
+      "width": 1440,
+      "height": 900,
+      "page": {
+        "title": "GSM in Fabric: Complete Guide to Fabric Weight, Quality & Usage – Grey Exim",
+        "href": "https://www.greyexim.com/blogs/news/gsm-in-fabric-complete-guide-to-fabric-weight-quality-usage",
+        "readyState": "complete",
+        "viewport": {
+          "innerWidth": 1440,
+          "innerHeight": 900,
+          "devicePixelRatio": 1
+        },
+        "dimensions": {
+          "htmlClientWidth": 1425,
+          "htmlScrollWidth": 1425,
+          "bodyClientWidth": 1425,
+          "bodyScrollWidth": 1425,
+          "horizontalOverflow": false
+        },
+        "headings": [
+          "GSM in Fabric: Complete Guide to Fabric Weight, Quality & Usage"
+        ],
+        "images": {
+          "total": 6,
+          "broken": 0,
+          "brokenSources": [],
+          "missingAlt": 1
+        },
+        "tables": [
+          {
+            "width": 732,
+            "left": 347,
+            "right": 1079,
+            "viewportOverflow": false,
+            "parentClientWidth": 732,
+            "parentScrollWidth": 732,
+            "rows": 5
+          }
+        ],
+        "inputs": [
+          {
+            "tag": "INPUT",
+            "type": "search",
+            "id": "Search-In-Modal-1",
+            "name": "q",
+            "fontSize": "14px",
+            "label": "Search"
+          },
+          {
+            "tag": "INPUT",
+            "type": "email",
+            "id": null,
+            "name": "contact[email]",
+            "fontSize": "14px",
+            "label": "Email address"
+          }
+        ],
+        "fixed": [],
+        "smallControls": [
+          {
+            "tag": "A",
+            "label": "Man scarves",
+            "width": 78,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "women bandana's",
+            "width": 113,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Best Sellers",
+            "width": 74,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Scarves",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bandanas",
+            "width": 63,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Candles",
+            "width": 51,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Back to Fashion Trends",
+            "width": 88,
+            "height": 20
+          },
+          {
+            "tag": "A",
+            "label": "Explore our collection",
+            "width": 134,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "contact us",
+            "width": 64,
+            "height": 18
+          },
+          {
+            "tag": "A",
+            "label": "Instagram",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Pinterest",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Facebook",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Bluesky",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "LinkedIn",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "TikTok",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "YouTube",
+            "width": 16,
+            "height": 16
+          },
+          {
+            "tag": "SUMMARY",
+            "label": "Contact us",
+            "width": 243,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "care@greyexim.com",
+            "width": 111,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "FAQ",
+            "width": 24,
+            "height": 16
+          },
+          {
+            "tag": "SUMMARY",
+            "label": "Services",
+            "width": 279,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Track your order",
+            "width": 85,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Returns",
+            "width": 42,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Shipping and delivery",
+            "width": 114,
+            "height": 16
+          },
+          {
+            "tag": "SUMMARY",
+            "label": "LEGAL & POLICIES",
+            "width": 279,
+            "height": 14
+          },
+          {
+            "tag": "A",
+            "label": "Terms & Conditions",
+            "width": 104,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Privacy Policy",
+            "width": 74,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Cookie Policy",
+            "width": 73,
+            "height": 16
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Cookie Settings",
+            "width": 84,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Payment Policy",
+            "width": 83,
+            "height": 16
+          },
+          {
+            "tag": "A",
+            "label": "Return & Refund Policy",
+            "width": 123,
+            "height": 16
+          }
+        ],
+        "details": [
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": false,
+            "summary": null
+          },
+          {
+            "open": true,
+            "summary": "Contact us"
+          },
+          {
+            "open": true,
+            "summary": "Services"
+          },
+          {
+            "open": true,
+            "summary": "LEGAL & POLICIES"
+          }
+        ],
+        "counts": {
+          "domElements": 1549,
+          "scripts": 77,
+          "stylesheets": 32,
+          "resources": 243,
+          "iframes": 1
+        },
+        "resources": {
+          "transferBytes": 10679,
+          "encodedBytes": 1765559,
+          "decodedBytes": 5699359
+        }
+      },
+      "afterScrollFixed": [
+        {
+          "tag": "CART-DRAWER",
+          "id": "",
+          "className": "drawer prada-cart-drawer is-empty",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "CartDrawer-Overlay",
+          "className": "cart-drawer__overlay",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "drawer__inner gradient color-scheme-1",
+          "position": "fixed",
+          "top": 0,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "menu-drawer",
+          "className": "gradient menu-drawer motion-reduce color-scheme-1",
+          "position": "fixed",
+          "top": -1184,
+          "height": 900
+        },
+        {
+          "tag": "DIV",
+          "id": "PradaLocalizationDrawer-sections--21841923834014__footer",
+          "className": "prada-localization-drawer",
+          "position": "fixed",
+          "top": 6522,
+          "height": 600
+        }
+      ],
+      "events": {
+        "exceptions": [
+          "Uncaught Error: Goaffpro is already loaded. This message prevents duplicate loading of the script. Kindly ignore."
+        ],
+        "console": [],
+        "failedRequests": [
+          {
+            "url": "32336.6407",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.6408",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          },
+          {
+            "url": "32336.6415",
+            "errorText": "net::ERR_ABORTED",
+            "type": "Fetch",
+            "canceled": true
+          }
+        ],
+        "errorResponses": []
+      }
+    }
+  ]
+}

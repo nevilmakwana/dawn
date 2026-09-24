@@ -1,0 +1,1106 @@
+{
+  "surface": "report",
+  "title": "GREY EXIM — COMPLETE WEBSITE AUDIT",
+  "generatedAt": "2026-09-23T10:59:02.507Z",
+  "asOf": "2026-09-23",
+  "status": "reviewed",
+  "buildStatus": "complete",
+  "filters": [],
+  "queries": {
+    "lighthouse_runs": {
+      "rows": [
+        {
+          "page": "article-mobile",
+          "url": "https://www.greyexim.com/blogs/news/gsm-in-fabric-complete-guide-to-fabric-weight-quality-usage",
+          "formFactor": "mobile",
+          "performance": 87,
+          "accessibility": 95,
+          "bestPractices": 73,
+          "seo": 92,
+          "fcpMs": 2096.398,
+          "lcpMs": 3676.1739999999995,
+          "tbtMs": 111.5,
+          "cls": 0.0009265405962744554,
+          "interactiveMs": 8244.2761,
+          "requests": 208,
+          "transferBytes": 1666576,
+          "mainThreadMs": 2296.344000000002,
+          "consoleErrors": 1,
+          "accessibilityFailures": 3
+        },
+        {
+          "page": "cart-mobile",
+          "url": "https://www.greyexim.com/cart",
+          "formFactor": "mobile",
+          "performance": 96,
+          "accessibility": 100,
+          "bestPractices": 73,
+          "seo": 100,
+          "fcpMs": 1141.9099999999999,
+          "lcpMs": 1991.9099999999999,
+          "tbtMs": 201.5,
+          "cls": 0,
+          "interactiveMs": 7956.647500000001,
+          "requests": 195,
+          "transferBytes": 1601037,
+          "mainThreadMs": 2229.0920000000206,
+          "consoleErrors": 1,
+          "accessibilityFailures": 0
+        },
+        {
+          "page": "collection-mobile",
+          "url": "https://www.greyexim.com/collections/women-scarves",
+          "formFactor": "mobile",
+          "performance": 60,
+          "accessibility": 97,
+          "bestPractices": 73,
+          "seo": 100,
+          "fcpMs": 3946.288170959473,
+          "lcpMs": 7726.9535000000005,
+          "tbtMs": 282.81500000000005,
+          "cls": 0,
+          "interactiveMs": 9234.8093,
+          "requests": 277,
+          "transferBytes": 2568495,
+          "mainThreadMs": 2889.931999999993,
+          "consoleErrors": 1,
+          "accessibilityFailures": 1
+        },
+        {
+          "page": "home-desktop",
+          "url": "https://www.greyexim.com/",
+          "formFactor": "desktop",
+          "performance": 96,
+          "accessibility": 100,
+          "bestPractices": 73,
+          "seo": 100,
+          "fcpMs": 653.511,
+          "lcpMs": 961.951,
+          "tbtMs": 1.5,
+          "cls": 0,
+          "interactiveMs": 3998.8067,
+          "requests": 219,
+          "transferBytes": 4711800,
+          "mainThreadMs": 633.6099999999975,
+          "consoleErrors": 1,
+          "accessibilityFailures": 0
+        },
+        {
+          "page": "home-mobile",
+          "url": "https://www.greyexim.com/",
+          "formFactor": "mobile",
+          "performance": 85,
+          "accessibility": 97,
+          "bestPractices": 73,
+          "seo": 100,
+          "fcpMs": 1887.984,
+          "lcpMs": 3329.941,
+          "tbtMs": 209,
+          "cls": 0,
+          "interactiveMs": 11157.6329,
+          "requests": 239,
+          "transferBytes": 2785080,
+          "mainThreadMs": 2425.683999999998,
+          "consoleErrors": 1,
+          "accessibilityFailures": 1
+        },
+        {
+          "page": "product-mobile",
+          "url": "https://www.greyexim.com/products/merry-forest-french-vanilla-candle",
+          "formFactor": "mobile",
+          "performance": 90,
+          "accessibility": 93,
+          "bestPractices": 73,
+          "seo": 100,
+          "fcpMs": 2294.447,
+          "lcpMs": 3178.866,
+          "tbtMs": 120.5,
+          "cls": 0,
+          "interactiveMs": 8363.9,
+          "requests": 248,
+          "transferBytes": 1959376,
+          "mainThreadMs": 2459.919999999998,
+          "consoleErrors": 1,
+          "accessibilityFailures": 2
+        },
+        {
+          "page": "search-mobile",
+          "url": "https://www.greyexim.com/search?q=scarf",
+          "formFactor": "mobile",
+          "performance": 60,
+          "accessibility": 92,
+          "bestPractices": 73,
+          "seo": 69,
+          "fcpMs": 3268.9195,
+          "lcpMs": 7146.4275,
+          "tbtMs": 349,
+          "cls": 0,
+          "interactiveMs": 8681.839500000002,
+          "requests": 297,
+          "transferBytes": 2565888,
+          "mainThreadMs": 3332.3999999999605,
+          "consoleErrors": 1,
+          "accessibilityFailures": 2
+        }
+      ],
+      "methods": [
+        {
+          "language": "javascript",
+          "code": "Flatten each saved Lighthouse LHR summary into one row per page/profile without changing the recorded scores or metric numeric values."
+        }
+      ],
+      "source": {
+        "label": "Lighthouse CLI lab captures for Grey Exim",
+        "files": [
+          "audit/evidence/lighthouse-article-mobile.json",
+          "audit/evidence/lighthouse-cart-mobile.json",
+          "audit/evidence/lighthouse-collection-mobile.json",
+          "audit/evidence/lighthouse-home-desktop.json",
+          "audit/evidence/lighthouse-home-mobile.json",
+          "audit/evidence/lighthouse-product-mobile.json",
+          "audit/evidence/lighthouse-search-mobile.json"
+        ],
+        "filters": [
+          "Single captured lab run per listed page/profile on 2026-09-23; not field/RUM data."
+        ],
+        "evidenceFlow": [
+          {
+            "title": "Capture",
+            "detail": "Lighthouse CLI loaded the public production URL in headless Chrome and saved JSON."
+          },
+          {
+            "title": "Summarize",
+            "detail": "audit/scripts/summarize-lighthouse.mjs extracted scores, timings, requests, bytes, failures, domains, and insights."
+          }
+        ],
+        "metricDefinitions": [
+          {
+            "label": "LCP",
+            "definition": "Largest Contentful Paint from the saved Lighthouse lab run, in milliseconds.",
+            "componentIds": [
+              "audit-overview",
+              "performance-table",
+              "audit-lighthouse"
+            ]
+          },
+          {
+            "label": "TBT",
+            "definition": "Total Blocking Time from the saved Lighthouse lab run, in milliseconds; not INP.",
+            "componentIds": [
+              "performance-table",
+              "audit-lighthouse"
+            ]
+          },
+          {
+            "label": "Transfer bytes",
+            "definition": "Sum of transferSize for network requests present in the Lighthouse run.",
+            "componentIds": [
+              "performance-table",
+              "audit-lighthouse"
+            ]
+          }
+        ]
+      }
+    },
+    "crawl_summary": {
+      "rows": [
+        {
+          "auditedPages": 91,
+          "non200Pages": 3,
+          "missingTitles": 1,
+          "missingDescriptions": 2,
+          "missingCanonicals": 1,
+          "missingOgImages": 1,
+          "duplicateTitleGroups": 4,
+          "brokenInternalLinks": 4,
+          "redirectedInternalLinks": 1
+        }
+      ],
+      "methods": [
+        {
+          "language": "javascript",
+          "code": "Count URL-level outcomes from the sitemap crawl; treat direct priority URLs and sitemap URLs as the reviewed population."
+        }
+      ],
+      "source": {
+        "label": "Grey Exim public sitemap and internal-link crawl",
+        "files": [
+          "audit/evidence/site-crawl.json"
+        ],
+        "filters": [
+          "All URLs exposed by the production sitemap plus listed priority utility URLs."
+        ],
+        "evidenceFlow": [
+          {
+            "title": "Discover",
+            "detail": "Read production sitemap.xml and child sitemaps."
+          },
+          {
+            "title": "Fetch",
+            "detail": "GET pages with concurrency 5 and 20-second timeout; link targets use HEAD with GET fallback."
+          }
+        ],
+        "metricDefinitions": [
+          {
+            "label": "Audited pages",
+            "definition": "Unique public URLs fetched from sitemap discovery plus priority utility URLs.",
+            "componentIds": [
+              "audit-overview",
+              "crawl-summary",
+              "audit-url-inventory"
+            ]
+          }
+        ]
+      }
+    },
+    "broken_links": {
+      "rows": [
+        {
+          "url": "https://www.greyexim.com/policies/return-and-refund-policy",
+          "status": 404,
+          "finalUrl": "https://www.greyexim.com/policies/return-and-refund-policy",
+          "redirected": false,
+          "durationMs": 441,
+          "error": null
+        },
+        {
+          "url": "https://www.greyexim.com/pages/faq",
+          "status": 404,
+          "finalUrl": "https://www.greyexim.com/pages/faq",
+          "redirected": false,
+          "durationMs": 274,
+          "error": null
+        },
+        {
+          "url": "https://www.greyexim.com/pages/track-order",
+          "status": 404,
+          "finalUrl": "https://www.greyexim.com/pages/track-order",
+          "redirected": false,
+          "durationMs": 357,
+          "error": null
+        },
+        {
+          "url": "https://www.greyexim.com/pages/returns",
+          "status": 404,
+          "finalUrl": "https://www.greyexim.com/pages/returns",
+          "redirected": false,
+          "durationMs": 245,
+          "error": null
+        }
+      ],
+      "source": {
+        "label": "Failed internal/priority URL checks",
+        "files": [
+          "audit/evidence/site-crawl.json"
+        ],
+        "filters": [
+          "HTTP status 400 or greater, or request failure."
+        ],
+        "evidenceFlow": [
+          {
+            "title": "Check",
+            "detail": "HEAD request with GET fallback for discovered internal link targets."
+          }
+        ]
+      }
+    },
+    "responsive_checks": {
+      "rows": [
+        {
+          "name": "home-320",
+          "url": "https://www.greyexim.com/",
+          "width": 320,
+          "height": 740,
+          "horizontalOverflow": false,
+          "scrollWidth": 320,
+          "viewportWidth": 320,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 34,
+          "exceptions": 1,
+          "networkErrors": 3,
+          "domElements": 1243,
+          "scripts": 82,
+          "resources": 148
+        },
+        {
+          "name": "collection-320",
+          "url": "https://www.greyexim.com/collections/women-scarves",
+          "width": 320,
+          "height": 740,
+          "horizontalOverflow": false,
+          "scrollWidth": 320,
+          "viewportWidth": 320,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 16,
+          "exceptions": 1,
+          "networkErrors": 3,
+          "domElements": 1517,
+          "scripts": 82,
+          "resources": 215
+        },
+        {
+          "name": "product-320",
+          "url": "https://www.greyexim.com/products/merry-forest-french-vanilla-candle",
+          "width": 320,
+          "height": 740,
+          "horizontalOverflow": false,
+          "scrollWidth": 320,
+          "viewportWidth": 320,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 40,
+          "exceptions": 1,
+          "networkErrors": 3,
+          "domElements": 1390,
+          "scripts": 82,
+          "resources": 253
+        },
+        {
+          "name": "search-320",
+          "url": "https://www.greyexim.com/search?q=scarf",
+          "width": 320,
+          "height": 740,
+          "horizontalOverflow": false,
+          "scrollWidth": 320,
+          "viewportWidth": 320,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 17,
+          "exceptions": 1,
+          "networkErrors": 3,
+          "domElements": 1616,
+          "scripts": 78,
+          "resources": 289
+        },
+        {
+          "name": "article-320",
+          "url": "https://www.greyexim.com/blogs/news/gsm-in-fabric-complete-guide-to-fabric-weight-quality-usage",
+          "width": 320,
+          "height": 740,
+          "horizontalOverflow": false,
+          "scrollWidth": 320,
+          "viewportWidth": 320,
+          "brokenImages": 0,
+          "missingAlt": 1,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 17,
+          "exceptions": 1,
+          "networkErrors": 5,
+          "domElements": 1550,
+          "scripts": 78,
+          "resources": 242
+        },
+        {
+          "name": "contact-320",
+          "url": "https://www.greyexim.com/pages/contact",
+          "width": 320,
+          "height": 740,
+          "horizontalOverflow": false,
+          "scrollWidth": 320,
+          "viewportWidth": 320,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 0,
+          "overflowingTables": 0,
+          "smallControlsSample": 14,
+          "exceptions": 1,
+          "networkErrors": 3,
+          "domElements": 1127,
+          "scripts": 79,
+          "resources": 237
+        },
+        {
+          "name": "faq-320",
+          "url": "https://www.greyexim.com/pages/contact?view=faq",
+          "width": 320,
+          "height": 740,
+          "horizontalOverflow": false,
+          "scrollWidth": 320,
+          "viewportWidth": 320,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 13,
+          "exceptions": 1,
+          "networkErrors": 3,
+          "domElements": 1333,
+          "scripts": 79,
+          "resources": 238
+        },
+        {
+          "name": "returns-320",
+          "url": "https://www.greyexim.com/pages/contact?view=returns",
+          "width": 320,
+          "height": 740,
+          "horizontalOverflow": false,
+          "scrollWidth": 320,
+          "viewportWidth": 320,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 16,
+          "exceptions": 1,
+          "networkErrors": 3,
+          "domElements": 1075,
+          "scripts": 79,
+          "resources": 239
+        },
+        {
+          "name": "track-320",
+          "url": "https://www.greyexim.com/pages/contact?view=track-order",
+          "width": 320,
+          "height": 740,
+          "horizontalOverflow": false,
+          "scrollWidth": 320,
+          "viewportWidth": 320,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 15,
+          "exceptions": 1,
+          "networkErrors": 3,
+          "domElements": 1069,
+          "scripts": 79,
+          "resources": 236
+        },
+        {
+          "name": "home-390",
+          "url": "https://www.greyexim.com/",
+          "width": 390,
+          "height": 844,
+          "horizontalOverflow": false,
+          "scrollWidth": 390,
+          "viewportWidth": 390,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 36,
+          "exceptions": 1,
+          "networkErrors": 3,
+          "domElements": 1348,
+          "scripts": 82,
+          "resources": 252
+        },
+        {
+          "name": "collection-390",
+          "url": "https://www.greyexim.com/collections/women-scarves",
+          "width": 390,
+          "height": 844,
+          "horizontalOverflow": false,
+          "scrollWidth": 390,
+          "viewportWidth": 390,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 18,
+          "exceptions": 1,
+          "networkErrors": 3,
+          "domElements": 1580,
+          "scripts": 82,
+          "resources": 270
+        },
+        {
+          "name": "product-390",
+          "url": "https://www.greyexim.com/products/merry-forest-french-vanilla-candle",
+          "width": 390,
+          "height": 844,
+          "horizontalOverflow": false,
+          "scrollWidth": 390,
+          "viewportWidth": 390,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 42,
+          "exceptions": 1,
+          "networkErrors": 3,
+          "domElements": 1390,
+          "scripts": 82,
+          "resources": 252
+        },
+        {
+          "name": "search-390",
+          "url": "https://www.greyexim.com/search?q=scarf",
+          "width": 390,
+          "height": 844,
+          "horizontalOverflow": false,
+          "scrollWidth": 390,
+          "viewportWidth": 390,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 21,
+          "exceptions": 1,
+          "networkErrors": 3,
+          "domElements": 1616,
+          "scripts": 78,
+          "resources": 288
+        },
+        {
+          "name": "article-390",
+          "url": "https://www.greyexim.com/blogs/news/gsm-in-fabric-complete-guide-to-fabric-weight-quality-usage",
+          "width": 390,
+          "height": 844,
+          "horizontalOverflow": false,
+          "scrollWidth": 390,
+          "viewportWidth": 390,
+          "brokenImages": 0,
+          "missingAlt": 1,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 17,
+          "exceptions": 1,
+          "networkErrors": 5,
+          "domElements": 1550,
+          "scripts": 78,
+          "resources": 241
+        },
+        {
+          "name": "home-1440",
+          "url": "https://www.greyexim.com/",
+          "width": 1440,
+          "height": 900,
+          "horizontalOverflow": false,
+          "scrollWidth": 1425,
+          "viewportWidth": 1425,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 39,
+          "exceptions": 1,
+          "networkErrors": 1,
+          "domElements": 1347,
+          "scripts": 81,
+          "resources": 263
+        },
+        {
+          "name": "collection-1440",
+          "url": "https://www.greyexim.com/collections/women-scarves",
+          "width": 1440,
+          "height": 900,
+          "horizontalOverflow": false,
+          "scrollWidth": 1425,
+          "viewportWidth": 1425,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 46,
+          "exceptions": 1,
+          "networkErrors": 1,
+          "domElements": 1579,
+          "scripts": 81,
+          "resources": 286
+        },
+        {
+          "name": "product-1440",
+          "url": "https://www.greyexim.com/products/merry-forest-french-vanilla-candle",
+          "width": 1440,
+          "height": 900,
+          "horizontalOverflow": false,
+          "scrollWidth": 1425,
+          "viewportWidth": 1425,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 32,
+          "exceptions": 1,
+          "networkErrors": 1,
+          "domElements": 1201,
+          "scripts": 81,
+          "resources": 242
+        },
+        {
+          "name": "search-1440",
+          "url": "https://www.greyexim.com/search?q=scarf",
+          "width": 1440,
+          "height": 900,
+          "horizontalOverflow": false,
+          "scrollWidth": 1425,
+          "viewportWidth": 1425,
+          "brokenImages": 0,
+          "missingAlt": 0,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 50,
+          "exceptions": 1,
+          "networkErrors": 1,
+          "domElements": 1615,
+          "scripts": 77,
+          "resources": 295
+        },
+        {
+          "name": "article-1440",
+          "url": "https://www.greyexim.com/blogs/news/gsm-in-fabric-complete-guide-to-fabric-weight-quality-usage",
+          "width": 1440,
+          "height": 900,
+          "horizontalOverflow": false,
+          "scrollWidth": 1425,
+          "viewportWidth": 1425,
+          "brokenImages": 0,
+          "missingAlt": 1,
+          "h1Count": 1,
+          "overflowingTables": 0,
+          "smallControlsSample": 32,
+          "exceptions": 1,
+          "networkErrors": 3,
+          "domElements": 1549,
+          "scripts": 77,
+          "resources": 243
+        }
+      ],
+      "source": {
+        "label": "Chrome DevTools Protocol responsive probes",
+        "files": [
+          "audit/evidence/browser-probe.json"
+        ],
+        "filters": [
+          "320, 390, and 1440 px representative viewports; 3.5-second settling window."
+        ],
+        "evidenceFlow": [
+          {
+            "title": "Render",
+            "detail": "Navigate production pages in an isolated headless Chrome profile."
+          },
+          {
+            "title": "Inspect",
+            "detail": "Read DOM dimensions, image state, controls, tables, scripts, resources, and console/network events."
+          }
+        ]
+      }
+    },
+    "static_theme": {
+      "rows": [
+        {
+          "totalFiles": 442,
+          "totalBytes": 9287404,
+          "importantDeclarations": 1344,
+          "inlineScripts": 119,
+          "inlineStyles": 19,
+          "eventListeners": 358,
+          "mutationObservers": 4,
+          "intervals": 2,
+          "consoleCalls": 19,
+          "potentialUnusedAssets": 50,
+          "potentialUnusedBytes": 338586,
+          "missingRenders": 0,
+          "invalidJson": 0
+        }
+      ],
+      "methods": [
+        {
+          "language": "javascript",
+          "code": "Scan local theme files for exact syntax signals and filename references; zero-reference assets remain review candidates, not deletion proof."
+        }
+      ],
+      "source": {
+        "label": "Local Grey Exim Dawn theme snapshot",
+        "files": [
+          "audit/evidence/static-theme-audit.json"
+        ],
+        "filters": [
+          "assets, sections, snippets, templates, layout, config, and locales."
+        ],
+        "evidenceFlow": [
+          {
+            "title": "Inventory",
+            "detail": "Read local theme files and sizes."
+          },
+          {
+            "title": "Analyze",
+            "detail": "Count CSS/JS signals, parse JSON/JSONC, and resolve static render targets."
+          }
+        ]
+      }
+    },
+    "bug_database": {
+      "rows": [
+        {
+          "id": "GE-001",
+          "severity": "P0 Confirmed",
+          "what": "Broken return-policy link",
+          "where": "Cart footer; policy references",
+          "why": "Trust/legal navigation; 404",
+          "how": "Link to `/policies/refund-policy` and 301 old path",
+          "expectedResult": "Policy always opens",
+          "verify": "Crawl + click from cart"
+        },
+        {
+          "id": "GE-002",
+          "severity": "P1 Confirmed",
+          "what": "GoAffPro loaded twice",
+          "where": "Every sampled page",
+          "why": "Uncaught error; wasted work",
+          "how": "Remove duplicate app embed/loader at source",
+          "expectedResult": "One loader, zero exception",
+          "verify": "Console on 7 page types"
+        },
+        {
+          "id": "GE-003",
+          "severity": "P1 Confirmed",
+          "what": "Collection LCP 7.7 s",
+          "where": "Mobile PLP",
+          "why": "Poor CWV/conversion",
+          "how": "Prioritize first image; reduce blocking/global work",
+          "expectedResult": "Lab LCP <2.5–3 s",
+          "verify": "3-run median Lighthouse"
+        },
+        {
+          "id": "GE-004",
+          "severity": "P1 Confirmed",
+          "what": "Search LCP 7.1 s",
+          "where": "Mobile search",
+          "why": "Slow discovery",
+          "how": "Same as GE-003 plus smaller initial result render",
+          "expectedResult": "Faster useful results",
+          "verify": "3-run median Lighthouse"
+        },
+        {
+          "id": "GE-005",
+          "severity": "P1 Confirmed",
+          "what": "Search input 14 px",
+          "where": "`main-search` mobile",
+          "why": "iOS focus zoom",
+          "how": "Set interactive input text to 16 px",
+          "expectedResult": "No viewport zoom",
+          "verify": "Physical iPhone Safari"
+        },
+        {
+          "id": "GE-006",
+          "severity": "P1 Confirmed",
+          "what": "Sort select inaccessible",
+          "where": "Search mobile",
+          "why": "Screen-reader label failure",
+          "how": "Visible label or `aria-label`; keep association",
+          "expectedResult": "Named control",
+          "verify": "Lighthouse + VoiceOver"
+        },
+        {
+          "id": "GE-007",
+          "severity": "P1 Confirmed",
+          "what": "13 px colour targets",
+          "where": "Product tiles",
+          "why": "Mistaps/accessibility",
+          "how": "24–44 px hit wrapper; keep 13 px dot",
+          "expectedResult": "Reliable selection",
+          "verify": "Lighthouse target-size + touch"
+        },
+        {
+          "id": "GE-008",
+          "severity": "P1 Confirmed",
+          "what": "6 px carousel dots",
+          "where": "Home/product grids",
+          "why": "Untappable",
+          "how": "Pseudo-element/hit-area enlargement",
+          "expectedResult": "Reliable navigation",
+          "verify": "Touch + keyboard"
+        },
+        {
+          "id": "GE-009",
+          "severity": "P1 Confirmed",
+          "what": "Product contrast failure",
+          "where": "Product mobile",
+          "why": "WCAG readability",
+          "how": "Adjust failing foreground/background token",
+          "expectedResult": "AA contrast",
+          "verify": "Lighthouse + contrast tool"
+        },
+        {
+          "id": "GE-010",
+          "severity": "P1 Confirmed",
+          "what": "Article image missing alt",
+          "where": "GSM article",
+          "why": "SEO/a11y",
+          "how": "Add meaningful alt or `alt=\"\"` if decorative",
+          "expectedResult": "Correct announcement",
+          "verify": "Lighthouse image-alt"
+        },
+        {
+          "id": "GE-011",
+          "severity": "P1 Confirmed",
+          "what": "Article table lacks headers",
+          "where": "GSM article",
+          "why": "Table unreadable to AT",
+          "how": "Use `<thead>`, `<th scope=\"col\">`",
+          "expectedResult": "Semantic grid",
+          "verify": "Lighthouse + screen reader"
+        },
+        {
+          "id": "GE-012",
+          "severity": "P1 Confirmed",
+          "what": "Back-link label mismatch",
+          "where": "Article subbar",
+          "why": "Accessible name differs from “JOURNAL”",
+          "how": "Align visible text and aria-label",
+          "expectedResult": "Predictable announcement",
+          "verify": "Lighthouse label-name"
+        },
+        {
+          "id": "GE-013",
+          "severity": "P1 Confirmed",
+          "what": "Contact lacks H1",
+          "where": "Contact",
+          "why": "Heading/SEO hierarchy",
+          "how": "Add one descriptive H1",
+          "expectedResult": "Clear page topic",
+          "verify": "Crawl + accessibility tree"
+        },
+        {
+          "id": "GE-014",
+          "severity": "P2 Confirmed",
+          "what": "Cart has three H1s",
+          "where": "Empty cart",
+          "why": "Heading ambiguity",
+          "how": "Keep one H1; downgrade state headings",
+          "expectedResult": "Logical hierarchy",
+          "verify": "Crawl + screen reader"
+        },
+        {
+          "id": "GE-015",
+          "severity": "P1 Confirmed",
+          "what": "Duplicate product titles",
+          "where": "8 indexed product URLs",
+          "why": "Cannibalization/confusion",
+          "how": "Consolidate, differentiate, canonical/redirect",
+          "expectedResult": "Unique intent per URL",
+          "verify": "Crawl + Search Console"
+        },
+        {
+          "id": "GE-016",
+          "severity": "P2 Confirmed",
+          "what": "Missing description",
+          "where": "`/pages/kp-account`",
+          "why": "Weak snippet; unclear index intent",
+          "how": "Add description or noindex/private",
+          "expectedResult": "Intentional index state",
+          "verify": "Crawl + source"
+        },
+        {
+          "id": "GE-017",
+          "severity": "P1 Confirmed",
+          "what": "Legacy support URLs 404",
+          "where": "`/pages/faq`, `/track-order`, `/returns`",
+          "why": "Old links/bookmarks fail",
+          "how": "301 to query-view URLs",
+          "expectedResult": "Backward compatibility",
+          "verify": "HTTP status + final URL"
+        },
+        {
+          "id": "GE-018",
+          "severity": "P1 Confirmed",
+          "what": "~100 KB unused JS",
+          "where": "All Lighthouse pages",
+          "why": "Parse/execute cost",
+          "how": "Route-split; remove unused embeds",
+          "expectedResult": "Lower JS/TBT",
+          "verify": "Coverage + Lighthouse"
+        },
+        {
+          "id": "GE-019",
+          "severity": "P1 Confirmed",
+          "what": "195–297 requests",
+          "where": "All pages",
+          "why": "Latency/CPU overhead",
+          "how": "Remove apps, combine ownership, lazy load",
+          "expectedResult": "Smaller waterfalls",
+          "verify": "Request budget CI"
+        },
+        {
+          "id": "GE-020",
+          "severity": "P1 Confirmed",
+          "what": "4.49 MB desktop home",
+          "where": "Home desktop",
+          "why": "High transfer",
+          "how": "Re-encode/defer hero video",
+          "expectedResult": "Lower first load",
+          "verify": "Lighthouse/network"
+        },
+        {
+          "id": "GE-021",
+          "severity": "P2 Confirmed",
+          "what": "Checkout bundles global",
+          "where": "Content/product pages",
+          "why": "~298 KB recurring code",
+          "how": "Review Shop/accelerated checkout app settings",
+          "expectedResult": "Fewer nonessential bytes",
+          "verify": "Waterfall diff"
+        },
+        {
+          "id": "GE-022",
+          "severity": "P2 Confirmed",
+          "what": "Third-party cookies",
+          "where": "All Lighthouse pages",
+          "why": "Privacy/future browser risk",
+          "how": "Consent-gate and document necessity",
+          "expectedResult": "Expected cookie state",
+          "verify": "Fresh profile before/after consent"
+        },
+        {
+          "id": "GE-023",
+          "severity": "P2 Likely",
+          "what": "Support-page flash",
+          "where": "Contact query views",
+          "why": "AJAX style/script race",
+          "how": "Server navigation or atomic preloaded swap",
+          "expectedResult": "No intermediate layout",
+          "verify": "Slow-3G video + performance marks"
+        },
+        {
+          "id": "GE-024",
+          "severity": "P2 Likely",
+          "what": "Wrong products flash",
+          "where": "Nested collections",
+          "why": "pending class/late loader",
+          "how": "Render correct server state; hide stale grid atomically",
+          "expectedResult": "Direct correct grid",
+          "verify": "Slow-3G deep links"
+        },
+        {
+          "id": "GE-025",
+          "severity": "P2 Confirmed",
+          "what": "Search toolbar clipped",
+          "where": "390 px search",
+          "why": "Sort affordance obscured",
+          "how": "Grid minmax, padding, label constraints",
+          "expectedResult": "Full label/arrow",
+          "verify": "320/375/390 screenshots"
+        },
+        {
+          "id": "GE-026",
+          "severity": "P2 Confirmed",
+          "what": "Sticky stack consumes viewport",
+          "where": "Collection mobile",
+          "why": "Less shopping space",
+          "how": "Collapse title/tabs or sticky only toolbar",
+          "expectedResult": "More visible products",
+          "verify": "Scroll on 320 px"
+        },
+        {
+          "id": "GE-027",
+          "severity": "P2 Confirmed",
+          "what": "1,344 `!important`s",
+          "where": "Theme CSS/Liquid",
+          "why": "Fragile cascade",
+          "how": "Component-by-component specificity cleanup",
+          "expectedResult": "Predictable styling",
+          "verify": "Visual regression suite"
+        },
+        {
+          "id": "GE-028",
+          "severity": "P2 Confirmed",
+          "what": "Monolithic header",
+          "where": "`header.liquid` 97 KB",
+          "why": "High regression/maintenance risk",
+          "how": "Split CSS/behavior/snippets",
+          "expectedResult": "Clear ownership",
+          "verify": "Theme Check + screenshots"
+        },
+        {
+          "id": "GE-029",
+          "severity": "P2 Confirmed",
+          "what": "Inline/global orchestration",
+          "where": "`theme.liquid`, sections",
+          "why": "Ordering/dup-init risk",
+          "how": "Move idempotent components to assets",
+          "expectedResult": "Fewer first-frame differences",
+          "verify": "Console + section reload tests"
+        },
+        {
+          "id": "GE-030",
+          "severity": "P2 Potential",
+          "what": "`/sf_private_access_tokens` 401",
+          "where": "Mobile probes",
+          "why": "Network noise; unclear integration",
+          "how": "Confirm Shop ownership; change only if unintended",
+          "expectedResult": "No unexplained error",
+          "verify": "Network with Shop enabled/disabled"
+        },
+        {
+          "id": "GE-031",
+          "severity": "P3 Confirmed",
+          "what": "Missing response policies",
+          "where": "Site headers",
+          "why": "Security hardening",
+          "how": "Add Referrer/Permissions policy if supported",
+          "expectedResult": "Reduced leakage/capabilities",
+          "verify": "Header scan"
+        },
+        {
+          "id": "GE-032",
+          "severity": "P2 Confirmed",
+          "what": "Email template invalid HTML",
+          "where": "`docs/order-confirmation-email.liquid`",
+          "why": "Reuse/render risk",
+          "how": "Correct table nesting",
+          "expectedResult": "Valid email HTML",
+          "verify": "Theme Check + email preview"
+        },
+        {
+          "id": "GE-033",
+          "severity": "P2 Confirmed",
+          "what": "Password undefined object warning",
+          "where": "`layout/password.liquid`",
+          "why": "Potential styling gap",
+          "how": "Define `scheme_classes` or remove reference",
+          "expectedResult": "No warning/stable page",
+          "verify": "Theme Check + password preview"
+        },
+        {
+          "id": "GE-034",
+          "severity": "P2 Potential",
+          "what": "Intermittent missing images",
+          "where": "Reported PLP behavior",
+          "why": "Lost product discovery",
+          "how": "Add error fallback/RUM; validate URLs",
+          "expectedResult": "Observable/recoverable failures",
+          "verify": "RUM + throttled repeat loads"
+        },
+        {
+          "id": "GE-035",
+          "severity": "P3 Confirmed",
+          "what": "External Wix article asset",
+          "where": "GSM article",
+          "why": "Extra origin/control/a11y risk",
+          "how": "Move to Shopify Files/CDN",
+          "expectedResult": "Controlled asset pipeline",
+          "verify": "Network/domain crawl"
+        }
+      ],
+      "source": {
+        "label": "Evidence-backed Grey Exim master bug database",
+        "files": [
+          "audit/GREY-EXIM-COMPLETE-WEBSITE-AUDIT.md"
+        ],
+        "filters": [
+          "Confirmed, likely, and potential findings are explicitly labeled."
+        ],
+        "evidenceFlow": [
+          {
+            "title": "Synthesize",
+            "detail": "Map crawler, Lighthouse, browser, screenshot, static-source, and Theme Check evidence into actionable findings."
+          }
+        ]
+      }
+    }
+  },
+  "id": "report:53bc4d72-4b76-47eb-bac3-e0b244241804"
+}

@@ -20,7 +20,7 @@ body:has(main[data-template='product']) .section-header.shopify-section-group-he
 .prada-product__wishlist--mobile { display: none; }
 .prada-product__dots { position: fixed; z-index: 3; left: 24px; bottom: 24px; display: flex; flex-direction: column; gap: 8px; }
 .prada-product__dots.is-gallery-ended { position: absolute; bottom: 24px; }
-.prada-product__dots a { display: grid; place-items: center; width: 12px; height: 12px; }
+.prada-product__dots a { display: grid; place-items: center; width: 24px; height: 24px; }
 .prada-product__dots span { display: block; width: 5px; height: 5px; border: 1px solid #111; border-radius: 50%; background: transparent; }
 .prada-product__dots a.is-active span, .prada-product__dots a[aria-current='true'] span { background: #111; }
 .prada-product__scroll-hint, .prada-product__sheet-handle { display: none; }
@@ -28,7 +28,7 @@ body:has(main[data-template='product']) .section-header.shopify-section-group-he
 .prada-product__info { position: sticky; top: calc(var(--header-height, 72px) + 16px); width: calc(100% - 96px); max-width: 790px; margin: 0 auto; padding: clamp(48px, 7vh, 72px) 0 48px; }
 .prada-product__heading-row h1 { margin: 0; max-width: 680px; font-size: 22px; line-height: 1.25; font-weight: 500; letter-spacing: -.015em; }
 .prada-product__price { display: flex; gap: 10px; margin-top: 10px; font-size: 14px; line-height: 1.35; letter-spacing: .01em; }
-.prada-product__price s { color: #777; }
+.prada-product__price s { color: #6f6f6f; }
 .prada-product__form { margin-top: 28px; }
 .prada-product__options { border: 0; }
 .prada-product__option { display: grid; grid-template-columns: minmax(120px, 1fr) minmax(170px, 2fr); align-items: center; min-height: 48px; margin-bottom: 12px; border: 1px solid var(--prada-border); font-size: 13px; }

@@ -60,10 +60,6 @@
     const section = document.currentScript?.previousElementSibling;
     if (!section) return;
 
-    const publicPath = '{{ routes.root_url }}policies/return-and-refund-policy';
-    if (window.location.pathname !== publicPath) {
-      window.history.replaceState(window.history.state, '', `${publicPath}${window.location.search}${window.location.hash}`);
-    }
     document.title = `{{ refund_policy_title | escape }} – {{ shop.name | escape }}`;
 
     const content = section.querySelector('[data-policy-content]');

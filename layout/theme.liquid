@@ -201,27 +201,6 @@
       }
     </style>
 
-    {%- if request.page_type == '404' -%}
-      <script>
-        if (/\/policies\/cookie-policy\/?$/.test(window.location.pathname)) {
-          window.location.replace('{{ routes.root_url }}pages/contact?view=cookie-policy');
-        } else if (/\/policies\/legal-notice\/?$/.test(window.location.pathname)) {
-          window.location.replace('{{ routes.root_url }}pages/contact?view=cookie-policy');
-        } else if (/\/policies\/contact-information\/?$/.test(window.location.pathname)) {
-          window.location.replace('{{ routes.root_url }}pages/contact?view=payment-policy');
-        } else if (/\/policies\/shipping-policy\/?$/.test(window.location.pathname)) {
-          window.location.replace('{{ routes.root_url }}pages/contact?view=faq#topic-shipments');
-        } else if (
-          /\/policies\/terms-of-service\/?$/.test(window.location.pathname) ||
-          /\/pages\/terms-and-conditions\/?$/.test(window.location.pathname)
-        ) {
-          window.location.replace('{{ routes.root_url }}pages/contact?view=terms-and-conditions');
-        } else if (/\/policies\/return-and-refund-policy\/?$/.test(window.location.pathname)) {
-          window.location.replace('{{ routes.root_url }}policies/refund-policy');
-        }
-      </script>
-    {%- endif -%}
-
     <script>
       document.documentElement.classList.add('using-pointer');
       document.addEventListener('pointerdown', () => document.documentElement.classList.add('using-pointer'), true);
@@ -524,9 +503,6 @@
     {%- if request.page_type == 'search' -%}
       {{ 'template-collection.css' | asset_url | stylesheet_tag }}
       {{ 'component-card.css' | asset_url | stylesheet_tag }}
-      {{ 'component-price.css' | asset_url | stylesheet_tag }}
-      {{ 'component-search.css' | asset_url | stylesheet_tag }}
-      {{ 'component-facets.css' | asset_url | stylesheet_tag }}
       {{ 'mask-blobs.css' | asset_url | stylesheet_tag }}
     {%- endif -%}
     <script src="{{ 'prada-product-wishlist.js' | asset_url }}" defer="defer"></script>

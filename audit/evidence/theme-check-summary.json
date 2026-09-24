@@ -1,0 +1,43 @@
+{
+  "generatedAt": "2026-09-23T00:00:00+05:30",
+  "command": "shopify theme check --path <workspace> --output json",
+  "result": {
+    "errors": 1,
+    "warnings": 3,
+    "items": [
+      {
+        "file": "docs/order-confirmation-email.liquid",
+        "severity": "error",
+        "check": "LiquidHTMLSyntaxError",
+        "line": 966,
+        "message": "Attempting to close HtmlElement 'td' before HtmlElement 'table' was closed"
+      },
+      {
+        "file": "sections/main-list-collections.liquid",
+        "severity": "warning",
+        "check": "VariableName",
+        "line": 19,
+        "message": "The variable 'moduloResult' uses wrong naming format"
+      },
+      {
+        "file": "sections/main-article.liquid",
+        "severity": "warning",
+        "check": "VariableName",
+        "line": 101,
+        "message": "The variable 'anchorId' uses wrong naming format"
+      },
+      {
+        "file": "layout/password.liquid",
+        "severity": "warning",
+        "check": "UndefinedObject",
+        "line": 39,
+        "message": "Unknown object 'scheme_classes' used"
+      }
+    ]
+  },
+  "remoteLiquidValidator": {
+    "attempted": true,
+    "completed": false,
+    "reason": "Blocked by privacy control because the command would submit private local theme source to an external validator. No bypass attempted."
+  }
+}

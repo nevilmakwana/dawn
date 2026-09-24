@@ -1,0 +1,1055 @@
+{
+  "generatedAt": "2026-09-23T10:35:55.819Z",
+  "methodology": "Static filename/reference and syntax signal inventory. A zero filename reference is a candidate for manual review, not proof that an asset is safe to delete.",
+  "totalFiles": 442,
+  "totalBytes": 9287404,
+  "byExtension": [
+    {
+      "ext": ".webm",
+      "files": 2,
+      "bytes": 3390134
+    },
+    {
+      "ext": ".json",
+      "files": 83,
+      "bytes": 2697617
+    },
+    {
+      "ext": ".liquid",
+      "files": 121,
+      "bytes": 1570799
+    },
+    {
+      "ext": ".css",
+      "files": 86,
+      "bytes": 675471
+    },
+    {
+      "ext": ".js",
+      "files": 49,
+      "bytes": 407711
+    },
+    {
+      "ext": ".png",
+      "files": 2,
+      "bytes": 276041
+    },
+    {
+      "ext": ".gif",
+      "files": 1,
+      "bytes": 179349
+    },
+    {
+      "ext": ".svg",
+      "files": 98,
+      "bytes": 90282
+    }
+  ],
+  "totals": {
+    "important": 1344,
+    "inlineScripts": 119,
+    "inlineStyles": 19,
+    "eventListeners": 358,
+    "mutationObservers": 4,
+    "intervals": 2,
+    "consoleCalls": 19
+  },
+  "topSignals": [
+    {
+      "file": "sections/header.liquid",
+      "bytes": 97352,
+      "important": 532,
+      "inlineScripts": 5,
+      "inlineStyles": 1,
+      "eventListeners": 8,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/greyexim-typography.css",
+      "bytes": 24781,
+      "important": 250,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 0,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/section-prada-story.css",
+      "bytes": 22123,
+      "important": 146,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 0,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "sections/image-banner.liquid",
+      "bytes": 54131,
+      "important": 102,
+      "inlineScripts": 2,
+      "inlineStyles": 0,
+      "eventListeners": 0,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "layout/theme.liquid",
+      "bytes": 37391,
+      "important": 47,
+      "inlineScripts": 27,
+      "inlineStyles": 2,
+      "eventListeners": 10,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/prada-cart-page.css",
+      "bytes": 49927,
+      "important": 45,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 0,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/global.js",
+      "bytes": 57611,
+      "important": 0,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 43,
+      "mutationObservers": 0,
+      "intervals": 2,
+      "consoleCalls": 2
+    },
+    {
+      "file": "sections/grey-exim-editorial-story.liquid",
+      "bytes": 36188,
+      "important": 40,
+      "inlineScripts": 2,
+      "inlineStyles": 1,
+      "eventListeners": 0,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/component-cart-drawer.css",
+      "bytes": 38383,
+      "important": 38,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 0,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/section-main-product.css",
+      "bytes": 34059,
+      "important": 32,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 0,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "sections/main-product.liquid",
+      "bytes": 65531,
+      "important": 0,
+      "inlineScripts": 4,
+      "inlineStyles": 0,
+      "eventListeners": 21,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/base.css",
+      "bytes": 85422,
+      "important": 18,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 0,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/prada-collection.css",
+      "bytes": 18322,
+      "important": 17,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 0,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "sections/main-collection-product-grid.liquid",
+      "bytes": 57450,
+      "important": 0,
+      "inlineScripts": 2,
+      "inlineStyles": 0,
+      "eventListeners": 15,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/prada-cart-page.js",
+      "bytes": 32855,
+      "important": 0,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 15,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 2
+    },
+    {
+      "file": "assets/prada-product-prefetch.js",
+      "bytes": 9035,
+      "important": 0,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 14,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "sections/grey-exim-payment-policy.liquid",
+      "bytes": 9083,
+      "important": 12,
+      "inlineScripts": 1,
+      "inlineStyles": 1,
+      "eventListeners": 1,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "sections/grey-exim-cookie-policy.liquid",
+      "bytes": 31391,
+      "important": 12,
+      "inlineScripts": 1,
+      "inlineStyles": 1,
+      "eventListeners": 0,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/image-banner-responsive-video.js",
+      "bytes": 4985,
+      "important": 0,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 12,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/localization-form.js",
+      "bytes": 7863,
+      "important": 0,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 12,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/prada-support-tabs.js",
+      "bytes": 14021,
+      "important": 0,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 11,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "sections/featured-product.liquid",
+      "bytes": 65773,
+      "important": 0,
+      "inlineScripts": 11,
+      "inlineStyles": 0,
+      "eventListeners": 0,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "sections/pradasphere-news.liquid",
+      "bytes": 9090,
+      "important": 0,
+      "inlineScripts": 1,
+      "inlineStyles": 0,
+      "eventListeners": 10,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "sections/collection-showcase.liquid",
+      "bytes": 60510,
+      "important": 1,
+      "inlineScripts": 1,
+      "inlineStyles": 1,
+      "eventListeners": 8,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "sections/footer.liquid",
+      "bytes": 44492,
+      "important": 0,
+      "inlineScripts": 2,
+      "inlineStyles": 0,
+      "eventListeners": 8,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "sections/prada-category-showcase.liquid",
+      "bytes": 33030,
+      "important": 0,
+      "inlineScripts": 2,
+      "inlineStyles": 1,
+      "eventListeners": 8,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/greyexim-prada-product.css",
+      "bytes": 16683,
+      "important": 9,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 0,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/quick-order-list.js",
+      "bytes": 18454,
+      "important": 0,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 9,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 2
+    },
+    {
+      "file": "assets/theme-editor.js",
+      "bytes": 2084,
+      "important": 0,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 9,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/quantity-popover.js",
+      "bytes": 3549,
+      "important": 0,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 8,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "sections/prada-best-sellers.liquid",
+      "bytes": 14819,
+      "important": 0,
+      "inlineScripts": 1,
+      "inlineStyles": 0,
+      "eventListeners": 7,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "snippets/header-drawer.liquid",
+      "bytes": 72499,
+      "important": 0,
+      "inlineScripts": 1,
+      "inlineStyles": 0,
+      "eventListeners": 7,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/facets.js",
+      "bytes": 17194,
+      "important": 0,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 7,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 1
+    },
+    {
+      "file": "assets/image-banner-subject-focus.js",
+      "bytes": 4267,
+      "important": 0,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 7,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/prada-wishlist-page.css",
+      "bytes": 7710,
+      "important": 7,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 0,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "sections/related-products.liquid",
+      "bytes": 14395,
+      "important": 0,
+      "inlineScripts": 1,
+      "inlineStyles": 0,
+      "eventListeners": 6,
+      "mutationObservers": 1,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/grey-exim-cookie-policy.css",
+      "bytes": 8035,
+      "important": 6,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 0,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/prada-linked-collection-loader.js",
+      "bytes": 10436,
+      "important": 0,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 6,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "assets/prada-wishlist-page.js",
+      "bytes": 7692,
+      "important": 0,
+      "inlineScripts": 0,
+      "inlineStyles": 0,
+      "eventListeners": 6,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    },
+    {
+      "file": "sections/featured-collection.liquid",
+      "bytes": 19132,
+      "important": 0,
+      "inlineScripts": 6,
+      "inlineStyles": 0,
+      "eventListeners": 0,
+      "mutationObservers": 0,
+      "intervals": 0,
+      "consoleCalls": 0
+    }
+  ],
+  "largestFiles": [
+    {
+      "file": "assets/hero-video.webm",
+      "bytes": 2547998,
+      "ext": ".webm"
+    },
+    {
+      "file": "assets/hero_section_mobile.webm",
+      "bytes": 842136,
+      "ext": ".webm"
+    },
+    {
+      "file": "assets/grey-exim-wordmark-logo-white.png",
+      "bytes": 247844,
+      "ext": ".png"
+    },
+    {
+      "file": "assets/sparkle.gif",
+      "bytes": 179349,
+      "ext": ".gif"
+    },
+    {
+      "file": "locales/th.schema.json",
+      "bytes": 118235,
+      "ext": ".json"
+    },
+    {
+      "file": "sections/header.liquid",
+      "bytes": 97352,
+      "ext": ".liquid"
+    },
+    {
+      "file": "locales/ja.schema.json",
+      "bytes": 95717,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/es.schema.json",
+      "bytes": 93848,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/fr.schema.json",
+      "bytes": 93407,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/pt-PT.schema.json",
+      "bytes": 93381,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/it.schema.json",
+      "bytes": 93200,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/pl.schema.json",
+      "bytes": 93005,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/pt-BR.schema.json",
+      "bytes": 92995,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/cs.schema.json",
+      "bytes": 92949,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/ko.schema.json",
+      "bytes": 92736,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/tr.schema.json",
+      "bytes": 91836,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/nl.schema.json",
+      "bytes": 91650,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/de.schema.json",
+      "bytes": 91579,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/fi.schema.json",
+      "bytes": 91252,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/da.schema.json",
+      "bytes": 90628,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/nb.schema.json",
+      "bytes": 90445,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/sv.schema.json",
+      "bytes": 90319,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/zh-TW.schema.json",
+      "bytes": 88778,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/en.default.schema.json",
+      "bytes": 88528,
+      "ext": ".json"
+    },
+    {
+      "file": "locales/zh-CN.schema.json",
+      "bytes": 88098,
+      "ext": ".json"
+    },
+    {
+      "file": "assets/base.css",
+      "bytes": 85422,
+      "ext": ".css"
+    },
+    {
+      "file": "snippets/header-drawer.liquid",
+      "bytes": 72499,
+      "ext": ".liquid"
+    },
+    {
+      "file": "sections/featured-product.liquid",
+      "bytes": 65773,
+      "ext": ".liquid"
+    },
+    {
+      "file": "sections/main-product.liquid",
+      "bytes": 65531,
+      "ext": ".liquid"
+    },
+    {
+      "file": "sections/collection-showcase.liquid",
+      "bytes": 60510,
+      "ext": ".liquid"
+    },
+    {
+      "file": "assets/global.js",
+      "bytes": 57611,
+      "ext": ".js"
+    },
+    {
+      "file": "sections/main-collection-product-grid.liquid",
+      "bytes": 57450,
+      "ext": ".liquid"
+    },
+    {
+      "file": "sections/image-banner.liquid",
+      "bytes": 54131,
+      "ext": ".liquid"
+    },
+    {
+      "file": "assets/prada-cart-page.css",
+      "bytes": 49927,
+      "ext": ".css"
+    },
+    {
+      "file": "snippets/facets.liquid",
+      "bytes": 49703,
+      "ext": ".liquid"
+    },
+    {
+      "file": "sections/footer.liquid",
+      "bytes": 44492,
+      "ext": ".liquid"
+    },
+    {
+      "file": "assets/cart-drawer.js",
+      "bytes": 42691,
+      "ext": ".js"
+    },
+    {
+      "file": "config/settings_schema.json",
+      "bytes": 41247,
+      "ext": ".json"
+    },
+    {
+      "file": "assets/cart.js",
+      "bytes": 40229,
+      "ext": ".js"
+    },
+    {
+      "file": "assets/component-cart-drawer.css",
+      "bytes": 38383,
+      "ext": ".css"
+    }
+  ],
+  "potentialUnusedAssets": [
+    {
+      "name": "grey-exim-wordmark-logo-white.png",
+      "bytes": 247844,
+      "ext": ".png",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "grey-exim-image-placeholder-logo.png",
+      "bytes": 28197,
+      "ext": ".png",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-perfume.svg",
+      "bytes": 7871,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-bottle.svg",
+      "bytes": 4510,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "component-complementary-products.css",
+      "bytes": 4302,
+      "ext": ".css",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-leather.svg",
+      "bytes": 3209,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-recycle.svg",
+      "bytes": 2260,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-paw-print.svg",
+      "bytes": 2215,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-gluten-free.svg",
+      "bytes": 1931,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-pepper.svg",
+      "bytes": 1903,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-plane.svg",
+      "bytes": 1877,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-banana.svg",
+      "bytes": 1789,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-apple.svg",
+      "bytes": 1785,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-carrot.svg",
+      "bytes": 1736,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-snowflake.svg",
+      "bytes": 1484,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-fire.svg",
+      "bytes": 1366,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-nut-free.svg",
+      "bytes": 1349,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-washing.svg",
+      "bytes": 1341,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-shirt.svg",
+      "bytes": 1228,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-plant.svg",
+      "bytes": 1218,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-leaf.svg",
+      "bytes": 1178,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-pants.svg",
+      "bytes": 947,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-iron.svg",
+      "bytes": 912,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-shoe.svg",
+      "bytes": 900,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-truck.svg",
+      "bytes": 900,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-question-mark.svg",
+      "bytes": 881,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-dairy-free.svg",
+      "bytes": 863,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-chat-bubble.svg",
+      "bytes": 767,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-eye.svg",
+      "bytes": 759,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-ruler.svg",
+      "bytes": 753,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-clipboard.svg",
+      "bytes": 746,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-stopwatch.svg",
+      "bytes": 724,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-star.svg",
+      "bytes": 713,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-price-tag.svg",
+      "bytes": 711,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-serving-dish.svg",
+      "bytes": 658,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-lipstick.svg",
+      "bytes": 657,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-return.svg",
+      "bytes": 583,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-map-pin.svg",
+      "bytes": 570,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-lock.svg",
+      "bytes": 554,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-dairy.svg",
+      "bytes": 548,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-silhouette.svg",
+      "bytes": 547,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-box.svg",
+      "bytes": 478,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-heart.svg",
+      "bytes": 461,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-dryer.svg",
+      "bytes": 449,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-lightning-bolt.svg",
+      "bytes": 414,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-check-mark.svg",
+      "bytes": 388,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-hamburger.svg",
+      "bytes": 366,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "user-login.svg",
+      "bytes": 302,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "shopping-bag.svg",
+      "bytes": 273,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    },
+    {
+      "name": "icon-inventory-status.svg",
+      "bytes": 169,
+      "ext": ".svg",
+      "referenceCount": 0,
+      "references": []
+    }
+  ],
+  "missingRenders": [],
+  "invalidJson": []
+}
