@@ -208,6 +208,17 @@
 
 .prada-localization-open { overflow: hidden; }
 
+/*
+ * The footer is normally skipped off-screen with content-visibility: auto.
+ * A fixed-position dialog inside that containment is positioned against the
+ * footer instead of the viewport, and nearby header layers can intercept its
+ * controls. Restore normal rendering only while the localization dialog is
+ * open so the panel, close button, and native selects stay viewport-fixed.
+ */
+html.prada-localization-open .footer {
+  content-visibility: visible;
+}
+
 .prada-localization-drawer {
   position: fixed;
   z-index: var(--ge-layer-global-dialog, 21000);
