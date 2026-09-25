@@ -2183,13 +2183,15 @@
   }
 
   @media screen and (min-width: 990px) {
-    body.template-product .section-header {
+    body.template-product .section-header,
+    body.template-article .section-header {
       transform: translate3d(0, 0, 0);
       transition: transform 240ms cubic-bezier(0.4, 0, 0.2, 1);
       will-change: transform;
     }
 
-    body.template-product .section-header.shopify-section-header-hidden:not(.is-navigating) {
+    body.template-product .section-header.shopify-section-header-hidden:not(.is-navigating),
+    body.template-article .section-header.shopify-section-header-hidden:not(.is-navigating) {
       transform: translate3d(0, -100%, 0);
     }
   }
