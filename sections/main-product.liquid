@@ -1074,6 +1074,51 @@
     let suppressHandleClick = false;
     let onboardingTimer;
     let scrollHintConsumed = false;
+    let mobileScrollAnimationFrame = 0;
+
+    const cancelMobileScrollAnimation = () => {
+      if (!mobileScrollAnimationFrame) return;
+      window.cancelAnimationFrame(mobileScrollAnimationFrame);
+      mobileScrollAnimationFrame = 0;
+    };
+
+    const getMobileScrollTarget = (element, headerOffset = false) => {
+      if (!element) return window.scrollY;
+      const header = document.querySelector('.section-header');
+      const offset = headerOffset ? header?.getBoundingClientRect().height || 0 : 0;
+      return Math.max(0, Math.round(window.scrollY + element.getBoundingClientRect().top - offset));
+    };
+
+    const scrollMobilePageTo = (element, { headerOffset = false } = {}) => {
+      if (!element) return;
+      cancelMobileScrollAnimation();
+      const startScrollTop = window.scrollY;
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduceMotion) {
+        window.scrollTo(0, getMobileScrollTarget(element, headerOffset));
+        return;
+      }
+
+      const startTime = performance.now();
+      const duration = 360;
+      const step = (currentTime) => {
+        const progress = Math.min((currentTime - startTime) / duration, 1);
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        const targetScrollTop = getMobileScrollTarget(element, headerOffset);
+        window.scrollTo(0, Math.round(startScrollTop + (targetScrollTop - startScrollTop) * easedProgress));
+
+        if (progress < 1) {
+          mobileScrollAnimationFrame = window.requestAnimationFrame(step);
+          return;
+        }
+
+        mobileScrollAnimationFrame = 0;
+        window.scrollTo(0, getMobileScrollTarget(element, headerOffset));
+      };
+
+      mobileScrollAnimationFrame = window.requestAnimationFrame(step);
+    };
 
     const setupProductVideos = () => {
       mediaList?.querySelectorAll('.prada-product__media video').forEach((video) => {
@@ -1184,9 +1229,7 @@
         const maximumScrollTop = Math.max(0, mobileGallery.scrollHeight - mobileGallery.clientHeight);
         mobileGallery.scrollTo({ top: Math.min(galleryReturnScrollTop, maximumScrollTop), behavior: 'auto' });
       }
-      window.requestAnimationFrame(() => {
-        (root.closest('.shopify-section') || root).scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
+      window.requestAnimationFrame(() => scrollMobilePageTo(root.closest('.shopify-section') || root));
       window.setTimeout(() => {
         root.classList.remove('mobile-info-open', 'mobile-info-closing');
       }, 420);
@@ -1198,7 +1241,7 @@
       galleryReturnScrollTop = mobileGallery?.scrollTop || 0;
       sheetHandle?.setAttribute('aria-expanded', 'true');
       sheetHandle?.setAttribute('aria-label', 'Close product information');
-      window.requestAnimationFrame(() => mobilePanel?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+      window.requestAnimationFrame(() => scrollMobilePageTo(mobilePanel, { headerOffset: true }));
     };
     const updateMobileGallery = () => {
       if (!mobileQuery.matches || !mobileGallery || galleryMedia.length < 2) return;
@@ -1214,6 +1257,7 @@
 
     mobileGallery?.addEventListener('scroll', updateMobileGallery, { passive: true });
     mobileGallery?.addEventListener('touchstart', (event) => {
+      cancelMobileScrollAnimation();
       window.clearTimeout(onboardingTimer);
       scrollHintConsumed = true;
       root.classList.remove('mobile-gallery-onboarding');
@@ -1237,6 +1281,7 @@
     });
     sheetHandle?.addEventListener('touchstart', (event) => {
       if (!root.classList.contains('mobile-info-open')) return;
+      cancelMobileScrollAnimation();
       event.stopPropagation();
       handleIsDragging = true;
       suppressHandleClick = false;
@@ -1261,7 +1306,7 @@
         closeMobileSheet();
       } else {
         root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
-        window.requestAnimationFrame(() => mobilePanel?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+        window.requestAnimationFrame(() => scrollMobilePageTo(mobilePanel, { headerOffset: true }));
       }
       window.setTimeout(() => { suppressHandleClick = false; }, 500);
     }, { passive: true });
@@ -1273,6 +1318,7 @@
       window.setTimeout(() => { suppressHandleClick = false; }, 500);
     }, { passive: true });
     mobilePanel?.addEventListener('touchstart', (event) => {
+      cancelMobileScrollAnimation();
       sheetTouchStart = event.touches[0].clientY;
       panelTouchStartX = event.touches[0].clientX;
     }, { passive: true });
@@ -1287,6 +1333,7 @@
       }
     }, { passive: true });
     mobileQuery.addEventListener?.('change', () => {
+      cancelMobileScrollAnimation();
       if (!mobileQuery.matches) root.classList.remove('mobile-info-open', 'mobile-info-closing');
       else updateMobileGallery();
     });
