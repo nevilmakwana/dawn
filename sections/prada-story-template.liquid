@@ -14,6 +14,7 @@
 -%}
 
 <article class="prada-story-section prada-story-section--{{ section.settings.color_scheme | default: 'editorial_dark' }}" id="PradaStory-{{ section.id }}">
+  <div class="prada-story__intro{% if section.settings.show_hero_image %} prada-story__intro--with-hero{% endif %}">
   <!-- 1. Top Category Hairline Bar -->
   <header class="prada-story__subbar">
     <a href="{{ blog.url | default: '/blogs/news' }}" class="prada-story__back-link">
@@ -73,6 +74,7 @@
       {%- endif -%}
     </div>
   {%- endif -%}
+  </div>
 
   <!-- 3. Dynamic Title & Editorial Deck -->
   <div class="prada-story__deck">
