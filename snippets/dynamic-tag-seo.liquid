@@ -1,0 +1,199 @@
+{% doc %}
+  Renders resolved SEO markup or collection-banner content for approved tag landing pages.
+
+  @param {string} mode - One of head, banner_title, banner_description, or structured_data.
+  @param {string} [seo_description] - Fallback description for unapproved tag pages.
+
+  @example
+  {% render 'dynamic-tag-seo', mode: 'head', seo_description: seo_description %}
+{% enddoc %}
+
+{%- liquid
+  assign pseo_title = blank
+  assign pseo_description = blank
+  assign pseo_approved = false
+  assign pseo_parent = blank
+  assign pseo_minimum_products = 3
+
+  case collection.handle
+    when 'scarves', 'women-scarves'
+      assign pseo_parent = 'scarves'
+    when 'bandanas', 'women-bandanas'
+      assign pseo_parent = 'bandanas'
+    when 'candles', 'scented-candles'
+      assign pseo_parent = 'candles'
+  endcase
+
+  if current_tags.size == 1 and pseo_parent != blank
+    assign pseo_tag = current_tags.first | handleize
+
+    case pseo_parent
+      when 'scarves'
+        case pseo_tag
+          when 'cotton'
+            assign pseo_title = 'Cotton Scarves'
+            assign pseo_description = 'Discover lightweight and breathable cotton scarves designed for comfortable everyday styling. Explore versatile prints and colors that complement casual outfits, travel looks, and thoughtful gifts.'
+          when 'silk-feel'
+            assign pseo_title = 'Silk-Feel Scarves'
+            assign pseo_description = 'Experience the smooth look and elegant drape of our silk-feel scarves. Discover polished designs that add effortless refinement to everyday and occasion outfits.'
+          when 'floral'
+            assign pseo_title = 'Floral Print Scarves'
+            assign pseo_description = 'Refresh your wardrobe with floral print scarves inspired by expressive color and timeless botanical patterns. Find an easy statement accessory for workdays, weekends, and gifting.'
+          when 'printed'
+            assign pseo_title = 'Printed Scarves'
+            assign pseo_description = 'Explore printed scarves featuring distinctive patterns, vivid colors, and versatile styling possibilities. Choose a design that brings personality to everyday and occasion looks.'
+          when 'geometric'
+            assign pseo_title = 'Geometric Print Scarves'
+            assign pseo_description = 'Make a modern statement with geometric print scarves featuring clean lines and bold patterns. Explore contemporary designs created to sharpen everyday outfits.'
+        endcase
+      when 'bandanas'
+        case pseo_tag
+          when 'cotton'
+            assign pseo_title = 'Cotton Bandanas'
+            assign pseo_description = 'Shop breathable cotton bandanas made for comfortable, versatile everyday wear. Style them around your head, neck, wrist, or bag for an easy personal touch.'
+          when 'floral'
+            assign pseo_title = 'Floral Bandanas'
+            assign pseo_description = 'Discover floral bandanas that combine expressive botanical prints with versatile styling. Add color and character to casual outfits, hair looks, and accessories.'
+          when 'head'
+            assign pseo_title = 'Head Bandanas'
+            assign pseo_description = 'Explore head bandanas designed for comfortable styling and everyday versatility. Wear them as a practical hair accessory or a distinctive finishing touch.'
+          when 'printed'
+            assign pseo_title = 'Printed Bandanas'
+            assign pseo_description = 'Find printed bandanas in distinctive patterns and vibrant colors for effortless everyday styling. Choose a versatile design for your hair, neck, wrist, or favorite bag.'
+        endcase
+      when 'candles'
+        case pseo_tag
+          when 'vanilla'
+            assign pseo_title = 'Vanilla Scented Candles'
+            assign pseo_description = 'Create a warm and comforting atmosphere with vanilla scented candles from Grey Exim. Discover decorative designs that bring an inviting fragrance and refined character to your space.'
+          when 'pillar'
+            assign pseo_title = 'Pillar Candles'
+            assign pseo_description = 'Elevate your home decor with sculptural pillar candles designed to look beautiful lit or unlit. Explore distinctive forms that add warmth, texture, and visual interest to any room.'
+        endcase
+    endcase
+
+    if pseo_title != blank and collection.products_count >= pseo_minimum_products
+      assign pseo_approved = true
+    endif
+  endif
+
+  assign pseo_parent_url = request.origin | append: collection.url
+  assign pseo_url = pseo_parent_url
+
+  if pseo_approved
+    assign pseo_url = pseo_parent_url | append: '/' | append: pseo_tag
+    if current_page > 1
+      assign pseo_url = pseo_url | append: '?page=' | append: current_page
+    endif
+  endif
+
+  assign pseo_fallback_description = seo_description | default: collection.description | strip_html | strip | truncate: 160
+  assign pseo_tags_label = current_tags | join: ', '
+  assign pseo_fallback_title = page_title | append: ' – tagged “' | append: pseo_tags_label | append: '”'
+  assign pseo_output_title = pseo_fallback_title
+  assign pseo_output_description = pseo_fallback_description
+
+  if pseo_approved
+    assign pseo_output_title = pseo_title
+    assign pseo_output_description = pseo_description
+  endif
+
+  assign pseo_share_image = collection.metafields.custom.social_share_image.value
+  assign pseo_share_image = pseo_share_image | default: collection.image | default: collection.products.first.featured_image
+  assign pseo_share_image = pseo_share_image | default: settings.social_share_image | default: settings.brand_image | default: settings.logo_hover | default: settings.logo
+
+  if pseo_share_image
+    assign pseo_image_width = 1200
+    assign pseo_image_height = pseo_image_width | divided_by: pseo_share_image.aspect_ratio | round
+    assign pseo_image_url = pseo_share_image | image_url: width: pseo_image_width, format: 'pjpg'
+  endif
+-%}
+
+{%- case mode -%}
+  {%- when 'head' -%}
+    <link rel="canonical" href="{{ pseo_url }}">
+    {%- unless pseo_approved -%}
+      <meta name="robots" content="noindex,follow">
+    {%- endunless -%}
+    <title>
+      {{- pseo_output_title | escape -}}
+      {%- if current_page != 1 %} – Page {{ current_page }}{% endif -%}
+      {%- unless pseo_output_title contains shop.name %} – {{ shop.name }}{% endunless -%}
+    </title>
+    {%- if pseo_output_description != blank -%}
+      <meta name="description" content="{{ pseo_output_description | escape }}">
+    {%- endif -%}
+    <meta property="og:site_name" content="{{ shop.name }}">
+    <meta property="og:url" content="{{ pseo_url }}">
+    <meta property="og:title" content="{{ pseo_output_title | escape }}">
+    <meta property="og:type" content="website">
+    <meta property="og:description" content="{{ pseo_output_description | escape }}">
+    {%- if pseo_share_image -%}
+      <meta property="og:image" content="https:{{ pseo_image_url }}">
+      <meta property="og:image:secure_url" content="https:{{ pseo_image_url }}">
+      <meta property="og:image:type" content="image/jpeg">
+      <meta property="og:image:width" content="{{ pseo_image_width }}">
+      <meta property="og:image:height" content="{{ pseo_image_height }}">
+      <meta property="og:image:alt" content="{{ pseo_share_image.alt | default: pseo_output_title | escape }}">
+    {%- endif -%}
+    {%- if settings.social_twitter_link != blank -%}
+      <meta name="twitter:site" content="{{ settings.social_twitter_link | split: 'twitter.com/' | last | prepend: '@' }}">
+    {%- endif -%}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ pseo_output_title | escape }}">
+    <meta name="twitter:description" content="{{ pseo_output_description | escape }}">
+    {%- if pseo_share_image -%}
+      <meta name="twitter:image" content="https:{{ pseo_image_url }}">
+      <meta name="twitter:image:alt" content="{{ pseo_share_image.alt | default: pseo_output_title | escape }}">
+    {%- endif -%}
+
+  {%- when 'banner_title' -%}
+    {%- if pseo_approved -%}
+      {{- pseo_title | escape -}}
+    {%- else -%}
+      {{- collection.title | escape -}}
+    {%- endif -%}
+
+  {%- when 'banner_description' -%}
+    {%- if pseo_approved -%}
+      {{- pseo_description | escape -}}
+    {%- else -%}
+      {{- collection.description -}}
+    {%- endif -%}
+
+  {%- when 'structured_data' -%}
+    {%- if pseo_approved -%}
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          "name": {{ pseo_title | json }},
+          "url": {{ pseo_url | json }},
+          "description": {{ pseo_description | json }},
+          "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": {{ shop.name | json }},
+                "item": {{ routes.root_url | prepend: request.origin | json }}
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": {{ collection.title | json }},
+                "item": {{ pseo_parent_url | json }}
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": {{ pseo_title | json }},
+                "item": {{ pseo_url | json }}
+              }
+            ]
+          }
+        }
+      </script>
+    {%- endif -%}
+{%- endcase -%}

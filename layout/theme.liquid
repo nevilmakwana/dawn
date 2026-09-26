@@ -52,7 +52,9 @@
 
       assign seo_description = seo_description | strip_html | strip | truncate: 160
     -%}
-    <link rel="canonical" href="{{ canonical_url }}">
+    {%- unless request.page_type == 'collection' and current_tags -%}
+      <link rel="canonical" href="{{ canonical_url }}">
+    {%- endunless -%}
     <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
     <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
     {%- unless settings.type_body_font.system? -%}
@@ -215,19 +217,27 @@
       <link rel="apple-touch-icon" href="{{ settings.favicon | image_url: width: 180, height: 180 }}">
     {%- endif -%}
 
-    <title>
-      {{ page_title }}
-      {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
-      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
-      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
-    </title>
+    {%- if request.page_type == 'collection' and current_tags -%}
+      {% render 'dynamic-tag-seo', mode: 'head', seo_description: seo_description %}
+    {%- else -%}
+      <title>
+        {{ page_title }}
+        {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+        {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+      </title>
 
-    {%- if seo_description != blank -%}
-      <meta name="description" content="{{ seo_description | escape }}">
+      {%- if seo_description != blank -%}
+        <meta name="description" content="{{ seo_description | escape }}">
+      {%- endif -%}
+
+      {% render 'meta-tags', seo_description: seo_description %}
     {%- endif -%}
 
-    {% render 'meta-tags', seo_description: seo_description %}
-    {% render 'dynamic-seo', seo_description: seo_description %}
+    {%- if request.page_type == 'collection' and current_tags -%}
+      {% render 'dynamic-tag-seo', mode: 'structured_data' %}
+    {%- else -%}
+      {% render 'dynamic-seo', seo_description: seo_description %}
+    {%- endif -%}
 
     <script type="module">
       import * as StandardEvents from 'https://cdn.shopify.com/storefront/standard-events.js';

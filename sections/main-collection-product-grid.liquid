@@ -54,10 +54,23 @@
           endif
         endfor
       endif
+
+      assign show_collection_seo = false
+      if paginate.current_page == 1
+        if current_tags or collection.description != blank
+          assign show_collection_seo = true
+        endif
+      endif
     -%}
     <header class="prada-collection__header">
       <div class="prada-collection__navigation">
-        <h1 class="prada-collection__title" data-prada-collection-title>{{ collection.title | escape }}</h1>
+        <h1 class="prada-collection__title" data-prada-collection-title>
+          {%- if current_tags -%}
+            {%- render 'dynamic-tag-seo', mode: 'banner_title' -%}
+          {%- else -%}
+            {{- collection.title | escape -}}
+          {%- endif -%}
+        </h1>
 
         <nav
           class="prada-collection__tabs"
@@ -239,13 +252,21 @@
         {%- endif -%}
       {%- endif -%}
 
-      {%- if paginate.current_page == 1 and collection.description != blank -%}
+      {%- if show_collection_seo -%}
         <section class="prada-collection__seo" aria-labelledby="CollectionSeoHeading-{{ section.id }}">
           <h2 id="CollectionSeoHeading-{{ section.id }}" class="prada-collection__seo-title">
-            {{ collection.title | escape }}
+            {%- if current_tags -%}
+              {%- render 'dynamic-tag-seo', mode: 'banner_title' -%}
+            {%- else -%}
+              {{- collection.title | escape -}}
+            {%- endif -%}
           </h2>
           <div class="prada-collection__seo-content rte">
-            {{ collection.description }}
+            {%- if current_tags -%}
+              {%- render 'dynamic-tag-seo', mode: 'banner_description' -%}
+            {%- else -%}
+              {{- collection.description -}}
+            {%- endif -%}
           </div>
         </section>
       {%- endif -%}
