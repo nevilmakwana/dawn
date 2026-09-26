@@ -71,7 +71,46 @@
           "type": "drawer_parent",
           "settings": {
             "title": "Men",
-            "link": "/collections/all"
+            "link": "shopify://collections/man-scarves"
+          }
+        },
+        "drawer_child_iVF7EW": {
+          "type": "drawer_child",
+          "settings": {
+            "title": "Scarves",
+            "link": "shopify://collections/man-scarves"
+          }
+        },
+        "drawer_grandchild_Lrpk9n": {
+          "type": "drawer_grandchild",
+          "settings": {
+            "title": "Crepe Scarves",
+            "link": "shopify://collections/man-scarves",
+            "products": []
+          }
+        },
+        "drawer_grandchild_kNUifJ": {
+          "type": "drawer_grandchild",
+          "settings": {
+            "title": "Crepe Bandanas",
+            "link": "shopify://collections/man-bandanas",
+            "products": []
+          }
+        },
+        "drawer_grandchild_4qGUxR": {
+          "type": "drawer_grandchild",
+          "settings": {
+            "title": "Cotton Scarves",
+            "link": "shopify://collections/man-cotton-scarves",
+            "products": []
+          }
+        },
+        "drawer_grandchild_VL8cnY": {
+          "type": "drawer_grandchild",
+          "settings": {
+            "title": "Cotton Bandanas",
+            "link": "shopify://collections/man-cotton-bandanas",
+            "products": []
           }
         },
         "drawer_parent_home_lifestyle": {
@@ -95,13 +134,13 @@
             "link": "",
             "products": [
               "sculpted-pillar-french-vanilla-candle",
-              "sculpted-french-vanilla-candle-1",
+              "sculpted-french-vanilla-candle",
               "carved-pillar-french-vanilla-candle",
               "sculptural-wavy-pillar-french-vanilla-candle",
               "pillar-french-vanilla-candle-2",
               "sculptural-pillar-french-vanilla-candle",
               "pillar-french-vanilla-candle-1",
-              "pillar-french-vanilla-candle",
+              "ge-url-migration-20260923-8840176697502",
               "sculptural-french-vanilla-candle",
               "wave-pillar-french-vanilla-candle"
             ]
@@ -118,7 +157,7 @@
               "snake-rose-sculpted-french-vanilla-candle",
               "dolphin-ocean-french-vanilla-candle",
               "floral-unicorn-french-vanilla-candle",
-              "sculpted-french-vanilla-candle"
+              "bear-french-vanilla-candle"
             ]
           }
         },
@@ -156,7 +195,7 @@
               "butterfly-floral-pillar-french-vanilla-candle",
               "botanical-mushroom-pillar-french-vanilla-candle",
               "snake-rose-sculpted-french-vanilla-candle",
-              "merry-forest-french-vanilla-scented-soy-wax-candle"
+              "merry-forest-french-vanilla-candle"
             ]
           }
         },
@@ -180,7 +219,7 @@
             "products": [
               "angel-wings-french-vanilla-candle",
               "floral-unicorn-french-vanilla-candle",
-              "merry-forest-french-vanilla-scented-soy-wax-candle"
+              "merry-forest-french-vanilla-candle"
             ]
           }
         }
@@ -194,6 +233,11 @@
         "drawer_grandchild_cotton_scarves",
         "drawer_grandchild_cotton_bandanas",
         "drawer_parent_men",
+        "drawer_child_iVF7EW",
+        "drawer_grandchild_Lrpk9n",
+        "drawer_grandchild_kNUifJ",
+        "drawer_grandchild_4qGUxR",
+        "drawer_grandchild_VL8cnY",
         "drawer_parent_home_lifestyle",
         "drawer_child_scented_candles",
         "drawer_grandchild_sculptural",
@@ -213,6 +257,12 @@
         "show_line_separator": true,
         "color_scheme": "scheme-1",
         "menu_color_scheme": "scheme-1",
+        "desktop_header_height": 72,
+        "mobile_header_height": 56,
+        "contact_drawer_heading": "Client Service",
+        "contact_email_label": "Send us an e-mail",
+        "contact_company_email": "care@greyexim.com",
+        "contact_drawer_note": "<p>Send your inquiry through our contact form and our team will respond by e-mail.</p>",
         "enable_country_selector": true,
         "enable_language_selector": true,
         "enable_customer_avatar": true,
