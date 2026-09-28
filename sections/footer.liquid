@@ -54,8 +54,19 @@
     endif
 
     assign greyexim_shipping_url = routes.root_url | append: 'pages/contact?view=faq#topic-shipments'
+    if shop.shipping_policy != blank
+      assign greyexim_shipping_url = shop.shipping_policy.url
+    endif
+
     assign greyexim_refund_url = routes.root_url | append: 'policies/refund-policy'
+    if shop.refund_policy != blank
+      assign greyexim_refund_url = shop.refund_policy.url
+    endif
+
     assign greyexim_terms_url = routes.root_url | append: 'pages/contact?view=terms-and-conditions'
+    if shop.terms_of_service != blank
+      assign greyexim_terms_url = shop.terms_of_service.url
+    endif
 
     assign greyexim_cookie_url = routes.root_url | append: 'pages/contact?view=cookie-policy'
     assign greyexim_payment_url = routes.root_url | append: 'pages/contact?view=payment-policy'

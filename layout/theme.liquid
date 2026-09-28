@@ -20,6 +20,28 @@
     {%- endif -%}
     {%- liquid
       assign seo_description = page_description | strip_html | strip
+      assign seo_canonical_url = canonical_url
+      assign seo_page_title = page_title
+
+      if request.path contains '/policies/privacy-policy' and shop.privacy_policy != blank
+        assign seo_page_title = 'Privacy Policy'
+        assign seo_description = shop.privacy_policy.body | strip_html | strip
+      elsif request.path contains '/policies/refund-policy' and shop.refund_policy != blank
+        assign seo_page_title = 'Return & Refund Policy'
+        assign seo_description = shop.refund_policy.body | strip_html | strip
+      elsif request.path contains '/policies/terms-of-service' or template.suffix == 'terms-and-conditions'
+        assign seo_canonical_url = shop.terms_of_service.url
+        assign seo_page_title = 'Terms & Conditions'
+        assign seo_description = shop.terms_of_service.body | strip_html | strip
+      elsif request.path contains '/policies/shipping-policy' or template.suffix == 'shipping-policy'
+        assign seo_canonical_url = shop.shipping_policy.url
+        assign seo_page_title = 'Shipping Policy'
+        assign seo_description = shop.shipping_policy.body | strip_html | strip
+      endif
+
+      unless seo_canonical_url contains '://'
+        assign seo_canonical_url = request.origin | append: seo_canonical_url
+      endunless
 
       if seo_description == blank
         case request.page_type
@@ -53,7 +75,7 @@
       assign seo_description = seo_description | strip_html | strip | truncate: 160
     -%}
     {%- unless request.page_type == 'collection' and current_tags -%}
-      <link rel="canonical" href="{{ canonical_url }}">
+      <link rel="canonical" href="{{ seo_canonical_url }}">
     {%- endunless -%}
     <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
     <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
@@ -221,16 +243,16 @@
       {% render 'dynamic-tag-seo', mode: 'head', seo_description: seo_description %}
     {%- else -%}
       <title>
-        {{ page_title }}
+        {{ seo_page_title }}
         {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
-        {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+        {%- unless seo_page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
       </title>
 
       {%- if seo_description != blank -%}
         <meta name="description" content="{{ seo_description | escape }}">
       {%- endif -%}
 
-      {% render 'meta-tags', seo_description: seo_description %}
+      {% render 'meta-tags', seo_description: seo_description, seo_page_title: seo_page_title, seo_canonical_url: seo_canonical_url %}
     {%- endif -%}
 
     {%- if request.page_type == 'collection' and current_tags -%}
@@ -589,11 +611,11 @@
       tabindex="-1"
       data-template="{{ template.name }}"
     >
-      {%- if request.path contains '/policies/privacy-policy' -%}
-        {% section 'grey-exim-shopify-policy' %}
-      {%- elsif request.path contains '/policies/refund-policy' -%}
-        {% section 'grey-exim-refund-policy' %}
-      {%- elsif request.path contains '/policies/terms-of-service' -%}
+      {%- if request.path contains '/policies/privacy-policy'
+        or request.path contains '/policies/refund-policy'
+        or request.path contains '/policies/terms-of-service'
+        or request.path contains '/policies/shipping-policy'
+      -%}
         {% section 'grey-exim-terms-policy' %}
       {%- else -%}
         {{ content_for_layout }}

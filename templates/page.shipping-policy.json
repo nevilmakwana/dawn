@@ -1,7 +1,7 @@
 {
   "sections": {
     "main": {
-      "type": "main-shipping-policy",
+      "type": "grey-exim-terms-policy",
       "settings": {}
     }
   },

@@ -3,22 +3,43 @@
 {{ 'grey-exim-terms-policy.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
-  assign terms_policy_title = section.settings.terms_policy_title | default: 'Terms and Conditions'
-  assign terms_policy_updated = section.settings.terms_policy_last_updated | default: 'Last updated: 14 August 2026'
-  assign terms_policy_toc_label = section.settings.terms_policy_toc_label | default: 'On this page'
+  assign native_policy_source = shop.terms_of_service
+  assign native_policy_title = 'Terms & Conditions'
+  assign native_policy_updated = 'Last updated: 14 August 2026'
+  assign native_policy_kind = 'terms'
+
+  if request.path contains '/policies/privacy-policy'
+    assign native_policy_source = shop.privacy_policy
+    assign native_policy_title = 'Privacy Policy'
+    assign native_policy_updated = 'Last updated: 18 September 2026'
+    assign native_policy_kind = 'privacy'
+  elsif request.path contains '/policies/refund-policy'
+    assign native_policy_source = shop.refund_policy
+    assign native_policy_title = 'Return & Refund Policy'
+    assign native_policy_updated = 'Last updated: 14 August 2026'
+    assign native_policy_kind = 'refund'
+  elsif request.path contains '/policies/shipping-policy' or template.suffix == 'shipping-policy'
+    assign native_policy_source = shop.shipping_policy
+    assign native_policy_title = 'Shipping Policy'
+    assign native_policy_updated = 'Last updated: 28 September 2026'
+    assign native_policy_kind = 'shipping'
+  endif
+
+  assign native_policy_toc_label = section.settings.policy_toc_label | default: 'On this page'
 -%}
 
 <article
   id="GreyTermsPolicy-{{ section.id }}"
-  class="grey-policy grey-cookie-policy grey-terms-policy"
+  class="grey-policy grey-cookie-policy grey-terms-policy grey-native-policy"
   data-terms-policy
+  data-native-policy-kind="{{ native_policy_kind }}"
   aria-labelledby="GreyTermsPolicyTitle-{{ section.id }}"
 >
   <header class="grey-policy__hero">
     <div class="grey-policy__hero-inner">
-      <h1 id="GreyTermsPolicyTitle-{{ section.id }}">{{ terms_policy_title | escape }}</h1>
-      {%- if terms_policy_updated != blank -%}
-        <p class="grey-policy__updated">{{ terms_policy_updated | escape }}</p>
+      <h1 id="GreyTermsPolicyTitle-{{ section.id }}">{{ native_policy_title | escape }}</h1>
+      {%- if native_policy_updated != blank -%}
+        <p class="grey-policy__updated">{{ native_policy_updated | escape }}</p>
       {%- endif -%}
     </div>
   </header>
@@ -26,8 +47,8 @@
   <div class="grey-policy__shell">
     <aside class="grey-policy__aside" data-terms-policy-aside>
       <details class="grey-policy__toc" open>
-        <summary>{{ terms_policy_toc_label | escape }}</summary>
-        <nav aria-label="{{ terms_policy_title | escape }} sections" data-terms-policy-toc>
+        <summary>{{ native_policy_toc_label | escape }}</summary>
+        <nav aria-label="{{ native_policy_title | escape }} sections" data-terms-policy-toc>
           <ol></ol>
         </nav>
       </details>
@@ -35,13 +56,11 @@
 
     <div class="grey-policy__content rte">
       <div class="grey-terms-policy__source" data-terms-policy-source>
-        {%- if section.settings.terms_policy_content != blank -%}
-          {{ section.settings.terms_policy_content }}
-        {%- elsif shop.terms_of_service.body != blank -%}
-          {{ shop.terms_of_service.body }}
+        {%- if native_policy_source != blank and native_policy_source.body != blank -%}
+          {{ native_policy_source.body }}
         {%- elsif request.design_mode -%}
           <p class="grey-terms-policy__empty">
-            Paste your complete Terms and Conditions in this section's <strong>Policy content</strong> setting. Format every main section title as Heading 2 to create the numbered navigation automatically.
+            Add this policy's content in Shopify Admin under <strong>Settings &rarr; Policies</strong>. Once saved, it will appear here automatically.
           </p>
         {%- endif -%}
       </div>
@@ -68,6 +87,8 @@
       const toc = root.querySelector('[data-terms-policy-toc] ol');
       const aside = root.querySelector('[data-terms-policy-aside]');
       if (!source || !toc || !aside) return;
+
+      document.title = `{{ native_policy_title | escape }} – {{ shop.name | escape }}`;
 
       const sourceNodes = Array.from(source.childNodes).filter((node) => (
         node.nodeType !== Node.TEXT_NODE || node.textContent.trim() !== ''
@@ -230,7 +251,8 @@
           appendCurrentContainer();
           sectionIndex += 1;
 
-          const headingText = node.textContent.trim();
+          const headingText = node.textContent.trim().replace(/^\d+[.)\s:-]*/, '');
+          node.textContent = headingText;
           const sectionElement = document.createElement('section');
           let sectionId = `terms-${slugify(headingText) || `section-${sectionIndex}`}`;
           let suffix = 2;
@@ -277,7 +299,7 @@
         const wrapper = document.createElement('div');
         wrapper.className = 'grey-terms-policy__table-wrap';
         wrapper.setAttribute('role', 'region');
-        wrapper.setAttribute('aria-label', 'Terms and conditions table');
+        wrapper.setAttribute('aria-label', `{{ native_policy_title | escape }} table`);
         wrapper.tabIndex = 0;
         table.parentNode.insertBefore(wrapper, table);
         wrapper.appendChild(table);
@@ -296,37 +318,19 @@
 
 {% schema %}
 {
-  "name": "Grey Exim terms policy",
+  "name": "Grey Exim native policy",
   "tag": "section",
-  "class": "section-grey-exim-terms-policy",
+  "class": "section-grey-exim-terms-policy section-grey-exim-native-policy",
   "settings": [
     {
       "type": "paragraph",
-      "content": "This editor stores Terms & Conditions only. Content entered here is never used by another policy."
+      "content": "Policy wording is loaded from Shopify Admin > Settings > Policies. This section controls presentation only."
     },
     {
       "type": "text",
-      "id": "terms_policy_title",
-      "label": "Policy title",
-      "default": "Terms and Conditions"
-    },
-    {
-      "type": "text",
-      "id": "terms_policy_last_updated",
-      "label": "Last updated text",
-      "default": "Last updated: 14 August 2026"
-    },
-    {
-      "type": "text",
-      "id": "terms_policy_toc_label",
+      "id": "policy_toc_label",
       "label": "Navigation heading",
       "default": "On this page"
-    },
-    {
-      "type": "richtext",
-      "id": "terms_policy_content",
-      "label": "Policy content",
-      "info": "Paste the complete Terms and Conditions here. Format every main section title as Heading 2; section numbers and On this page links are created automatically."
     }
   ]
 }
