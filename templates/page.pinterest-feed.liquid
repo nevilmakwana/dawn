@@ -1,0 +1,72 @@
+{%- layout none -%}
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+  <channel>
+    <title>{{ shop.name | escape }}</title>
+    {{ '<link>' }}{{ shop.url | escape }}{{ '</link>' }}
+    <description>{{ shop.description | strip_html | strip | default: shop.name | escape }}</description>
+    <lastBuildDate>{{ 'now' | date: '%a, %d %b %Y %H:%M:%S %z' }}</lastBuildDate>
+    {%- paginate collections['all'].products by 250 -%}
+      {%- for product in collections['all'].products -%}
+        {%- assign clean_description = product.description | strip_html | strip | default: product.title | truncate: 5000 -%}
+        {%- assign product_title_downcase = product.title | downcase -%}
+        {%- for variant in product.variants -%}
+          {%- assign feed_image = variant.image | default: product.featured_image -%}
+          {%- if feed_image -%}
+            {%- assign product_link = shop.url | append: variant.url -%}
+            {%- assign feed_image_url = feed_image | image_url: width: 2000 -%}
+            {%- unless feed_image_url contains 'http' -%}
+              {%- assign feed_image_url = 'https:' | append: feed_image_url -%}
+            {%- endunless -%}
+            {%- assign regular_price = variant.price -%}
+            {%- assign sale_price = blank -%}
+            {%- if variant.compare_at_price > variant.price -%}
+              {%- assign regular_price = variant.compare_at_price -%}
+              {%- assign sale_price = variant.price -%}
+            {%- endif -%}
+            <item>
+              <g:id>{{ variant.id }}</g:id>
+              {{ '<g:item_group_id>' }}{{ product.id }}{{ '</g:item_group_id>' }}
+              <g:title>{{ product.title | strip_html | strip | escape }}{% unless variant.title == 'Default Title' %} - {{ variant.title | strip_html | strip | escape }}{% endunless %}</g:title>
+              <g:description>{{ clean_description | escape }}</g:description>
+              <g:link>{{ product_link | escape }}</g:link>
+              {{ '<g:image_link>' }}{{ feed_image_url | escape }}{{ '</g:image_link>' }}
+              {%- if variant.image and product.featured_image and variant.image.id != product.featured_image.id -%}
+                {%- assign additional_image_url = product.featured_image | image_url: width: 2000 -%}
+                {%- unless additional_image_url contains 'http' -%}
+                  {%- assign additional_image_url = 'https:' | append: additional_image_url -%}
+                {%- endunless -%}
+                {{ '<g:additional_image_link>' }}{{ additional_image_url | escape }}{{ '</g:additional_image_link>' }}
+              {%- endif -%}
+              <g:price>{{ regular_price | money_without_currency | remove: ',' | strip }} INR</g:price>
+              {%- if sale_price != blank -%}
+                {{ '<g:sale_price>' }}{{ sale_price | money_without_currency | remove: ',' | strip }} INR{{ '</g:sale_price>' }}
+              {%- endif -%}
+              <g:availability>{% if variant.available %}in stock{% else %}out of stock{% endif %}</g:availability>
+              <g:condition>new</g:condition>
+              <g:brand>{{ product.vendor | default: shop.name | strip_html | strip | truncate: 100 | escape }}</g:brand>
+              {%- if product_title_downcase contains 'bandana' -%}
+                {{ '<g:google_product_category>543586</g:google_product_category>' }}
+              {%- else -%}
+                {{ '<g:google_product_category>543673</g:google_product_category>' }}
+              {%- endif -%}
+              {%- if product.type != blank -%}
+                {{ '<g:product_type>' }}{{ product.type | strip_html | strip | escape }}{{ '</g:product_type>' }}
+              {%- endif -%}
+              {%- unless product.has_only_default_variant -%}
+                {{ '<g:variant_names>' }}{{ product.options | join: ',' | escape }}{{ '</g:variant_names>' }}
+                {{ '<g:variant_values>' }}{{ variant.options | join: ',' | escape }}{{ '</g:variant_values>' }}
+              {%- endunless -%}
+              {%- if variant.barcode != blank -%}
+                <g:gtin>{{ variant.barcode | strip | escape }}</g:gtin>
+              {%- endif -%}
+              {%- if variant.sku != blank -%}
+                <g:mpn>{{ variant.sku | strip | truncate: 70 | escape }}</g:mpn>
+              {%- endif -%}
+              {{ '<g:alt_text>' }}{{ feed_image.alt | default: product.title | strip_html | strip | truncate: 500 | escape }}{{ '</g:alt_text>' }}
+            </item>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endfor -%}
+    {%- endpaginate -%}
+  </channel>
+</rss>
