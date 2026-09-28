@@ -1077,9 +1077,11 @@
     let mobileScrollAnimationFrame = 0;
 
     const cancelMobileScrollAnimation = () => {
-      if (!mobileScrollAnimationFrame) return;
-      window.cancelAnimationFrame(mobileScrollAnimationFrame);
-      mobileScrollAnimationFrame = 0;
+      if (mobileScrollAnimationFrame) {
+        window.cancelAnimationFrame(mobileScrollAnimationFrame);
+        mobileScrollAnimationFrame = 0;
+      }
+      root.classList.remove('mobile-info-settling');
     };
 
     const getMobileScrollTarget = (element, headerOffset = false) => {
@@ -1093,20 +1095,22 @@
       if (!element) return;
       cancelMobileScrollAnimation();
       const startScrollTop = window.scrollY;
+      const targetScrollTop = getMobileScrollTarget(element, headerOffset);
+      const scrollDistance = targetScrollTop - startScrollTop;
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      if (reduceMotion) {
-        window.scrollTo(0, getMobileScrollTarget(element, headerOffset));
+      if (reduceMotion || Math.abs(scrollDistance) < 1) {
+        window.scrollTo(0, targetScrollTop);
         return;
       }
 
+      root.classList.add('mobile-info-settling');
       const startTime = performance.now();
       const duration = 360;
       const step = (currentTime) => {
         const progress = Math.min((currentTime - startTime) / duration, 1);
         const easedProgress = 1 - Math.pow(1 - progress, 3);
-        const targetScrollTop = getMobileScrollTarget(element, headerOffset);
-        window.scrollTo(0, Math.round(startScrollTop + (targetScrollTop - startScrollTop) * easedProgress));
+        window.scrollTo(0, Math.round(startScrollTop + scrollDistance * easedProgress));
 
         if (progress < 1) {
           mobileScrollAnimationFrame = window.requestAnimationFrame(step);
@@ -1114,7 +1118,8 @@
         }
 
         mobileScrollAnimationFrame = 0;
-        window.scrollTo(0, getMobileScrollTarget(element, headerOffset));
+        window.scrollTo(0, targetScrollTop);
+        root.classList.remove('mobile-info-settling');
       };
 
       mobileScrollAnimationFrame = window.requestAnimationFrame(step);
