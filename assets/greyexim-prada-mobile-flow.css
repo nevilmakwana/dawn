@@ -402,13 +402,18 @@
 
   .prada-best-sellers button.prada-product-tile__pagination-dot {
     position: relative;
+    display: grid;
+    place-items: center;
     width: 2.4rem;
     height: 2.4rem;
+    padding: 0;
     border: 0;
     background: transparent;
   }
 
   .prada-best-sellers button.prada-product-tile__pagination-dot::before {
+    display: block;
+    box-sizing: border-box;
     width: 0.6rem;
     height: 0.6rem;
     border: 1px solid var(--prada-ink);
@@ -527,8 +532,11 @@
     .related-products
     button.prada-product-tile__pagination-dot {
     position: relative;
+    display: grid;
+    place-items: center;
     width: 2.4rem;
     height: 2.4rem;
+    padding: 0;
     border: 0;
     background: transparent;
   }
@@ -536,6 +544,8 @@
   main[data-template='product']
     .related-products
     button.prada-product-tile__pagination-dot::before {
+    display: block;
+    box-sizing: border-box;
     width: 0.6rem;
     height: 0.6rem;
     border: 1px solid var(--prada-ink);
