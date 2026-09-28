@@ -1062,6 +1062,7 @@
     const mobileQuery = window.matchMedia('(max-width: 989px)');
     const mobileGallery = root.querySelector('.prada-product__media-list');
     const mobilePanel = root.querySelector('.prada-product__panel');
+    const mobileInfo = root.querySelector('.prada-product__info');
     const scrollHint = root.querySelector('[data-prada-scroll-hint]');
     const sheetHandle = root.querySelector('[data-prada-sheet-handle]');
     let sheetTouchStart = 0;
@@ -1072,6 +1073,11 @@
     let galleryReturnScrollTop = mobileGallery?.scrollTop || 0;
     let handleIsDragging = false;
     let suppressHandleClick = false;
+    let infoTouchStartX = 0;
+    let infoTouchStartY = 0;
+    let infoGestureStartedOpen = false;
+    let infoGestureStartedAtTop = false;
+    let infoGestureClaimed = false;
     let onboardingTimer;
     let scrollHintConsumed = false;
     let mobileScrollAnimationFrame = 0;
@@ -1089,6 +1095,11 @@
       const header = document.querySelector('.section-header');
       const offset = headerOffset ? header?.getBoundingClientRect().height || 0 : 0;
       return Math.max(0, Math.round(window.scrollY + element.getBoundingClientRect().top - offset));
+    };
+
+    const isMobileInfoAtTop = () => {
+      const panelScrollTarget = getMobileScrollTarget(mobilePanel, true);
+      return Math.abs(window.scrollY - panelScrollTarget) <= 4;
     };
 
     const scrollMobilePageTo = (element, { headerOffset = false } = {}) => {
@@ -1334,6 +1345,44 @@
       suppressHandleClick = true;
       root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
       window.setTimeout(() => { suppressHandleClick = false; }, 500);
+    }, { passive: true });
+    mobileInfo?.addEventListener('touchstart', (event) => {
+      cancelMobileScrollAnimation();
+      infoTouchStartX = event.touches[0].clientX;
+      infoTouchStartY = event.touches[0].clientY;
+      infoGestureStartedOpen = root.classList.contains('mobile-info-open');
+      infoGestureStartedAtTop = infoGestureStartedOpen && isMobileInfoAtTop();
+      infoGestureClaimed = false;
+    }, { passive: true });
+    mobileInfo?.addEventListener('touchmove', (event) => {
+      const verticalDistance = infoTouchStartY - event.touches[0].clientY;
+      const horizontalDistance = Math.abs(infoTouchStartX - event.touches[0].clientX);
+      if (Math.abs(verticalDistance) <= horizontalDistance) return;
+
+      const shouldOpen = !infoGestureStartedOpen && verticalDistance > 8;
+      const shouldClose = infoGestureStartedOpen && infoGestureStartedAtTop && verticalDistance < -8;
+      if (!shouldOpen && !shouldClose) return;
+
+      infoGestureClaimed = true;
+      event.preventDefault();
+    }, { passive: false });
+    mobileInfo?.addEventListener('touchend', (event) => {
+      const verticalDistance = infoTouchStartY - event.changedTouches[0].clientY;
+      const horizontalDistance = Math.abs(infoTouchStartX - event.changedTouches[0].clientX);
+      const isVerticalGesture = Math.abs(verticalDistance) > horizontalDistance;
+
+      if (infoGestureClaimed && isVerticalGesture) {
+        if (!infoGestureStartedOpen && verticalDistance > 45) {
+          openMobileSheet();
+        } else if (infoGestureStartedOpen && infoGestureStartedAtTop && verticalDistance < -70) {
+          closeMobileSheet();
+        }
+      }
+
+      infoGestureClaimed = false;
+    }, { passive: true });
+    mobileInfo?.addEventListener('touchcancel', () => {
+      infoGestureClaimed = false;
     }, { passive: true });
     mobileQuery.addEventListener?.('change', () => {
       cancelMobileScrollAnimation();
