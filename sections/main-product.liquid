@@ -1066,6 +1066,7 @@
     const sheetHandle = root.querySelector('[data-prada-sheet-handle]');
     let sheetTouchStart = 0;
     let handleDragY = 0;
+    let handleStartedOpen = false;
     let galleryTouchStart = 0;
     let galleryTouchStartedAtEnd = false;
     let galleryReturnScrollTop = mobileGallery?.scrollTop || 0;
@@ -1284,38 +1285,51 @@
       else openMobileSheet();
     });
     sheetHandle?.addEventListener('touchstart', (event) => {
-      if (!root.classList.contains('mobile-info-open')) return;
       cancelMobileScrollAnimation();
       event.stopPropagation();
       handleIsDragging = true;
+      handleStartedOpen = root.classList.contains('mobile-info-open');
       suppressHandleClick = false;
       sheetTouchStart = event.touches[0].clientY;
       handleDragY = 0;
       root.classList.remove('mobile-info-settling');
-      root.classList.add('mobile-info-dragging');
+      if (handleStartedOpen) root.classList.add('mobile-info-dragging');
     }, { passive: true });
     sheetHandle?.addEventListener('touchmove', (event) => {
       if (!handleIsDragging) return;
       event.stopPropagation();
-      handleDragY = Math.max(0, event.touches[0].clientY - sheetTouchStart);
-      if (handleDragY > 5) suppressHandleClick = true;
-    }, { passive: true });
+      const dragDistance = event.touches[0].clientY - sheetTouchStart;
+      handleDragY = handleStartedOpen ? Math.max(0, dragDistance) : Math.min(0, dragDistance);
+      if (Math.abs(handleDragY) > 5) suppressHandleClick = true;
+      if (Math.abs(handleDragY) > 0) event.preventDefault();
+    }, { passive: false });
     sheetHandle?.addEventListener('touchend', (event) => {
       if (!handleIsDragging) return;
       event.stopPropagation();
       handleIsDragging = false;
-      handleDragY = Math.max(handleDragY, event.changedTouches[0].clientY - sheetTouchStart);
-      if (handleDragY > 5) suppressHandleClick = true;
-      if (handleDragY > 70) {
-        closeMobileSheet();
+      const dragDistance = event.changedTouches[0].clientY - sheetTouchStart;
+      handleDragY = handleStartedOpen
+        ? Math.max(handleDragY, dragDistance)
+        : Math.min(handleDragY, dragDistance);
+      if (Math.abs(handleDragY) > 5) suppressHandleClick = true;
+      if (handleStartedOpen) {
+        if (handleDragY > 70) {
+          closeMobileSheet();
+        } else {
+          root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
+          window.requestAnimationFrame(() => scrollMobilePageTo(mobilePanel, { headerOffset: true }));
+        }
+      } else if (handleDragY < -45) {
+        openMobileSheet();
       } else {
         root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
-        window.requestAnimationFrame(() => scrollMobilePageTo(mobilePanel, { headerOffset: true }));
       }
+      handleStartedOpen = false;
       window.setTimeout(() => { suppressHandleClick = false; }, 500);
     }, { passive: true });
     sheetHandle?.addEventListener('touchcancel', () => {
       handleIsDragging = false;
+      handleStartedOpen = false;
       handleDragY = 0;
       suppressHandleClick = true;
       root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
