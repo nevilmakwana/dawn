@@ -43,16 +43,38 @@
         "card_kUc9Gx": {
           "type": "card",
           "settings": {
-            "image": "shopify://shop_images/imgi_4_m.jpg",
-            "title": "Shoes",
-            "group_key": "",
+            "image": "shopify://shop_images/grey-exim-brown-leaf-print-cambric-cotton-bandana-product-shot.png",
+            "title": "Bandanas",
+            "group_key": "Bandanas",
             "landing_collection": "",
             "subtitle": "",
             "link": "",
-            "collection": "",
+            "collection": "women-cotton-bandanas",
             "collection_list": [],
             "product_list": [],
-            "product_tag": "best-seller"
+            "product_tag": ""
+          }
+        },
+        "child_collection_bandanas_crepe": {
+          "type": "child_collection",
+          "settings": {
+            "parent_group": "Bandanas",
+            "collection": "women-bandanas",
+            "title": "",
+            "tab_handle": "",
+            "subtitle": "",
+            "link": ""
+          }
+        },
+        "child_collection_bandanas_cotton": {
+          "type": "child_collection",
+          "settings": {
+            "parent_group": "Bandanas",
+            "collection": "women-cotton-bandanas",
+            "title": "",
+            "tab_handle": "",
+            "subtitle": "",
+            "link": ""
           }
         }
       },
@@ -60,7 +82,9 @@
         "card_wUCFgi",
         "child_collection_HrwhaX",
         "child_collection_yqHdRi",
-        "card_kUc9Gx"
+        "card_kUc9Gx",
+        "child_collection_bandanas_crepe",
+        "child_collection_bandanas_cotton"
       ],
       "name": "Collection showcase",
       "settings": {
