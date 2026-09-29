@@ -70,6 +70,7 @@ body:has(main[data-template='product']) .section-header.shopify-section-group-he
 .prada-product__drawer-close svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.6; }
 .prada-product__drawer-body { flex: 1 1 auto; min-height: 0; padding: 4px 48px 64px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
 .prada-product__drawer-pane { max-width: 680px; font-size: 14px; line-height: 1.7; }
+.prada-product__drawer-pane[data-prada-drawer-pane="details"] .light { opacity: 1; }
 .prada-product__drawer-pane[hidden] { display: none !important; }
 .prada-product__metafield-section { padding-bottom: 30px; }
 .prada-product__metafield-section > div > :first-child,
