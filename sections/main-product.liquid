@@ -10,6 +10,20 @@
   assign detail_care = product.metafields.custom.care_guide
   assign detail_delivery = product.metafields.custom.delivery_and_payment
   assign detail_shipping_returns = product.metafields.custom.shipping_and_returns
+  assign product_category_identity = product.title | append: ' ' | append: product.type | append: ' ' | append: product.handle | downcase
+  assign is_scarf_or_bandana_product = false
+  if product_category_identity contains 'scarf' or product_category_identity contains 'bandana'
+    assign is_scarf_or_bandana_product = true
+  endif
+  unless is_scarf_or_bandana_product
+    for product_collection in product.collections
+      assign product_collection_identity = product_collection.title | append: ' ' | append: product_collection.handle | downcase
+      if product_collection_identity contains 'scarf' or product_collection_identity contains 'bandana'
+        assign is_scarf_or_bandana_product = true
+        break
+      endif
+    endfor
+  endunless
   assign category_color_metafield = product.metafields.shopify['color-pattern']
   assign product_color_label = category_color_metafield.value | map: 'label' | join: ', '
   if product_color_label == blank
@@ -454,7 +468,11 @@
               <div>
                 <p>Free Shipping in India</p>
                 <p>48-Hour Returns on First Order</p>
-                <p>COD &amp; Partial COD Available</p>
+                {%- if is_scarf_or_bandana_product -%}
+                  <p>Cash On Delivery Available</p>
+                {%- else -%}
+                  <p>COD &amp; Partial COD Available</p>
+                {%- endif -%}
               </div>
             </section>
           {%- endif -%}
