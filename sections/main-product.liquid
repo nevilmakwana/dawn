@@ -10,39 +10,6 @@
   assign detail_care = product.metafields.custom.care_guide
   assign detail_delivery = product.metafields.custom.delivery_and_payment
   assign detail_shipping_returns = product.metafields.custom.shipping_and_returns
-  assign product_title_downcase = product.title | downcase
-  assign product_type_downcase = product.type | downcase
-  assign product_handle_downcase = product.handle | downcase
-  assign template_suffix_downcase = template.suffix | default: '' | downcase
-  assign is_scarf_product = false
-  assign is_custom_design_product = false
-
-  if product_title_downcase contains 'scarf' or product_type_downcase contains 'scarf'
-    assign is_scarf_product = true
-  endif
-
-  if product_title_downcase contains 'custom design' or product_handle_downcase contains 'custom-design' or template_suffix_downcase contains 'custom-design'
-    assign is_custom_design_product = true
-  endif
-
-  for product_tag in product.tags
-    assign product_tag_downcase = product_tag | downcase
-    if product_tag_downcase contains 'custom design' or product_tag_downcase contains 'custom-design' or product_tag_downcase contains 'custom_design'
-      assign is_custom_design_product = true
-      break
-    endif
-  endfor
-
-  for product_collection in product.collections
-    assign product_collection_title_downcase = product_collection.title | downcase
-    assign product_collection_handle_downcase = product_collection.handle | downcase
-    if product_collection_title_downcase contains 'scarf' or product_collection_handle_downcase contains 'scarf'
-      assign is_scarf_product = true
-    endif
-    if product_collection_title_downcase contains 'custom design' or product_collection_handle_downcase contains 'custom-design'
-      assign is_custom_design_product = true
-    endif
-  endfor
   assign category_color_metafield = product.metafields.shopify['color-pattern']
   assign product_color_label = category_color_metafield.value | map: 'label' | join: ', '
   if product_color_label == blank
@@ -482,7 +449,7 @@
             <section class="prada-product__metafield-section">
               <div>{{ detail_shipping_returns | metafield_tag }}</div>
             </section>
-          {%- elsif is_scarf_product and is_custom_design_product == false -%}
+          {%- else -%}
             <section class="prada-product__metafield-section">
               <div>
                 <p>Free Shipping in India</p>
@@ -490,9 +457,6 @@
                 <p>COD &amp; Partial COD Available</p>
               </div>
             </section>
-          {%- else -%}
-            <p>Shipping and return options are calculated at checkout.</p>
-            {%- if shop.shipping_policy.body != blank -%}{{ shop.shipping_policy.body }}{%- endif -%}
           {%- endif -%}
         </div>
         <div class="prada-product__drawer-pane prada-product__size-chart" data-prada-drawer-pane="size-chart" hidden>
