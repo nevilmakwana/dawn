@@ -422,6 +422,14 @@
     content: '';
   }
 
+  .prada-best-sellers button.prada-product-tile__pagination-dot:first-child::before {
+    transform: translateX(0.9rem);
+  }
+
+  .prada-best-sellers button.prada-product-tile__pagination-dot:last-child::before {
+    transform: translateX(-0.9rem);
+  }
+
   .prada-best-sellers button.prada-product-tile__pagination-dot.is-active {
     background: transparent;
   }
