@@ -1046,30 +1046,13 @@
     const mobilePanel = root.querySelector('.prada-product__panel');
     const scrollHint = root.querySelector('[data-prada-scroll-hint]');
     const sheetHandle = root.querySelector('[data-prada-sheet-handle]');
-    let sheetTouchStart = 0;
-    let handleDragY = 0;
-    let handleStartedOpen = false;
     let galleryTouchStart = 0;
     let galleryTouchStartedAtEnd = false;
     let galleryReturnScrollTop = mobileGallery?.scrollTop || 0;
-    let handleIsDragging = false;
     let suppressHandleClick = false;
-    let handleScrollStart = 0;
-    let handleClosedScrollTarget = 0;
-    let handleOpenScrollTarget = 0;
     let mobileSheetStateFrame = 0;
     let onboardingTimer;
     let scrollHintConsumed = false;
-    let mobileScrollAnimationFrame = 0;
-
-    const cancelMobileScrollAnimation = () => {
-      if (mobileScrollAnimationFrame) {
-        window.cancelAnimationFrame(mobileScrollAnimationFrame);
-        mobileScrollAnimationFrame = 0;
-      }
-      root.classList.remove('mobile-info-settling');
-    };
-
     const getMobileScrollTarget = (element, headerOffset = false) => {
       if (!element) return window.scrollY;
       const header = document.querySelector('.section-header');
@@ -1077,41 +1060,12 @@
       return Math.max(0, Math.round(window.scrollY + element.getBoundingClientRect().top - offset));
     };
 
-    const scrollMobilePageToPosition = (targetScrollTop) => {
-      cancelMobileScrollAnimation();
-      const startScrollTop = window.scrollY;
-      const scrollDistance = targetScrollTop - startScrollTop;
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      if (reduceMotion || Math.abs(scrollDistance) < 1) {
-        window.scrollTo(0, targetScrollTop);
-        return;
-      }
-
-      root.classList.add('mobile-info-settling');
-      const startTime = performance.now();
-      const duration = 360;
-      const step = (currentTime) => {
-        const progress = Math.min((currentTime - startTime) / duration, 1);
-        const easedProgress = 1 - Math.pow(1 - progress, 3);
-        window.scrollTo(0, Math.round(startScrollTop + scrollDistance * easedProgress));
-
-        if (progress < 1) {
-          mobileScrollAnimationFrame = window.requestAnimationFrame(step);
-          return;
-        }
-
-        mobileScrollAnimationFrame = 0;
-        window.scrollTo(0, targetScrollTop);
-        root.classList.remove('mobile-info-settling');
-      };
-
-      mobileScrollAnimationFrame = window.requestAnimationFrame(step);
-    };
-
     const scrollMobilePageTo = (element, { headerOffset = false } = {}) => {
       if (!element) return;
-      scrollMobilePageToPosition(getMobileScrollTarget(element, headerOffset));
+      window.scrollTo({
+        top: getMobileScrollTarget(element, headerOffset),
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+      });
     };
 
     const setupProductVideos = () => {
@@ -1241,7 +1195,6 @@
       mobileSheetStateFrame = 0;
       if (
         !mobileQuery.matches ||
-        handleIsDragging ||
         root.classList.contains('mobile-info-settling') ||
         root.classList.contains('mobile-info-closing')
       ) return;
@@ -1275,7 +1228,6 @@
     window.addEventListener('scroll', queueMobileSheetStateSync, { passive: true });
     mobileGallery?.addEventListener('scroll', updateMobileGallery, { passive: true });
     mobileGallery?.addEventListener('touchstart', (event) => {
-      cancelMobileScrollAnimation();
       window.clearTimeout(onboardingTimer);
       scrollHintConsumed = true;
       root.classList.remove('mobile-gallery-onboarding');
@@ -1286,7 +1238,9 @@
     }, { passive: true });
     mobileGallery?.addEventListener('touchend', (event) => {
       const upwardDistance = galleryTouchStart - event.changedTouches[0].clientY;
-      if (galleryTouchStartedAtEnd && upwardDistance > 45) openMobileSheet();
+      if (galleryTouchStartedAtEnd && upwardDistance > 45) {
+        openMobileSheet();
+      }
       galleryTouchStartedAtEnd = false;
     }, { passive: true });
     sheetHandle?.addEventListener('click', () => {
@@ -1297,91 +1251,17 @@
       if (root.classList.contains('mobile-info-open')) closeMobileSheet();
       else openMobileSheet();
     });
-    sheetHandle?.addEventListener('touchstart', (event) => {
-      cancelMobileScrollAnimation();
-      event.stopPropagation();
-      handleIsDragging = true;
-      handleStartedOpen = root.classList.contains('mobile-info-open');
-      suppressHandleClick = false;
-      sheetTouchStart = event.touches[0].clientY;
-      handleDragY = 0;
-      handleScrollStart = window.scrollY;
-      handleClosedScrollTarget = getMobileScrollTarget(root.closest('.shopify-section') || root);
-      handleOpenScrollTarget = getMobileScrollTarget(mobilePanel, true);
-      root.classList.remove('mobile-info-settling');
-      root.classList.add('mobile-info-dragging');
-    }, { passive: true });
-    sheetHandle?.addEventListener('touchmove', (event) => {
-      if (!handleIsDragging) return;
-      event.stopPropagation();
-      const dragDistance = event.touches[0].clientY - sheetTouchStart;
-      handleDragY = handleStartedOpen ? Math.max(0, dragDistance) : Math.min(0, dragDistance);
-      if (Math.abs(handleDragY) > 5) suppressHandleClick = true;
-      if (Math.abs(handleDragY) > 0) {
-        event.preventDefault();
-        const minimumTarget = Math.min(handleClosedScrollTarget, handleOpenScrollTarget);
-        const maximumTarget = Math.max(handleClosedScrollTarget, handleOpenScrollTarget);
-        const dragScrollTarget = Math.min(
-          maximumTarget,
-          Math.max(minimumTarget, handleScrollStart - handleDragY)
-        );
-        window.scrollTo(0, Math.round(dragScrollTarget));
-      }
-    }, { passive: false });
-    sheetHandle?.addEventListener('touchend', (event) => {
-      if (!handleIsDragging) return;
-      event.stopPropagation();
-      handleIsDragging = false;
-      const dragDistance = event.changedTouches[0].clientY - sheetTouchStart;
-      handleDragY = handleStartedOpen
-        ? Math.max(handleDragY, dragDistance)
-        : Math.min(handleDragY, dragDistance);
-      if (Math.abs(handleDragY) > 5) suppressHandleClick = true;
-      if (handleStartedOpen) {
-        if (handleDragY > 70) {
-          closeMobileSheet();
-        } else {
-          root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
-          window.requestAnimationFrame(() => scrollMobilePageTo(mobilePanel, { headerOffset: true }));
-        }
-      } else if (handleDragY < -45) {
-        openMobileSheet();
-      } else {
-        root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
-        scrollMobilePageToPosition(handleScrollStart);
-      }
-      handleStartedOpen = false;
-      window.setTimeout(() => { suppressHandleClick = false; }, 500);
-    }, { passive: true });
-    sheetHandle?.addEventListener('touchcancel', () => {
-      const restoreScrollTarget = handleStartedOpen ? handleOpenScrollTarget : handleScrollStart;
-      handleIsDragging = false;
-      handleStartedOpen = false;
-      handleDragY = 0;
-      suppressHandleClick = true;
-      root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
-      scrollMobilePageToPosition(restoreScrollTarget);
-      window.setTimeout(() => { suppressHandleClick = false; }, 500);
-    }, { passive: true });
     mobileQuery.addEventListener?.('change', () => {
-      cancelMobileScrollAnimation();
       if (mobileSheetStateFrame) {
         window.cancelAnimationFrame(mobileSheetStateFrame);
         mobileSheetStateFrame = 0;
       }
-      if (!mobileQuery.matches) root.classList.remove('mobile-info-open', 'mobile-info-closing');
+      if (!mobileQuery.matches) root.classList.remove('mobile-info-open');
       else {
         updateMobileGallery();
         queueMobileSheetStateSync();
       }
     });
-    queueMobileSheetStateSync();
-
-    if (document.readyState === 'complete') {
-      window.setTimeout(playMobileOnboarding, 650);
-    } else {
-      window.addEventListener('load', () => window.setTimeout(playMobileOnboarding, 650), { once: true });
-    }
 
     setupProductVideos();
     updateVariant({ updateHistory: false });
