@@ -722,7 +722,7 @@ class MenuDrawer extends HTMLElement {
 
   openMenuDrawer(summaryElement) {
     cancelAnimationFrame(this.openAnimationFrame);
-    this.mainDetailsToggle.classList.remove('menu-opening');
+    this.mainDetailsToggle.classList.remove('menu-opening', 'is-prada-closing');
 
     this.openAnimationFrame = requestAnimationFrame(() => {
       this.openAnimationFrame = requestAnimationFrame(() => {
@@ -743,6 +743,7 @@ class MenuDrawer extends HTMLElement {
 
     cancelAnimationFrame(this.openAnimationFrame);
     this.openAnimationFrame = null;
+    this.mainDetailsToggle.classList.add('is-prada-closing');
     this.mainDetailsToggle.classList.remove('menu-opening');
     this.mainDetailsToggle.querySelectorAll('details').forEach((details) => {
       details.removeAttribute('open');
@@ -793,6 +794,7 @@ class MenuDrawer extends HTMLElement {
         window.requestAnimationFrame(handleAnimation);
       } else {
         detailsElement.removeAttribute('open');
+        detailsElement.classList.remove('is-prada-closing');
         if (detailsElement.closest('details[open]')) {
           trapFocus(detailsElement.closest('details[open]'), detailsElement.querySelector('summary'));
         }
