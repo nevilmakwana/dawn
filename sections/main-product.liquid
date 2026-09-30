@@ -1044,7 +1044,6 @@
     const mobileQuery = window.matchMedia('(max-width: 989px)');
     const mobileGallery = root.querySelector('.prada-product__media-list');
     const mobilePanel = root.querySelector('.prada-product__panel');
-    const mobileInfo = root.querySelector('.prada-product__info');
     const scrollHint = root.querySelector('[data-prada-scroll-hint]');
     const sheetHandle = root.querySelector('[data-prada-sheet-handle]');
     let sheetTouchStart = 0;
@@ -1055,11 +1054,10 @@
     let galleryReturnScrollTop = mobileGallery?.scrollTop || 0;
     let handleIsDragging = false;
     let suppressHandleClick = false;
-    let infoTouchStartX = 0;
-    let infoTouchStartY = 0;
-    let infoGestureStartedOpen = false;
-    let infoGestureStartedAtTop = false;
-    let infoGestureClaimed = false;
+    let handleScrollStart = 0;
+    let handleClosedScrollTarget = 0;
+    let handleOpenScrollTarget = 0;
+    let mobileSheetStateFrame = 0;
     let onboardingTimer;
     let scrollHintConsumed = false;
     let mobileScrollAnimationFrame = 0;
@@ -1079,16 +1077,9 @@
       return Math.max(0, Math.round(window.scrollY + element.getBoundingClientRect().top - offset));
     };
 
-    const isMobileInfoAtTop = () => {
-      const panelScrollTarget = getMobileScrollTarget(mobilePanel, true);
-      return Math.abs(window.scrollY - panelScrollTarget) <= 4;
-    };
-
-    const scrollMobilePageTo = (element, { headerOffset = false } = {}) => {
-      if (!element) return;
+    const scrollMobilePageToPosition = (targetScrollTop) => {
       cancelMobileScrollAnimation();
       const startScrollTop = window.scrollY;
-      const targetScrollTop = getMobileScrollTarget(element, headerOffset);
       const scrollDistance = targetScrollTop - startScrollTop;
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1116,6 +1107,11 @@
       };
 
       mobileScrollAnimationFrame = window.requestAnimationFrame(step);
+    };
+
+    const scrollMobilePageTo = (element, { headerOffset = false } = {}) => {
+      if (!element) return;
+      scrollMobilePageToPosition(getMobileScrollTarget(element, headerOffset));
     };
 
     const setupProductVideos = () => {
@@ -1234,12 +1230,35 @@
     };
     const openMobileSheet = () => {
       if (!mobileQuery.matches || root.classList.contains('mobile-info-open')) return;
-      root.classList.remove('mobile-info-closing');
+      root.classList.remove('mobile-info-closing', 'mobile-info-dragging');
       root.classList.add('mobile-info-open');
       galleryReturnScrollTop = mobileGallery?.scrollTop || 0;
       sheetHandle?.setAttribute('aria-expanded', 'true');
       sheetHandle?.setAttribute('aria-label', 'Close product information');
       window.requestAnimationFrame(() => scrollMobilePageTo(mobilePanel, { headerOffset: true }));
+    };
+    const syncMobileSheetState = () => {
+      mobileSheetStateFrame = 0;
+      if (
+        !mobileQuery.matches ||
+        handleIsDragging ||
+        root.classList.contains('mobile-info-settling') ||
+        root.classList.contains('mobile-info-closing')
+      ) return;
+
+      const isOpen = window.scrollY >= getMobileScrollTarget(mobilePanel, true) - 2;
+      if (root.classList.contains('mobile-info-open') === isOpen) return;
+
+      root.classList.toggle('mobile-info-open', isOpen);
+      sheetHandle?.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      sheetHandle?.setAttribute(
+        'aria-label',
+        isOpen ? 'Close product information' : 'Open product information'
+      );
+    };
+    const queueMobileSheetStateSync = () => {
+      if (mobileSheetStateFrame) return;
+      mobileSheetStateFrame = window.requestAnimationFrame(syncMobileSheetState);
     };
     const updateMobileGallery = () => {
       if (!mobileQuery.matches || !mobileGallery || galleryMedia.length < 2) return;
@@ -1253,6 +1272,7 @@
       if (scrollHint) scrollHint.classList.toggle('is-visible', !scrollHintConsumed && hasStarted && !atLastMedia);
     };
 
+    window.addEventListener('scroll', queueMobileSheetStateSync, { passive: true });
     mobileGallery?.addEventListener('scroll', updateMobileGallery, { passive: true });
     mobileGallery?.addEventListener('touchstart', (event) => {
       cancelMobileScrollAnimation();
@@ -1285,8 +1305,11 @@
       suppressHandleClick = false;
       sheetTouchStart = event.touches[0].clientY;
       handleDragY = 0;
+      handleScrollStart = window.scrollY;
+      handleClosedScrollTarget = getMobileScrollTarget(root.closest('.shopify-section') || root);
+      handleOpenScrollTarget = getMobileScrollTarget(mobilePanel, true);
       root.classList.remove('mobile-info-settling');
-      if (handleStartedOpen) root.classList.add('mobile-info-dragging');
+      root.classList.add('mobile-info-dragging');
     }, { passive: true });
     sheetHandle?.addEventListener('touchmove', (event) => {
       if (!handleIsDragging) return;
@@ -1294,7 +1317,16 @@
       const dragDistance = event.touches[0].clientY - sheetTouchStart;
       handleDragY = handleStartedOpen ? Math.max(0, dragDistance) : Math.min(0, dragDistance);
       if (Math.abs(handleDragY) > 5) suppressHandleClick = true;
-      if (Math.abs(handleDragY) > 0) event.preventDefault();
+      if (Math.abs(handleDragY) > 0) {
+        event.preventDefault();
+        const minimumTarget = Math.min(handleClosedScrollTarget, handleOpenScrollTarget);
+        const maximumTarget = Math.max(handleClosedScrollTarget, handleOpenScrollTarget);
+        const dragScrollTarget = Math.min(
+          maximumTarget,
+          Math.max(minimumTarget, handleScrollStart - handleDragY)
+        );
+        window.scrollTo(0, Math.round(dragScrollTarget));
+      }
     }, { passive: false });
     sheetHandle?.addEventListener('touchend', (event) => {
       if (!handleIsDragging) return;
@@ -1316,61 +1348,34 @@
         openMobileSheet();
       } else {
         root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
+        scrollMobilePageToPosition(handleScrollStart);
       }
       handleStartedOpen = false;
       window.setTimeout(() => { suppressHandleClick = false; }, 500);
     }, { passive: true });
     sheetHandle?.addEventListener('touchcancel', () => {
+      const restoreScrollTarget = handleStartedOpen ? handleOpenScrollTarget : handleScrollStart;
       handleIsDragging = false;
       handleStartedOpen = false;
       handleDragY = 0;
       suppressHandleClick = true;
       root.classList.remove('mobile-info-dragging', 'mobile-info-settling');
+      scrollMobilePageToPosition(restoreScrollTarget);
       window.setTimeout(() => { suppressHandleClick = false; }, 500);
-    }, { passive: true });
-    mobileInfo?.addEventListener('touchstart', (event) => {
-      cancelMobileScrollAnimation();
-      infoTouchStartX = event.touches[0].clientX;
-      infoTouchStartY = event.touches[0].clientY;
-      infoGestureStartedOpen = root.classList.contains('mobile-info-open');
-      infoGestureStartedAtTop = infoGestureStartedOpen && isMobileInfoAtTop();
-      infoGestureClaimed = false;
-    }, { passive: true });
-    mobileInfo?.addEventListener('touchmove', (event) => {
-      const verticalDistance = infoTouchStartY - event.touches[0].clientY;
-      const horizontalDistance = Math.abs(infoTouchStartX - event.touches[0].clientX);
-      if (Math.abs(verticalDistance) <= horizontalDistance) return;
-
-      const shouldOpen = !infoGestureStartedOpen && verticalDistance > 8;
-      const shouldClose = infoGestureStartedOpen && infoGestureStartedAtTop && verticalDistance < -8;
-      if (!shouldOpen && !shouldClose) return;
-
-      infoGestureClaimed = true;
-      event.preventDefault();
-    }, { passive: false });
-    mobileInfo?.addEventListener('touchend', (event) => {
-      const verticalDistance = infoTouchStartY - event.changedTouches[0].clientY;
-      const horizontalDistance = Math.abs(infoTouchStartX - event.changedTouches[0].clientX);
-      const isVerticalGesture = Math.abs(verticalDistance) > horizontalDistance;
-
-      if (infoGestureClaimed && isVerticalGesture) {
-        if (!infoGestureStartedOpen && verticalDistance > 45) {
-          openMobileSheet();
-        } else if (infoGestureStartedOpen && infoGestureStartedAtTop && verticalDistance < -70) {
-          closeMobileSheet();
-        }
-      }
-
-      infoGestureClaimed = false;
-    }, { passive: true });
-    mobileInfo?.addEventListener('touchcancel', () => {
-      infoGestureClaimed = false;
     }, { passive: true });
     mobileQuery.addEventListener?.('change', () => {
       cancelMobileScrollAnimation();
+      if (mobileSheetStateFrame) {
+        window.cancelAnimationFrame(mobileSheetStateFrame);
+        mobileSheetStateFrame = 0;
+      }
       if (!mobileQuery.matches) root.classList.remove('mobile-info-open', 'mobile-info-closing');
-      else updateMobileGallery();
+      else {
+        updateMobileGallery();
+        queueMobileSheetStateSync();
+      }
     });
+    queueMobileSheetStateSync();
 
     if (document.readyState === 'complete') {
       window.setTimeout(playMobileOnboarding, 650);
