@@ -1,0 +1,48 @@
+{% doc %}
+  Renders crawlable links from parent collections to approved pSEO tag pages.
+
+  @example
+  {% render 'pseo-related-links' %}
+{% enddoc %}
+
+{%- liquid
+  assign related_pages = blank
+  assign current_tag_handle = current_tags.first | handleize
+
+  case collection.handle
+    when 'women-scarves'
+      assign related_pages = 'printed|Printed scarves'
+    when 'women-bandanas'
+      assign related_pages = 'floral|Floral bandanas,head|Head bandanas,printed|Printed bandanas'
+    when 'scented-candles'
+      assign related_pages = 'vanilla|Vanilla scented candles,pillar|Pillar candles'
+  endcase
+-%}
+
+{%- if related_pages != blank -%}
+  <nav class="prada-collection__related" aria-labelledby="CollectionRelatedHeading-{{ collection.id }}">
+    <h3 id="CollectionRelatedHeading-{{ collection.id }}" class="prada-collection__related-title">
+      Explore related collections
+    </h3>
+    <ul class="prada-collection__related-list" role="list">
+      {%- if current_tags -%}
+        <li>
+          <a class="prada-collection__related-link" href="{{ collection.url }}">{{ collection.title | escape }}</a>
+        </li>
+      {%- endif -%}
+      {%- assign related_items = related_pages | split: ',' -%}
+      {%- for related_item in related_items -%}
+        {%- assign related_parts = related_item | split: '|' -%}
+        {%- assign related_tag = related_parts.first -%}
+        {%- assign related_label = related_parts.last -%}
+        {%- unless current_tag_handle == related_tag -%}
+          <li>
+            <a class="prada-collection__related-link" href="{{ collection.url }}/{{ related_tag }}">
+              {{- related_label | escape -}}
+            </a>
+          </li>
+        {%- endunless -%}
+      {%- endfor -%}
+    </ul>
+  </nav>
+{%- endif -%}

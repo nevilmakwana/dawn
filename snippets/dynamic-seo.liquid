@@ -10,6 +10,7 @@
 {%- liquid
   assign home_url = routes.root_url | prepend: request.origin
   assign breadcrumb_name = blank
+  assign organization_logo = settings.logo | default: settings.brand_image | default: settings.logo_hover
 
   case request.page_type
     when 'product'
@@ -25,6 +26,19 @@
 
 {%- if request.page_type == 'search' -%}
   <meta name="robots" content="noindex,follow">
+{%- endif -%}
+
+{%- if request.page_type == 'index' -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": {{ home_url | append: '#organization' | json }},
+      "name": {{ shop.name | json }},
+      "url": {{ home_url | json }}{% if organization_logo != blank %},
+      "logo": {{ organization_logo | image_url: width: 600 | prepend: 'https:' | json }}{% endif %}
+    }
+  </script>
 {%- endif -%}
 
 {%- if request.page_type == 'product' -%}

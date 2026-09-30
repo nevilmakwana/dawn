@@ -59,6 +59,8 @@
       if paginate.current_page == 1
         if current_tags or collection.description != blank
           assign show_collection_seo = true
+        elsif collection.handle == 'women-scarves' or collection.handle == 'women-bandanas' or collection.handle == 'scented-candles'
+          assign show_collection_seo = true
         endif
       endif
     -%}
@@ -268,6 +270,7 @@
               {{- collection.description -}}
             {%- endif -%}
           </div>
+          {%- render 'pseo-related-links' -%}
         </section>
       {%- endif -%}
     </div>

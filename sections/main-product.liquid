@@ -125,7 +125,8 @@
               position: forloop.index,
               loading: initial_media_loading,
               fetchpriority: initial_media_fetch_priority,
-              preload: initial_media_preload
+              preload: initial_media_preload,
+              product_title: product.title
             -%}
           {%- endif -%}
         {%- endfor -%}
@@ -143,6 +144,7 @@
                   assign media_fetch_priority = 'low'
                   assign media_preload = false
                   assign mobile_image_width = media.preview_image.width | at_most: 950
+                  assign media_alt = media.alt | default: product.title
                   if forloop.first
                     assign media_loading = 'eager'
                     assign media_fetch_priority = 'high'
@@ -167,7 +169,7 @@
                     preload: media_preload,
                     widths: '360, 480, 550, 640, 750, 950, 1200, 1500, 1800',
                     sizes: '(min-width: 990px) 50vw, 100vw',
-                    alt: media.alt | default: product.title,
+                    alt: media_alt,
                     class: 'prada-product__gallery-image'
                   }}
                 </picture>
@@ -534,12 +536,13 @@
                   "
                   sizes="100vw"
                 >
+                {%- assign media_alt = media.alt | default: product.title -%}
                 {{ media.preview_image | image_url: width: 1800 | image_tag:
                   loading: 'lazy',
                   fetchpriority: 'low',
                   widths: '360, 480, 550, 640, 750, 950, 1200, 1500, 1800',
                   sizes: '(min-width: 990px) 50vw, 100vw',
-                  alt: media.alt | default: product.title,
+                  alt: media_alt,
                   class: 'prada-product__gallery-image'
                 }}
               </picture>
@@ -568,7 +571,8 @@
               media: media,
               section_id: section.id,
               variant_id: variant.id,
-              position: forloop.index
+              position: forloop.index,
+              product_title: product.title
             -%}
           {%- endif -%}
         {%- endfor -%}

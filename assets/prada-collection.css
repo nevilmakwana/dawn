@@ -38,6 +38,32 @@
   margin-bottom: 0;
 }
 
+.prada-collection__related {
+  margin-top: 3.2rem;
+}
+
+.prada-collection__related-title {
+  margin: 0 0 1.2rem;
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.prada-collection__related-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.prada-collection__related-link {
+  color: inherit;
+  font-size: 1.4rem;
+  text-underline-offset: 0.3rem;
+}
+
 @media screen and (max-width: 749px) {
   .prada-collection__seo {
     padding: 4.8rem 2rem 5.6rem;

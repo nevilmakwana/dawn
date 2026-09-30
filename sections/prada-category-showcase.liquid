@@ -1,7 +1,9 @@
-{{ 'component-price.css' | asset_url | stylesheet_tag }}
-{{ 'section-related-products.css' | asset_url | stylesheet_tag }}
-{{ 'prada-collection.css' | asset_url | stylesheet_tag }}
-{{ 'greyexim-prada-mobile-flow.css' | asset_url | stylesheet_tag }}
+{%- unless request.page_type == 'index' -%}
+  {{ 'component-price.css' | asset_url | stylesheet_tag }}
+  {{ 'section-related-products.css' | asset_url | stylesheet_tag }}
+  {{ 'prada-collection.css' | asset_url | stylesheet_tag }}
+  {{ 'greyexim-prada-mobile-flow.css' | asset_url | stylesheet_tag }}
+{%- endunless -%}
 
 {%- liquid
   assign showcase_mode = section.settings.content_mode | default: 'categories'

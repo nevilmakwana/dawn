@@ -9,12 +9,14 @@
   - loading: Native image loading mode (optional, defaults to lazy)
   - fetchpriority: Browser fetch priority (optional, defaults to low)
   - preload: Send a responsive preload hint for this image (optional)
+  - product_title: Product title used when the media has no alt text
 {% endcomment %}
 
 {%- liquid
   assign media_loading = loading | default: 'lazy'
   assign media_fetch_priority = fetchpriority | default: 'low'
   assign mobile_image_width = media.preview_image.width | at_most: 950
+  assign media_alt = media.alt | default: product_title
   assign media_preload = false
   if preload == true
     assign media_preload = true
@@ -46,7 +48,7 @@
           preload: media_preload,
           widths: '360, 480, 550, 640, 750, 950, 1200, 1500, 1800',
           sizes: '(min-width: 990px) 50vw, 100vw',
-          alt: media.alt | default: product.title,
+          alt: media_alt,
           class: 'prada-product__gallery-image'
         }}
       </picture>

@@ -97,6 +97,7 @@
     assign pseo_output_title = pseo_title
     assign pseo_output_description = pseo_description
   endif
+  assign pseo_meta_description = pseo_output_description | strip_html | strip | truncate: 160
 
   assign pseo_share_image = collection.metafields.custom.social_share_image.value
   assign pseo_share_image = pseo_share_image | default: collection.image | default: collection.products.first.featured_image
@@ -120,14 +121,14 @@
       {%- if current_page != 1 %} – Page {{ current_page }}{% endif -%}
       {%- unless pseo_output_title contains shop.name %} – {{ shop.name }}{% endunless -%}
     </title>
-    {%- if pseo_output_description != blank -%}
-      <meta name="description" content="{{ pseo_output_description | escape }}">
+    {%- if pseo_meta_description != blank -%}
+      <meta name="description" content="{{ pseo_meta_description | escape }}">
     {%- endif -%}
     <meta property="og:site_name" content="{{ shop.name }}">
     <meta property="og:url" content="{{ pseo_url }}">
     <meta property="og:title" content="{{ pseo_output_title | escape }}">
     <meta property="og:type" content="website">
-    <meta property="og:description" content="{{ pseo_output_description | escape }}">
+    <meta property="og:description" content="{{ pseo_meta_description | escape }}">
     {%- if pseo_share_image -%}
       <meta property="og:image" content="https:{{ pseo_image_url }}">
       <meta property="og:image:secure_url" content="https:{{ pseo_image_url }}">
@@ -141,7 +142,7 @@
     {%- endif -%}
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ pseo_output_title | escape }}">
-    <meta name="twitter:description" content="{{ pseo_output_description | escape }}">
+    <meta name="twitter:description" content="{{ pseo_meta_description | escape }}">
     {%- if pseo_share_image -%}
       <meta name="twitter:image" content="https:{{ pseo_image_url }}">
       <meta name="twitter:image:alt" content="{{ pseo_share_image.alt | default: pseo_output_title | escape }}">

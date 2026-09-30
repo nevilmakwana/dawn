@@ -39,6 +39,15 @@
         assign seo_description = shop.shipping_policy.body | strip_html | strip
       endif
 
+      if request.page_type == 'index'
+        if seo_page_title == blank or seo_page_title == shop.name
+          assign seo_page_title = 'Printed Scarves, Bandanas & Scented Candles | Grey Exim'
+        endif
+        if seo_description == blank or seo_description == shop.name
+          assign seo_description = 'Shop premium printed scarves, cotton bandanas and scented candles at Grey Exim. Explore designs for everyday styling, gifting and home decor in India.'
+        endif
+      endif
+
       unless seo_canonical_url contains '://'
         assign seo_canonical_url = request.origin | append: seo_canonical_url
       endunless
@@ -310,6 +319,15 @@
 
     {%- if settings.animations_reveal_on_scroll -%}
       <script src="{{ 'animations.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+    {%- comment -%}Prevent an unstyled first frame by loading homepage above-the-fold CSS in the head.{%- endcomment -%}
+    {%- if request.page_type == 'index' -%}
+      {{ 'section-image-banner.css' | asset_url | stylesheet_tag }}
+      {{ 'component-price.css' | asset_url | stylesheet_tag }}
+      {{ 'section-related-products.css' | asset_url | stylesheet_tag }}
+      {{ 'prada-collection.css' | asset_url | stylesheet_tag }}
+      {{ 'greyexim-prada-mobile-flow.css' | asset_url | stylesheet_tag }}
     {%- endif -%}
 
     {{ content_for_header }}

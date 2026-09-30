@@ -1,4 +1,6 @@
-{{ 'section-image-banner.css' | asset_url | stylesheet_tag }}
+{%- unless request.page_type == 'index' -%}
+  {{ 'section-image-banner.css' | asset_url | stylesheet_tag }}
+{%- endunless -%}
 
 {%- if section.settings.mobile_center_zoom and section.settings.mobile_auto_subject_focus -%}
   <script src="{{ 'image-banner-subject-focus.js' | asset_url }}" defer="defer"></script>
