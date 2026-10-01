@@ -321,15 +321,6 @@
       <script src="{{ 'animations.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
 
-    {%- comment -%}Prevent an unstyled first frame by loading homepage above-the-fold CSS in the head.{%- endcomment -%}
-    {%- if request.page_type == 'index' -%}
-      {{ 'section-image-banner.css' | asset_url | stylesheet_tag }}
-      {{ 'component-price.css' | asset_url | stylesheet_tag }}
-      {{ 'section-related-products.css' | asset_url | stylesheet_tag }}
-      {{ 'prada-collection.css' | asset_url | stylesheet_tag }}
-      {{ 'greyexim-prada-mobile-flow.css' | asset_url | stylesheet_tag }}
-    {%- endif -%}
-
     {{ content_for_header }}
 
     {%- liquid
@@ -547,6 +538,14 @@
     {% endstyle %}
 
     {{ 'base.css' | asset_url | stylesheet_tag }}
+    {%- comment -%}Load homepage component CSS after base.css so component rules keep their intended cascade.{%- endcomment -%}
+    {%- if request.page_type == 'index' -%}
+      {{ 'section-image-banner.css' | asset_url | stylesheet_tag }}
+      {{ 'component-price.css' | asset_url | stylesheet_tag }}
+      {{ 'section-related-products.css' | asset_url | stylesheet_tag }}
+      {{ 'prada-collection.css' | asset_url | stylesheet_tag }}
+      {{ 'greyexim-prada-mobile-flow.css' | asset_url | stylesheet_tag }}
+    {%- endif -%}
     {{ 'greyexim-typography.css' | asset_url | stylesheet_tag }}
     {{ 'prada-product-wishlist.css' | asset_url | stylesheet_tag }}
     {%- if request.path contains '/pages/contact' -%}
