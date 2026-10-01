@@ -1,3 +1,7 @@
+html,
+body.template-product,
+body.template-product #MainContent,
+.section-prada-product { background-color: #fff; }
 .section-prada-product { margin: 0; padding-top: var(--header-height, 72px); }
 body:has(main[data-template='product']) .section-header,
 body:has(main[data-template='product']) .section-header .header-wrapper,
@@ -92,6 +96,8 @@ body:has(main[data-template='product']) .section-header.shopify-section-group-he
 html.prada-drawer-open body { overflow: hidden; }
 
 @media screen and (max-width: 989px) {
+  html,
+  body.template-product { overscroll-behavior-y: none; }
   html.prada-drawer-open body.template-product #MainContent { z-index: var(--ge-layer-global-dialog, 21000) !important; }
   html.prada-drawer-open body.template-product .section-header { z-index: 0 !important; visibility: hidden !important; pointer-events: none !important; }
   .section-prada-product { padding-top: var(--header-height, 56px); }
