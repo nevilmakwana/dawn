@@ -6,7 +6,20 @@
   assign payment_policy_title = section.settings.payment_policy_title | default: section.settings.title | default: 'Payment Policy'
   assign payment_policy_updated = section.settings.payment_policy_last_updated | default: section.settings.last_updated | default: 'Last updated: 13 August 2026'
   assign payment_policy_toc_label = section.settings.payment_policy_toc_label | default: section.settings.toc_label | default: 'On this page'
-  assign payment_policy_content = section.settings.payment_policy_content | default: section.settings.policy_content
+  assign admin_payment_policy = blank
+
+  for store_policy in shop.policies
+    if store_policy.url contains '/policies/contact-information'
+      assign admin_payment_policy = store_policy
+      break
+    endif
+  endfor
+
+  if admin_payment_policy != blank and admin_payment_policy.body != blank
+    assign payment_policy_content = admin_payment_policy.body
+  else
+    assign payment_policy_content = section.settings.payment_policy_content | default: section.settings.policy_content
+  endif
 -%}
 
 <style>
@@ -58,7 +71,7 @@
           {{ payment_policy_content }}
         {%- elsif request.design_mode -%}
           <p class="grey-payment-policy__empty">
-            Paste your complete Payment Policy in this section's <strong>Policy content</strong> setting. Format every main section title as Heading 2 to create the numbered navigation automatically.
+            Add the Payment Policy in Shopify Admin under <strong>Settings &rarr; Policies &rarr; Contact information</strong>, or paste it into this section's <strong>Policy content</strong> setting. Format every main section title as Heading 2 to create the numbered navigation automatically.
           </p>
         {%- endif -%}
       </div>
@@ -209,7 +222,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "This editor stores Payment Policy only. Content entered here is never used by another policy."
+      "content": "The Shopify Admin Contact information policy is shown first when it has content. This section's Policy content is used as the fallback."
     },
     {
       "type": "text",
