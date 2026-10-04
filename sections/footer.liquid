@@ -70,6 +70,7 @@
 
     assign greyexim_cookie_url = routes.root_url | append: 'pages/contact?view=cookie-policy'
     assign greyexim_payment_url = routes.root_url | append: 'pages/contact?view=payment-policy'
+    assign greyexim_blog_url = routes.root_url | append: 'blogs/news'
   -%}
 
   <div id="GreyeximFooter" class="prada-footer">
@@ -103,6 +104,7 @@
         <ul>
           <li><a href="/pages/contact#send-us-email">{{ section.settings.contact_email | default: shop.email | escape }}</a></li>
           <li><a href="/pages/contact?view=faq">FAQ</a></li>
+          <li><a href="{{ greyexim_blog_url }}">Blogs</a></li>
         </ul>
       </div>
     </details>
@@ -612,6 +614,7 @@
             <li><a href="/pages/contact">Contact Grey Exim</a></li>
             {%- if shop.email != blank -%}<li><a href="mailto:{{ shop.email | escape }}">{{ shop.email | escape }}</a></li>{%- endif -%}
             <li><a href="/pages/contact?view=faq">FAQ</a></li>
+            <li><a href="{{ greyexim_blog_url }}">Blogs</a></li>
           </ul>
         </div>
       </details>
