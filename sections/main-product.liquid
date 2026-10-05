@@ -10,6 +10,12 @@
   assign detail_care = product.metafields.custom.care_guide
   assign detail_delivery = product.metafields.custom.delivery_and_payment
   assign detail_shipping_returns = product.metafields.custom.shipping_and_returns
+  assign size_chart_entry = product.metafields.custom.size_chart.value
+  assign size_chart_image = size_chart_entry.size_chart_image.value
+  if size_chart_image == blank
+    assign size_chart_image = section.settings.size_chart_image
+  endif
+  assign size_chart_alt = size_chart_image.alt | default: size_chart_entry.name.value | default: 'Size chart'
   assign product_category_identity = product.title | append: ' ' | append: product.type | append: ' ' | append: product.handle | downcase
   assign is_scarf_or_bandana_product = false
   if product_category_identity contains 'scarf' or product_category_identity contains 'bandana'
@@ -480,10 +486,10 @@
           {%- endif -%}
         </div>
         <div class="prada-product__drawer-pane prada-product__size-chart" data-prada-drawer-pane="size-chart" hidden>
-          {%- if section.settings.size_chart_image != blank -%}
-            {{ section.settings.size_chart_image | image_url: width: 1600 | image_tag: loading: 'lazy', widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 50vw, 100vw', alt: 'Size chart' }}
+          {%- if size_chart_image != blank -%}
+            {{ size_chart_image | image_url: width: 1600 | image_tag: loading: 'lazy', widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 50vw, 100vw', alt: size_chart_alt }}
           {%- else -%}
-            <p>Add a size chart image from the product section settings in Theme Editor.</p>
+            <p>Select a Size Chart in the product metafields.</p>
           {%- endif -%}
         </div>
         {%- for option in product.options_with_values -%}
@@ -1281,7 +1287,7 @@
     {
       "type": "image_picker",
       "id": "size_chart_image",
-      "label": "Size chart image"
+      "label": "Fallback size chart image"
     }
   ],
   "blocks": [
