@@ -380,15 +380,23 @@
                 endif
               -%}
               {%- unless option_name contains 'color' or option_name contains 'colour' or is_default_title_option -%}
-                <div class="prada-product__option{% if option_name contains 'size' %} prada-product__option--size{% endif %}">
+                <div
+                  class="prada-product__option{% if option_name contains 'size' %} prada-product__option--size{% endif %}"
+                  {% if option_name contains 'size' %}data-prada-size-option{% endif %}
+                >
                   {%- unless option_name contains 'size' -%}<span>{{ option.name }}</span>{%- endunless -%}
                   <button
                     class="prada-product__option-trigger"
                     type="button"
                     data-prada-drawer-open="option-{{ forloop.index0 }}"
                     data-prada-drawer-label="Select {{ option.name | escape }}"
+                    {% if option_name contains 'size' %}
+                      data-prada-size-trigger
+                      aria-describedby="PradaSizeError-{{ section.id }}"
+                      aria-invalid="false"
+                    {% endif %}
                   >
-                    <span>{% if option_name contains 'size' %}Size&nbsp;&nbsp;{% endif %}<span data-prada-selected-value="{{ forloop.index0 }}">{{ option.selected_value }}</span></span>
+                    <span data-prada-selected-value="{{ forloop.index0 }}">{% if option_name contains 'size' %}Select Size{% else %}{{ option.selected_value }}{% endif %}</span>
                     <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5"/></svg>
                   </button>
                   {%- if option_name contains 'size' -%}
@@ -400,6 +408,9 @@
                     {%- endfor -%}
                   </select>
                 </div>
+                {%- if option_name contains 'size' -%}
+                  <p class="prada-product__size-error" id="PradaSizeError-{{ section.id }}" data-prada-size-error role="status" aria-live="polite" hidden>Please select a size</p>
+                {%- endif -%}
               {%- endunless -%}
             {%- endfor -%}
           </div>
@@ -508,10 +519,10 @@
               {%- assign option_index = forloop.index0 -%}
               {%- for value in option.values -%}
                 <button
-                  class="prada-product__choice{% if option.selected_value == value %} is-selected{% endif %}"
+                  class="prada-product__choice{% unless drawer_option_name contains 'size' %}{% if option.selected_value == value %} is-selected{% endif %}{% endunless %}"
                   type="button"
                   role="option"
-                  aria-selected="{% if option.selected_value == value %}true{% else %}false{% endif %}"
+                  aria-selected="{% if drawer_option_name contains 'size' %}false{% elsif option.selected_value == value %}true{% else %}false{% endif %}"
                   data-prada-option-choice="{{ option_index }}"
                   data-prada-option-value="{{ value | escape }}"
                 >
@@ -675,6 +686,14 @@
     const productColorLabel = {{ product_color_label | json }};
     const selectors = [...root.querySelectorAll('[data-prada-option]')]
       .sort((a, b) => Number(a.dataset.pradaOption) - Number(b.dataset.pradaOption));
+    const sizeSelector = selectors.find((selector) => selector.dataset.pradaOptionName?.toLowerCase().includes('size'));
+    const sizeOptionIndex = sizeSelector ? Number(sizeSelector.dataset.pradaOption) : -1;
+    const sizeOption = root.querySelector('[data-prada-size-option]');
+    const sizeTrigger = root.querySelector('[data-prada-size-trigger]');
+    const sizeError = root.querySelector('[data-prada-size-error]');
+    const productForm = root.querySelector('.prada-product__form');
+    let hasExplicitSizeSelection = !sizeSelector;
+    let sizeFeedbackTimer = 0;
     const colorSelector = root.querySelector('.prada-product__option--color [data-prada-option]');
     const colorOptionIndex = colorSelector ? Number(colorSelector.dataset.pradaOption) : -1;
     const colorChoices = colorOptionIndex >= 0
@@ -827,10 +846,17 @@
       price.innerHTML = `${variant.compare_at_price > variant.price ? `<s class="money">${formatMoney(variant.compare_at_price)}</s>` : ''}<span class="money">${formatMoney(variant.price)}</span>`;
       price.dataset.pradaPriceCents = String(variant.price);
       selectors.forEach((selector, index) => {
+        const isPendingSize = index === sizeOptionIndex && !hasExplicitSizeSelection;
         const selectedValue = root.querySelector(`[data-prada-selected-value="${index}"]`);
-        if (selectedValue) selectedValue.textContent = selector.value;
+        if (selectedValue) {
+          selectedValue.textContent = isPendingSize
+            ? 'Select Size'
+            : index === sizeOptionIndex
+              ? `Size  ${selector.value}`
+              : selector.value;
+        }
         root.querySelectorAll(`[data-prada-option-choice="${index}"]`).forEach((choice) => {
-          const selected = choice.dataset.pradaOptionValue === selector.value;
+          const selected = !isPendingSize && choice.dataset.pradaOptionValue === selector.value;
           choice.classList.toggle('is-selected', selected);
           choice.setAttribute('aria-selected', selected ? 'true' : 'false');
           if (choice.classList.contains('prada-product__swatch')) choice.setAttribute('aria-pressed', selected ? 'true' : 'false');
@@ -871,6 +897,44 @@
       scheduleVariantGallery(variant);
       if (updateHistory) window.history.replaceState({}, '', `${root.dataset.productUrl}?variant=${variant.id}`);
     };
+
+    const clearSizeFeedback = () => {
+      window.clearTimeout(sizeFeedbackTimer);
+      sizeOption?.classList.remove('is-size-required');
+      sizeTrigger?.setAttribute('aria-invalid', 'false');
+      if (sizeError) sizeError.hidden = true;
+    };
+
+    const showSizeFeedback = () => {
+      if (!sizeOption || !sizeTrigger || !sizeError) return;
+
+      window.clearTimeout(sizeFeedbackTimer);
+      sizeOption.classList.remove('is-size-required');
+      void sizeOption.offsetWidth;
+      sizeOption.classList.add('is-size-required');
+      sizeTrigger.setAttribute('aria-invalid', 'true');
+      sizeError.hidden = false;
+
+      const selectorBounds = sizeOption.getBoundingClientRect();
+      const headerOffset = Number.parseFloat(getComputedStyle(root).getPropertyValue('--header-height')) || 72;
+      const isOutsideViewport = selectorBounds.top < headerOffset + 16 || selectorBounds.bottom > window.innerHeight - 16;
+
+      if (isOutsideViewport) {
+        sizeOption.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        window.setTimeout(() => sizeTrigger.focus({ preventScroll: true }), 350);
+      } else {
+        sizeTrigger.focus({ preventScroll: true });
+      }
+
+      sizeFeedbackTimer = window.setTimeout(clearSizeFeedback, 1700);
+    };
+
+    productForm?.addEventListener('submit', (event) => {
+      if (!sizeSelector || hasExplicitSizeSelection) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      showSizeFeedback();
+    }, { capture: true });
 
     selectors.forEach((selector) => {
       selector.addEventListener('change', () => updateVariant({ syncWishlist: true }));
@@ -955,8 +1019,14 @@
     root.querySelectorAll('[data-prada-drawer-close]').forEach((button) => button.addEventListener('click', closeDrawer));
     root.querySelectorAll('[data-prada-option-choice]').forEach((choice) => {
       choice.addEventListener('click', () => {
-        const selector = selectors[Number(choice.dataset.pradaOptionChoice)];
+        const choiceOptionIndex = Number(choice.dataset.pradaOptionChoice);
+        const selector = selectors[choiceOptionIndex];
         const shouldCloseDrawer = !choice.classList.contains('prada-product__swatch');
+        if (!selector) return;
+        if (choiceOptionIndex === sizeOptionIndex) {
+          hasExplicitSizeSelection = true;
+          clearSizeFeedback();
+        }
         selector.value = choice.dataset.pradaOptionValue;
         selector.dispatchEvent(new Event('change', { bubbles: true }));
         if (shouldCloseDrawer) closeDrawer();
