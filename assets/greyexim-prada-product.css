@@ -87,6 +87,7 @@ body:has(main[data-template='product']) .section-header.shopify-section-group-he
 .prada-product__drawer-accordion[open] summary svg { transform: rotate(180deg); }
 .prada-product__drawer-accordion > div { padding: 0 0 28px; }
 .prada-product__size-chart { max-width: none; }
+.prada-product__size-chart-images { display: grid; gap: 24px; }
 .prada-product__size-chart img { display: block; width: 100%; height: auto; }
 .prada-product__choice-list { margin-top: -24px; }
 .prada-product__choice { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 72px; padding: 0 20px; border: 0; border-bottom: 1px solid var(--prada-border); background: #fff; color: #111; font: inherit; font-size: 16px; text-align: left; cursor: pointer; }

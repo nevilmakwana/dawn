@@ -11,8 +11,9 @@
   assign detail_delivery = product.metafields.custom.delivery_and_payment
   assign detail_shipping_returns = product.metafields.custom.shipping_and_returns
   assign size_chart_entry = product.metafields.custom.size_chart.value
+  assign size_chart_images = size_chart_entry.size_chart_images.value
   assign size_chart_image = size_chart_entry.size_chart_image.value
-  if size_chart_image == blank
+  if size_chart_images == blank and size_chart_image == blank
     assign size_chart_image = section.settings.size_chart_image
   endif
   assign size_chart_alt = size_chart_image.alt | default: size_chart_entry.name.value | default: 'Size chart'
@@ -486,7 +487,14 @@
           {%- endif -%}
         </div>
         <div class="prada-product__drawer-pane prada-product__size-chart" data-prada-drawer-pane="size-chart" hidden>
-          {%- if size_chart_image != blank -%}
+          {%- if size_chart_images != blank -%}
+            <div class="prada-product__size-chart-images">
+              {%- for chart_image in size_chart_images -%}
+                {%- assign chart_image_alt = chart_image.alt | default: size_chart_entry.name.value | default: 'Size chart' -%}
+                {{ chart_image | image_url: width: 1600 | image_tag: loading: 'lazy', widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 50vw, 100vw', alt: chart_image_alt }}
+              {%- endfor -%}
+            </div>
+          {%- elsif size_chart_image != blank -%}
             {{ size_chart_image | image_url: width: 1600 | image_tag: loading: 'lazy', widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 50vw, 100vw', alt: size_chart_alt }}
           {%- else -%}
             <p>Select a Size Chart in the product metafields.</p>
