@@ -8,38 +8,6 @@
         "padding_bottom": 36
       }
     },
-    "offer-notice-manager": {
-      "type": "offer-notice-manager",
-      "settings": {
-        "max_visible": "2",
-        "show_icon": true,
-        "icon_style": "diamond",
-        "show_cta": true,
-        "show_terms": true,
-        "terms_expanded": false,
-        "terms_when_eligible": false
-      },
-      "blocks": {
-        "starter-offer": {
-          "type": "offer",
-          "settings": {
-            "enabled": false,
-            "offer_title": "New offer",
-            "offer_scope": "all_products",
-            "qualification_basis": "quantity",
-            "minimum_quantity": 1,
-            "maximum_quantity": 0,
-            "minimum_subtotal": 0,
-            "maximum_subtotal": 0,
-            "show_on": "cart",
-            "priority": "05"
-          }
-        }
-      },
-      "block_order": [
-        "starter-offer"
-      ]
-    },
     "cart-footer": {
       "type": "main-cart-footer",
       "settings": {
@@ -67,7 +35,6 @@
   },
   "order": [
     "cart-items",
-    "offer-notice-manager",
     "cart-footer"
   ]
 }

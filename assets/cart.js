@@ -313,7 +313,6 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
   getSectionsToRender() {
     const mainCartItems = document.getElementById('main-cart-items');
     const mainCartFooter = document.getElementById('main-cart-footer');
-    const offerNoticeManager = document.querySelector('[data-offer-notice-manager][data-id]');
     const sections = [
       {
         id: 'cart-icon-bubble',
@@ -341,13 +340,6 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
         id: 'main-cart-footer',
         section: mainCartFooter.dataset.id,
         selector: '.js-contents',
-      });
-    }
-    if (offerNoticeManager?.dataset.id) {
-      sections.push({
-        id: offerNoticeManager.id,
-        section: offerNoticeManager.dataset.id,
-        selector: '[data-offer-notice-manager-content]',
       });
     }
 
