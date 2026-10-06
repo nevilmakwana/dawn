@@ -1,0 +1,753 @@
+{{ 'offer-notice-manager.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign current_timestamp = 'now' | date: '%s' | plus: 0
+  assign visible_offer_count = 0
+  assign visible_limit = section.settings.max_visible | plus: 0
+  if section.settings.max_visible == 'all'
+    assign visible_limit = 10
+  endif
+-%}
+
+{%- capture offer_cards -%}
+  {%- for priority_number in (1..10) -%}
+    {%- if visible_offer_count >= visible_limit -%}
+      {%- break -%}
+    {%- endif -%}
+    {%- assign priority_value = priority_number -%}
+    {%- if priority_number < 10 -%}
+      {%- assign priority_value = priority_number | prepend: '0' -%}
+    {%- endif -%}
+
+    {%- for block in section.blocks -%}
+      {%- if visible_offer_count >= visible_limit -%}
+        {%- break -%}
+      {%- endif -%}
+      {%- if block.type == 'offer' and block.settings.enabled and block.settings.offer_title != blank and block.settings.priority == priority_value -%}
+        {%- liquid
+          assign location_allowed = false
+          case block.settings.show_on
+            when 'cart'
+              if request.page_type == 'cart'
+                assign location_allowed = true
+              endif
+            when 'product'
+              if request.page_type == 'product'
+                assign location_allowed = true
+              endif
+            when 'both'
+              if request.page_type == 'cart' or request.page_type == 'product'
+                assign location_allowed = true
+              endif
+          endcase
+
+          assign date_allowed = true
+          if block.settings.start_date != blank
+            assign start_timestamp = block.settings.start_date | date: '%s' | plus: 0
+            if start_timestamp > 0 and current_timestamp < start_timestamp
+              assign date_allowed = false
+            endif
+          endif
+          if block.settings.end_date != blank
+            assign end_of_day = block.settings.end_date | append: ' 23:59:59'
+            assign end_timestamp = end_of_day | date: '%s' | plus: 0
+            if end_timestamp > 0 and current_timestamp > end_timestamp
+              assign date_allowed = false
+            endif
+          endif
+
+          assign offer_relevant = false
+          assign eligible_quantity = 0
+          assign eligible_subtotal = 0
+
+          case block.settings.offer_scope
+            when 'all_products'
+              for item in cart.items
+                assign eligible_quantity = eligible_quantity | plus: item.quantity
+                assign eligible_subtotal = eligible_subtotal | plus: item.final_line_price
+              endfor
+              if request.page_type == 'cart' and cart.item_count > 0
+                assign offer_relevant = true
+              elsif request.page_type == 'product' and product != blank
+                assign offer_relevant = true
+              endif
+
+            when 'specific_products'
+              assign eligible_product_ids = block.settings.eligible_products | map: 'id'
+              for item in cart.items
+                if eligible_product_ids contains item.product.id
+                  assign eligible_quantity = eligible_quantity | plus: item.quantity
+                  assign eligible_subtotal = eligible_subtotal | plus: item.final_line_price
+                endif
+              endfor
+              if request.page_type == 'cart' and eligible_quantity > 0
+                assign offer_relevant = true
+              elsif request.page_type == 'product' and eligible_product_ids contains product.id
+                assign offer_relevant = true
+              endif
+
+            when 'specific_collections'
+              assign eligible_collection_ids = block.settings.eligible_collections | map: 'id'
+              for item in cart.items
+                assign item_is_eligible = false
+                for product_collection in item.product.collections
+                  if eligible_collection_ids contains product_collection.id
+                    assign item_is_eligible = true
+                    break
+                  endif
+                endfor
+                if item_is_eligible
+                  assign eligible_quantity = eligible_quantity | plus: item.quantity
+                  assign eligible_subtotal = eligible_subtotal | plus: item.final_line_price
+                endif
+              endfor
+              if request.page_type == 'cart' and eligible_quantity > 0
+                assign offer_relevant = true
+              elsif request.page_type == 'product' and product != blank
+                for product_collection in product.collections
+                  if eligible_collection_ids contains product_collection.id
+                    assign offer_relevant = true
+                    break
+                  endif
+                endfor
+              endif
+          endcase
+
+          assign minimum_metric = block.settings.minimum_quantity | plus: 0
+          assign maximum_metric = block.settings.maximum_quantity | plus: 0
+          assign current_metric = eligible_quantity
+          if block.settings.qualification_basis == 'subtotal'
+            assign minimum_metric = block.settings.minimum_subtotal | times: 100 | round
+            assign maximum_metric = block.settings.maximum_subtotal | times: 100 | round
+            assign current_metric = eligible_subtotal
+          endif
+
+          assign is_below_minimum = false
+          assign is_above_maximum = false
+          if current_metric < minimum_metric
+            assign is_below_minimum = true
+          endif
+          if maximum_metric > 0 and current_metric > maximum_metric
+            assign is_above_maximum = true
+          endif
+
+          assign discount_confirmed = false
+          assign normalized_discount_id = block.settings.applied_discount_id | strip | downcase
+          if normalized_discount_id != blank
+            for discount_application in cart.discount_applications
+              assign normalized_discount_title = discount_application.title | strip | downcase
+              if normalized_discount_title == normalized_discount_id
+                assign discount_confirmed = true
+                break
+              endif
+            endfor
+          endif
+
+          assign offer_status = 'not-eligible'
+          assign status_label = section.settings.not_eligible_label
+          assign status_message = block.settings.progress_message
+          if discount_confirmed
+            assign offer_status = 'applied'
+            assign status_label = section.settings.applied_label
+            assign status_message = block.settings.applied_message
+          elsif is_below_minimum == false and is_above_maximum == false
+            assign offer_status = 'eligible'
+            assign status_label = section.settings.eligible_label
+            assign status_message = block.settings.eligible_message
+          elsif is_above_maximum
+            assign status_message = block.settings.maximum_message
+          endif
+
+          assign remaining_quantity = minimum_metric | minus: current_metric
+          if remaining_quantity < 0 or block.settings.qualification_basis == 'subtotal'
+            assign remaining_quantity = 0
+          endif
+          assign remaining_amount = minimum_metric | minus: current_metric
+          if remaining_amount < 0 or block.settings.qualification_basis != 'subtotal'
+            assign remaining_amount = 0
+          endif
+          assign remaining_amount_money = remaining_amount | money
+          assign eligible_subtotal_money = eligible_subtotal | money
+          assign status_message = status_message | replace: '[remaining_quantity]', remaining_quantity
+          assign status_message = status_message | replace: '[remaining_amount]', remaining_amount_money
+          assign status_message = status_message | replace: '[eligible_quantity]', eligible_quantity
+          assign status_message = status_message | replace: '[eligible_subtotal]', eligible_subtotal_money
+
+          assign show_progress = false
+          assign progress_percent = 0
+          if offer_status == 'not-eligible' and is_below_minimum and minimum_metric > 0
+            assign show_progress = true
+            assign progress_percent = current_metric | times: 100 | divided_by: minimum_metric
+            if progress_percent > 100
+              assign progress_percent = 100
+            endif
+          endif
+
+          assign show_terms = section.settings.show_terms
+          if block.settings.terms == blank
+            assign show_terms = false
+          endif
+          if section.settings.terms_when_eligible and offer_status == 'not-eligible'
+            assign show_terms = false
+          endif
+
+          assign should_render = false
+          if location_allowed and date_allowed and offer_relevant
+            assign should_render = true
+          endif
+        -%}
+
+        {%- if should_render -%}
+          {%- assign visible_offer_count = visible_offer_count | plus: 1 -%}
+          <li>
+            <article
+              class="offer-notice-manager__card"
+              {% if block.settings.announcement_anchor != blank %}
+                id="{{ block.settings.announcement_anchor | handleize }}"
+              {% endif %}
+              data-status="{{ offer_status }}"
+              aria-labelledby="OfferNoticeTitle-{{ section.id }}-{{ block.id }}"
+              {{ block.shopify_attributes }}
+            >
+              {%- if section.settings.show_icon and section.settings.icon_style != 'none' -%}
+                <span
+                  class="offer-notice-manager__icon offer-notice-manager__icon--{{ section.settings.icon_style }}"
+                  aria-hidden="true"
+                >
+                  {%- if offer_status == 'applied' -%}
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="m5 12.5 4.2 4.2L19 7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  {%- else -%}
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 3.5 14.2 9l5.8 3-5.8 3L12 20.5 9.8 15 4 12l5.8-3L12 3.5Z" stroke-width="1.25" stroke-linejoin="round"/>
+                    </svg>
+                  {%- endif -%}
+                </span>
+              {%- endif -%}
+
+              <div class="offer-notice-manager__content">
+                <div class="offer-notice-manager__heading-row">
+                  <h2 class="offer-notice-manager__title" id="OfferNoticeTitle-{{ section.id }}-{{ block.id }}">
+                    {{ block.settings.offer_title | escape }}
+                  </h2>
+                  {%- if status_label != blank -%}
+                    <span class="offer-notice-manager__status">{{ status_label | escape }}</span>
+                  {%- endif -%}
+                </div>
+
+                {%- if block.settings.description != blank -%}
+                  <div class="offer-notice-manager__description">
+                    {{ block.settings.description | escape | newline_to_br }}
+                  </div>
+                {%- endif -%}
+
+                {%- if status_message != blank -%}
+                  <p class="offer-notice-manager__message">{{ status_message | escape }}</p>
+                {%- endif -%}
+
+                {%- if show_progress -%}
+                  <div
+                    class="offer-notice-manager__progress"
+                    role="progressbar"
+                    aria-label="{{ section.settings.progress_aria_label | escape }}"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="{{ progress_percent }}"
+                  >
+                    <span
+                      class="offer-notice-manager__progress-value"
+                      style="--offer-progress: {{ progress_percent }}%;"
+                    ></span>
+                  </div>
+                {%- endif -%}
+
+                {%- if show_terms -%}
+                  <details class="offer-notice-manager__terms"{% if section.settings.terms_expanded %} open{% endif %}>
+                    <summary>
+                      {%- if block.settings.terms_label != blank -%}
+                        {{ block.settings.terms_label | escape }}
+                      {%- else -%}
+                        {{ section.settings.terms_toggle_label | escape }}
+                      {%- endif -%}
+                    </summary>
+                    <div class="offer-notice-manager__terms-content">
+                      {{ block.settings.terms | escape | newline_to_br }}
+                    </div>
+                  </details>
+                {%- endif -%}
+              </div>
+
+              {%- if section.settings.show_cta and block.settings.cta_text != blank and block.settings.cta_url != blank -%}
+                <div class="offer-notice-manager__action">
+                  <a class="offer-notice-manager__cta" href="{{ block.settings.cta_url }}">
+                    {{ block.settings.cta_text | escape }}
+                  </a>
+                </div>
+              {%- endif -%}
+            </article>
+          </li>
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endfor -%}
+{%- endcapture -%}
+
+<div
+  id="OfferNoticeManager-{{ section.id }}"
+  class="offer-notice-manager"
+  data-offer-notice-manager
+  data-id="{{ section.id }}"
+  style="
+    --offer-notice-background: {{ section.settings.background_color }};
+    --offer-notice-text: {{ section.settings.text_color }};
+    --offer-notice-muted: {{ section.settings.muted_text_color }};
+    --offer-notice-border: {{ section.settings.border_color }};
+    --offer-notice-accent: {{ section.settings.accent_color }};
+    --offer-notice-radius: {{ section.settings.corner_radius }}px;
+    --offer-notice-border-width: {{ section.settings.border_width }}px;
+    --offer-notice-padding-desktop: {{ section.settings.padding_desktop }}px;
+    --offer-notice-padding-mobile: {{ section.settings.padding_mobile }}px;
+    --offer-notice-title-size: {{ section.settings.title_size }}px;
+    --offer-notice-description-size: {{ section.settings.description_size }}px;
+    --offer-notice-terms-size: {{ section.settings.terms_size }}px;
+  "
+>
+  <div data-offer-notice-manager-content aria-live="polite" aria-atomic="true">
+    {%- if visible_offer_count > 0 -%}
+      <section class="offer-notice-manager__surface" aria-label="{{ section.settings.region_label | escape }}">
+        <ul class="offer-notice-manager__list">
+          {{ offer_cards }}
+        </ul>
+      </section>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Offer notice manager",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 10,
+  "enabled_on": {
+    "templates": ["cart", "product"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Display"
+    },
+    {
+      "type": "select",
+      "id": "max_visible",
+      "label": "Maximum visible offers",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "all", "label": "All" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_icon",
+      "label": "Show icon",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "label": "Icon style",
+      "options": [
+        { "value": "diamond", "label": "Diamond" },
+        { "value": "circle", "label": "Circle" },
+        { "value": "none", "label": "None" }
+      ],
+      "default": "diamond"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show offer buttons",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_terms",
+      "label": "Show terms",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "terms_expanded",
+      "label": "Keep terms expanded",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "terms_when_eligible",
+      "label": "Show terms only when eligible",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Editable labels"
+    },
+    {
+      "type": "text",
+      "id": "region_label",
+      "label": "Section accessibility label",
+      "default": "Available offers"
+    },
+    {
+      "type": "text",
+      "id": "not_eligible_label",
+      "label": "Not eligible label",
+      "default": "Offer progress"
+    },
+    {
+      "type": "text",
+      "id": "eligible_label",
+      "label": "Eligible label",
+      "default": "Eligible"
+    },
+    {
+      "type": "text",
+      "id": "applied_label",
+      "label": "Applied label",
+      "default": "Applied"
+    },
+    {
+      "type": "text",
+      "id": "terms_toggle_label",
+      "label": "Default terms link label",
+      "default": "View offer terms"
+    },
+    {
+      "type": "text",
+      "id": "progress_aria_label",
+      "label": "Progress accessibility label",
+      "default": "Offer progress"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "muted_text_color",
+      "label": "Secondary text",
+      "default": "#5f5f5f"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border",
+      "default": "#d8d8d8"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent and button",
+      "default": "#111111"
+    },
+    {
+      "type": "header",
+      "content": "Spacing and type"
+    },
+    {
+      "type": "range",
+      "id": "padding_desktop",
+      "min": 12,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Desktop card padding",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_mobile",
+      "min": 12,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Mobile card padding",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "corner_radius",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Corner radius",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 3,
+      "step": 1,
+      "unit": "px",
+      "label": "Border width",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Title size",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Description size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "terms_size",
+      "min": 11,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Terms size",
+      "default": 13
+    }
+  ],
+  "blocks": [
+    {
+      "type": "offer",
+      "name": "Offer",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "enabled",
+          "label": "Enable offer",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "offer_title",
+          "label": "Offer title",
+          "default": "New offer"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description"
+        },
+        {
+          "type": "textarea",
+          "id": "terms",
+          "label": "Terms and conditions"
+        },
+        {
+          "type": "text",
+          "id": "terms_label",
+          "label": "Terms link label",
+          "info": "Leave blank to use the section default."
+        },
+        {
+          "type": "header",
+          "content": "Status messages"
+        },
+        {
+          "type": "textarea",
+          "id": "progress_message",
+          "label": "Not eligible message",
+          "default": "Add [remaining_quantity] more eligible item(s) to unlock this offer.",
+          "info": "Available placeholders: [remaining_quantity], [remaining_amount], [eligible_quantity], [eligible_subtotal]."
+        },
+        {
+          "type": "textarea",
+          "id": "eligible_message",
+          "label": "Eligible message",
+          "default": "Your cart is eligible for this offer."
+        },
+        {
+          "type": "textarea",
+          "id": "applied_message",
+          "label": "Applied message",
+          "default": "The matching discount is applied to your cart."
+        },
+        {
+          "type": "textarea",
+          "id": "maximum_message",
+          "label": "Maximum exceeded message",
+          "default": "Your cart is outside this offer's maximum limit."
+        },
+        {
+          "type": "header",
+          "content": "Button"
+        },
+        {
+          "type": "text",
+          "id": "cta_text",
+          "label": "Button label"
+        },
+        {
+          "type": "url",
+          "id": "cta_url",
+          "label": "Button link"
+        },
+        {
+          "type": "text",
+          "id": "announcement_anchor",
+          "label": "Announcement link anchor",
+          "info": "Optional. For example, enter seasonal-offer and use /cart#seasonal-offer as the announcement button link."
+        },
+        {
+          "type": "header",
+          "content": "Eligibility"
+        },
+        {
+          "type": "select",
+          "id": "offer_scope",
+          "label": "Offer applies to",
+          "options": [
+            { "value": "all_products", "label": "All products" },
+            { "value": "specific_products", "label": "Specific products" },
+            { "value": "specific_collections", "label": "Specific collections" }
+          ],
+          "default": "all_products"
+        },
+        {
+          "type": "product_list",
+          "id": "eligible_products",
+          "label": "Eligible products",
+          "limit": 50
+        },
+        {
+          "type": "collection_list",
+          "id": "eligible_collections",
+          "label": "Eligible collections",
+          "limit": 50
+        },
+        {
+          "type": "select",
+          "id": "qualification_basis",
+          "label": "Qualification basis",
+          "options": [
+            { "value": "quantity", "label": "Eligible item quantity" },
+            { "value": "subtotal", "label": "Eligible item subtotal" }
+          ],
+          "default": "quantity"
+        },
+        {
+          "type": "number",
+          "id": "minimum_quantity",
+          "label": "Minimum eligible quantity",
+          "default": 1
+        },
+        {
+          "type": "number",
+          "id": "maximum_quantity",
+          "label": "Maximum eligible quantity",
+          "default": 0,
+          "info": "Use 0 for no maximum."
+        },
+        {
+          "type": "number",
+          "id": "minimum_subtotal",
+          "label": "Minimum eligible subtotal",
+          "default": 0,
+          "info": "Enter the amount in your store currency, without a currency symbol."
+        },
+        {
+          "type": "number",
+          "id": "maximum_subtotal",
+          "label": "Maximum eligible subtotal",
+          "default": 0,
+          "info": "Use 0 for no maximum."
+        },
+        {
+          "type": "text",
+          "id": "applied_discount_id",
+          "label": "Applied discount title or code",
+          "info": "APPLIED is shown only when this exactly matches a discount title available in the cart."
+        },
+        {
+          "type": "header",
+          "content": "Schedule and placement"
+        },
+        {
+          "type": "text",
+          "id": "start_date",
+          "label": "Start date",
+          "info": "Optional. Use YYYY-MM-DD."
+        },
+        {
+          "type": "text",
+          "id": "end_date",
+          "label": "End date",
+          "info": "Optional. Use YYYY-MM-DD. The full end date is included."
+        },
+        {
+          "type": "select",
+          "id": "show_on",
+          "label": "Show on",
+          "options": [
+            { "value": "cart", "label": "Cart" },
+            { "value": "product", "label": "Product" },
+            { "value": "both", "label": "Cart and product" }
+          ],
+          "default": "cart"
+        },
+        {
+          "type": "select",
+          "id": "priority",
+          "label": "Priority",
+          "info": "1 is highest. Reorder blocks to control ties.",
+          "options": [
+            { "value": "01", "label": "1" },
+            { "value": "02", "label": "2" },
+            { "value": "03", "label": "3" },
+            { "value": "04", "label": "4" },
+            { "value": "05", "label": "5" },
+            { "value": "06", "label": "6" },
+            { "value": "07", "label": "7" },
+            { "value": "08", "label": "8" },
+            { "value": "09", "label": "9" },
+            { "value": "10", "label": "10" }
+          ],
+          "default": "05"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Offer notice manager",
+      "blocks": [
+        { "type": "offer" }
+      ]
+    }
+  ]
+}
+{% endschema %}
