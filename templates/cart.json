@@ -23,16 +23,24 @@
         "starter-offer": {
           "type": "offer",
           "settings": {
-            "enabled": false,
-            "offer_title": "New offer",
+            "enabled": true,
+            "offer_title": "Buy 2 & Get 20% Off",
+            "description": "Buy any 2 eligible products and get 20% off.",
+            "progress_message": "Add [remaining_quantity] more item(s) to unlock 20% off.",
+            "eligible_message": "Your cart qualifies for 20% off.",
+            "applied_message": "The 20% discount has been applied to your cart.",
+            "cta_text": "Shop now",
+            "cta_url": "shopify://collections/all",
+            "announcement_anchor": "buy-2-get-20-off",
             "offer_scope": "all_products",
             "qualification_basis": "quantity",
-            "minimum_quantity": 1,
+            "minimum_quantity": 2,
             "maximum_quantity": 0,
             "minimum_subtotal": 0,
             "maximum_subtotal": 0,
+            "applied_discount_id": "BUY 2 & GET 20% OFF",
             "show_on": "cart",
-            "priority": "05"
+            "priority": "01"
           }
         }
       },
