@@ -449,6 +449,37 @@
       }
     }
 
+    html.gx-announcement-visible #MainContent > #shopify-section-{{ section.id }}:first-child,
+    html.gx-announcement-visible #MainContent > #shopify-section-{{ section.id }}:first-child #Banner-{{ section.id }} {
+      min-height: calc(100vh - var(--gx-hero-viewport-offset, 0px)) !important;
+      height: calc(100vh - var(--gx-hero-viewport-offset, 0px)) !important;
+    }
+
+    @supports (height: 100svh) {
+      html.gx-announcement-visible #MainContent > #shopify-section-{{ section.id }}:first-child,
+      html.gx-announcement-visible #MainContent > #shopify-section-{{ section.id }}:first-child #Banner-{{ section.id }} {
+        min-height: calc(100svh - var(--gx-hero-viewport-offset, 0px)) !important;
+        height: calc(100svh - var(--gx-hero-viewport-offset, 0px)) !important;
+      }
+    }
+
+    @supports (height: 100dvh) {
+      html.gx-announcement-visible #MainContent > #shopify-section-{{ section.id }}:first-child,
+      html.gx-announcement-visible #MainContent > #shopify-section-{{ section.id }}:first-child #Banner-{{ section.id }} {
+        min-height: calc(100dvh - var(--gx-hero-viewport-offset, 0px)) !important;
+        height: calc(100dvh - var(--gx-hero-viewport-offset, 0px)) !important;
+      }
+    }
+
+    @media screen and (min-width: 750px) {
+      html.gx-announcement-visible #MainContent > #shopify-section-{{ section.id }}:first-child #Banner-{{ section.id }} .banner__media > img,
+      html.gx-announcement-visible #MainContent > #shopify-section-{{ section.id }}:first-child #Banner-{{ section.id }} .banner__media > video,
+      html.gx-announcement-visible #MainContent > #shopify-section-{{ section.id }}:first-child #Banner-{{ section.id }} .banner__responsive-picture > img,
+      html.gx-announcement-visible #MainContent > #shopify-section-{{ section.id }}:first-child #Banner-{{ section.id }} .banner__video-poster > img {
+        object-position: center top !important;
+      }
+    }
+
     #Banner-{{ section.id }} .banner__media,
     #Banner-{{ section.id }} .banner__content {
       min-height: 100% !important;
@@ -548,9 +579,12 @@
       }
 
       #Banner-{{ section.id }} {
-        aspect-ratio: 1079 / 2048 !important;
+        aspect-ratio: {% if mobile_banner_aspect_ratio != blank %}{{ mobile_banner_aspect_ratio }}{% else %}9 / 16{% endif %} !important;
         min-height: 0 !important;
         height: auto !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow: hidden !important;
         --mobile-banner-subject-position: {{ mobile_subject_focus_position }};
       }
 
@@ -604,17 +638,44 @@
         position: absolute !important;
         inset: 0 !important;
         width: 100% !important;
+        min-width: 100% !important;
+        max-width: none !important;
+        overflow: hidden !important;
       }
 
       #Banner-{{ section.id }} .banner__media > img,
       #Banner-{{ section.id }} .banner__media > svg,
       #Banner-{{ section.id }} .banner__media > video {
+        position: absolute !important;
+        inset: 0 !important;
         width: 100% !important;
+        min-width: 100% !important;
+        max-width: none !important;
         height: 100% !important;
+        min-height: 100% !important;
         object-fit: cover !important;
         object-position: var(--mobile-banner-subject-position, center center) !important;
         transition: object-position 300ms ease;
+        transform: translateZ(0);
       }
+    }
+  {%- endif -%}
+
+  {%- if section.settings.enable_custom_font_colors -%}
+    #Banner-{{ section.id }} .banner__heading {
+      color: {{ section.settings.heading_font_color }} !important;
+    }
+
+    #Banner-{{ section.id }} .banner__text,
+    #Banner-{{ section.id }} .banner__text p,
+    #Banner-{{ section.id }} .banner__text a,
+    #Banner-{{ section.id }} .banner__text strong {
+      color: {{ section.settings.text_font_color }} !important;
+    }
+
+    #Banner-{{ section.id }} .banner__buttons .button,
+    #Banner-{{ section.id }} .prada-banner-link-button {
+      color: {{ section.settings.button_font_color }} !important;
     }
   {%- endif -%}
 {%- endstyle -%}
@@ -1221,6 +1282,34 @@
       "id": "color_scheme",
       "label": "t:sections.all.colors.label",
       "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Custom font colors"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_custom_font_colors",
+      "default": false,
+      "label": "Enable custom font colors"
+    },
+    {
+      "type": "color",
+      "id": "heading_font_color",
+      "label": "Heading font color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_font_color",
+      "label": "Text font color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "button_font_color",
+      "label": "Button font color",
+      "default": "#FFFFFF"
     },
     {
       "type": "checkbox",
