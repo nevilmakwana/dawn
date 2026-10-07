@@ -633,12 +633,34 @@
     }
 
     .social-links a {
+      display: block !important;
+      width: 22px !important;
+      height: 22px !important;
       color: #171717 !important;
-      font-size: 10px !important;
+      font-size: 0 !important;
       font-weight: 700 !important;
       line-height: 1.4 !important;
       text-decoration: none !important;
       text-transform: uppercase !important;
+    }
+
+    .social-icon {
+      display: block !important;
+      width: 22px !important;
+      height: 22px !important;
+      border: 0 !important;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .social-links a {
+        color: #d0d0d0 !important;
+        -webkit-text-fill-color: #d0d0d0 !important;
+      }
+    }
+
+    [data-ogsc] .social-links a {
+      color: #d0d0d0 !important;
+      -webkit-text-fill-color: #d0d0d0 !important;
     }
 
     .footer .disclaimer__subtext,
@@ -700,9 +722,6 @@
         padding-left: 4px !important;
       }
 
-      .social-links a {
-        font-size: 9px !important;
-      }
     }
   </style>
 </head>
@@ -723,7 +742,7 @@
                       <td class="brand-logo-cell">
                         <a href="{{ shop.url }}" aria-label="Visit Grey Exim">
                           <img
-                            src="https://www.greyexim.com/cdn/shop/files/Logo-Wordmark_Black.png?v=1777105537&amp;width=440"
+                            src="https://www.greyexim.com/cdn/shop/t/6/assets/grey-exim-logo-grey-wordmark.png"
                             alt="Grey Exim"
                             width="220"
                             class="brand-logo"
@@ -4450,11 +4469,11 @@
                       <td>
                         <table class="social-links" role="presentation" align="center">
                           <tr>
-                            <td><a href="https://www.instagram.com/greyexim">Instagram</a></td>
-                            <td><a href="https://www.facebook.com/GreyExim/">Facebook</a></td>
-                            <td><a href="https://www.pinterest.com/greyexim">Pinterest</a></td>
-                            <td><a href="https://www.youtube.com/@GreyExim">YouTube</a></td>
-                            <td><a href="https://www.linkedin.com/company/grey-exim/">LinkedIn</a></td>
+                            <td><a href="https://www.instagram.com/greyexim" aria-label="Instagram"><img class="social-icon" src="https://img.icons8.com/ios-glyphs/60/8c8c8c/instagram-new.png" alt="Instagram" width="22" height="22"></a></td>
+                            <td><a href="https://www.pinterest.com/greyexim" aria-label="Pinterest"><img class="social-icon" src="https://img.icons8.com/ios-filled/60/8c8c8c/pinterest.png" alt="Pinterest" width="22" height="22"></a></td>
+                            <td><a href="https://www.facebook.com/GreyExim/" aria-label="Facebook"><img class="social-icon" src="https://img.icons8.com/ios-filled/60/8c8c8c/facebook-new.png" alt="Facebook" width="22" height="22"></a></td>
+                            <td><a href="https://bsky.app/profile/greyexim.com" aria-label="Bluesky"><img class="social-icon" src="https://img.icons8.com/material-sharp/60/8c8c8c/bluesky.png" alt="Bluesky" width="22" height="22"></a></td>
+                            <td><a href="https://www.youtube.com/@GreyExim" aria-label="YouTube"><img class="social-icon" src="https://img.icons8.com/ios-filled/60/8c8c8c/youtube-play.png" alt="YouTube" width="22" height="22"></a></td>
                           </tr>
                         </table>
 
