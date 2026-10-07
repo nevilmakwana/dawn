@@ -286,17 +286,12 @@ class CartDrawer extends HTMLElement {
 
     const lineKey = response?.key || response?.id;
     if (lineKey) {
-      state.lineReference.key = String(lineKey);
+      this.setRowLineKey(state.row, lineKey);
       state.lineReference.resolveKey?.(String(lineKey));
-      if (state.row?.isConnected) {
-        state.row.dataset.cartLineKey = String(lineKey);
-        state.row.querySelectorAll('cart-remove-button').forEach((button) => {
-          button.dataset.lineKey = String(lineKey);
-        });
-        state.row.querySelectorAll('[data-quantity-line-key]').forEach((input) => {
-          input.dataset.quantityLineKey = String(lineKey);
-        });
-      }
+    }
+
+    if (state.row?.isConnected && Number.isFinite(response?.final_price)) {
+      this.updateRowUnitPrice(state.row, response.final_price);
     }
 
     if (Number.isFinite(response?.quantity) && state.row?.isConnected) {
@@ -317,7 +312,6 @@ class CartDrawer extends HTMLElement {
       this.updateQuantityControlState(state.row);
     }
 
-    this.scheduleRefreshAfterOptimisticAdd(state);
   }
 
   cancelOptimisticAdd(state) {
@@ -340,7 +334,16 @@ class CartDrawer extends HTMLElement {
   }
 
   scheduleRefreshAfterOptimisticAdd(_state, { after } = {}) {
-    Promise.resolve(after).catch(() => undefined).finally(() => this.requestCanonicalRefresh());
+    Promise.resolve(after)
+      .then((cart) => {
+        if (typeof cart?.item_count !== 'number') return;
+        this.setDisplayedTotals(cart.item_count, cart.total_price);
+        const row = _state?.row;
+        const line = this.findCartLine(cart, row, _state?.lineReference?.key);
+        if (line && row?.isConnected) this.syncRowFromCartLine(row, line);
+      })
+      .catch(() => undefined)
+      .finally(() => this.requestCanonicalRefresh());
   }
 
   removeItem(removeButton, event) {
@@ -382,15 +385,7 @@ class CartDrawer extends HTMLElement {
     const removeRequest = async () => {
       let lineKey = lineReference.key;
       if (!lineKey && lineReference.keyPromise) lineKey = await lineReference.keyPromise;
-      if (!lineKey) throw new Error('Cart line is not ready');
-
-      const response = await fetch(`${routes.cart_change_url}`, {
-        ...fetchConfig(),
-        body: JSON.stringify({ id: lineKey, quantity: 0 }),
-      });
-      const cart = await response.json();
-      if (!response.ok || cart?.errors) throw new Error(cart?.errors || window.cartStrings?.error || 'Cart update failed');
-      return cart;
+      return this.changeCartLine(row, lineKey, 0);
     };
 
     const promise = window.PradaCartMutations?.enqueue
@@ -534,6 +529,123 @@ class CartDrawer extends HTMLElement {
     };
   }
 
+  setRowLineKey(row, lineKey) {
+    if (!row || !lineKey) return;
+    const key = String(lineKey);
+    row.dataset.cartLineKey = key;
+    row.querySelectorAll('cart-remove-button').forEach((button) => {
+      button.dataset.lineKey = key;
+    });
+    row.querySelectorAll('[data-quantity-line-key]').forEach((input) => {
+      input.dataset.quantityLineKey = key;
+    });
+
+    if (row._pradaLineReference) row._pradaLineReference.key = key;
+    if (row._pradaQuantityState) row._pradaQuantityState.lineKey = key;
+  }
+
+  updateRowUnitPrice(row, unitPrice) {
+    const price = Number.parseInt(unitPrice || '0', 10);
+    if (!row || !Number.isFinite(price) || price < 0) return;
+    row.dataset.cartUnitPrice = String(price);
+    const priceElement = row.querySelector('.prada-cart-drawer__price');
+    if (priceElement) priceElement.textContent = this.formatMoney(price, priceElement.textContent);
+  }
+
+  findCartLine(cart, row, preferredKey, preferredQuantity) {
+    const items = Array.isArray(cart?.items) ? cart.items : [];
+    if (preferredKey) {
+      const exact = items.find((item) => String(item.key) === String(preferredKey));
+      if (exact) return exact;
+    }
+
+    const variantId = row?.dataset.cartVariantId || row?.querySelector('[data-quantity-variant-id]')?.dataset.quantityVariantId;
+    const candidates = items.filter((item) => String(item.variant_id || item.id) === String(variantId || ''));
+    if (candidates.length <= 1) return candidates[0] || null;
+
+    const linePosition = Number.parseInt(row?.dataset.cartLinePosition || '', 10);
+    const positional = Number.isFinite(linePosition) ? items[linePosition - 1] : null;
+    if (positional && candidates.includes(positional)) return positional;
+
+    const quantity = Number.parseInt(preferredQuantity || row?.dataset.cartQuantity || '', 10);
+    return candidates.find((item) => item.quantity === quantity) || candidates[0] || null;
+  }
+
+  syncRowFromCartLine(row, line) {
+    if (!row || !line) return;
+    this.setRowLineKey(row, line.key);
+    row.dataset.cartVariantId = String(line.variant_id || line.id || row.dataset.cartVariantId || '');
+    this.updateRowQuantity(row, line.quantity);
+    this.updateRowUnitPrice(row, line.final_price ?? line.price);
+  }
+
+  isInvalidLineError(cart) {
+    const message = [cart?.description, cart?.message, cart?.errors]
+      .filter(Boolean)
+      .map((value) => (typeof value === 'string' ? value : JSON.stringify(value)))
+      .join(' ');
+    return /no valid id|valid id or line|line parameter|invalid.*(?:id|line)/i.test(message);
+  }
+
+  async fetchCurrentCart() {
+    const cartUrl = window.routes?.cart_url || '/cart';
+    const response = await fetch(`${cartUrl}.js`, {
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    });
+    if (!response.ok) throw new Error(window.cartStrings?.error || 'Cart refresh failed');
+    return response.json();
+  }
+
+  async changeCartLine(row, requestedKey, quantity) {
+    const sendChange = async (lineKey) => {
+      if (!lineKey) return { response: null, cart: { description: 'No valid id or line parameter' } };
+      const response = await fetch(`${routes.cart_change_url}`, {
+        ...fetchConfig(),
+        cache: 'no-store',
+        body: JSON.stringify({ id: String(lineKey), quantity }),
+      });
+      let cart;
+      try {
+        cart = await response.json();
+      } catch (_error) {
+        cart = { description: window.cartStrings?.error || 'Cart update failed' };
+      }
+      return { response, cart };
+    };
+
+    let result = await sendChange(requestedKey);
+    if (!result.response?.ok || result.cart?.errors || result.cart?.status) {
+      if (!this.isInvalidLineError(result.cart)) {
+        throw new Error(
+          result.cart?.description ||
+            result.cart?.message ||
+            result.cart?.errors ||
+            window.cartStrings?.error ||
+            'Cart update failed',
+        );
+      }
+
+      const currentCart = await this.fetchCurrentCart();
+      const currentLine = this.findCartLine(currentCart, row, requestedKey);
+      if (!currentLine?.key) throw new Error(window.cartStrings?.error || 'Cart item is no longer available');
+      this.setRowLineKey(row, currentLine.key);
+      result = await sendChange(currentLine.key);
+    }
+
+    if (!result.response?.ok || result.cart?.errors || result.cart?.status) {
+      throw new Error(
+        result.cart?.description ||
+          result.cart?.message ||
+          result.cart?.errors ||
+          window.cartStrings?.error ||
+          'Cart update failed',
+      );
+    }
+
+    return result.cart;
+  }
+
   findRowByVariant(variantId) {
     return [...this.querySelectorAll('#CartDrawer-CartItems .cart-item:not([data-cart-remove-pending="true"])')].find(
       (row) => String(row.dataset.cartVariantId || row.querySelector('[data-quantity-variant-id]')?.dataset.quantityVariantId || '') === String(variantId),
@@ -626,16 +738,7 @@ class CartDrawer extends HTMLElement {
     stepper?.setAttribute('aria-busy', 'true');
 
     const changeRequest = async () => {
-      const response = await fetch(`${routes.cart_change_url}`, {
-        ...fetchConfig(),
-        cache: 'no-store',
-        body: JSON.stringify({ id: state.lineKey, quantity: requestedQuantity }),
-      });
-      const cart = await response.json();
-      if (!response.ok || cart?.errors) {
-        throw new Error(cart?.description || cart?.message || cart?.errors || window.cartStrings?.error || 'Cart update failed');
-      }
-      return cart;
+      return this.changeCartLine(row, state.lineKey, requestedQuantity);
     };
 
     const promise = window.PradaCartMutations?.enqueue
@@ -645,9 +748,10 @@ class CartDrawer extends HTMLElement {
     promise
       .then((cart) => {
         if (revision !== state.revision || !row.isConnected) return;
-        const confirmedLine = cart.items?.find((item) => String(item.key) === state.lineKey);
+        const confirmedLine = this.findCartLine(cart, row, state.lineKey, requestedQuantity);
         const confirmedQuantity = Number.parseInt(confirmedLine?.quantity || requestedQuantity, 10) || requestedQuantity;
-        this.updateRowQuantity(row, confirmedQuantity);
+        if (confirmedLine) this.syncRowFromCartLine(row, confirmedLine);
+        else this.updateRowQuantity(row, confirmedQuantity);
         this.setDisplayedTotals(cart.item_count, cart.total_price);
         publish(PUB_SUB_EVENTS.cartUpdate, {
           source: 'cart-drawer-quantity',

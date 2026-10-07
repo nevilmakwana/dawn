@@ -161,6 +161,7 @@
                         id="CartDrawer-Item-{{ item.index | plus: 1 }}"
                         class="cart-item{% if item.parent_relationship.parent != null %} cart-item__nested-line{% endif %}"
                         data-cart-line-key="{{ item.key | escape }}"
+                        data-cart-line-position="{{ item.index | plus: 1 }}"
                         data-cart-variant-id="{{ item.variant.id }}"
                         data-cart-quantity="{{ item.quantity }}"
                         data-cart-unit-price="{{ item.final_price }}"
@@ -246,7 +247,7 @@
                                   class="quantity__input prada-cart-drawer__quantity-input"
                                   type="number"
                                   data-quantity-variant-id="{{ item.variant.id }}"
-                                  data-quantity-line-key="{{ item.key }}"
+                                  data-quantity-line-key="{{ item.key | escape }}"
                                   name="updates[]"
                                   value="{{ item.quantity }}"
                                   {% # theme-check-disable %}

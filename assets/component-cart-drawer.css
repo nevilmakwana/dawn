@@ -588,6 +588,9 @@ cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-button {
   color: #111111;
   opacity: 1;
   transition: none;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-button .svg-wrapper {
@@ -624,6 +627,7 @@ cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-input {
   line-height: 32px;
   opacity: 1;
   cursor: default;
+  touch-action: manipulation;
 }
 
 cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-stepper[aria-busy='true'] {
@@ -883,6 +887,7 @@ cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-stepper[aria-busy='tr
     text-decoration: underline;
     text-underline-offset: 4px;
     cursor: pointer;
+    touch-action: manipulation;
   }
 
   cart-drawer.prada-cart-drawer.is-empty .drawer__inner {
@@ -1278,7 +1283,7 @@ cart-drawer.prada-cart-drawer .prada-cart-drawer__quantity-stepper[aria-busy='tr
   cart-drawer.prada-cart-drawer:not(.is-empty) .prada-cart-drawer__quantity-input {
     width: 28px;
     height: 28px;
-    font-size: 12px;
+    font-size: 16px;
     line-height: 28px;
   }
 

@@ -236,31 +236,26 @@ if (!customElements.get('product-form')) {
       }
 
       resolveCartLinesUpdate(deferred, { defer = false } = {}) {
-        if (!deferred) return;
         const { CartLinesUpdateEvent } = window.StandardEvents || {};
-        if (!CartLinesUpdateEvent) return;
 
         const fetchCartData = () =>
           typeof CartItems !== 'undefined'
             ? CartItems.fetchCartData()
             : fetch(`${routes.cart_url}.json`).then((response) => response.json());
-        const pendingCartDataPromise = defer
-          ? new Promise((resolve) => {
-              const loadCartData = () => resolve(fetchCartData());
-              if ('requestIdleCallback' in window) {
-                window.requestIdleCallback(loadCartData, { timeout: 1200 });
-              } else {
-                window.setTimeout(loadCartData, 200);
-              }
-            })
-          : fetchCartData();
+        const pendingCartDataPromise = defer ? Promise.resolve().then(fetchCartData) : fetchCartData();
 
         return pendingCartDataPromise
           .then((cart) => {
-            if (!cart?.currency) return deferred.reject(new Error('Missing currency in cart response'));
-            deferred.resolve({ cart: CartLinesUpdateEvent.createCartFromAjaxResponse(cart) });
+            if (!cart?.currency) throw new Error('Missing currency in cart response');
+            if (deferred && CartLinesUpdateEvent) {
+              deferred.resolve({ cart: CartLinesUpdateEvent.createCartFromAjaxResponse(cart) });
+            }
+            return cart;
           })
-          .catch((e) => deferred.reject(e));
+          .catch((error) => {
+            deferred?.reject(error);
+            throw error;
+          });
       }
 
       dispatchCartErrorEvent(message, code) {
