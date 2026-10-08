@@ -1,0 +1,364 @@
+.offer-notice-manager {
+  --offer-notice-background: #ffffff;
+  --offer-notice-text: #111111;
+  --offer-notice-muted: #5f5f5f;
+  --offer-notice-border: #d8d8d8;
+  --offer-notice-accent: #111111;
+  --offer-notice-radius: 0px;
+  --offer-notice-border-width: 1px;
+  --offer-notice-padding-desktop: 24px;
+  --offer-notice-padding-mobile: 18px;
+  --offer-notice-title-size: 18px;
+  --offer-notice-description-size: 14px;
+  --offer-notice-terms-size: 13px;
+  color: var(--offer-notice-text);
+}
+
+.offer-notice-manager__surface {
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 0 5rem;
+}
+
+.offer-notice-manager__list {
+  display: grid;
+  gap: 1.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.offer-notice-manager__card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 1.6rem;
+  align-items: start;
+  padding: var(--offer-notice-padding-desktop);
+  border: var(--offer-notice-border-width) solid var(--offer-notice-border);
+  border-radius: var(--offer-notice-radius);
+  background: var(--offer-notice-background);
+  scroll-margin-top: 12rem;
+}
+
+.offer-notice-manager__icon {
+  display: grid;
+  width: 2.8rem;
+  height: 2.8rem;
+  place-items: center;
+  flex: 0 0 auto;
+  color: var(--offer-notice-accent);
+}
+
+.offer-notice-manager__icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+}
+
+.offer-notice-manager__icon--circle {
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.offer-notice-manager__icon--circle svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.offer-notice-manager__content {
+  min-width: 0;
+}
+
+.offer-notice-manager__heading-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.2rem;
+  align-items: baseline;
+}
+
+.offer-notice-manager__title {
+  margin: 0;
+  color: inherit;
+  font-size: var(--offer-notice-title-size);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.offer-notice-manager__status {
+  color: var(--offer-notice-muted);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.offer-notice-manager__card[data-status='eligible'] .offer-notice-manager__status,
+.offer-notice-manager__card[data-status='applied'] .offer-notice-manager__status {
+  color: var(--offer-notice-accent);
+}
+
+.offer-notice-manager__description,
+.offer-notice-manager__message,
+.offer-notice-manager__terms-content {
+  overflow-wrap: anywhere;
+}
+
+.offer-notice-manager__description,
+.offer-notice-manager__message {
+  margin: 0.7rem 0 0;
+  line-height: 1.5;
+}
+
+.offer-notice-manager__description {
+  font-size: var(--offer-notice-description-size);
+}
+
+.offer-notice-manager__message {
+  color: var(--offer-notice-muted);
+  font-size: 1.3rem;
+}
+
+.offer-notice-manager__progress {
+  position: relative;
+  height: 2px;
+  margin-top: 1.4rem;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--offer-notice-border) 70%, transparent);
+}
+
+.offer-notice-manager__progress-value {
+  display: block;
+  width: var(--offer-progress, 0%);
+  height: 100%;
+  background: var(--offer-notice-accent);
+}
+
+.offer-notice-manager__terms {
+  margin-top: 1.2rem;
+  border-top: 1px solid color-mix(in srgb, var(--offer-notice-border) 72%, transparent);
+}
+
+.offer-notice-manager__terms summary {
+  width: fit-content;
+  padding: 1.1rem 0 0;
+  color: inherit;
+  cursor: pointer;
+  font-size: var(--offer-notice-terms-size);
+  font-weight: 500;
+  list-style-position: inside;
+}
+
+.offer-notice-manager__terms-content {
+  margin-top: 0.8rem;
+  color: var(--offer-notice-muted);
+  font-size: var(--offer-notice-terms-size);
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.offer-notice-manager__cta {
+  display: inline-flex;
+  min-height: 4rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 1.6rem;
+  border: 1px solid var(--offer-notice-accent);
+  color: var(--offer-notice-background);
+  background: var(--offer-notice-accent);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.offer-notice-manager__cta:hover {
+  color: var(--offer-notice-accent);
+  background: transparent;
+}
+
+.offer-notice-manager__coupon {
+  margin-top: 1.2rem;
+  border: var(--offer-notice-border-width) solid var(--offer-notice-border);
+  border-radius: var(--offer-notice-radius);
+  background: var(--offer-notice-background);
+}
+
+.offer-notice-manager__coupon:first-child {
+  margin-top: 0;
+}
+
+.offer-notice-manager__coupon summary {
+  display: flex;
+  min-height: 5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+  padding: 1.3rem var(--offer-notice-padding-desktop);
+  color: inherit;
+  cursor: pointer;
+  font-size: 1.3rem;
+  font-weight: 600;
+  list-style: none;
+}
+
+.offer-notice-manager__coupon summary::-webkit-details-marker {
+  display: none;
+}
+
+.offer-notice-manager__coupon summary svg {
+  width: 1.2rem;
+  flex: 0 0 auto;
+  transition: transform 160ms ease;
+}
+
+.offer-notice-manager__coupon[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.offer-notice-manager__coupon-content {
+  padding: 0 var(--offer-notice-padding-desktop) var(--offer-notice-padding-desktop);
+  border-top: 1px solid color-mix(in srgb, var(--offer-notice-border) 72%, transparent);
+}
+
+.offer-notice-manager__coupon-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding-top: 1.6rem;
+}
+
+.offer-notice-manager__coupon-form[aria-busy='true'] {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.offer-notice-manager__coupon-form input,
+.offer-notice-manager__coupon-form button {
+  min-height: 4.2rem;
+  border-radius: 0;
+  box-shadow: none;
+  font: inherit;
+}
+
+.offer-notice-manager__coupon-form input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.9rem 1.2rem;
+  border: 1px solid var(--offer-notice-border);
+  border-right: 0;
+  color: var(--offer-notice-text);
+  background: var(--offer-notice-background);
+  font-size: 1.3rem;
+}
+
+.offer-notice-manager__coupon-form button {
+  min-width: 9rem;
+  padding: 0.9rem 1.6rem;
+  border: 1px solid var(--offer-notice-accent);
+  color: var(--offer-notice-background);
+  background: var(--offer-notice-accent);
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.offer-notice-manager__coupon-form button:hover {
+  color: var(--offer-notice-accent);
+  background: transparent;
+}
+
+.offer-notice-manager__coupon-error {
+  margin: 0.8rem 0 0;
+  color: #8a1f1f;
+  font-size: 1.2rem;
+  line-height: 1.4;
+}
+
+.offer-notice-manager__coupon-applied {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  margin-top: 1rem;
+  color: var(--offer-notice-muted);
+  font-size: 1.2rem;
+}
+
+.offer-notice-manager__coupon-applied ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.offer-notice-manager__coupon-applied li {
+  color: var(--offer-notice-text);
+  font-weight: 600;
+}
+
+.offer-notice-manager__cta:focus-visible,
+.offer-notice-manager__terms summary:focus-visible,
+.offer-notice-manager__coupon summary:focus-visible,
+.offer-notice-manager__coupon input:focus-visible,
+.offer-notice-manager__coupon button:focus-visible {
+  outline: 2px solid var(--offer-notice-accent);
+  outline-offset: 3px;
+}
+
+@media screen and (max-width: 749px) {
+  .offer-notice-manager__surface {
+    padding: 0 1.5rem;
+  }
+
+  .offer-notice-manager__card {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1.2rem;
+    padding: var(--offer-notice-padding-mobile);
+  }
+
+  .offer-notice-manager__action {
+    grid-column: 2;
+  }
+
+  .offer-notice-manager__cta {
+    width: 100%;
+  }
+
+  .offer-notice-manager__coupon summary {
+    padding-right: var(--offer-notice-padding-mobile);
+    padding-left: var(--offer-notice-padding-mobile);
+  }
+
+  .offer-notice-manager__coupon-content {
+    padding-right: var(--offer-notice-padding-mobile);
+    padding-bottom: var(--offer-notice-padding-mobile);
+    padding-left: var(--offer-notice-padding-mobile);
+  }
+
+  .offer-notice-manager__coupon-form button {
+    min-width: 7.6rem;
+    padding-right: 1.2rem;
+    padding-left: 1.2rem;
+  }
+}
+
+@supports not (color: color-mix(in srgb, #000 50%, #fff)) {
+  .offer-notice-manager__progress {
+    background: var(--offer-notice-border);
+  }
+
+  .offer-notice-manager__terms {
+    border-top-color: var(--offer-notice-border);
+  }
+
+  .offer-notice-manager__coupon-content {
+    border-top-color: var(--offer-notice-border);
+  }
+}

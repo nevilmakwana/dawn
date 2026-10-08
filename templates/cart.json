@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "cart-items": {
@@ -7,6 +16,52 @@
         "padding_top": 36,
         "padding_bottom": 36
       }
+    },
+    "offer-notice-manager": {
+      "type": "offer-notice-manager",
+      "settings": {
+        "max_visible": "2",
+        "show_icon": true,
+        "icon_style": "diamond",
+        "show_cta": true,
+        "show_terms": true,
+        "terms_expanded": false,
+        "terms_when_eligible": false,
+        "show_coupon": true,
+        "coupon_heading": "Have a coupon code?",
+        "coupon_placeholder": "Enter coupon code",
+        "coupon_button": "Apply",
+        "coupon_applied_label": "Applied coupon",
+        "coupon_error": "This coupon code is invalid or not eligible for this cart."
+      },
+      "blocks": {
+        "buy-two-offer": {
+          "type": "offer",
+          "settings": {
+            "enabled": true,
+            "offer_title": "Buy 2 & Get 20% Off",
+            "description": "Buy any 2 eligible products and get 20% off.",
+            "progress_message": "Add [remaining_quantity] more item(s) to unlock 20% off.",
+            "eligible_message": "Your cart qualifies for 20% off.",
+            "applied_message": "The 20% discount has been applied to your cart.",
+            "cta_text": "Shop now",
+            "cta_url": "shopify://collections/all",
+            "announcement_anchor": "buy-2-get-20-off",
+            "offer_scope": "all_products",
+            "qualification_basis": "quantity",
+            "minimum_quantity": 2,
+            "maximum_quantity": 0,
+            "minimum_subtotal": 0,
+            "maximum_subtotal": 0,
+            "applied_discount_id": "BUY 2 & GET 20% OFF",
+            "show_on": "cart",
+            "priority": "01"
+          }
+        }
+      },
+      "block_order": [
+        "buy-two-offer"
+      ]
     },
     "cart-footer": {
       "type": "main-cart-footer",
@@ -35,6 +90,7 @@
   },
   "order": [
     "cart-items",
+    "offer-notice-manager",
     "cart-footer"
   ]
 }
